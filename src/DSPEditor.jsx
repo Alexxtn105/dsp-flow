@@ -23,7 +23,7 @@ const nodeTypes = {
 let nodeId = 0;
 const getNodeId = () => `node_${nodeId++}`;
 
-function DSPEditor() {
+function DSPEditor({ isDarkTheme }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -55,7 +55,7 @@ function DSPEditor() {
                 id: getNodeId(),
                 type: 'block',
                 position,
-                data: { 
+                data: {
                     label: type,
                     blockType: type,
                     params: getDefaultParams(type)
@@ -104,17 +104,15 @@ function DSPEditor() {
         };
 
         try {
-            // Временно сохраняем в localStorage
-            // TODO: заменить на API запрос к Go серверу
             const savedSchemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
             const existingIndex = savedSchemes.findIndex(s => s.name === schemeName);
-            
+
             if (existingIndex >= 0) {
                 savedSchemes[existingIndex] = schemeData;
             } else {
                 savedSchemes.push(schemeData);
             }
-            
+
             localStorage.setItem('dsp-schemes', JSON.stringify(savedSchemes));
             alert(`Схема "${schemeName}" успешно сохранена!`);
         } catch (error) {
@@ -127,7 +125,7 @@ function DSPEditor() {
         try {
             const savedSchemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
             const scheme = savedSchemes.find(s => s.name === schemeName);
-            
+
             if (scheme) {
                 setNodes(scheme.nodes || []);
                 setEdges(scheme.edges || []);
@@ -150,8 +148,8 @@ function DSPEditor() {
     };
 
     return (
-        <div className="dsp-editor">
-            <Toolbar />
+        <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
+            <Toolbar isDarkTheme={isDarkTheme} />
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <ReactFlow
                     nodes={nodes}
@@ -165,13 +163,23 @@ function DSPEditor() {
                     nodeTypes={nodeTypes}
                     fitView
                 >
-                    <Background variant="dots" gap={16} size={1} />
+                    <Background
+                        variant="dots"
+                        gap={16}
+                        size={1}
+                        color={isDarkTheme ? '#374151' : '#e5e7eb'}
+                    />
                     <Controls />
-                    <MiniMap />
-                    <SavePanel 
-                        onSave={onSave} 
+                    <MiniMap
+                        style={{
+                            backgroundColor: isDarkTheme ? '#1f2937' : 'white'
+                        }}
+                    />
+                    <SavePanel
+                        onSave={onSave}
                         onLoad={onLoad}
                         savedSchemes={getSavedSchemes()}
+                        isDarkTheme={isDarkTheme}
                     />
                 </ReactFlow>
             </div>

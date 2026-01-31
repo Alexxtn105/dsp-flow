@@ -1,11 +1,21 @@
 .toolbar {
+    position: fixed;
+    left: 0;
+    top: 70px; /* Новая высота хедера */
+    height: calc(100vh - 70px);
     background: #f9fafb;
     border-right: 1px solid #e5e7eb;
     width: 280px;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, background-color 0.3s;
     z-index: 10;
+}
+
+.dark-theme .toolbar {
+    background: #1f2937;
+    border-right-color: #374151;
+    color: #f9fafb;
 }
 
 .toolbar.collapsed {
@@ -16,30 +26,47 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px;
+    padding: 12px;
     background: white;
     border-bottom: 1px solid #e5e7eb;
 }
 
+.dark-theme .toolbar-header {
+    background: #111827;
+    border-bottom-color: #374151;
+}
+
 .toolbar-header h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #1a192b;
+}
+
+.dark-theme .toolbar-header h2 {
+    color: #f9fafb;
 }
 
 .collapse-btn {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     padding: 4px 8px;
     color: #6b7280;
     transition: color 0.2s;
 }
 
+.dark-theme .collapse-btn {
+    color: #9ca3af;
+}
+
 .collapse-btn:hover {
     color: #4F46E5;
+}
+
+.dark-theme .collapse-btn:hover {
+    color: #818cf8;
 }
 
 .toolbar-content {
@@ -50,22 +77,28 @@
 }
 
 .blocks-list {
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .block-item {
     background: white;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     cursor: grab;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     transition: all 0.2s;
+}
+
+.dark-theme .block-item {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
 }
 
 .block-item:hover {
@@ -74,19 +107,28 @@
     transform: translateY(-2px);
 }
 
+.dark-theme .block-item:hover {
+    border-color: #818cf8;
+    box-shadow: 0 2px 8px rgba(129, 140, 248, 0.2);
+}
+
 .block-item:active {
     cursor: grabbing;
 }
 
 .block-icon {
-    font-size: 24px;
-    width: 32px;
-    height: 32px;
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #f3f4f6;
     border-radius: 6px;
+}
+
+.dark-theme .block-icon {
+    background: #4b5563;
 }
 
 .block-info {
@@ -95,24 +137,38 @@
 
 .block-name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     color: #1a192b;
     margin-bottom: 2px;
 }
 
+.dark-theme .block-name {
+    color: #f9fafb;
+}
+
 .block-description {
-    font-size: 12px;
+    font-size: 11px;
     color: #6b7280;
+}
+
+.dark-theme .block-description {
+    color: #d1d5db;
 }
 
 .toolbar-hint {
     margin-top: auto;
-    padding: 16px;
+    padding: 12px;
     background: #fef3c7;
     border-top: 1px solid #fde68a;
-    font-size: 12px;
+    font-size: 11px;
     color: #92400e;
     text-align: center;
+}
+
+.dark-theme .toolbar-hint {
+    background: #78350f;
+    border-top-color: #92400e;
+    color: #fef3c7;
 }
 
 .toolbar.collapsed .toolbar-header h2,

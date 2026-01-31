@@ -7,8 +7,8 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -18,25 +18,67 @@ html, body {
   display: flex;
   flex-direction: column;
   background: #f9fafb;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Темная тема */
+.app.dark-theme {
+  background: #111827;
+  color: #f9fafb;
 }
 
 .app-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 20px 32px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 20;
+  flex-shrink: 0; /* Запрещаем сжатие хедера */
+  height: 70px; /* Фиксированная высота */
+}
+
+.app-header-content {
+  flex: 1;
 }
 
 .app-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 28px;
-  font-weight: 700;
+  margin: 0;
+  font-size: 18px; /* Уменьшенный шрифт */
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .app-header p {
-  margin: 0;
-  font-size: 14px;
+  margin: 2px 0 0 0;
+  font-size: 12px; /* Уменьшенный шрифт */
   opacity: 0.9;
+}
+
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.dark-theme .app-header {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
 #root {

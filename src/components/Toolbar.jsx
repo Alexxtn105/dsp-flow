@@ -22,7 +22,7 @@ const DSP_BLOCKS = [
     },
 ];
 
-function Toolbar() {
+function Toolbar({ isDarkTheme }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const onDragStart = (event, nodeType) => {
@@ -31,17 +31,17 @@ function Toolbar() {
     };
 
     return (
-        <div className={`toolbar ${isCollapsed ? 'collapsed' : ''}`}>
+        <div className={`toolbar ${isCollapsed ? 'collapsed' : ''} ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="toolbar-header">
                 <h2>Блоки DSP</h2>
-                <button 
+                <button
                     className="collapse-btn"
                     onClick={() => setIsCollapsed(!isCollapsed)}
                 >
                     {isCollapsed ? '▶' : '◀'}
                 </button>
             </div>
-            
+
             {!isCollapsed && (
                 <div className="toolbar-content">
                     <div className="blocks-list">
@@ -60,7 +60,7 @@ function Toolbar() {
                             </div>
                         ))}
                     </div>
-                    
+
                     <div className="toolbar-hint">
                         💡 Перетащите блок на холст для добавления
                     </div>

@@ -1,10 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './SavePanel.css';
 
-function SavePanel({ onSave, onLoad, savedSchemes }) {
+function SavePanel({ onSave, onLoad, savedSchemes, isDarkTheme }) {
     const [schemeName, setSchemeName] = useState('');
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
+
+    useEffect(() => {
+        // Управляем скроллом body при открытии/закрытии диалогов
+        if (showSaveDialog || showLoadDialog) {
+            document.body.classList.add('dialog-open');
+        } else {
+            document.body.classList.remove('dialog-open');
+        }
+
+        // Очистка при размонтировании
+        return () => {
+            document.body.classList.remove('dialog-open');
+        };
+    }, [showSaveDialog, showLoadDialog]);
 
     const handleSave = () => {
         if (schemeName.trim()) {
@@ -19,16 +33,25 @@ function SavePanel({ onSave, onLoad, savedSchemes }) {
         setShowLoadDialog(false);
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSave();
+        } else if (e.key === 'Escape') {
+            setShowSaveDialog(false);
+            setShowLoadDialog(false);
+        }
+    };
+
     return (
         <div className="save-panel">
-            <button 
+            <button
                 className="panel-btn save-btn"
                 onClick={() => setShowSaveDialog(true)}
             >
                 💾 Сохранить
             </button>
-            
-            <button 
+
+            <button
                 className="panel-btn load-btn"
                 onClick={() => setShowLoadDialog(true)}
                 disabled={savedSchemes.length === 0}
@@ -38,14 +61,17 @@ function SavePanel({ onSave, onLoad, savedSchemes }) {
 
             {showSaveDialog && (
                 <div className="dialog-overlay" onClick={() => setShowSaveDialog(false)}>
-                    <div className="dialog" onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className={`dialog ${isDarkTheme ? 'dark-theme' : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={handleKeyDown}
+                    >
                         <h3>Сохранить схему</h3>
                         <input
                             type="text"
                             placeholder="Введите название схемы..."
                             value={schemeName}
                             onChange={(e) => setSchemeName(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSave()}
                             autoFocus
                         />
                         <div className="dialog-buttons">
@@ -62,7 +88,11 @@ function SavePanel({ onSave, onLoad, savedSchemes }) {
 
             {showLoadDialog && (
                 <div className="dialog-overlay" onClick={() => setShowLoadDialog(false)}>
-                    <div className="dialog load-dialog" onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className={`dialog load-dialog ${isDarkTheme ? 'dark-theme' : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={handleKeyDown}
+                    >
                         <h3>Загрузить схему</h3>
                         <div className="schemes-list">
                             {savedSchemes.map((scheme) => (

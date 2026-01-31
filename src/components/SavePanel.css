@@ -8,21 +8,33 @@
 }
 
 .panel-btn {
-    padding: 10px 16px;
+    padding: 8px 14px;
     background: white;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.dark-theme .panel-btn {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .panel-btn:hover:not(:disabled) {
     border-color: #4F46E5;
     box-shadow: 0 4px 8px rgba(79, 70, 229, 0.2);
     transform: translateY(-2px);
+}
+
+.dark-theme .panel-btn:hover:not(:disabled) {
+    border-color: #818cf8;
+    box-shadow: 0 4px 8px rgba(129, 140, 248, 0.3);
 }
 
 .panel-btn:disabled {
@@ -35,10 +47,19 @@
     color: white;
 }
 
+.dark-theme .save-btn:hover:not(:disabled) {
+    background: #818cf8;
+}
+
 .load-btn:hover:not(:disabled) {
     background: #10b981;
     color: white;
     border-color: #10b981;
+}
+
+.dark-theme .load-btn:hover:not(:disabled) {
+    background: #34d399;
+    border-color: #34d399;
 }
 
 .dialog-overlay {
@@ -52,30 +73,64 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    overflow: hidden; /* Убираем прокрутку */
 }
 
 .dialog {
     background: white;
     border-radius: 12px;
-    padding: 24px;
-    min-width: 400px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90vw;
+    max-height: 80vh;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: dialogSlideIn 0.3s ease-out;
+    overflow: visible; /* Убираем внутреннюю прокрутку */
+}
+
+@keyframes dialogSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dark-theme .dialog {
+    background: #1f2937;
+    color: #f9fafb;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 .dialog h3 {
     margin: 0 0 16px 0;
-    font-size: 20px;
+    font-size: 18px;
     color: #1a192b;
+}
+
+.dark-theme .dialog h3 {
+    color: #f9fafb;
 }
 
 .dialog input {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 16px;
     box-sizing: border-box;
+    background: white;
+    color: #1a192b;
+}
+
+.dark-theme .dialog input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
 }
 
 .dialog input:focus {
@@ -83,17 +138,21 @@
     border-color: #4F46E5;
 }
 
+.dark-theme .dialog input:focus {
+    border-color: #818cf8;
+}
+
 .dialog-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: flex-end;
 }
 
 .dialog-buttons button {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -104,8 +163,16 @@
     color: white;
 }
 
+.dark-theme .dialog-buttons button:first-child {
+    background: #818cf8;
+}
+
 .dialog-buttons button:first-child:hover:not(:disabled) {
     background: #4338ca;
+}
+
+.dark-theme .dialog-buttons button:first-child:hover:not(:disabled) {
+    background: #6366f1;
 }
 
 .dialog-buttons button:first-child:disabled {
@@ -118,18 +185,60 @@
     color: #1a192b;
 }
 
+.dark-theme .dialog-buttons button:last-child {
+    background: #4b5563;
+    color: #f9fafb;
+}
+
 .dialog-buttons button:last-child:hover {
     background: #e5e7eb;
 }
 
+.dark-theme .dialog-buttons button:last-child:hover {
+    background: #6b7280;
+}
+
 .load-dialog {
-    min-width: 500px;
+    width: 450px;
+    max-width: 90vw;
 }
 
 .schemes-list {
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
     margin-bottom: 16px;
+    padding-right: 4px; /* Отступ для скроллбара */
+}
+
+/* Стилизация скроллбара */
+.schemes-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.schemes-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.dark-theme .schemes-list::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+.schemes-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.dark-theme .schemes-list::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+.schemes-list::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+.dark-theme .schemes-list::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
 }
 
 .scheme-item {
@@ -138,22 +247,50 @@
     border-radius: 8px;
     margin-bottom: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease-out; /* Плавная анимация без прокрутки */
+    background: white;
+    transform-origin: center;
+    will-change: transform; /* Оптимизация для анимации */
+}
+
+.dark-theme .scheme-item {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
 }
 
 .scheme-item:hover {
     border-color: #4F46E5;
     background: #f9fafb;
-    transform: translateX(4px);
+    transform: translateX(4px) scale(1.02);
+}
+
+.dark-theme .scheme-item:hover {
+    border-color: #818cf8;
+    background: #4b5563;
 }
 
 .scheme-name {
     font-weight: 600;
     color: #1a192b;
     margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.dark-theme .scheme-name {
+    color: #f9fafb;
 }
 
 .scheme-date {
-    font-size: 12px;
+    font-size: 11px;
     color: #6b7280;
+}
+
+.dark-theme .scheme-date {
+    color: #d1d5db;
+}
+
+/* Убираем скролл на body при открытом диалоге */
+body.dialog-open {
+    overflow: hidden;
 }
