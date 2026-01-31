@@ -36,25 +36,120 @@ html, body {
   justify-content: space-between;
   align-items: center;
   z-index: 20;
-  flex-shrink: 0; /* Запрещаем сжатие хедера */
-  height: 70px; /* Фиксированная высота */
+  flex-shrink: 0;
+  height: 70px;
+  gap: 20px;
 }
 
-.app-header-content {
+.app-header-left {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  min-width: 0;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 18px; /* Уменьшенный шрифт */
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .app-header p {
   margin: 2px 0 0 0;
-  font-size: 12px; /* Уменьшенный шрифт */
+  font-size: 12px;
   opacity: 0.9;
+  white-space: nowrap;
+}
+
+.current-scheme-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.scheme-name {
+  font-weight: 600;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 12px;
+  border-radius: 16px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scheme-unsaved {
+  font-size: 11px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.header-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.header-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.header-btn.save {
+  background: rgba(34, 197, 94, 0.7);
+}
+
+.header-btn.save:hover {
+  background: rgba(34, 197, 94, 0.8);
+}
+
+.header-btn.save-as {
+  background: rgba(59, 130, 246, 0.7);
+}
+
+.header-btn.save-as:hover {
+  background: rgba(59, 130, 246, 0.8);
+}
+
+.header-btn.load {
+  background: rgba(249, 115, 22, 0.7);
+}
+
+.header-btn.load:hover {
+  background: rgba(249, 115, 22, 0.8);
 }
 
 .theme-toggle {

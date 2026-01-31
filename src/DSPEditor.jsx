@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
     ReactFlow,
     Background,
@@ -13,7 +13,6 @@ import '@xyflow/react/dist/style.css';
 
 import Toolbar from './components/Toolbar';
 import BlockNode from './components/BlockNode';
-import SavePanel from './components/SavePanel';
 import './DSPEditor.css';
 
 const nodeTypes = {
@@ -47,27 +46,91 @@ const getDefaultParams = (blockType) => {
     }
 };
 
-function DSPEditor({ isDarkTheme }) {
+function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
-    const [savedSchemes, setSavedSchemes] = useState([]);
+    const lastSavedState = useRef(null);
+    const autoSaveTimeout = useRef(null);
 
-    // Функция для обновления списка сохраненных схем
-    const updateSavedSchemes = useCallback(() => {
-        try {
-            const schemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
-            setSavedSchemes(schemes);
-        } catch {
-            setSavedSchemes([]);
-        }
-    }, []);
-
-    // Загружаем схемы при монтировании
+    // Загружаем автосохраненную схему при монтировании
     useEffect(() => {
-        updateSavedSchemes();
-    }, [updateSavedSchemes]);
+        const loadAutoSavedScheme = () => {
+            try {
+                const autoSaved = localStorage.getItem('dsp-autosave');
+                if (autoSaved) {
+                    const { nodes: savedNodes, edges: savedEdges, timestamp } = JSON.parse(autoSaved);
+
+                    // Проверяем, не слишком ли старое автосохранение (больше 1 дня)
+                    const saveDate = new Date(timestamp);
+                    const now = new Date();
+                    const diffDays = (now - saveDate) / (1000 * 60 * 60 * 24);
+
+                    if (diffDays < 1) { // Сохранено менее 1 дня назад
+                        setNodes(savedNodes || []);
+                        setEdges(savedEdges || []);
+                        console.log('Автосохраненная схема загружена');
+                    } else {
+                        localStorage.removeItem('dsp-autosave');
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки автосохраненной схемы:', error);
+            }
+        };
+
+        loadAutoSavedScheme();
+    }, [setNodes, setEdges]);
+
+    // Функция автосохранения
+    const autoSave = useCallback(() => {
+        if (!reactFlowInstance || nodes.length === 0) return;
+
+        const flow = reactFlowInstance.toObject();
+        const autoSaveData = {
+            nodes: flow.nodes,
+            edges: flow.edges,
+            viewport: flow.viewport,
+            timestamp: new Date().toISOString(),
+        };
+
+        try {
+            localStorage.setItem('dsp-autosave', JSON.stringify(autoSaveData));
+            lastSavedState.current = JSON.stringify(autoSaveData);
+
+            // Если текущая схема не сохранена, отмечаем это
+            if (currentScheme.name === 'not_saved' && !currentScheme.isSaved) {
+                onSchemeUpdate('not_saved', false);
+            }
+        } catch (error) {
+            console.error('Ошибка автосохранения:', error);
+        }
+    }, [reactFlowInstance, nodes, currentScheme, onSchemeUpdate]);
+
+    // Автосохранение при изменении схемы
+    useEffect(() => {
+        if (autoSaveTimeout.current) {
+            clearTimeout(autoSaveTimeout.current);
+        }
+
+        autoSaveTimeout.current = setTimeout(() => {
+            autoSave();
+        }, 2000); // Автосохранение через 2 секунды после изменений
+
+        return () => {
+            if (autoSaveTimeout.current) {
+                clearTimeout(autoSaveTimeout.current);
+            }
+        };
+    }, [nodes, edges, autoSave]);
+
+    // Автосохранение при размонтировании
+    useEffect(() => {
+        return () => {
+            autoSave();
+        };
+    }, [autoSave]);
 
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
@@ -109,7 +172,8 @@ function DSPEditor({ isDarkTheme }) {
         [reactFlowInstance, setNodes]
     );
 
-    const onSave = useCallback(async (schemeData) => {
+    // Функция сохранения схемы
+    const saveScheme = useCallback(async (schemeData) => {
         if (!reactFlowInstance) return false;
 
         const flow = reactFlowInstance.toObject();
@@ -133,19 +197,19 @@ function DSPEditor({ isDarkTheme }) {
 
             localStorage.setItem('dsp-schemes', JSON.stringify(savedSchemes));
 
-            // Обновляем список схем после сохранения
-            updateSavedSchemes();
+            // Очищаем автосохранение после успешного сохранения
+            localStorage.removeItem('dsp-autosave');
+            lastSavedState.current = null;
 
-            alert(`Схема "${schemeData.name}" успешно сохранена!`);
-            return true;
+            return { success: true, data: fullSchemeData };
         } catch (error) {
             console.error('Ошибка сохранения схемы:', error);
-            alert('Ошибка при сохранении схемы');
-            return false;
+            return { success: false, error: 'Ошибка при сохранении схемы' };
         }
-    }, [reactFlowInstance, updateSavedSchemes]);
+    }, [reactFlowInstance]);
 
-    const onLoad = useCallback((schemeName) => {
+    // Функция загрузки схемы
+    const loadScheme = useCallback((schemeName) => {
         try {
             const savedSchemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
             const scheme = savedSchemes.find(s => s.name === schemeName);
@@ -156,32 +220,60 @@ function DSPEditor({ isDarkTheme }) {
                 if (scheme.viewport && reactFlowInstance) {
                     reactFlowInstance.setViewport(scheme.viewport);
                 }
-                return true;
+
+                // Очищаем автосохранение после загрузки
+                localStorage.removeItem('dsp-autosave');
+                lastSavedState.current = null;
+
+                return { success: true, data: scheme };
             }
-            return false;
+            return { success: false, error: 'Схема не найдена' };
         } catch (error) {
             console.error('Ошибка загрузки схемы:', error);
-            alert('Ошибка при загрузке схемы');
-            return false;
+            return { success: false, error: 'Ошибка при загрузке схемы' };
         }
     }, [reactFlowInstance, setNodes, setEdges]);
 
-    const onDelete = useCallback((schemeName) => {
+    // Функция удаления схемы
+    const deleteScheme = useCallback((schemeName) => {
         try {
             const savedSchemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
             const filteredSchemes = savedSchemes.filter(s => s.name !== schemeName);
 
             localStorage.setItem('dsp-schemes', JSON.stringify(filteredSchemes));
-            updateSavedSchemes();
 
-            alert(`Схема "${schemeName}" успешно удалена!`);
-            return true;
+            return { success: true };
         } catch (error) {
             console.error('Ошибка удаления схемы:', error);
-            alert('Ошибка при удалении схемы');
-            return false;
+            return { success: false, error: 'Ошибка при удалении схемы' };
         }
-    }, [updateSavedSchemes]);
+    }, []);
+
+    // Экспортируем функции для использования в диалогах
+    const editorAPI = useMemo(() => ({
+        saveScheme,
+        loadScheme,
+        deleteScheme,
+        getSavedSchemes: () => {
+            try {
+                return JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
+            } catch {
+                return [];
+            }
+        }
+    }), [saveScheme, loadScheme, deleteScheme]);
+
+    // Передаем API в глобальную область для доступа из диалогов
+    useEffect(() => {
+        window.dspEditorAPI = editorAPI;
+    }, [editorAPI]);
+
+    // Очистка при размонтировании
+    useEffect(() => {
+        return () => {
+            delete window.dspEditorAPI;
+        };
+    }, []);
 
     return (
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -217,14 +309,6 @@ function DSPEditor({ isDarkTheme }) {
                             backgroundColor: isDarkTheme ? '#1f2937' : 'white',
                             border: isDarkTheme ? '1px solid #4b5563' : '1px solid #e5e7eb',
                         }}
-                    />
-                    <SavePanel
-                        onSave={onSave}
-                        onLoad={onLoad}
-                        onDelete={onDelete}
-                        savedSchemes={savedSchemes}
-                        isDarkTheme={isDarkTheme}
-                        onSchemesUpdate={updateSavedSchemes}
                     />
                 </ReactFlow>
             </div>
