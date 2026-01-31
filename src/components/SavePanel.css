@@ -74,17 +74,17 @@
     justify-content: center;
     z-index: 1000;
     overflow: hidden !important;
-    padding: 20px; /* Добавляем отступы от краев экрана */
+    padding: 20px;
 }
 
 .dialog {
     background: white;
     border-radius: 12px;
     padding: 20px;
-    width: 450px;
+    width: 500px; /* Увеличили ширину для текстового поля описания */
     max-width: 90vw;
-    height: 700px; /* Фиксированная высота */
-    max-height: 85vh; /* Но не больше 85% высоты экрана */
+    height: 700px;
+    max-height: 85vh;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     animation: dialogSlideIn 0.3s ease-out;
     overflow: visible !important;
@@ -120,7 +120,8 @@
     color: #f9fafb;
 }
 
-.dialog input {
+.dialog input,
+.dialog textarea {
     width: 100%;
     padding: 10px;
     border: 2px solid #e5e7eb;
@@ -131,21 +132,32 @@
     background: white;
     color: #1a192b;
     flex-shrink: 0;
+    font-family: inherit;
 }
 
-.dark-theme .dialog input {
+.dark-theme .dialog input,
+.dark-theme .dialog textarea {
     background: #374151;
     border-color: #4b5563;
     color: #f9fafb;
 }
 
-.dialog input:focus {
+.dialog input:focus,
+.dialog textarea:focus {
     outline: none;
     border-color: #4F46E5;
 }
 
-.dark-theme .dialog input:focus {
+.dark-theme .dialog input:focus,
+.dark-theme .dialog textarea:focus {
     border-color: #818cf8;
+}
+
+.dialog textarea {
+    min-height: 80px;
+    resize: vertical;
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 .dialog-buttons {
@@ -207,7 +219,7 @@
 }
 
 .load-dialog {
-    width: 480px; /* Немного шире для лучшего отображения */
+    width: 520px; /* Увеличили ширину */
     max-width: 90vw;
 }
 
@@ -217,15 +229,13 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     margin-bottom: 16px;
-    padding-right: 8px; /* Отступ для скроллбара */
+    padding-right: 8px;
     scrollbar-width: thin;
     scrollbar-color: #c1c1c1 #f1f1f1;
     contain: strict;
-    /* Убираем горизонтальный скролл */
     max-width: 100%;
 }
 
-/* Убираем горизонтальный скролл полностью */
 .schemes-list * {
     max-width: 100%;
     overflow-x: hidden;
@@ -264,15 +274,6 @@
     background: #9ca3af;
 }
 
-/* Убираем горизонтальный скроллбар */
-.schemes-list::-webkit-scrollbar-button:horizontal:start:decrement,
-.schemes-list::-webkit-scrollbar-button:horizontal:end:increment,
-.schemes-list::-webkit-scrollbar-button:vertical:start:decrement,
-.schemes-list::-webkit-scrollbar-button:vertical:end:increment {
-    display: none;
-}
-
-/* Контейнер для схем - ограничиваем ширину */
 .schemes-list-container {
     width: 100%;
     max-width: 100%;
@@ -290,15 +291,13 @@
     z-index: 1;
     transition: all 0.2s ease-out;
     overflow: hidden;
-    width: calc(100% - 8px); /* Уменьшаем ширину на 8px */
+    width: calc(100% - 8px);
     box-sizing: border-box;
     margin-right: 0;
-    /* Предотвращаем выход за границы */
     transform-origin: left center;
     will-change: transform, border-color, background-color;
 }
 
-/* Псевдоэлемент для анимации без изменения размеров */
 .scheme-item::before {
     content: '';
     position: absolute;
@@ -318,11 +317,10 @@
     color: #f9fafb;
 }
 
-/* Анимация при hover - только визуальные эффекты, без сдвига вправо */
 .scheme-item:hover {
     border-color: #4F46E5;
     background: #f9fafb;
-    transform: scale(1.02); /* Увеличение вместо сдвига вправо */
+    transform: scale(1.02);
 }
 
 .scheme-item:hover::before {
@@ -339,7 +337,6 @@
     box-shadow: 0 4px 12px rgba(129, 140, 248, 0.15);
 }
 
-/* Активное состояние при нажатии */
 .scheme-item:active {
     transform: scale(0.98);
     transition: transform 0.1s ease-out;
@@ -354,11 +351,29 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-    padding-right: 4px; /* Отступ от скроллбара */
+    padding-right: 4px;
 }
 
 .dark-theme .scheme-name {
     color: #f9fafb;
+}
+
+.scheme-description {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    max-height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    padding-right: 4px;
+}
+
+.dark-theme .scheme-description {
+    color: #d1d5db;
 }
 
 .scheme-date {
@@ -368,19 +383,118 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-    padding-right: 4px; /* Отступ от скроллбара */
+    padding-right: 4px;
 }
 
 .dark-theme .scheme-date {
     color: #d1d5db;
 }
 
-/* Специальный класс для схемы при hover - чтобы не перекрывать скроллбар */
-.scheme-item.hovered {
-    z-index: 2; /* Поднимаем выше скроллбара */
+.scheme-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: flex-end;
 }
 
-/* Убираем скролл на body при открытом диалоге */
+.scheme-action-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.load-btn-action {
+    background: #10b981;
+    color: white;
+}
+
+.load-btn-action:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.delete-btn-action {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-btn-action:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.scheme-item.hovered {
+    z-index: 2;
+}
+
+/* Стили для подтверждения удаления */
+.confirm-dialog {
+    width: 400px;
+    height: auto;
+}
+
+.confirm-dialog h3 {
+    color: #dc2626;
+}
+
+.confirm-dialog p {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.dark-theme .confirm-dialog p {
+    color: #d1d5db;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.confirm-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.confirm-delete {
+    background: #dc2626;
+    color: white;
+}
+
+.confirm-delete:hover {
+    background: #b91c1c;
+}
+
+.confirm-cancel {
+    background: #f3f4f6;
+    color: #1a192b;
+}
+
+.dark-theme .confirm-cancel {
+    background: #4b5563;
+    color: #f9fafb;
+}
+
+.confirm-cancel:hover {
+    background: #e5e7eb;
+}
+
+.dark-theme .confirm-cancel:hover {
+    background: #6b7280;
+}
+
 body.dialog-open {
     overflow: hidden !important;
     position: fixed;
@@ -388,12 +502,10 @@ body.dialog-open {
     height: 100%;
 }
 
-/* Предотвращаем любые движения страницы */
 .dialog-open * {
     overscroll-behavior: none;
 }
 
-/* Медиа-запросы для адаптивности */
 @media (max-height: 800px) {
     .dialog {
         height: 600px;
@@ -410,4 +522,42 @@ body.dialog-open {
     .dialog {
         height: 400px;
     }
+}
+
+/* Стили для формы сохранения */
+.save-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.dark-theme .form-field label {
+    color: #9ca3af;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: -8px;
+}
+
+.dark-theme .form-hint {
+    color: #9ca3af;
 }

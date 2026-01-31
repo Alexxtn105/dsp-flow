@@ -28,7 +28,7 @@ function DSPEditor({ isDarkTheme }) {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
-    const [savedSchemes, setSavedSchemes] = useState([]); // Состояние для сохраненных схем
+    const [savedSchemes, setSavedSchemes] = useState([]);
 
     // Загружаем схемы при монтировании
     useEffect(() => {
@@ -107,12 +107,12 @@ function DSPEditor({ isDarkTheme }) {
         }
     };
 
-    const onSave = useCallback(async (schemeName) => {
+    const onSave = useCallback(async (schemeData) => {
         if (!reactFlowInstance) return;
 
         const flow = reactFlowInstance.toObject();
-        const schemeData = {
-            name: schemeName,
+        const fullSchemeData = {
+            ...schemeData,
             nodes: flow.nodes,
             edges: flow.edges,
             viewport: flow.viewport,
@@ -121,12 +121,12 @@ function DSPEditor({ isDarkTheme }) {
 
         try {
             const savedSchemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
-            const existingIndex = savedSchemes.findIndex(s => s.name === schemeName);
+            const existingIndex = savedSchemes.findIndex(s => s.name === schemeData.name);
 
             if (existingIndex >= 0) {
-                savedSchemes[existingIndex] = schemeData;
+                savedSchemes[existingIndex] = fullSchemeData;
             } else {
-                savedSchemes.push(schemeData);
+                savedSchemes.push(fullSchemeData);
             }
 
             localStorage.setItem('dsp-schemes', JSON.stringify(savedSchemes));
@@ -134,10 +134,12 @@ function DSPEditor({ isDarkTheme }) {
             // Обновляем список схем после сохранения
             updateSavedSchemes();
 
-            alert(`Схема "${schemeName}" успешно сохранена!`);
+            alert(`Схема "${schemeData.name}" успешно сохранена!`);
+            return true;
         } catch (error) {
             console.error('Ошибка сохранения схемы:', error);
             alert('Ошибка при сохранении схемы');
+            return false;
         }
     }, [reactFlowInstance, updateSavedSchemes]);
 
@@ -152,12 +154,32 @@ function DSPEditor({ isDarkTheme }) {
                 if (scheme.viewport && reactFlowInstance) {
                     reactFlowInstance.setViewport(scheme.viewport);
                 }
+                return true;
             }
+            return false;
         } catch (error) {
             console.error('Ошибка загрузки схемы:', error);
             alert('Ошибка при загрузке схемы');
+            return false;
         }
     }, [reactFlowInstance, setNodes, setEdges]);
+
+    const onDelete = useCallback((schemeName) => {
+        try {
+            const savedSchemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
+            const filteredSchemes = savedSchemes.filter(s => s.name !== schemeName);
+
+            localStorage.setItem('dsp-schemes', JSON.stringify(filteredSchemes));
+            updateSavedSchemes();
+
+            alert(`Схема "${schemeName}" успешно удалена!`);
+            return true;
+        } catch (error) {
+            console.error('Ошибка удаления схемы:', error);
+            alert('Ошибка при удалении схемы');
+            return false;
+        }
+    }, [updateSavedSchemes]);
 
     return (
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -190,9 +212,10 @@ function DSPEditor({ isDarkTheme }) {
                     <SavePanel
                         onSave={onSave}
                         onLoad={onLoad}
+                        onDelete={onDelete}
                         savedSchemes={savedSchemes}
                         isDarkTheme={isDarkTheme}
-                        onSchemesUpdate={updateSavedSchemes} // Добавляем callback для обновления
+                        onSchemesUpdate={updateSavedSchemes}
                     />
                 </ReactFlow>
             </div>
