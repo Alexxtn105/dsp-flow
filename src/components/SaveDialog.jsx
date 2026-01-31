@@ -8,8 +8,17 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
     });
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [existingSchemes, setExistingSchemes] = useState([]);
 
     useEffect(() => {
+        // Загружаем список существующих схем для проверки дубликатов
+        try {
+            const schemes = window.dspEditorAPI?.getSavedSchemes() || [];
+            setExistingSchemes(schemes);
+        } catch (error) {
+            console.error('Ошибка загрузки списка схем:', error);
+        }
+
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
                 onClose();
@@ -26,6 +35,17 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
         if (!formData.name.trim()) {
             setError('Введите название схемы');
             return;
+        }
+
+        // Для режима "Сохранить как" проверяем, нет ли схемы с таким именем
+        if (mode === 'saveAs') {
+            const exists = existingSchemes.some(scheme =>
+                scheme.name.toLowerCase() === formData.name.trim().toLowerCase()
+            );
+            if (exists) {
+                setError('Схема с таким именем уже существует');
+                return;
+            }
         }
 
         setIsSubmitting(true);
@@ -55,8 +75,9 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
         if (error) setError('');
     };
 
-    const title = mode === 'saveAs' ? 'Сохранить как' : 'Сохранить схему';
+    const title = mode === 'saveAs' ? 'Сохранить схему как' : 'Сохранить схему';
     const buttonText = mode === 'saveAs' ? 'Сохранить' : 'Обновить';
+    const placeholder = mode === 'saveAs' ? 'Введите новое название схемы...' : 'Название схемы';
 
     return (
         <div className="dialog-overlay" onClick={onClose}>
@@ -74,13 +95,19 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
                         <input
                             id="scheme-name"
                             type="text"
-                            placeholder="Введите название схемы..."
+                            placeholder={placeholder}
                             value={formData.name}
                             onChange={(e) => handleChange('name', e.target.value)}
-                            autoFocus
+                            autoFocus={mode === 'saveAs'}
                             maxLength={100}
                             disabled={isSubmitting}
+                            readOnly={mode === 'save'}
                         />
+                        {mode === 'save' && (
+                            <div className="form-hint">
+                                Для изменения названия используйте "Сохранить как"
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-field">

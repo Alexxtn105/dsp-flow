@@ -46,13 +46,20 @@ const getDefaultParams = (blockType) => {
     }
 };
 
-function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate }) {
+function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const lastSavedState = useRef(null);
     const autoSaveTimeout = useRef(null);
+
+    // Отслеживаем наличие узлов для кнопки "Сохранить как"
+    useEffect(() => {
+        if (onNodesUpdate) {
+            onNodesUpdate(nodes.length > 0);
+        }
+    }, [nodes, onNodesUpdate]);
 
     // Загружаем автосохраненную схему при монтировании
     useEffect(() => {

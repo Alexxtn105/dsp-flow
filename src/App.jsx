@@ -18,6 +18,7 @@ function App() {
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
+    const [hasNodes, setHasNodes] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('dsp-theme', isDarkTheme ? 'dark' : 'light');
@@ -53,14 +54,24 @@ function App() {
         setShowLoadDialog(true);
     };
 
+    const handleNodesUpdate = (hasNodes) => {
+        setHasNodes(hasNodes);
+    };
+
+    const isSaveEnabled = currentScheme.name !== 'not_saved' && currentScheme.isSaved;
+    const isSaveAsEnabled = hasNodes;
+
     return (
         <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
             <header className="app-header">
                 <div className="app-header-left">
                     <h1>🎛️ DSP Flow Editor</h1>
                     <p>Редактор схем цифровой обработки сигналов</p>
+                </div>
+
+                <div className="app-header-center">
                     <div className="current-scheme-info">
-                        <div className="scheme-name">
+                        <div className="scheme-name" title={currentScheme.name}>
                             {currentScheme.name}
                         </div>
                         {!currentScheme.isSaved && currentScheme.name !== 'not_saved' && (
@@ -76,7 +87,8 @@ function App() {
                         <button
                             className="header-btn save"
                             onClick={handleSave}
-                            title="Сохранить текущую схему"
+                            title={isSaveEnabled ? "Сохранить текущую схему" : "Сначала сохраните схему как..."}
+                            disabled={!isSaveEnabled}
                         >
                             💾 Сохранить
                         </button>
@@ -85,6 +97,7 @@ function App() {
                             className="header-btn save-as"
                             onClick={() => setShowSaveAsDialog(true)}
                             title="Сохранить под новым именем"
+                            disabled={!isSaveAsEnabled}
                         >
                             📝 Сохранить как
                         </button>
@@ -108,6 +121,7 @@ function App() {
                 isDarkTheme={isDarkTheme}
                 currentScheme={currentScheme}
                 onSchemeUpdate={handleSchemeUpdate}
+                onNodesUpdate={handleNodesUpdate}
             />
 
             {showSaveDialog && (
