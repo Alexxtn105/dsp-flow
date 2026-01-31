@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
     ReactFlow,
     Background,
@@ -28,6 +28,22 @@ function DSPEditor({ isDarkTheme }) {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
+    const [savedSchemes, setSavedSchemes] = useState([]); // Состояние для сохраненных схем
+
+    // Загружаем схемы при монтировании
+    useEffect(() => {
+        updateSavedSchemes();
+    }, []);
+
+    // Функция для обновления списка сохраненных схем
+    const updateSavedSchemes = useCallback(() => {
+        try {
+            const schemes = JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
+            setSavedSchemes(schemes);
+        } catch {
+            setSavedSchemes([]);
+        }
+    }, []);
 
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
@@ -114,12 +130,16 @@ function DSPEditor({ isDarkTheme }) {
             }
 
             localStorage.setItem('dsp-schemes', JSON.stringify(savedSchemes));
+
+            // Обновляем список схем после сохранения
+            updateSavedSchemes();
+
             alert(`Схема "${schemeName}" успешно сохранена!`);
         } catch (error) {
             console.error('Ошибка сохранения схемы:', error);
             alert('Ошибка при сохранении схемы');
         }
-    }, [reactFlowInstance]);
+    }, [reactFlowInstance, updateSavedSchemes]);
 
     const onLoad = useCallback((schemeName) => {
         try {
@@ -138,14 +158,6 @@ function DSPEditor({ isDarkTheme }) {
             alert('Ошибка при загрузке схемы');
         }
     }, [reactFlowInstance, setNodes, setEdges]);
-
-    const getSavedSchemes = () => {
-        try {
-            return JSON.parse(localStorage.getItem('dsp-schemes') || '[]');
-        } catch {
-            return [];
-        }
-    };
 
     return (
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -178,8 +190,9 @@ function DSPEditor({ isDarkTheme }) {
                     <SavePanel
                         onSave={onSave}
                         onLoad={onLoad}
-                        savedSchemes={getSavedSchemes()}
+                        savedSchemes={savedSchemes}
                         isDarkTheme={isDarkTheme}
+                        onSchemesUpdate={updateSavedSchemes} // Добавляем callback для обновления
                     />
                 </ReactFlow>
             </div>

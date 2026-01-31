@@ -73,19 +73,23 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    overflow: hidden; /* Убираем прокрутку */
+    overflow: hidden !important;
+    padding: 20px; /* Добавляем отступы от краев экрана */
 }
 
 .dialog {
     background: white;
     border-radius: 12px;
     padding: 20px;
-    width: 400px;
+    width: 450px;
     max-width: 90vw;
-    max-height: 80vh;
+    height: 700px; /* Фиксированная высота */
+    max-height: 85vh; /* Но не больше 85% высоты экрана */
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     animation: dialogSlideIn 0.3s ease-out;
-    overflow: visible; /* Убираем внутреннюю прокрутку */
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes dialogSlideIn {
@@ -109,6 +113,7 @@
     margin: 0 0 16px 0;
     font-size: 18px;
     color: #1a192b;
+    flex-shrink: 0;
 }
 
 .dark-theme .dialog h3 {
@@ -125,6 +130,7 @@
     box-sizing: border-box;
     background: white;
     color: #1a192b;
+    flex-shrink: 0;
 }
 
 .dark-theme .dialog input {
@@ -146,6 +152,8 @@
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 .dialog-buttons button {
@@ -199,25 +207,40 @@
 }
 
 .load-dialog {
-    width: 450px;
+    width: 480px; /* Немного шире для лучшего отображения */
     max-width: 90vw;
 }
 
 .schemes-list {
-    max-height: 300px;
-    overflow-y: auto;
+    flex: 1;
+    min-height: 100px;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     margin-bottom: 16px;
-    padding-right: 4px; /* Отступ для скроллбара */
+    padding-right: 8px; /* Отступ для скроллбара */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+    contain: strict;
+    /* Убираем горизонтальный скролл */
+    max-width: 100%;
 }
 
-/* Стилизация скроллбара */
+/* Убираем горизонтальный скролл полностью */
+.schemes-list * {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Стилизация скроллбара для Webkit */
 .schemes-list::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
 .schemes-list::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 3px;
+    margin: 4px 0;
 }
 
 .dark-theme .schemes-list::-webkit-scrollbar-track {
@@ -241,16 +264,52 @@
     background: #9ca3af;
 }
 
+/* Убираем горизонтальный скроллбар */
+.schemes-list::-webkit-scrollbar-button:horizontal:start:decrement,
+.schemes-list::-webkit-scrollbar-button:horizontal:end:increment,
+.schemes-list::-webkit-scrollbar-button:vertical:start:decrement,
+.schemes-list::-webkit-scrollbar-button:vertical:end:increment {
+    display: none;
+}
+
+/* Контейнер для схем - ограничиваем ширину */
+.schemes-list-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 .scheme-item {
     padding: 12px;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
     margin-bottom: 8px;
     cursor: pointer;
-    transition: all 0.2s ease-out; /* Плавная анимация без прокрутки */
     background: white;
-    transform-origin: center;
-    will-change: transform; /* Оптимизация для анимации */
+    position: relative;
+    z-index: 1;
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+    width: calc(100% - 8px); /* Уменьшаем ширину на 8px */
+    box-sizing: border-box;
+    margin-right: 0;
+    /* Предотвращаем выход за границы */
+    transform-origin: left center;
+    will-change: transform, border-color, background-color;
+}
+
+/* Псевдоэлемент для анимации без изменения размеров */
+.scheme-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 6px;
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    transition: box-shadow 0.2s ease-out;
+    z-index: -1;
 }
 
 .dark-theme .scheme-item {
@@ -259,15 +318,31 @@
     color: #f9fafb;
 }
 
+/* Анимация при hover - только визуальные эффекты, без сдвига вправо */
 .scheme-item:hover {
     border-color: #4F46E5;
     background: #f9fafb;
-    transform: translateX(4px) scale(1.02);
+    transform: scale(1.02); /* Увеличение вместо сдвига вправо */
+}
+
+.scheme-item:hover::before {
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
 }
 
 .dark-theme .scheme-item:hover {
     border-color: #818cf8;
     background: #4b5563;
+    transform: scale(1.02);
+}
+
+.dark-theme .scheme-item:hover::before {
+    box-shadow: 0 4px 12px rgba(129, 140, 248, 0.15);
+}
+
+/* Активное состояние при нажатии */
+.scheme-item:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
 }
 
 .scheme-name {
@@ -275,6 +350,11 @@
     color: #1a192b;
     margin-bottom: 4px;
     font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    padding-right: 4px; /* Отступ от скроллбара */
 }
 
 .dark-theme .scheme-name {
@@ -284,13 +364,50 @@
 .scheme-date {
     font-size: 11px;
     color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    padding-right: 4px; /* Отступ от скроллбара */
 }
 
 .dark-theme .scheme-date {
     color: #d1d5db;
 }
 
+/* Специальный класс для схемы при hover - чтобы не перекрывать скроллбар */
+.scheme-item.hovered {
+    z-index: 2; /* Поднимаем выше скроллбара */
+}
+
 /* Убираем скролл на body при открытом диалоге */
 body.dialog-open {
-    overflow: hidden;
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+/* Предотвращаем любые движения страницы */
+.dialog-open * {
+    overscroll-behavior: none;
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-height: 800px) {
+    .dialog {
+        height: 600px;
+    }
+}
+
+@media (max-height: 700px) {
+    .dialog {
+        height: 500px;
+    }
+}
+
+@media (max-height: 600px) {
+    .dialog {
+        height: 400px;
+    }
 }
