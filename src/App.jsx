@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import DSPEditor from './DSPEditor';
 import Footer from './components/Footer';
 import SaveDialog from './components/SaveDialog';
@@ -71,13 +71,13 @@ function App() {
         setShowLoadDialog(true);
     };
 
-    const handleNodesUpdate = (hasNodes) => {
+    const handleNodesUpdate = useCallback((hasNodes) => {
         setHasNodes(hasNodes);
-    };
+    }, []);
 
-    const handleStatsUpdate = (newStats) => {
+    const handleStatsUpdate = useCallback((newStats) => {
         setStats(newStats);
-    };
+    }, []);
 
     const handleStartSimulation = () => {
         if (stats.nodesCount === 0) {
