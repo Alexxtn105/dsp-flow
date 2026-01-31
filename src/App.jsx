@@ -1,57 +1,43 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   ReactFlow,
-  Controls,
+  addEdge,
+  SelectionMode,
+  useEdgesState,
+  useNodesState,
   Background,
-  applyNodeChanges,
-  applyEdgeChanges,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-const initialNodes = [
-  {
-    id: 'n1',
-    data: { label: 'Node 1' },
-    position: { x: 0, y: 0 },
-    type: 'input',
-  },
-  {
-    id: 'n2',
-    data: { label: 'Node 2' },
-    position: { x: 100, y: 100 },
-  },
-];
+import { initialNodes } from './nodes';
+import { initialEdges } from './edges';
 
-const initialEdges = [
-  { id: 'n1-n2', source: 'n1', target: 'n2', label: 'connects with', type: 'step' },
-];
+const panOnDrag = [1, 2];
 
 function Flow() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  const onNodesChange = useCallback(
-      (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-      [],
-  );
-  const onEdgesChange = useCallback(
-      (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-      [],
+  const onConnect = useCallback(
+      (connection) => setEdges((eds) => addEdge(connection, eds)),
+      [setEdges],
   );
 
   return (
-      <div style={{ height: '100%' }}>
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            fitView
-        >
-          <Background />
-          <Controls />
-        </ReactFlow>
-      </div>
+      <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          panOnScroll
+          selectionOnDrag
+          panOnDrag={panOnDrag}
+          selectionMode={SelectionMode.Partial}
+          fitView
+      >
+        <Background />
+      </ReactFlow>
   );
 }
 
