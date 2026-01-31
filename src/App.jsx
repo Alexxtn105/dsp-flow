@@ -21,6 +21,10 @@ function App() {
     const [showLoadDialog, setShowLoadDialog] = useState(false);
     const [hasNodes, setHasNodes] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
+    const [stats, setStats] = useState({
+        nodesCount: 0,
+        connectionsCount: 0
+    });
     const isSchemeLoaded = useRef(false);
 
     useEffect(() => {
@@ -71,7 +75,21 @@ function App() {
         setHasNodes(hasNodes);
     };
 
+    const handleStatsUpdate = (newStats) => {
+        setStats(newStats);
+    };
+
     const handleStartSimulation = () => {
+        if (stats.nodesCount === 0) {
+            alert('Добавьте хотя бы один узел для запуска симуляции');
+            return;
+        }
+
+        if (stats.connectionsCount === 0) {
+            alert('Соедините узлы для запуска симуляции');
+            return;
+        }
+
         setIsRunning(true);
         console.log('Запуск симуляции схемы...');
         // TODO: Добавить логику запуска симуляции
@@ -147,6 +165,7 @@ function App() {
                 currentScheme={currentScheme}
                 onSchemeUpdate={handleSchemeUpdate}
                 onNodesUpdate={handleNodesUpdate}
+                onStatsUpdate={handleStatsUpdate}
             />
 
             <Footer
@@ -154,6 +173,8 @@ function App() {
                 onStart={handleStartSimulation}
                 onStop={handleStopSimulation}
                 isRunning={isRunning}
+                nodesCount={stats.nodesCount}
+                connectionsCount={stats.connectionsCount}
             />
 
             {showSaveDialog && (

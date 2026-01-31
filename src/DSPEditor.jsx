@@ -45,7 +45,7 @@ const getDefaultParams = (blockType) => {
     }
 };
 
-function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }) {
+function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate, onStatsUpdate }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -54,6 +54,7 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
     const autoSaveTimeout = useRef(null);
     const isInitialLoad = useRef(true);
     const hasLoadedExternalScheme = useRef(false);
+    const prevStats = useRef({ nodesCount: 0, connectionsCount: 0 });
 
     // Отслеживаем наличие узлов для кнопки "Сохранить как"
     useEffect(() => {
@@ -61,6 +62,26 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
             onNodesUpdate(nodes.length > 0);
         }
     }, [nodes, onNodesUpdate]);
+
+    // Отдельный useEffect для статистики - предотвращаем бесконечный цикл
+    useEffect(() => {
+        const currentStats = {
+            nodesCount: nodes.length,
+            connectionsCount: edges.length
+        };
+
+        // Обновляем только если статистика изменилась
+        if (
+            prevStats.current.nodesCount !== currentStats.nodesCount ||
+            prevStats.current.connectionsCount !== currentStats.connectionsCount
+        ) {
+            prevStats.current = currentStats;
+
+            if (onStatsUpdate) {
+                onStatsUpdate(currentStats);
+            }
+        }
+    }, [nodes, edges, onStatsUpdate]);
 
     // Загружаем автосохраненную схему только при первом монтировании
     // и только если не было загружено внешней схемы

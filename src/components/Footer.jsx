@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import './Footer.css';
 
-function Footer({ isDarkTheme, onStart, onStop, isRunning }) {
+function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount = 0, connectionsCount = 0 }) {
     return (
         <footer className={`app-footer ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="footer-content">
@@ -35,8 +34,8 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning }) {
 
                 <div className="footer-right">
                     <div className="footer-info">
-                        <span className="nodes-count">Узлов: 0</span>
-                        <span className="connections-count">Соединений: 0</span>
+                        <span className="nodes-count">Узлов: {nodesCount}</span>
+                        <span className="connections-count">Соединений: {connectionsCount}</span>
                     </div>
                 </div>
             </div>
