@@ -23,17 +23,36 @@ const nodeTypes = {
 let nodeId = 0;
 const getNodeId = () => `node_${nodeId++}`;
 
+const getDefaultParams = (blockType) => {
+    switch (blockType) {
+        case 'КИХ-Фильтр':
+            return {
+                order: 64,
+                cutoff: 1000,
+                filterType: 'lowpass',
+            };
+        case 'Входной сигнал':
+            return {
+                frequency: 1000,
+                amplitude: 1.0,
+                signalType: 'sine',
+            };
+        case 'Осциллограф':
+            return {
+                timeWindow: 10,
+                samplingRate: 48000,
+            };
+        default:
+            return {};
+    }
+};
+
 function DSPEditor({ isDarkTheme }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [savedSchemes, setSavedSchemes] = useState([]);
-
-    // Загружаем схемы при монтировании
-    useEffect(() => {
-        updateSavedSchemes();
-    }, []);
 
     // Функция для обновления списка сохраненных схем
     const updateSavedSchemes = useCallback(() => {
@@ -44,6 +63,11 @@ function DSPEditor({ isDarkTheme }) {
             setSavedSchemes([]);
         }
     }, []);
+
+    // Загружаем схемы при монтировании
+    useEffect(() => {
+        updateSavedSchemes();
+    }, [updateSavedSchemes]);
 
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
@@ -62,10 +86,12 @@ function DSPEditor({ isDarkTheme }) {
             const type = event.dataTransfer.getData('application/reactflow');
             if (!type) return;
 
-            const position = reactFlowInstance.screenToFlowPosition({
+            const position = reactFlowInstance?.screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY,
             });
+
+            if (!position) return;
 
             const newNode = {
                 id: getNodeId(),
@@ -83,32 +109,8 @@ function DSPEditor({ isDarkTheme }) {
         [reactFlowInstance, setNodes]
     );
 
-    const getDefaultParams = (blockType) => {
-        switch (blockType) {
-            case 'КИХ-Фильтр':
-                return {
-                    order: 64,
-                    cutoff: 1000,
-                    filterType: 'lowpass',
-                };
-            case 'Входной сигнал':
-                return {
-                    frequency: 1000,
-                    amplitude: 1.0,
-                    signalType: 'sine',
-                };
-            case 'Осциллограф':
-                return {
-                    timeWindow: 10,
-                    samplingRate: 48000,
-                };
-            default:
-                return {};
-        }
-    };
-
     const onSave = useCallback(async (schemeData) => {
-        if (!reactFlowInstance) return;
+        if (!reactFlowInstance) return false;
 
         const flow = reactFlowInstance.toObject();
         const fullSchemeData = {
@@ -206,7 +208,6 @@ function DSPEditor({ isDarkTheme }) {
                     <Controls
                         position="bottom-left"
                         style={{
-                            // Дополнительные inline стили для уверенности
                             backgroundColor: isDarkTheme ? '#1f2937' : 'white',
                             borderColor: isDarkTheme ? '#4b5563' : '#e5e7eb',
                         }}
