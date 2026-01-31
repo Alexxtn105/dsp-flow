@@ -13,6 +13,13 @@ function App() {
         // Сохраняем тему в localStorage при изменении
         localStorage.setItem('dsp-theme', isDarkTheme ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+
+        // Также применяем тему к body для React Flow
+        if (isDarkTheme) {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
     }, [isDarkTheme]);
 
     const toggleTheme = () => {
@@ -24,7 +31,7 @@ function App() {
             <header className="app-header">
                 <div className="app-header-content">
                     <h1>🎛️ DSP Flow Editor</h1>
-                    {/*<p>Редактор схем цифровой обработки сигналов</p>*/}
+                    <p>Редактор схем цифровой обработки сигналов</p>
                 </div>
                 <button className="theme-toggle" onClick={toggleTheme}>
                     {isDarkTheme ? '☀️ Светлая тема' : '🌙 Темная тема'}

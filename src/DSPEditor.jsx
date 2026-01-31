@@ -203,10 +203,18 @@ function DSPEditor({ isDarkTheme }) {
                         size={1}
                         color={isDarkTheme ? '#374151' : '#e5e7eb'}
                     />
-                    <Controls />
+                    <Controls
+                        position="bottom-left"
+                        style={{
+                            // Дополнительные inline стили для уверенности
+                            backgroundColor: isDarkTheme ? '#1f2937' : 'white',
+                            borderColor: isDarkTheme ? '#4b5563' : '#e5e7eb',
+                        }}
+                    />
                     <MiniMap
                         style={{
-                            backgroundColor: isDarkTheme ? '#1f2937' : 'white'
+                            backgroundColor: isDarkTheme ? '#1f2937' : 'white',
+                            border: isDarkTheme ? '1px solid #4b5563' : '1px solid #e5e7eb',
                         }}
                     />
                     <SavePanel

@@ -140,3 +140,77 @@
     fill: #374151;
     stroke: #4b5563;
 }
+
+/* Стили для кнопок управления React Flow в темной теме */
+.dark-theme .react-flow__controls {
+    background: #1f2937 !important;
+    border: 1px solid #4b5563 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+.dark-theme .react-flow__controls-button {
+    background: #374151 !important;
+    border: none !important;
+    border-bottom: 1px solid #4b5563 !important;
+    color: #d1d5db !important;
+    fill: #d1d5db !important;
+    stroke: #d1d5db !important;
+}
+
+.dark-theme .react-flow__controls-button:hover {
+    background: #4b5563 !important;
+    color: #f9fafb !important;
+    fill: #f9fafb !important;
+    stroke: #f9fafb !important;
+}
+
+.dark-theme .react-flow__controls-button:active {
+    background: #6b7280 !important;
+}
+
+.dark-theme .react-flow__controls-button:disabled {
+    background: #374151 !important;
+    color: #6b7280 !important;
+    fill: #6b7280 !important;
+    stroke: #6b7280 !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* Последняя кнопка без нижней границы */
+.dark-theme .react-flow__controls-button:last-child {
+    border-bottom: none !important;
+}
+
+/* Специфичные стили для иконок внутри кнопок */
+.dark-theme .react-flow__controls-button svg {
+    fill: #d1d5db !important;
+    stroke: #d1d5db !important;
+}
+
+.dark-theme .react-flow__controls-button:hover svg {
+    fill: #f9fafb !important;
+    stroke: #f9fafb !important;
+}
+
+.dark-theme .react-flow__controls-button:disabled svg {
+    fill: #6b7280 !important;
+    stroke: #6b7280 !important;
+}
+
+/* Адаптация для различных состояний кнопок */
+.dark-theme .react-flow__controls-button.react-flow__controls-interactive {
+    background: #4f46e5 !important;
+    color: white !important;
+}
+
+.dark-theme .react-flow__controls-button.react-flow__controls-interactive:hover {
+    background: #6366f1 !important;
+}
+
+.dark-theme .react-flow__controls-button.react-flow__controls-interactive svg {
+    fill: white !important;
+    stroke: white !important;
+}
