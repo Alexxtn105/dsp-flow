@@ -29,22 +29,121 @@ const getDefaultParams = (blockType) => {
                 cutoff: 1000,
                 filterType: 'lowpass',
             };
+        case 'Полосовой КИХ-фильтр':
+            return {
+                order: 64,
+                lowCutoff: 1000,
+                highCutoff: 3000,
+                filterType: 'bandpass',
+            };
+        case 'ФВЧ КИХ-фильтр':
+            return {
+                order: 64,
+                cutoff: 1000,
+                filterType: 'highpass',
+            };
+        case 'ФНЧ КИХ-фильтр':
+            return {
+                order: 64,
+                cutoff: 1000,
+                filterType: 'lowpass',
+            };
+        case 'Преобразователь Гильберта':
+            return {
+                order: 64,
+                phaseShift: 90,
+            };
+        case 'Фильтр Герцеля':
+            return {
+                targetFrequency: 1000,
+                samplingRate: 48000,
+                N: 256,
+            };
         case 'Входной сигнал':
             return {
                 frequency: 1000,
                 amplitude: 1.0,
                 signalType: 'sine',
             };
+        case 'Референсный синусный генератор':
+            return {
+                frequency: 1000,
+                amplitude: 1.0,
+                phase: 0,
+                controllable: true,
+            };
+        case 'Референсный косинусный генератор':
+            return {
+                frequency: 1000,
+                amplitude: 1.0,
+                phase: 0,
+                controllable: true,
+            };
         case 'Осциллограф':
             return {
                 timeWindow: 10,
                 samplingRate: 48000,
+                channels: 1,
+            };
+        case 'Скользящее БПФ':
+            return {
+                windowSize: 1024,
+                overlap: 512,
+                fftSize: 1024,
+            };
+        case 'БПФ':
+            return {
+                fftSize: 8192,
+                windowType: 'hann',
+                normalize: true,
+            };
+        case 'Спектроанализатор':
+            return {
+                fftSize: 2048,
+                frequencyRange: 'full',
+                dBScale: true,
+                averaging: 5,
+            };
+        case 'Фазовый детектор':
+            return {
+                referenceFrequency: 1000,
+                sensitivity: 1.0,
+                outputRange: '±180°',
+            };
+        case 'Частотный детектор':
+            return {
+                centerFrequency: 1000,
+                bandwidth: 100,
+                sensitivity: 1.0,
+            };
+        case 'Интегратор':
+            return {
+                integrationTime: 1.0,
+                resetOnOverflow: true,
+                maxValue: 1000,
+            };
+        case 'Сумматор':
+            return {
+                numInputs: 2,
+                weights: [1.0, 1.0],
+                normalization: 'none',
+            };
+        case 'Перемножитель':
+            return {
+                numInputs: 2,
+                operation: 'multiply',
+                scaleFactor: 1.0,
+            };
+        case 'Фазовое созвездие':
+            return {
+                symbolRate: 1000,
+                constellation: 'QPSK',
+                eyeDiagram: true,
             };
         default:
             return {};
     }
 };
-
 function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate, onStatsUpdate }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
