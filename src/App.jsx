@@ -1,24 +1,50 @@
-import { useState } from 'react';
-import { ReactFlow, Background, Panel } from '@xyflow/react';
+import { useCallback } from 'react';
+import {
+    ReactFlow,
+    addEdge,
+    useNodesState,
+    useEdgesState,
+} from '@xyflow/react';
+import CustomEdge from './CustomEdge';
 
 import '@xyflow/react/dist/style.css';
 
-import { defaultNodes } from './nodes';
-import { defaultEdges } from './edges';
+const initialNodes = [
+    { id: 'a', position: { x: 0, y: 0 }, data: { label: 'Node A' } },
+    { id: 'b', position: { x: 0, y: 100 }, data: { label: 'Node B' } },
+    { id: 'c', position: { x: 0, y: 200 }, data: { label: 'Node C' } },
+];
+
+const initialEdges = [
+    { id: 'a->b', type: 'custom-edge', source: 'a', target: 'b' },
+    { id: 'b->c', type: 'custom-edge', source: 'b', target: 'c' },
+];
+
+const edgeTypes = {
+    'custom-edge': CustomEdge,
+};
 
 function Flow() {
-    const [variant, setVariant] = useState('cross');
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const onConnect = useCallback(
+        (connection) => {
+            const edge = { ...connection, type: 'custom-edge' };
+            setEdges((eds) => addEdge(edge, eds));
+        },
+        [setEdges],
+    );
 
     return (
-        <ReactFlow defaultNodes={defaultNodes} defaultEdges={defaultEdges} fitView>
-            <Background color="skyblue" variant={variant} />
-            <Panel>
-                <div>variant:</div>
-                <button onClick={() => setVariant('dots')}>dots</button>
-                <button onClick={() => setVariant('lines')}>lines</button>
-                <button onClick={() => setVariant('cross')}>cross</button>
-            </Panel>
-        </ReactFlow>
+        <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            edgeTypes={edgeTypes}
+            fitView
+        />
     );
 }
 
