@@ -7,7 +7,6 @@ import {
     addEdge,
     useNodesState,
     useEdgesState,
-    Panel,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -102,58 +101,7 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
         loadAutoSavedScheme();
     }, [currentScheme, onSchemeUpdate, setNodes, setEdges]);
 
-    // Функция автосохранения
-    const autoSave = useCallback(() => {
-        if (!reactFlowInstance || nodes.length === 0 || hasLoadedExternalScheme.current) return;
-
-        const flow = reactFlowInstance.toObject();
-        const autoSaveData = {
-            nodes: flow.nodes,
-            edges: flow.edges,
-            viewport: flow.viewport,
-            timestamp: new Date().toISOString(),
-        };
-
-        try {
-            localStorage.setItem('dsp-autosave', JSON.stringify(autoSaveData));
-            lastSavedState.current = JSON.stringify(autoSaveData);
-
-            // Если текущая схема не сохранена, отмечаем это
-            if (currentScheme.name === 'not_saved' && !currentScheme.isSaved) {
-                onSchemeUpdate('not_saved', false);
-            }
-        } catch (error) {
-            console.error('Ошибка автосохранения:', error);
-        }
-    }, [reactFlowInstance, nodes, currentScheme, onSchemeUpdate]);
-
-    // Автосохранение при изменении схемы
-    useEffect(() => {
-        if (hasLoadedExternalScheme.current) return;
-
-        if (autoSaveTimeout.current) {
-            clearTimeout(autoSaveTimeout.current);
-        }
-
-        autoSaveTimeout.current = setTimeout(() => {
-            autoSave();
-        }, 2000); // Автосохранение через 2 секунды после изменений
-
-        return () => {
-            if (autoSaveTimeout.current) {
-                clearTimeout(autoSaveTimeout.current);
-            }
-        };
-    }, [nodes, edges, autoSave]);
-
-    // Следим за изменениями currentScheme
-    useEffect(() => {
-        // Если схема была загружена через LoadDialog, сбрасываем флаг внешней загрузки
-        if (currentScheme.name !== 'not_saved' && currentScheme.isSaved) {
-            hasLoadedExternalScheme.current = false;
-        }
-    }, [currentScheme]);
-
+    // Оптимизация: мемоизируем обработчики событий
     const onConnect = useCallback(
         (params) => {
             setEdges((eds) => addEdge({ ...params, animated: true }, eds));
@@ -208,6 +156,85 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
         },
         [reactFlowInstance, setNodes, currentScheme.name, onSchemeUpdate]
     );
+
+    // Оптимизированная функция автосохранения
+    const autoSave = useCallback(() => {
+        if (!reactFlowInstance || nodes.length === 0 || hasLoadedExternalScheme.current) return;
+
+        const flow = reactFlowInstance.toObject();
+        // Используем requestIdleCallback для неблокирующего сохранения
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                const autoSaveData = {
+                    nodes: flow.nodes,
+                    edges: flow.edges,
+                    viewport: flow.viewport,
+                    timestamp: new Date().toISOString(),
+                };
+
+                try {
+                    localStorage.setItem('dsp-autosave', JSON.stringify(autoSaveData));
+                    lastSavedState.current = JSON.stringify(autoSaveData);
+
+                    // Если текущая схема не сохранена, отмечаем это
+                    if (currentScheme.name === 'not_saved' && !currentScheme.isSaved) {
+                        onSchemeUpdate('not_saved', false);
+                    }
+                } catch (error) {
+                    console.error('Ошибка автосохранения:', error);
+                }
+            }, { timeout: 1000 });
+        } else {
+            // Fallback для браузеров без requestIdleCallback
+            setTimeout(() => {
+                const autoSaveData = {
+                    nodes: flow.nodes,
+                    edges: flow.edges,
+                    viewport: flow.viewport,
+                    timestamp: new Date().toISOString(),
+                };
+
+                try {
+                    localStorage.setItem('dsp-autosave', JSON.stringify(autoSaveData));
+                    lastSavedState.current = JSON.stringify(autoSaveData);
+
+                    // Если текущая схема не сохранена, отмечаем это
+                    if (currentScheme.name === 'not_saved' && !currentScheme.isSaved) {
+                        onSchemeUpdate('not_saved', false);
+                    }
+                } catch (error) {
+                    console.error('Ошибка автосохранения:', error);
+                }
+            }, 0);
+        }
+    }, [reactFlowInstance, nodes, currentScheme, onSchemeUpdate]);
+
+    // Оптимизированный таймер автосохранения
+    useEffect(() => {
+        if (hasLoadedExternalScheme.current) return;
+
+        if (autoSaveTimeout.current) {
+            clearTimeout(autoSaveTimeout.current);
+        }
+
+        autoSaveTimeout.current = setTimeout(() => {
+            autoSave();
+        }, 3000); // Увеличили время до 3 секунд для лучшей производительности
+
+        return () => {
+            if (autoSaveTimeout.current) {
+                clearTimeout(autoSaveTimeout.current);
+            }
+        };
+    }, [nodes, edges, autoSave]);
+
+    // Следим за изменениями currentScheme
+    useEffect(() => {
+        // Если схема была загружена через LoadDialog, сбрасываем флаг внешней загрузки
+        if (currentScheme.name !== 'not_saved' && currentScheme.isSaved) {
+            hasLoadedExternalScheme.current = false;
+        }
+    }, [currentScheme]);
 
     // Функция сохранения схемы
     const saveScheme = useCallback(async (schemeData) => {
@@ -329,6 +356,27 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
                     onDragOver={onDragOver}
                     nodeTypes={nodeTypes}
                     fitView
+                    // Оптимизации производительности
+                    nodesDraggable={true}
+                    nodesConnectable={true}
+                    nodesFocusable={true}
+                    elementsSelectable={true}
+                    panOnScroll={false}
+                    panOnScrollSpeed={1}
+                    panOnDrag={true}
+                    zoomOnScroll={true}
+                    zoomOnPinch={true}
+                    zoomOnDoubleClick={true}
+                    selectNodesOnDrag={false} // Улучшает производительность при перетаскивании
+                    defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                    minZoom={0.1}
+                    maxZoom={4}
+                    preventScrolling={true}
+                    onlyRenderVisibleElements={false} // Рендерим все элементы для плавности
+                    snapToGrid={false} // Отключаем привязку к сетке для плавности
+                    snapGrid={[15, 15]}
+                    connectionLineType="smoothstep"
+                    connectionLineStyle={{ stroke: '#4F46E5', strokeWidth: 2 }}
                 >
                     <Background
                         variant="dots"
@@ -342,12 +390,19 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
                             backgroundColor: isDarkTheme ? '#1f2937' : 'white',
                             borderColor: isDarkTheme ? '#4b5563' : '#e5e7eb',
                         }}
+                        showZoom={true}
+                        showFitView={true}
+                        showInteractive={true}
                     />
                     <MiniMap
                         style={{
                             backgroundColor: isDarkTheme ? '#1f2937' : 'white',
                             border: isDarkTheme ? '1px solid #4b5563' : '1px solid #e5e7eb',
                         }}
+                        nodeStrokeColor={() => '#4F46E5'}
+                        nodeColor={() => '#e5e7eb'}
+                        maskColor={isDarkTheme ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'}
+                        position="bottom-right"
                     />
                 </ReactFlow>
             </div>

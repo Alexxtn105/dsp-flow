@@ -1,8 +1,8 @@
 .toolbar {
-    position: fixed;
+    position: absolute; /* Изменено с fixed на absolute */
     left: 0;
-    top: 70px; /* Новая высота хедера */
-    height: calc(100vh - 70px);
+    top: 0;
+    height: 100%;
     background: #f9fafb;
     border-right: 1px solid #e5e7eb;
     width: 280px;
@@ -11,6 +11,7 @@
     transition: width 0.3s ease, background-color 0.3s;
     z-index: 10;
 }
+
 
 .dark-theme .toolbar {
     background: #1f2937;
@@ -29,6 +30,7 @@
     padding: 12px;
     background: white;
     border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
 }
 
 .dark-theme .toolbar-header {
@@ -55,6 +57,11 @@
     padding: 4px 8px;
     color: #6b7280;
     transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
 }
 
 .dark-theme .collapse-btn {
@@ -72,8 +79,8 @@
 .toolbar-content {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
+    flex: 1;
+    overflow: hidden; /* Изменил с auto на hidden */
 }
 
 .blocks-list {
@@ -81,6 +88,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    overflow-y: auto; /* Добавляем прокрутку только для списка блоков */
+    flex: 1;
 }
 
 .block-item {
@@ -93,6 +102,7 @@
     align-items: center;
     gap: 10px;
     transition: all 0.2s;
+    user-select: none;
 }
 
 .dark-theme .block-item {
@@ -125,6 +135,7 @@
     justify-content: center;
     background: #f3f4f6;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .dark-theme .block-icon {
@@ -133,6 +144,7 @@
 
 .block-info {
     flex: 1;
+    min-width: 0;
 }
 
 .block-name {
@@ -140,6 +152,9 @@
     font-size: 13px;
     color: #1a192b;
     margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dark-theme .block-name {
@@ -149,6 +164,9 @@
 .block-description {
     font-size: 11px;
     color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dark-theme .block-description {
@@ -156,13 +174,13 @@
 }
 
 .toolbar-hint {
-    margin-top: auto;
     padding: 12px;
     background: #fef3c7;
     border-top: 1px solid #fde68a;
     font-size: 11px;
     color: #92400e;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .dark-theme .toolbar-hint {
@@ -172,6 +190,16 @@
 }
 
 .toolbar.collapsed .toolbar-header h2,
-.toolbar.collapsed .toolbar-content {
+.toolbar.collapsed .toolbar-content,
+.toolbar.collapsed .toolbar-hint {
     display: none;
+}
+
+.toolbar.collapsed .toolbar-header {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.toolbar.collapsed .collapse-btn {
+    transform: rotate(180deg);
 }

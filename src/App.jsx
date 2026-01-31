@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import DSPEditor from './DSPEditor';
+import Footer from './components/Footer';
 import SaveDialog from './components/SaveDialog';
 import LoadDialog from './components/LoadDialog';
 import './App.css';
@@ -19,6 +20,7 @@ function App() {
     const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
     const [hasNodes, setHasNodes] = useState(false);
+    const [isRunning, setIsRunning] = useState(false);
     const isSchemeLoaded = useRef(false);
 
     useEffect(() => {
@@ -67,6 +69,18 @@ function App() {
 
     const handleNodesUpdate = (hasNodes) => {
         setHasNodes(hasNodes);
+    };
+
+    const handleStartSimulation = () => {
+        setIsRunning(true);
+        console.log('Запуск симуляции схемы...');
+        // TODO: Добавить логику запуска симуляции
+    };
+
+    const handleStopSimulation = () => {
+        setIsRunning(false);
+        console.log('Остановка симуляции...');
+        // TODO: Добавить логику остановки симуляции
     };
 
     const isSaveEnabled = currentScheme.name !== 'not_saved' && currentScheme.isSaved;
@@ -133,6 +147,13 @@ function App() {
                 currentScheme={currentScheme}
                 onSchemeUpdate={handleSchemeUpdate}
                 onNodesUpdate={handleNodesUpdate}
+            />
+
+            <Footer
+                isDarkTheme={isDarkTheme}
+                onStart={handleStartSimulation}
+                onStop={handleStopSimulation}
+                isRunning={isRunning}
             />
 
             {showSaveDialog && (

@@ -1,5 +1,7 @@
 * {
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
@@ -11,6 +13,7 @@ html, body {
   sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
 }
 
 .app {
@@ -19,6 +22,8 @@ html, body {
   flex-direction: column;
   background: #f9fafb;
   transition: background-color 0.3s, color 0.3s;
+  contain: strict;
+  overflow: hidden;
 }
 
 /* Темная тема */
@@ -39,6 +44,9 @@ html, body {
   flex-shrink: 0;
   height: 70px;
   gap: 20px;
+  position: relative;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .app-header-left {
@@ -89,6 +97,7 @@ html, body {
   min-width: 200px;
   max-width: 400px;
   justify-content: center;
+  will-change: transform, opacity;
 }
 
 .scheme-name {
@@ -108,7 +117,6 @@ html, body {
   white-space: nowrap;
 }
 
-
 .header-controls {
   display: flex;
   align-items: center;
@@ -124,16 +132,23 @@ html, body {
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   display: flex;
   align-items: center;
   gap: 5px;
   white-space: nowrap;
+  will-change: transform, background-color;
+  transform: translateZ(0);
 }
 
 .header-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
+}
+
+.header-btn:active {
+  transform: translateY(0);
+  transition: transform 0.05s;
 }
 
 .header-btn:disabled {
@@ -177,13 +192,19 @@ html, body {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  transition: all 0.3s;
+  transition: all 0.15s;
   white-space: nowrap;
+  will-change: transform, background-color;
+  transform: translateZ(0);
 }
 
 .theme-toggle:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
 }
 
 .dark-theme .app-header {
