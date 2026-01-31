@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import DSPEditor from './DSPEditor';
 import SaveDialog from './components/SaveDialog';
 import LoadDialog from './components/LoadDialog';
@@ -19,6 +19,7 @@ function App() {
     const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
     const [hasNodes, setHasNodes] = useState(false);
+    const isSchemeLoaded = useRef(false);
 
     useEffect(() => {
         localStorage.setItem('dsp-theme', isDarkTheme ? 'dark' : 'light');
@@ -44,10 +45,20 @@ function App() {
     };
 
     const handleSchemeUpdate = (schemeName, isSaved = true) => {
+        // Защита от сброса на not_saved после загрузки схемы
+        if (isSchemeLoaded.current && schemeName === 'not_saved') {
+            return;
+        }
+
         setCurrentScheme({
             name: schemeName,
             isSaved
         });
+
+        // Отмечаем, что схема была загружена
+        if (schemeName !== 'not_saved' && isSaved) {
+            isSchemeLoaded.current = true;
+        }
     };
 
     const handleLoad = () => {

@@ -3,7 +3,7 @@ import './SaveDialog.css';
 
 function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 'save' }) {
     const [formData, setFormData] = useState({
-        name: mode === 'saveAs' ? '' : schemeName,
+        name: '',
         description: ''
     });
     const [error, setError] = useState('');
@@ -15,8 +15,34 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
         try {
             const schemes = window.dspEditorAPI?.getSavedSchemes() || [];
             setExistingSchemes(schemes);
+
+            // Для режима "save" загружаем существующее описание схемы
+            if (mode === 'save' && schemeName && schemeName !== 'not_saved') {
+                const existingScheme = schemes.find(s => s.name === schemeName);
+                if (existingScheme) {
+                    setFormData({
+                        name: schemeName,
+                        description: existingScheme.description || ''
+                    });
+                } else {
+                    setFormData({
+                        name: schemeName,
+                        description: ''
+                    });
+                }
+            } else {
+                // Для режима "saveAs" оставляем пустое описание или используем текущее имя
+                setFormData({
+                    name: mode === 'saveAs' ? '' : schemeName,
+                    description: ''
+                });
+            }
         } catch (error) {
             console.error('Ошибка загрузки списка схем:', error);
+            setFormData({
+                name: mode === 'saveAs' ? '' : schemeName,
+                description: ''
+            });
         }
 
         const handleKeyDown = (e) => {
@@ -27,7 +53,7 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
 
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
+    }, [onClose, schemeName, mode]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -100,7 +126,7 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode = 's
                             onChange={(e) => handleChange('name', e.target.value)}
                             autoFocus={mode === 'saveAs'}
                             maxLength={100}
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || mode === 'save'}
                             readOnly={mode === 'save'}
                         />
                         {mode === 'save' && (

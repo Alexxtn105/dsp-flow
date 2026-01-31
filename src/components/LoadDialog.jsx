@@ -7,6 +7,7 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
     const [error, setError] = useState('');
     const [schemeToDelete, setSchemeToDelete] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [selectedScheme, setSelectedScheme] = useState(null);
 
     useEffect(() => {
         loadSchemes();
@@ -68,18 +69,32 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
         } finally {
             setShowConfirm(false);
             setSchemeToDelete(null);
+            setSelectedScheme(null);
         }
     };
 
-    const confirmDelete = (schemeName, e) => {
+    const confirmDelete = (scheme, e) => {
         e.stopPropagation();
-        setSchemeToDelete(schemeName);
+        setSchemeToDelete(scheme.name);
+        setSelectedScheme(scheme);
         setShowConfirm(true);
     };
 
     const cancelDelete = () => {
         setShowConfirm(false);
         setSchemeToDelete(null);
+        setSelectedScheme(null);
+    };
+
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp);
+        return date.toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     };
 
     return (
@@ -107,7 +122,7 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
                                 <div className="scheme-header">
                                     <div className="scheme-name">{scheme.name}</div>
                                     <div className="scheme-date">
-                                        {new Date(scheme.timestamp).toLocaleString('ru-RU')}
+                                        {formatDate(scheme.timestamp)}
                                     </div>
                                 </div>
 
@@ -129,7 +144,7 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
                                     </button>
                                     <button
                                         className="scheme-action-btn delete-btn"
-                                        onClick={(e) => confirmDelete(scheme.name, e)}
+                                        onClick={(e) => confirmDelete(scheme, e)}
                                     >
                                         Удалить
                                     </button>
@@ -162,6 +177,11 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
                         <h3>Удалить схему</h3>
                         <p>
                             Вы уверены, что хотите удалить схему "{schemeToDelete}"?<br />
+                            {selectedScheme?.description && (
+                                <>
+                                    Описание: {selectedScheme.description}<br /><br />
+                                </>
+                            )}
                             Это действие нельзя отменить.
                         </p>
                         <div className="confirm-buttons">

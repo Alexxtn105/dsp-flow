@@ -53,6 +53,8 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const lastSavedState = useRef(null);
     const autoSaveTimeout = useRef(null);
+    const isInitialLoad = useRef(true);
+    const hasLoadedExternalScheme = useRef(false);
 
     // Отслеживаем наличие узлов для кнопки "Сохранить как"
     useEffect(() => {
@@ -61,8 +63,11 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
         }
     }, [nodes, onNodesUpdate]);
 
-    // Загружаем автосохраненную схему при монтировании
+    // Загружаем автосохраненную схему только при первом монтировании
+    // и только если не было загружено внешней схемы
     useEffect(() => {
+        if (!isInitialLoad.current || hasLoadedExternalScheme.current) return;
+
         const loadAutoSavedScheme = () => {
             try {
                 const autoSaved = localStorage.getItem('dsp-autosave');
@@ -78,21 +83,28 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
                         setNodes(savedNodes || []);
                         setEdges(savedEdges || []);
                         console.log('Автосохраненная схема загружена');
+
+                        // Если есть автосохранение, но схема не сохранена, устанавливаем статус
+                        if (currentScheme.name === 'not_saved' && !currentScheme.isSaved) {
+                            onSchemeUpdate('not_saved', false);
+                        }
                     } else {
                         localStorage.removeItem('dsp-autosave');
                     }
                 }
             } catch (error) {
                 console.error('Ошибка загрузки автосохраненной схемы:', error);
+            } finally {
+                isInitialLoad.current = false;
             }
         };
 
         loadAutoSavedScheme();
-    }, [setNodes, setEdges]);
+    }, [currentScheme, onSchemeUpdate, setNodes, setEdges]);
 
     // Функция автосохранения
     const autoSave = useCallback(() => {
-        if (!reactFlowInstance || nodes.length === 0) return;
+        if (!reactFlowInstance || nodes.length === 0 || hasLoadedExternalScheme.current) return;
 
         const flow = reactFlowInstance.toObject();
         const autoSaveData = {
@@ -117,6 +129,8 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
 
     // Автосохранение при изменении схемы
     useEffect(() => {
+        if (hasLoadedExternalScheme.current) return;
+
         if (autoSaveTimeout.current) {
             clearTimeout(autoSaveTimeout.current);
         }
@@ -132,16 +146,25 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
         };
     }, [nodes, edges, autoSave]);
 
-    // Автосохранение при размонтировании
+    // Следим за изменениями currentScheme
     useEffect(() => {
-        return () => {
-            autoSave();
-        };
-    }, [autoSave]);
+        // Если схема была загружена через LoadDialog, сбрасываем флаг внешней загрузки
+        if (currentScheme.name !== 'not_saved' && currentScheme.isSaved) {
+            hasLoadedExternalScheme.current = false;
+        }
+    }, [currentScheme]);
 
     const onConnect = useCallback(
-        (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
-        [setEdges]
+        (params) => {
+            setEdges((eds) => addEdge({ ...params, animated: true }, eds));
+            // После изменения схемы сбрасываем флаг внешней загрузки
+            if (hasLoadedExternalScheme.current) {
+                hasLoadedExternalScheme.current = false;
+                // Помечаем схему как измененную
+                onSchemeUpdate(currentScheme.name, false);
+            }
+        },
+        [setEdges, currentScheme.name, onSchemeUpdate]
     );
 
     const onDragOver = useCallback((event) => {
@@ -175,8 +198,15 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
             };
 
             setNodes((nds) => nds.concat(newNode));
+
+            // После изменения схемы сбрасываем флаг внешней загрузки
+            if (hasLoadedExternalScheme.current) {
+                hasLoadedExternalScheme.current = false;
+                // Помечаем схему как измененную
+                onSchemeUpdate(currentScheme.name, false);
+            }
         },
-        [reactFlowInstance, setNodes]
+        [reactFlowInstance, setNodes, currentScheme.name, onSchemeUpdate]
     );
 
     // Функция сохранения схемы
@@ -207,6 +237,7 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
             // Очищаем автосохранение после успешного сохранения
             localStorage.removeItem('dsp-autosave');
             lastSavedState.current = null;
+            hasLoadedExternalScheme.current = false;
 
             return { success: true, data: fullSchemeData };
         } catch (error) {
@@ -231,6 +262,7 @@ function DSPEditor({ isDarkTheme, currentScheme, onSchemeUpdate, onNodesUpdate }
                 // Очищаем автосохранение после загрузки
                 localStorage.removeItem('dsp-autosave');
                 lastSavedState.current = null;
+                hasLoadedExternalScheme.current = true;
 
                 return { success: true, data: scheme };
             }
