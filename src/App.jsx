@@ -1,44 +1,15 @@
-import { useCallback } from 'react';
-import {
-  ReactFlow,
-  addEdge,
-  SelectionMode,
-  useEdgesState,
-  useNodesState,
-  Background,
-} from '@xyflow/react';
+import { ReactFlow, Controls } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { initialNodes } from './nodes';
-import { initialEdges } from './edges';
-
-const panOnDrag = [1, 2];
+import { defaultNodes } from './nodes.jsx';
+import { defaultEdges } from './edges';
 
 function Flow() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  const onConnect = useCallback(
-      (connection) => setEdges((eds) => addEdge(connection, eds)),
-      [setEdges],
-  );
-
-  return (
-      <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          panOnScroll
-          selectionOnDrag
-          panOnDrag={panOnDrag}
-          selectionMode={SelectionMode.Partial}
-          fitView
-      >
-        <Background />
-      </ReactFlow>
-  );
+    return (
+        <ReactFlow defaultNodes={defaultNodes} defaultEdges={defaultEdges} fitView>
+            <Controls />
+        </ReactFlow>
+    );
 }
 
 export default Flow;
