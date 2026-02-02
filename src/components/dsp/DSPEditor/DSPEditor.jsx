@@ -108,29 +108,62 @@ function DSPEditor({
     /**
      * Проверка допустимости соединения
      */
+    // const isValidConnection = useCallback((connection) => {
+    //     const sourceNode = nodes.find(node => node.id === connection.source);
+    //     const targetNode = nodes.find(node => node.id === connection.target);
+    //
+    //     if (!sourceNode || !targetNode) return false;
+    //
+    //     // Запрещаем соединение узла с самим собой
+    //     if (sourceNode.id === targetNode.id) {
+    //         return false;
+    //     }
+    //
+    //     // Проверяем типы сигналов
+    //     const sourceSignalType = sourceNode.data?.signalConfig?.output;
+    //     const targetSignalType = targetNode.data?.signalConfig?.input;
+    //
+    //     // Если у источника нет выхода или у цели нет входа
+    //     if (!sourceSignalType || !targetSignalType) {
+    //         return false;
+    //     }
+    //
+    //     // Проверяем совместимость типов сигналов
+    //     return areSignalsCompatible(sourceSignalType, targetSignalType);
+    // }, [nodes]);
+
     const isValidConnection = useCallback((connection) => {
-        const sourceNode = nodes.find(node => node.id === connection.source);
-        const targetNode = nodes.find(node => node.id === connection.target);
+            const sourceNode = nodes.find(node => node.id === connection.source);
+            const targetNode = nodes.find(node => node.id === connection.target);
 
-        if (!sourceNode || !targetNode) return false;
+            if (!sourceNode || !targetNode) return false;
 
-        // Запрещаем соединение узла с самим собой
-        if (sourceNode.id === targetNode.id) {
-            return false;
-        }
+            // Запрещаем соединение узла с самим собой
+            if (sourceNode.id === targetNode.id) {
+                return false;
+            }
 
-        // Проверяем типы сигналов
-        const sourceSignalType = sourceNode.data?.signalConfig?.output;
-        const targetSignalType = targetNode.data?.signalConfig?.input;
+            // Проверяем, не подключено ли уже что-то ко входу целевого узла
+            const existingEdgeToTarget = edges.find(edge =>
+                edge.target === connection.target && edge.targetHandle === connection.targetHandle
+            );
 
-        // Если у источника нет выхода или у цели нет входа
-        if (!sourceSignalType || !targetSignalType) {
-            return false;
-        }
+            if (existingEdgeToTarget) {
+                return false; // Уже есть соединение на этот вход
+            }
 
-        // Проверяем совместимость типов сигналов
-        return areSignalsCompatible(sourceSignalType, targetSignalType);
-    }, [nodes]);
+            // Проверяем типы сигналов
+            const sourceSignalType = sourceNode.data?.signalConfig?.output;
+            const targetSignalType = targetNode.data?.signalConfig?.input;
+
+            // Если у источника нет выхода или у цели нет входа
+            if (!sourceSignalType || !targetSignalType) {
+                return false;
+            }
+
+            // Проверяем совместимость типов сигналов
+            return areSignalsCompatible(sourceSignalType, targetSignalType);
+        }, [nodes, edges]); // Добавили edges в зависимости
 
     const onConnect = useCallback(
         (params) => {
@@ -139,13 +172,25 @@ function DSPEditor({
 
             if (!sourceNode || !targetNode) return;
 
+            // Проверяем, не существует ли уже такого соединения
+            const connectionExists = edges.some(edge =>
+                edge.source === params.source &&
+                edge.target === params.target &&
+                edge.sourceHandle === params.sourceHandle &&
+                edge.targetHandle === params.targetHandle
+            );
+
+            if (connectionExists) {
+                return; // Такое соединение уже существует
+            }
+
             // Получаем тип сигнала от источника
             const signalType = sourceNode.data?.signalConfig?.output || 'real';
 
             // Создаём ребро с информацией о типе сигнала
             const edge = {
                 ...params,
-                animated: isRunning, // Анимация зависит от состояния симуляции
+                animated: isRunning,
                 type: signalType === 'complex' ? 'complex' : 'real',
                 data: {
                     signalType: signalType
@@ -159,7 +204,7 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning]
+        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning, edges] // Добавили edges
     );
 
     const onDragOver = useCallback((event) => {
@@ -174,9 +219,14 @@ function DSPEditor({
             const blockType = event.dataTransfer.getData('application/reactflow');
             if (!blockType) return;
 
-            const position = reactFlowInstance?.screenToFlowPosition({
-                x: event.clientX,
-                y: event.clientY,
+            // Получаем позицию относительно React Flow wrapper
+            const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+            if (!reactFlowBounds || !reactFlowInstance) return;
+
+            // Вычисляем позицию относительно React Flow
+            const position = reactFlowInstance.screenToFlowPosition({
+                x: event.clientX - reactFlowBounds.left,
+                y: event.clientY - reactFlowBounds.top,
             });
 
             if (!position) return;
@@ -184,7 +234,7 @@ function DSPEditor({
             const signalConfig = getBlockSignalConfig(blockType);
 
             const newNode = {
-                id: generateNodeId(),
+                id: generateNodeId(), // Теперь гарантированно уникальный
                 type: 'block',
                 position,
                 data: {
@@ -202,8 +252,9 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate]
+        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, reactFlowWrapper]
     );
+
 
     // Обновляем анимацию существующих соединений при изменении состояния симуляции
     useEffect(() => {

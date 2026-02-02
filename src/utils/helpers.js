@@ -7,6 +7,26 @@
 
 import { DSP_ICONS, BLOCK_SIGNAL_CONFIG, SIGNAL_TYPES, DEFAULT_BLOCK_PARAMS } from './constants';
 
+/**
+ * Генератор уникальных ID для узлов
+ */
+export const generateNodeId = () => {
+    // Используем timestamp + случайное число для уникальности
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 9);
+    return `node_${timestamp}_${random}`;
+};
+
+/**
+ * Генератор уникальных ID для узлов
+ */
+// let nodeIdCounter = 0;
+// export const generateNodeId = () => {
+//     nodeIdCounter++;
+//     return `node_${nodeIdCounter}`;
+// };
+
+
 
 /**
  * Debounce функция
@@ -23,21 +43,13 @@ export const debounce = (func, wait) => {
     };
 };
 
-/**
- * Генератор уникальных ID для узлов
- */
-let nodeIdCounter = 0;
-export const generateNodeId = () => {
-    nodeIdCounter++;
-    return `node_${nodeIdCounter}`;
-};
 
 /**
  * Сброс счётчика ID (для тестов)
  */
-export const resetNodeIdCounter = () => {
-    nodeIdCounter = 0;
-};
+// export const resetNodeIdCounter = () => {
+//     nodeIdCounter = 0;
+// };
 
 /**
  * Получить параметры по умолчанию для блока

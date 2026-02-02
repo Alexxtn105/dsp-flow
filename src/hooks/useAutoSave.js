@@ -30,6 +30,8 @@ export const useAutoSave = (
         if (isUnmountedRef.current) return;
         if (!reactFlowInstance) return;
         if (nodes.length === 0) return;
+
+        // Используем текущее значение функции skipWhen
         if (skipWhen()) return;
 
         // Отменяем предыдущее сохранение если оно еще выполняется
@@ -42,6 +44,14 @@ export const useAutoSave = (
 
         try {
             const flow = reactFlowInstance.toObject();
+
+            // Проверяем, что все ID узлов уникальны
+            const nodeIds = new Set(flow.nodes.map(node => node.id));
+            if (nodeIds.size !== flow.nodes.length) {
+                console.error('Duplicate node IDs detected, skipping autosave');
+                return;
+            }
+
             const autoSaveData = {
                 nodes: flow.nodes,
                 edges: flow.edges,
@@ -88,7 +98,15 @@ export const useAutoSave = (
     }, [reactFlowInstance, nodes, edges, skipWhen]);
 
     // Создаём debounced версию автосохранения
-    const debouncedAutoSave = useRef(debounce(autoSave, delay)).current;
+    // Используем useRef для хранения debounced функции
+    const debouncedAutoSaveRef = useRef(null);
+
+    // Инициализируем debounced функцию при первом рендере
+    useEffect(() => {
+        debouncedAutoSaveRef.current = debounce(() => {
+            autoSave();
+        }, delay);
+    }, [autoSave, delay]);
 
     /**
      * Загрузить автосохраненные данные
@@ -136,8 +154,11 @@ export const useAutoSave = (
     useEffect(() => {
         if (!enabled) return;
 
-        debouncedAutoSave();
-    }, [nodes, edges, enabled, debouncedAutoSave]);
+        // Вызываем debounced функцию через ref
+        if (debouncedAutoSaveRef.current) {
+            debouncedAutoSaveRef.current();
+        }
+    }, [nodes, edges, enabled]);
 
     /**
      * Cleanup при размонтировании
