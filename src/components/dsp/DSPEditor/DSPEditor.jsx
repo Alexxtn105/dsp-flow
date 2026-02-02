@@ -11,29 +11,32 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-//import Toolbar from '../../layout/Toolbar';
+import Toolbar from "../../layout/Toolbar/Toolbar.jsx";
 import BlockNode from '../BlockNode';
 import { useAutoSave } from '../../../hooks/useAutoSave';
 import { generateNodeId, getDefaultParams } from '../../../utils/helpers';
+import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
-import Toolbar from "../../layout/Toolbar/Toolbar.jsx";
 
 const nodeTypes = {
     block: BlockNode,
 };
 
 function DSPEditor({
-    isDarkTheme,
-    currentScheme,
-    onSchemeUpdate,
-    onStatsUpdate,
-    onReactFlowInit
-}) {
+                       isDarkTheme,
+                       currentScheme,
+                       onSchemeUpdate,
+                       onStatsUpdate,
+                       onReactFlowInit
+                   }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const hasLoadedExternalScheme = useRef(false);
+
+    // Получаем контекст
+    const { loadedSchemeData, setLoadedSchemeData } = useDSPEditor();
 
     // Автосохранение с исправленным race condition
     const { loadAutoSave, clearAutoSave } = useAutoSave(
@@ -53,9 +56,33 @@ function DSPEditor({
             if (autoSaved) {
                 setNodes(autoSaved.nodes || []);
                 setEdges(autoSaved.edges || []);
+                hasLoadedExternalScheme.current = true;
             }
         }
     }, [loadAutoSave, setNodes, setEdges]);
+
+    // Обработка загруженной схемы из контекста
+    useEffect(() => {
+        if (loadedSchemeData && loadedSchemeData.nodes) {
+            // Очищаем автосохранение
+            clearAutoSave();
+
+            // Сбрасываем текущие узлы и соединения
+            setNodes(loadedSchemeData.nodes || []);
+            setEdges(loadedSchemeData.edges || []);
+
+            // Устанавливаем флаг загрузки внешней схемы
+            hasLoadedExternalScheme.current = true;
+
+            // Очищаем данные загрузки в контексте
+            setLoadedSchemeData(null);
+
+            console.log('Схема загружена из контекста:', {
+                nodes: loadedSchemeData.nodes?.length || 0,
+                edges: loadedSchemeData.edges?.length || 0
+            });
+        }
+    }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData]);
 
     // Обновление статистики
     useEffect(() => {
@@ -78,12 +105,12 @@ function DSPEditor({
     const onConnect = useCallback(
         (params) => {
             setEdges((eds) => addEdge({ ...params, animated: true }, eds));
-            if (hasLoadedExternalScheme.current) {
-                hasLoadedExternalScheme.current = false;
+            // Помечаем схему как несохранённую при изменении
+            if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme.name, onSchemeUpdate]
+        [setEdges, currentScheme, onSchemeUpdate]
     );
 
     const onDragOver = useCallback((event) => {
@@ -118,12 +145,12 @@ function DSPEditor({
 
             setNodes((nds) => nds.concat(newNode));
 
-            if (hasLoadedExternalScheme.current) {
-                hasLoadedExternalScheme.current = false;
+            // Помечаем схему как несохранённую при добавлении узла
+            if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [reactFlowInstance, setNodes, currentScheme.name, onSchemeUpdate]
+        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate]
     );
 
     return (

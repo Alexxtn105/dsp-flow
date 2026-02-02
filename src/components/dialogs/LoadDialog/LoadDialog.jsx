@@ -5,7 +5,7 @@ import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import { formatDate } from '../../../utils/helpers';
 
 function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
-    const { getSavedSchemes, loadScheme, deleteScheme } = useDSPEditor();
+    const { getSavedSchemes, loadScheme, deleteScheme, setLoadedSchemeData } = useDSPEditor();
     const [schemes, setSchemes] = useState([]);
 
     useEffect(() => {
@@ -14,7 +14,9 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
 
     const handleLoad = async (schemeName) => {
         const result = await loadScheme(schemeName);
-        if (result.success) {
+        if (result.success && result.data) {
+            // Устанавливаем загруженные данные в контекст
+            setLoadedSchemeData(result.data);
             onLoadSuccess(schemeName);
         }
     };

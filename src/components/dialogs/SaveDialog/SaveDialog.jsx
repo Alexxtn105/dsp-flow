@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import Dialog from '../../common/Dialog/Dialog';
+import Dialog from '../../common/Dialog/Dialog.jsx';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import ValidationService from '../../../services/validationService';
 
@@ -26,19 +26,34 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode }) {
             return;
         }
 
-        const flow = reactFlowInstance.toObject();
-        const result = await saveScheme({
-            name: formData.name,
-            description: formData.description,
-            nodes: flow.nodes,
-            edges: flow.edges,
-            viewport: flow.viewport
-        });
+        try {
+            const flow = reactFlowInstance.toObject();
+            const schemeData = {
+                name: formData.name,
+                description: formData.description,
+                nodes: flow.nodes,
+                edges: flow.edges,
+                viewport: flow.viewport
+            };
 
-        if (result.success) {
-            onSaveSuccess(formData.name);
-        } else {
-            setError(result.errors?.join(', ') || result.message || 'Ошибка сохранения');
+            console.log('Сохранение схемы:', {
+                name: schemeData.name,
+                nodes: schemeData.nodes?.length,
+                edges: schemeData.edges?.length
+            });
+
+            const result = await saveScheme(schemeData);
+
+            if (result.success) {
+                console.log('Схема успешно сохранена:', formData.name);
+                onSaveSuccess(formData.name);
+            } else {
+                setError(result.errors?.join(', ') || result.message || 'Ошибка сохранения');
+                console.error('Ошибка сохранения:', result);
+            }
+        } catch (err) {
+            console.error('Ошибка при сохранении:', err);
+            setError('Неожиданная ошибка при сохранении');
         }
     };
 

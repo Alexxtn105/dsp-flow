@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { useSchemeStorage } from '../hooks/useSchemeStorage';
 
 const DSPEditorContext = createContext(null);
@@ -8,11 +8,14 @@ const DSPEditorContext = createContext(null);
  */
 export const DSPEditorProvider = ({ children, reactFlowInstance }) => {
     const schemeStorage = useSchemeStorage();
+    const [loadedSchemeData, setLoadedSchemeData] = useState(null);
 
     const value = useMemo(() => ({
         reactFlowInstance,
+        loadedSchemeData,
+        setLoadedSchemeData,
         ...schemeStorage
-    }), [reactFlowInstance, schemeStorage]);
+    }), [reactFlowInstance, loadedSchemeData, schemeStorage]);
 
     return (
         <DSPEditorContext.Provider value={value}>

@@ -11,11 +11,12 @@ import './App.css';
 function App() {
     const { isDarkTheme, toggleTheme } = useTheme();
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
-    
+
     // Состояние текущей схемы
     const [currentScheme, setCurrentScheme] = useState({
         name: 'not_saved',
-        isSaved: true // true потому что новый проект пустой
+        isSaved: true,
+        data: null // Добавляем поле для хранения данных схемы
     });
 
     // Состояния диалогов
@@ -35,10 +36,11 @@ function App() {
     /**
      * Обновление информации о схеме
      */
-    const handleSchemeUpdate = useCallback((schemeName, isSaved = true) => {
+    const handleSchemeUpdate = useCallback((schemeName, isSaved = true, schemeData = null) => {
         setCurrentScheme({
             name: schemeName,
-            isSaved
+            isSaved,
+            data: schemeData
         });
     }, []);
 
@@ -66,7 +68,7 @@ function App() {
      * Обработчик успешного сохранения
      */
     const handleSaveSuccess = useCallback((schemeName) => {
-        handleSchemeUpdate(schemeName, true);
+        handleSchemeUpdate(schemeName, true, null);
         setShowSaveDialog(false);
         setShowSaveAsDialog(false);
     }, [handleSchemeUpdate]);
@@ -75,7 +77,8 @@ function App() {
      * Обработчик успешной загрузки
      */
     const handleLoadSuccess = useCallback((schemeName) => {
-        handleSchemeUpdate(schemeName, true);
+        // Здесь мы не передаем данные схемы, они будут загружены через DSPEditorContext
+        handleSchemeUpdate(schemeName, true, null);
         setShowLoadDialog(false);
     }, [handleSchemeUpdate]);
 
