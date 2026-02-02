@@ -11,12 +11,13 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import Toolbar from "../../layout/Toolbar/Toolbar.jsx";
+import Toolbar from '../../layout/Toolbar/Toolbar.jsx';
 import BlockNode from '../BlockNode';
 import { useAutoSave } from '../../../hooks/index.js';
 import { generateNodeId, getDefaultParams } from '../../../utils/helpers';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
+import './ReactFlowTheme.css'; // Добавляем импорт
 
 const nodeTypes = {
     block: BlockNode,
@@ -169,7 +170,11 @@ function DSPEditor({
                     nodeTypes={nodeTypes}
                     fitView
                 >
-                    <Background color={isDarkTheme ? '#374151' : '#e5e7eb'} />
+                    <Background
+                        color={isDarkTheme ? '#374151' : '#e5e7eb'}
+                        gap={16}
+                        size={1}
+                    />
                     <Controls />
                     <MiniMap />
                 </ReactFlow>
