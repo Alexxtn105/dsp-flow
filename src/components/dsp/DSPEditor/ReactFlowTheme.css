@@ -1,211 +1,10 @@
-/* Стили для элементов управления React Flow */
-
-/* Controls (панель управления) */
-.react-flow__controls {
-    box-shadow: var(--shadow-md) !important;
-    border-radius: var(--radius-md) !important;
-    overflow: hidden !important;
-}
-
-.react-flow__controls-button {
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-primary) !important;
-    border-bottom: none !important;
-    color: var(--text-primary) !important;
-    width: 32px !important;
-    height: 32px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-}
-
-.react-flow__controls-button:hover {
-    background: var(--bg-tertiary) !important;
-}
-
-.react-flow__controls-button:first-child {
-    border-top-left-radius: var(--radius-md) !important;
-    border-top-right-radius: var(--radius-md) !important;
-}
-
-.react-flow__controls-button:last-child {
-    border-bottom: 1px solid var(--border-primary) !important;
-    border-bottom-left-radius: var(--radius-md) !important;
-    border-bottom-right-radius: var(--radius-md) !important;
-}
-
-/* MiniMap */
-.react-flow__minimap {
-    background: var(--bg-secondary) !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-md) !important;
-    border: 1px solid var(--border-primary) !important;
-}
-
-.react-flow__minimap-node {
-    fill: var(--accent-primary) !important;
-    stroke: var(--border-primary) !important;
-    stroke-width: 1px !important;
-}
-
-.dark-theme .react-flow__minimap-node {
-    fill: var(--accent-primary) !important;
-}
-
-/* Улучшения для темной темы */
-.dark-theme .react-flow__controls-button {
-    background: var(--bg-tertiary) !important;
-    border-color: var(--border-secondary) !important;
-}
-
-.dark-theme .react-flow__controls-button:hover {
-    background: var(--bg-secondary) !important;
-}
-
-.dark-theme .react-flow__minimap {
-    background: var(--bg-tertiary) !important;
-    border-color: var(--border-secondary) !important;
-}
-
-/* Стили для ручек (handles) */
-.react-flow__handle {
-    width: 10px !important;
-    height: 10px !important;
-    background: var(--accent-primary) !important;
-    border: 2px solid var(--bg-secondary) !important;
-}
-
-.react-flow__handle:hover {
-    background: var(--accent-hover) !important;
-}
-
-/* Соединения */
-.react-flow__edge-path {
-    stroke: var(--accent-primary) !important;
-    stroke-width: 2px !important;
-}
-
-.react-flow__edge.animated path {
-    stroke-dasharray: 5 !important;
-    animation: dashdraw 0.5s linear infinite !important;
-}
-
-@keyframes dashdraw {
-    from {
-        stroke-dashoffset: 10;
-    }
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .react-flow__controls {
-        transform: scale(0.9);
-        transform-origin: bottom right;
-    }
-
-    .react-flow__minimap {
-        width: 120px !important;
-        height: 90px !important;
-    }
-}
-
-/* Соединения для действительных сигналов */
-.react-flow__edge-path.real {
-    stroke: #3b82f6 !important;
-    stroke-width: 2px !important;
-    stroke-dasharray: 5 !important;
-    animation: dashdraw 0.5s linear infinite !important;
-}
-
-/* Соединения для комплексных сигналов (двойная линия) */
-.react-flow__edge-path.complex {
-    stroke: #8b5cf6 !important;
-    stroke-width: 4px !important;
-    stroke-dasharray: 5 !important;
-    animation: dashdraw 0.5s linear infinite !important;
-    filter: url(#double-line);
-}
-
-/* Создаем SVG фильтр для двойной линии */
-.react-flow__edges svg {
-    filter: none;
-}
-
-.react-flow__edges svg defs {
-    filter: none;
-}
-
-/* Альтернативный подход: создаем псевдоэлемент для двойной линии */
-.react-flow__edge.complex::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-            to right,
-            transparent 45%,
-            #8b5cf6 45%,
-            #8b5cf6 55%,
-            transparent 55%
-    );
-    animation: dashdraw 0.5s linear infinite;
-    z-index: -1;
-}
-
-/* Анимация для штриховой линии */
-@keyframes dashdraw {
-    from {
-        stroke-dashoffset: 10;
-    }
-}
-
-/* Темная тема */
-.dark-theme .react-flow__edge-path.real {
-    stroke: #60a5fa !important;
-}
-
-.dark-theme .react-flow__edge-path.complex {
-    stroke: #a78bfa !important;
-}
-
-/* Подсветка при наведении */
-.react-flow__edge:hover .react-flow__edge-path {
-    stroke-width: 3px !important;
-    filter: brightness(1.2);
-}
-
-.react-flow__edge.complex:hover .react-flow__edge-path {
-    stroke-width: 5px !important;
-}
-
-/* Индикатор невалидного соединения */
-.react-flow__connection-path.invalid {
-    stroke: #ef4444 !important;
-    stroke-dasharray: 5 !important;
-    animation: dashdraw 0.3s linear infinite !important;
-}
+/* ... существующие стили ... */
 
 /* Легенда типов сигналов */
-/*.signal-legend {*/
-/*    position: absolute;*/
-/*    bottom: 20px;*/
-/*    right: 20px;*/
-/*    background: var(--bg-secondary);*/
-/*    border: 1px solid var(--border-primary);*/
-/*    border-radius: var(--radius-md);*/
-/*    padding: 12px;*/
-/*    z-index: 10;*/
-/*    font-size: 12px;*/
-/*    box-shadow: var(--shadow-md);*/
-/*}*/
-
 .signal-legend {
     position: absolute;
-    top: 15px;
-    right: 15px; /* Изменено с right на left */
+    right: 15px;
+    top: 15px; /* Перемещаем в левый нижний угол */
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-md);
@@ -213,8 +12,8 @@
     z-index: 10;
     font-size: 12px;
     box-shadow: var(--shadow-md);
+    max-width: 180px;
 }
-
 
 .signal-legend-title {
     font-weight: 600;
@@ -225,43 +24,120 @@
 .signal-legend-items {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .signal-legend-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .signal-legend-line {
-    width: 30px;
+    width: 40px;
+    height: 2px;
+    position: relative;
+}
+
+/* ИСПРАВЛЕНИЕ: делаем действительный сигнал пунктирным */
+.signal-legend-line.real {
+    background: transparent;
+    border-bottom: 2px dashed #3b82f6;
+}
+
+/* Комплексный сигнал - фиолетовая пунктирная */
+.signal-legend-line.complex {
+    background: transparent;
+    position: relative;
     height: 2px;
 }
 
-.signal-legend-line.real {
-    background: #3b82f6;
-    border-bottom: 1px dashed #3b82f6;
+.signal-legend-line.complex::before,
+.signal-legend-line.complex::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    border-bottom: 2px dashed #8b5cf6;
 }
 
-.signal-legend-line.complex {
-    background: #8b5cf6;
-    border-top: 1px dashed #8b5cf6;
-    border-bottom: 1px dashed #8b5cf6;
-    height: 4px;
+.signal-legend-line.complex::before {
+    top: 0;
+}
+
+.signal-legend-line.complex::after {
+    bottom: 0;
 }
 
 .signal-legend-label {
     color: var(--text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
 }
 
+/* Темная тема */
 .dark-theme .signal-legend-line.real {
-    background: #60a5fa;
     border-bottom-color: #60a5fa;
 }
 
-.dark-theme .signal-legend-line.complex {
-    background: #a78bfa;
-    border-top-color: #a78bfa;
+.dark-theme .signal-legend-line.complex::before,
+.dark-theme .signal-legend-line.complex::after {
     border-bottom-color: #a78bfa;
+}
+
+/* Анимация для соединений (скорость движения пунктира)*/
+@keyframes dashdraw {
+    from {
+        stroke-dashoffset: 10;
+    }
+}
+
+/* Кастомные стили для соединений React Flow */
+.react-flow__edge.real .react-flow__edge-path {
+    stroke: #3b82f6 !important;
+    stroke-width: 2px !important;
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.5s linear infinite !important;
+}
+
+.react-flow__edge.complex .react-flow__edge-path {
+    stroke: #8b5cf6 !important;
+    stroke-width: 2px !important;
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.5s linear infinite !important;
+}
+
+/* Для темной темы */
+.dark-theme .react-flow__edge.real .react-flow__edge-path {
+    stroke: #60a5fa !important;
+}
+
+.dark-theme .react-flow__edge.complex .react-flow__edge-path {
+    stroke: #a78bfa !important;
+}
+
+/* Подсветка при наведении */
+.react-flow__edge:hover .react-flow__edge-path {
+    stroke-width: 3px !important;
+    filter: brightness(1.2);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .signal-legend {
+        right: 10px;
+        top: 10px;
+        padding: 8px;
+        max-width: 150px;
+    }
+
+    .signal-legend-line {
+        width: 30px;
+    }
+
+    .signal-legend-label {
+        font-size: 10px;
+    }
 }

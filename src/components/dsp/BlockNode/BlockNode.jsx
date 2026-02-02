@@ -1,6 +1,6 @@
-import { memo } from 'react';
+import {memo} from 'react';
 import PropTypes from 'prop-types';
-import { Handle, Position } from '@xyflow/react';
+import {Handle, Position} from '@xyflow/react';
 import Icon from '../../common/Icons/Icon.jsx';
 
 
@@ -19,13 +19,12 @@ import {
 } from '../../../utils/helpers';
 import './BlockNode.css';
 
-function BlockNode({ data, selected }) {
+function BlockNode({data, selected}) {
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
     const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
-
 
 
     return (
@@ -44,26 +43,30 @@ function BlockNode({ data, selected }) {
 
             <div className="block-header">
                 <div className="block-icon-title">
-                 <span className="block-icon" title={`${description}\nВход: ${getSignalTypeDescription(signalConfig.input)}\nВыход: ${getSignalTypeDescription(signalConfig.output)}`}>
-                    {/*<div className="block-icon" title={description}>*/}
-                        <Icon name={iconName} size="medium" />
-                     {/*</div>*/}
+                 <span className="block-icon"
+                       title={`${description}\nВход: ${getSignalTypeDescription(signalConfig.input)}\nВыход: ${getSignalTypeDescription(signalConfig.output)}`}>
+                        <Icon name={iconName} size="medium"/>
                  </span>
                     <div className="block-title">
                         <div className="block-name">{data.label}</div>
-                        <div className="block-type">{description}</div>
+                        <div className="block-type">{description} </div>
                     </div>
+                    {/*<div>*/}
+                    {/*    /!*БЛОК ТИПОВ СИГНАЛОВ*!/*/}
+                    {/*    {signalConfig.input && signalConfig.output && (*/}
+                    {/*        <div className="block-signal-types">*/}
+                    {/*            <span className={`signal-type-badge ${getSignalTypeClass(signalConfig.input)}`}>*/}
+                    {/*                {signalConfig.input === 'complex' ? 'Cplx' : 'Re'}→*/}
+                    {/*            </span>*/}
+                    {/*            <span className={`signal-type-badge ${getSignalTypeClass(signalConfig.output)}`}>*/}
+                    {/*                →{signalConfig.output === 'complex' ? 'Cplx' : 'Re'}*/}
+                    {/*            </span>*/}
+                    {/*        </div>*/}
+                    {/*    )}*/}
+                    {/*</div>*/}
                 </div>
-                {signalConfig.input && signalConfig.output && (
-                    <div className="block-signal-types">
-                        <span className={`signal-type-badge ${getSignalTypeClass(signalConfig.input)}`}>
-                            {signalConfig.input === 'complex' ? 'C' : 'R'}→
-                        </span>
-                        <span className={`signal-type-badge ${getSignalTypeClass(signalConfig.output)}`}>
-                            →{signalConfig.output === 'complex' ? 'C' : 'R'}
-                        </span>
-                    </div>
-                )}
+
+
             </div>
 
             {data.params && Object.keys(data.params).length > 0 && (

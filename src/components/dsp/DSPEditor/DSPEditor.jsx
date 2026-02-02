@@ -13,6 +13,9 @@ import '@xyflow/react/dist/style.css';
 
 import Toolbar from '../../layout/Toolbar/Toolbar.jsx';
 import BlockNode from '../BlockNode';
+import RealSignalEdge from '../edges/RealSignalEdge';
+import ComplexSignalEdge from '../edges/ComplexSignalEdge';
+import SignalLegend from './SignalLegend';
 import { useAutoSave } from '../../../hooks/index.js';
 import {
     generateNodeId,
@@ -23,10 +26,14 @@ import {
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
-import SignalLegend from './SignalLegend';
 
 const nodeTypes = {
     block: BlockNode,
+};
+
+const edgeTypes = {
+    real: RealSignalEdge,
+    complex: ComplexSignalEdge,
 };
 
 function DSPEditor({
@@ -141,9 +148,6 @@ function DSPEditor({
                 type: signalType === 'complex' ? 'complex' : 'real',
                 data: {
                     signalType: signalType
-                },
-                style: {
-                    strokeWidth: signalType === 'complex' ? 4 : 2,
                 }
             };
 
@@ -214,6 +218,7 @@ function DSPEditor({
                     onDrop={onDrop}
                     onDragOver={onDragOver}
                     nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
                     isValidConnection={isValidConnection}
                     fitView
                 >
