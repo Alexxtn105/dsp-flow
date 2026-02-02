@@ -15,8 +15,7 @@ function App() {
     // Состояние текущей схемы
     const [currentScheme, setCurrentScheme] = useState({
         name: 'not_saved',
-        isSaved: true,
-        data: null // Добавляем поле для хранения данных схемы
+        isSaved: true // true потому что новый проект пустой
     });
 
     // Состояния диалогов
@@ -36,11 +35,10 @@ function App() {
     /**
      * Обновление информации о схеме
      */
-    const handleSchemeUpdate = useCallback((schemeName, isSaved = true, schemeData = null) => {
+    const handleSchemeUpdate = useCallback((schemeName, isSaved = true) => {
         setCurrentScheme({
             name: schemeName,
-            isSaved,
-            data: schemeData
+            isSaved
         });
     }, []);
 
@@ -68,7 +66,7 @@ function App() {
      * Обработчик успешного сохранения
      */
     const handleSaveSuccess = useCallback((schemeName) => {
-        handleSchemeUpdate(schemeName, true, null);
+        handleSchemeUpdate(schemeName, true);
         setShowSaveDialog(false);
         setShowSaveAsDialog(false);
     }, [handleSchemeUpdate]);
@@ -77,8 +75,7 @@ function App() {
      * Обработчик успешной загрузки
      */
     const handleLoadSuccess = useCallback((schemeName) => {
-        // Здесь мы не передаем данные схемы, они будут загружены через DSPEditorContext
-        handleSchemeUpdate(schemeName, true, null);
+        handleSchemeUpdate(schemeName, true);
         setShowLoadDialog(false);
     }, [handleSchemeUpdate]);
 
@@ -111,8 +108,8 @@ function App() {
     }, []);
 
     // Условия активности кнопок
-    const isSaveEnabled = currentScheme.name !== 'not_saved' && !currentScheme.isSaved;
-    const isSaveAsEnabled = stats.nodesCount > 0;
+    const isSaveEnabled = true; // Всегда доступна
+    const isSaveAsEnabled = true; // Всегда доступна
 
     return (
         <DSPEditorProvider reactFlowInstance={reactFlowInstance}>

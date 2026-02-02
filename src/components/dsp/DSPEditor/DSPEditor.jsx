@@ -13,7 +13,7 @@ import '@xyflow/react/dist/style.css';
 
 import Toolbar from "../../layout/Toolbar/Toolbar.jsx";
 import BlockNode from '../BlockNode';
-import { useAutoSave } from '../../../hooks/useAutoSave';
+import { useAutoSave } from '../../../hooks/index.js';
 import { generateNodeId, getDefaultParams } from '../../../utils/helpers';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';

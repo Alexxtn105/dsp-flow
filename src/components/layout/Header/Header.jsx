@@ -2,15 +2,15 @@ import PropTypes from 'prop-types';
 import './Header.css';
 
 function Header({
-    isDarkTheme,
-    toggleTheme,
-    currentScheme,
-    onSave,
-    onSaveAs,
-    onLoad,
-    isSaveEnabled,
-    isSaveAsEnabled
-}) {
+                    isDarkTheme,
+                    toggleTheme,
+                    currentScheme,
+                    onSave,
+                    onSaveAs,
+                    onLoad,
+                    isSaveEnabled,
+                    isSaveAsEnabled
+                }) {
     return (
         <header className="app-header">
             <div className="app-header-left">
@@ -36,7 +36,7 @@ function Header({
                     <button
                         className="header-btn save"
                         onClick={onSave}
-                        title={isSaveEnabled ? "Сохранить текущую схему" : "Сначала сохраните схему как..."}
+                        title="Сохранить текущую схему"
                         disabled={!isSaveEnabled}
                     >
                         💾 Сохранить

@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState } from 'react';
-import { useSchemeStorage } from '../hooks/useSchemeStorage';
+import { useSchemeStorage } from '../hooks/index.js';
 
 const DSPEditorContext = createContext(null);
 
