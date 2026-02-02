@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import Icon from '../../common/Icon';
 import './ControlToolbar.css';
 
 function ControlToolbar({
@@ -13,7 +14,12 @@ function ControlToolbar({
     return (
         <div className={`control-toolbar ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="control-toolbar-header">
-                <span className="control-toolbar-icon" title="Панель управления">⚙️</span>
+                <Icon
+                    name="settings"
+                    size="large"
+                    className="control-toolbar-icon"
+                    title="Панель управления"
+                />
             </div>
 
             <div className="control-toolbar-content">
@@ -24,7 +30,7 @@ function ControlToolbar({
                         title="Сохранить текущую схему"
                         disabled={!isSaveEnabled}
                     >
-                        <span className="control-btn-icon">💾</span>
+                        <Icon name="save" size="large" className="control-btn-icon" />
                         <span className="control-btn-tooltip">Сохранить</span>
                     </button>
 
@@ -34,7 +40,7 @@ function ControlToolbar({
                         title="Сохранить под новым именем"
                         disabled={!isSaveAsEnabled}
                     >
-                        <span className="control-btn-icon">📝</span>
+                        <Icon name="save_as" size="large" className="control-btn-icon" />
                         <span className="control-btn-tooltip">Сохранить как</span>
                     </button>
 
@@ -43,7 +49,7 @@ function ControlToolbar({
                         onClick={onLoad}
                         title="Загрузить сохраненную схему"
                     >
-                        <span className="control-btn-icon">📂</span>
+                        <Icon name="folder_open" size="large" className="control-btn-icon" />
                         <span className="control-btn-tooltip">Загрузить</span>
                     </button>
 
@@ -52,7 +58,11 @@ function ControlToolbar({
                         onClick={toggleTheme}
                         title={isDarkTheme ? "Переключить на светлую тему" : "Переключить на темную тему"}
                     >
-                        <span className="control-btn-icon">{isDarkTheme ? '☀️' : '🌙'}</span>
+                        <Icon
+                            name={isDarkTheme ? 'light_mode' : 'dark_mode'}
+                            size="large"
+                            className="control-btn-icon"
+                        />
                         <span className="control-btn-tooltip">
                             {isDarkTheme ? 'Светлая тема' : 'Темная тема'}
                         </span>

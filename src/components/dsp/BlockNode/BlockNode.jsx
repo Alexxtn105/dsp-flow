@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Handle, Position } from '@xyflow/react';
+import Icon from '../../common/Icon';
 import {
     isGeneratorBlock,
     isVisualizationBlock,
@@ -14,7 +15,7 @@ import './BlockNode.css';
 function BlockNode({ data, selected }) {
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
-    const icon = getBlockIcon(data.blockType);
+    const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
 
     return (
@@ -30,9 +31,9 @@ function BlockNode({ data, selected }) {
 
             <div className="block-header">
                 <div className="block-icon-title">
-                    <span className="block-icon" title={description}>
-                        {icon}
-                    </span>
+                    <div className="block-icon" title={description}>
+                        <Icon name={iconName} size="medium" />
+                    </div>
                     <div className="block-title">
                         <div className="block-name">{data.label}</div>
                         <div className="block-type">{description}</div>

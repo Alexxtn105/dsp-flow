@@ -20,9 +20,17 @@
     flex-shrink: 0;
 }
 
+/*.control-toolbar-icon {*/
+/*    font-size: 24px;*/
+/*    flex-shrink: 0;*/
+/*}*/
+
 .control-toolbar-icon {
-    font-size: 24px;
-    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
 }
 
 .control-toolbar-content {
@@ -101,11 +109,19 @@
     transform: none;
 }
 
+/*.control-btn-icon {*/
+/*    font-size: 24px;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*}*/
+
 .control-btn-icon {
-    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 24px;
+    height: 24px;
 }
 
 .control-btn-tooltip {

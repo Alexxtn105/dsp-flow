@@ -2,6 +2,57 @@
  * Константы приложения
  */
 
+/**
+ * Маппинг иконок для блоков DSP
+ */
+export const DSP_ICONS = {
+    // Фильтры
+    'КИХ-Фильтр': 'filter_alt',
+    'Полосовой КИХ-фильтр': 'tune',
+    'ФВЧ КИХ-фильтр': 'trending_up',
+    'ФНЧ КИХ-фильтр': 'trending_down',
+    'Преобразователь Гильберта': 'transform',
+    'Фильтр Герцеля': 'psychology',
+
+    // Генераторы
+    'Входной сигнал': 'network_ping',
+    'Синусный генератор': 'waves',
+    'Косинусный генератор': 'graphic_eq',
+
+    // БПФ/Анализ
+    'Скользящее БПФ': 'moving',
+    'БПФ': 'auto_graph',
+    'Спектроанализатор': 'analytics',
+
+    // Детекторы
+    'Фазовый детектор': 'speed',
+    'Частотный детектор': 'speed',
+
+    // Математические
+    'Интегратор': 'functions',
+    'Сумматор': 'add',
+    'Перемножитель': 'close',
+
+    // Визуализация
+    'Осциллограф': 'show_chart',
+    'Фазовое созвездие': 'star',
+
+    // Действия
+    'save': 'save',
+    'save_as': 'save_as',
+    'load': 'folder_open',
+    'theme_light': 'light_mode',
+    'theme_dark': 'dark_mode',
+    'settings': 'settings',
+    'start': 'play_arrow',
+    'stop': 'stop',
+    'expand': 'chevron_right',
+    'collapse': 'chevron_left',
+    'group_expand': 'expand_more',
+    'group_collapse': 'expand_less'
+};
+
+
 // Типы блоков DSP
 export const DSP_BLOCK_TYPES = {
     // Фильтры
@@ -14,8 +65,8 @@ export const DSP_BLOCK_TYPES = {
 
     // Генераторы
     INPUT_SIGNAL: 'Входной сигнал',
-    REF_SINE_GEN: 'Референсный синусный генератор',
-    REF_COSINE_GEN: 'Референсный косинусный генератор',
+    REF_SINE_GEN: 'Синусный генератор',
+    REF_COSINE_GEN: 'Косинусный генератор',
 
     // БПФ/Анализ
     SLIDING_FFT: 'Скользящее БПФ',
@@ -138,7 +189,7 @@ export const DEFAULT_BLOCK_PARAMS = {
     }
 };
 
-// Группы блоков для тулбара
+// Обновите DSP_GROUPS с новыми иконками
 export const DSP_GROUPS = [
     {
         id: 'filters',
@@ -148,37 +199,37 @@ export const DSP_GROUPS = [
             {
                 id: 'fir-filter',
                 name: DSP_BLOCK_TYPES.FIR_FILTER,
-                icon: '⚡',
+                icon: DSP_ICONS['КИХ-Фильтр'],
                 description: 'КИХ-фильтр (FIR)',
             },
             {
                 id: 'bandpass-fir-filter',
                 name: DSP_BLOCK_TYPES.BANDPASS_FIR,
-                icon: '🎛️',
+                icon: DSP_ICONS['Полосовой КИХ-фильтр'],
                 description: 'Полосовой КИХ-фильтр',
             },
             {
                 id: 'highpass-fir-filter',
                 name: DSP_BLOCK_TYPES.HIGHPASS_FIR,
-                icon: '📈',
+                icon: DSP_ICONS['ФВЧ КИХ-фильтр'],
                 description: 'ФВЧ КИХ-фильтр',
             },
             {
                 id: 'lowpass-fir-filter',
                 name: DSP_BLOCK_TYPES.LOWPASS_FIR,
-                icon: '📉',
+                icon: DSP_ICONS['ФНЧ КИХ-фильтр'],
                 description: 'ФНЧ КИХ-фильтр',
             },
             {
                 id: 'hilbert-transformer',
                 name: DSP_BLOCK_TYPES.HILBERT_TRANSFORMER,
-                icon: '🌀',
+                icon: DSP_ICONS['Преобразователь Гильберта'],
                 description: 'Преобразователь Гильберта',
             },
             {
                 id: 'goertzel-filter',
                 name: DSP_BLOCK_TYPES.GOERTZEL_FILTER,
-                icon: '🔍',
+                icon: DSP_ICONS['Фильтр Герцеля'],
                 description: 'Фильтр Герцеля',
             },
         ]
@@ -191,19 +242,19 @@ export const DSP_GROUPS = [
             {
                 id: 'input-signal',
                 name: DSP_BLOCK_TYPES.INPUT_SIGNAL,
-                icon: '〰️',
+                icon: DSP_ICONS['Входной сигнал'],
                 description: 'Генератор входного сигнала',
             },
             {
                 id: 'ref-sine-generator',
                 name: DSP_BLOCK_TYPES.REF_SINE_GEN,
-                icon: '📐',
+                icon: DSP_ICONS['Синусный генератор'],
                 description: 'Управляемый референсный синусный генератор',
             },
             {
                 id: 'ref-cosine-generator',
                 name: DSP_BLOCK_TYPES.REF_COSINE_GEN,
-                icon: '📏',
+                icon: DSP_ICONS['Косинусный генератор'],
                 description: 'Управляемый референсный косинусный генератор',
             },
         ]
@@ -216,19 +267,19 @@ export const DSP_GROUPS = [
             {
                 id: 'sliding-fft',
                 name: DSP_BLOCK_TYPES.SLIDING_FFT,
-                icon: '🌀',
+                icon: DSP_ICONS['Скользящее БПФ'],
                 description: 'Скользящее БПФ',
             },
             {
                 id: 'fft',
                 name: DSP_BLOCK_TYPES.FFT,
-                icon: '⚡',
+                icon: DSP_ICONS['БПФ'],
                 description: 'БПФ (размер кратен степени двойки)',
             },
             {
                 id: 'spectrum-analyzer',
                 name: DSP_BLOCK_TYPES.SPECTRUM_ANALYZER,
-                icon: '📊',
+                icon: DSP_ICONS['Спектроанализатор'],
                 description: 'Спектральный анализ',
             },
         ]
@@ -241,13 +292,13 @@ export const DSP_GROUPS = [
             {
                 id: 'phase-detector',
                 name: DSP_BLOCK_TYPES.PHASE_DETECTOR,
-                icon: '📐',
+                icon: DSP_ICONS['Фазовый детектор'],
                 description: 'Фазовый детектор',
             },
             {
                 id: 'frequency-detector',
                 name: DSP_BLOCK_TYPES.FREQUENCY_DETECTOR,
-                icon: '📏',
+                icon: DSP_ICONS['Частотный детектор'],
                 description: 'Частотный детектор',
             },
         ]
@@ -260,19 +311,19 @@ export const DSP_GROUPS = [
             {
                 id: 'integrator',
                 name: DSP_BLOCK_TYPES.INTEGRATOR,
-                icon: '∫',
+                icon: DSP_ICONS['Интегратор'],
                 description: 'Интегратор',
             },
             {
                 id: 'summer',
                 name: DSP_BLOCK_TYPES.SUMMER,
-                icon: '➕',
+                icon: DSP_ICONS['Сумматор'],
                 description: 'Сумматор',
             },
             {
                 id: 'multiplier',
                 name: DSP_BLOCK_TYPES.MULTIPLIER,
-                icon: '✖️',
+                icon: DSP_ICONS['Перемножитель'],
                 description: 'Перемножитель',
             },
         ]
@@ -285,13 +336,13 @@ export const DSP_GROUPS = [
             {
                 id: 'oscilloscope',
                 name: DSP_BLOCK_TYPES.OSCILLOSCOPE,
-                icon: '📊',
+                icon: DSP_ICONS['Осциллограф'],
                 description: 'Визуализация сигнала',
             },
             {
                 id: 'constellation',
                 name: DSP_BLOCK_TYPES.CONSTELLATION,
-                icon: '⭐',
+                icon: DSP_ICONS['Фазовое созвездие'],
                 description: 'Фазовое созвездие',
             },
         ]

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import Icon from '../../common/Icon';
 import './Footer.css';
 
 function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectionsCount }) {
@@ -18,7 +19,8 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectio
                             onClick={onStart}
                             disabled={isRunning}
                         >
-                            ▶️ Старт
+                            <Icon name="play_arrow" size="small" />
+                            {/*<span>Старт</span>*/}
                         </button>
 
                         <button
@@ -26,7 +28,8 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectio
                             onClick={onStop}
                             disabled={!isRunning}
                         >
-                            ⏹️ Стоп
+                            <Icon name="stop" size="small" />
+                            {/*<span>Стоп</span>*/}
                         </button>
                     </div>
                 </div>

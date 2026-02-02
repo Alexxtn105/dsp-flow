@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import Icon from '../../common/Icon';
 import { DSP_GROUPS } from '../../../utils/constants';
 import './Toolbar.css';
 
@@ -24,7 +25,7 @@ function Toolbar({ isDarkTheme }) {
             <div className="toolbar-header">
                 {!isCollapsed && (
                     <div className="toolbar-header-content">
-                        <span className="toolbar-icon">🎛️</span>
+                        <Icon name="tune" size="large" className="toolbar-icon" />
                         <h2 className="toolbar-title">Блоки DSP</h2>
                     </div>
                 )}
@@ -33,7 +34,7 @@ function Toolbar({ isDarkTheme }) {
                     onClick={() => setIsCollapsed(!isCollapsed)}
                     title={isCollapsed ? "Развернуть панель" : "Свернуть панель"}
                 >
-                    {isCollapsed ? '▶' : '◀'}
+                    <Icon name={isCollapsed ? 'chevron_right' : 'chevron_left'} size="medium" />
                 </button>
             </div>
 
@@ -43,7 +44,10 @@ function Toolbar({ isDarkTheme }) {
                         <div key={group.id} className="group-container">
                             <div className="group-header" onClick={() => toggleGroup(group.id)}>
                                 <span>{group.name}</span>
-                                <span>{collapsedGroups[group.id] ? '▶' : '▼'}</span>
+                                <Icon
+                                    name={collapsedGroups[group.id] ? 'expand_more' : 'expand_less'}
+                                    size="small"
+                                />
                             </div>
                             {!collapsedGroups[group.id] && (
                                 <div className="group-blocks">
@@ -55,7 +59,11 @@ function Toolbar({ isDarkTheme }) {
                                             onDragStart={(e) => onDragStart(e, block.name)}
                                             title={block.description}
                                         >
-                                            <span className="block-icon">{block.icon}</span>
+                                            <Icon
+                                                name={block.icon}
+                                                size="small"
+                                                className="block-icon"
+                                            />
                                             <div className="block-info">
                                                 <div className="block-name">{block.name}</div>
                                                 {block.description && (
