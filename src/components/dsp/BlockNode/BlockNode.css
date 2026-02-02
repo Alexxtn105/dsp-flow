@@ -1,73 +1,132 @@
 .block-node {
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     padding: 12px;
-    min-width: 150px;
+    min-width: 180px;
+    max-width: 220px;
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-fast);
     cursor: grab;
+    position: relative;
 }
 
 /*.block-node:hover {*/
 /*    border-color: var(--accent-primary);*/
 /*    box-shadow: var(--shadow-md);*/
-/*    transform: translateY(-2px);*/
+/*    transform: translateY(-1px);*/
 /*}*/
 
 .block-node.selected {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 30%, transparent),
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 20%, transparent),
     var(--shadow-md);
     background: var(--bg-primary);
 }
 
 .block-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-weight: 600;
     margin-bottom: 8px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--border-primary);
 }
 
+.block-icon-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .block-icon {
-    font-size: 16px;
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 4px;
+}
+
+.block-title {
+    flex: 1;
+    min-width: 0;
 }
 
 .block-name {
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .block-type {
-    font-size: 10px;
-    color: var(--text-tertiary);
-    margin-bottom: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .block-params {
+    font-size: 12px;
     margin-top: 8px;
+    max-height: 100px;
+    overflow-y: auto;
 }
 
-.param-item {
+.block-param {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    margin: 4px 0;
+    padding: 3px 0;
+    border-bottom: 1px dashed var(--border-primary);
+}
+
+.block-param:last-child {
+    border-bottom: none;
 }
 
 .param-label {
-    font-size: 10px;
     color: var(--text-secondary);
+    font-size: 11px;
+    flex-shrink: 0;
 }
 
 .param-value {
-    font-size: 10px;
     color: var(--text-primary);
     font-weight: 500;
+    font-size: 11px;
+    text-align: right;
+    flex-shrink: 0;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+/* Стили для ручек (handles) */
+.block-handle {
+    width: 10px !important;
+    height: 10px !important;
+    background: var(--accent-primary) !important;
+    border: 2px solid var(--bg-secondary) !important;
+    border-radius: 50% !important;
+    transition: all var(--transition-fast) !important;
+}
+
+/*.block-handle:hover {*/
+/*    background: var(--accent-hover) !important;*/
+/*    transform: scale(1.2);*/
+/*    border-color: var(--bg-secondary) !important;*/
+/*}*/
 
 /* Темная тема */
 .dark-theme .block-node {
@@ -82,84 +141,69 @@
 .dark-theme .block-node.selected {
     background: var(--bg-secondary);
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 30%, transparent),
-    var(--shadow-lg);
 }
 
 .dark-theme .block-header {
     border-bottom-color: var(--border-secondary);
 }
 
-/* Handle для перетаскивания */
-.block-handle {
-    width: 8px !important;
-    height: 8px !important;
-    background: var(--accent-primary) !important;
-    border: 2px solid var(--bg-secondary) !important;
-    border-radius: 50% !important;
+.dark-theme .block-icon {
+    background: var(--bg-secondary);
 }
 
-.block-handle:hover {
-    background: var(--accent-hover) !important;
-    transform: scale(1.2);
+.dark-theme .block-param {
+    border-bottom-color: var(--border-secondary);
 }
 
-.handle-left {
-    left: -4px !important;
-}
+/* Адаптивность */
+@media (max-width: 768px) {
+    .block-node {
+        min-width: 150px;
+        padding: 8px;
+    }
 
-.handle-right {
-    right: -4px !important;
-}
+    .block-icon {
+        font-size: 16px;
+        width: 24px;
+        height: 24px;
+    }
 
-.handle-top {
-    top: -4px !important;
-}
+    .block-name {
+        font-size: 12px;
+    }
 
-.handle-bottom {
-    bottom: -4px !important;
-}
+    .block-type {
+        font-size: 10px;
+    }
 
-/* Порт (точка соединения) */
-.react-flow__handle {
-    width: 8px !important;
-    height: 8px !important;
-    background: var(--accent-primary) !important;
-    border: 2px solid var(--bg-secondary) !important;
-}
-
-.react-flow__handle:hover {
-    background: var(--accent-hover) !important;
-}
-
-/* Соединения */
-.react-flow__edge-path {
-    stroke: var(--accent-primary) !important;
-    stroke-width: 2px !important;
-}
-
-.react-flow__edge.animated path {
-    stroke-dasharray: 5 !important;
-    animation: dashdraw 0.5s linear infinite !important;
-}
-
-@keyframes dashdraw {
-    from {
-        stroke-dashoffset: 10;
+    .block-param {
+        font-size: 11px;
     }
 }
 
-/* Текст на соединениях */
-.react-flow__edge-text {
-    font-size: 10px !important;
-    fill: var(--text-primary) !important;
+/* Прокрутка для параметров */
+.block-params::-webkit-scrollbar {
+    width: 4px;
+}
+
+.block-params::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.block-params::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 2px;
+}
+
+.block-params::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
 }
 
 /* Анимация появления */
 @keyframes nodeAppear {
     from {
         opacity: 0;
-        transform: scale(0.8);
+        transform: scale(0.9);
     }
     to {
         opacity: 1;
@@ -169,16 +213,4 @@
 
 .block-node {
     animation: nodeAppear 0.2s ease-out;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .block-node {
-        min-width: 120px;
-        padding: 8px;
-    }
-
-    .block-name {
-        font-size: 11px;
-    }
 }

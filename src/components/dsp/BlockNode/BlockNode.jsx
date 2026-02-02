@@ -1,44 +1,70 @@
 import { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Handle, Position } from '@xyflow/react';
-import { isGeneratorBlock, isVisualizationBlock } from '../../../utils/helpers';
+import {
+    isGeneratorBlock,
+    isVisualizationBlock,
+    getBlockIcon,
+    getBlockDescription,
+    formatParamName,
+    formatParamValue
+} from '../../../utils/helpers';
 import './BlockNode.css';
 
-function BlockNode({ data }) {
+function BlockNode({ data, selected }) {
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
+    const icon = getBlockIcon(data.blockType);
+    const description = getBlockDescription(data.blockType);
 
     return (
-        <div className="block-node">
+        <div className={`block-node ${selected ? 'selected' : ''}`}>
             {hasInput && (
                 <Handle
                     type="target"
                     position={Position.Left}
                     id="input"
-                    style={{ background: 'var(--accent-primary)' }}
+                    className="block-handle"
                 />
             )}
 
             <div className="block-header">
-                {data.label}
+                <div className="block-icon-title">
+                    <span className="block-icon" title={description}>
+                        {icon}
+                    </span>
+                    <div className="block-title">
+                        <div className="block-name">{data.label}</div>
+                        <div className="block-type">{description}</div>
+                    </div>
+                </div>
             </div>
 
-            <div className="block-params">
-                {/* Параметры блока */}
-                {Object.entries(data.params || {}).slice(0, 2).map(([key, value]) => (
-                    <div key={key} className="block-param">
-                        <span className="param-label">{key}:</span>
-                        <span className="param-value">{String(value)}</span>
-                    </div>
-                ))}
-            </div>
+            {data.params && Object.keys(data.params).length > 0 && (
+                <div className="block-params">
+                    {Object.entries(data.params).slice(0, 3).map(([key, value]) => (
+                        <div key={key} className="block-param">
+                            <span className="param-label">{formatParamName(key)}:</span>
+                            <span className="param-value">{formatParamValue(value)}</span>
+                        </div>
+                    ))}
+                    {Object.keys(data.params).length > 3 && (
+                        <div className="block-param">
+                            <span className="param-label">...</span>
+                            <span className="param-value">
+                                еще {Object.keys(data.params).length - 3}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {hasOutput && (
                 <Handle
                     type="source"
                     position={Position.Right}
                     id="output"
-                    style={{ background: 'var(--accent-primary)' }}
+                    className="block-handle"
                 />
             )}
         </div>
@@ -50,7 +76,8 @@ BlockNode.propTypes = {
         label: PropTypes.string.isRequired,
         blockType: PropTypes.string.isRequired,
         params: PropTypes.object
-    }).isRequired
+    }).isRequired,
+    selected: PropTypes.bool.isRequired
 };
 
 export default memo(BlockNode);
