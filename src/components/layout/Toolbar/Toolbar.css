@@ -1,0 +1,84 @@
+.toolbar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-primary);
+    width: 280px;
+    transition: width 0.3s;
+    z-index: 10;
+}
+
+.toolbar.collapsed {
+    width: 50px;
+}
+
+.toolbar-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toolbar-header h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.toolbar-content {
+    padding: 8px;
+    overflow-y: auto;
+    height: calc(100% - 48px);
+}
+
+.group-container {
+    margin-bottom: 8px;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+}
+
+.group-header {
+    padding: 10px;
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.group-blocks {
+    padding: 4px;
+}
+
+.block-item {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    margin: 4px;
+    cursor: grab;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.block-item:hover {
+    border-color: var(--accent-primary);
+}
+
+.block-icon {
+    font-size: 16px;
+}
+
+.block-name {
+    font-weight: 600;
+    font-size: 12px;
+}

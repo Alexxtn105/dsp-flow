@@ -1,85 +1,88 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import DSPEditor from './DSPEditor';
-import Footer from './components/Footer';
-import SaveDialog from './components/SaveDialog';
-import LoadDialog from './components/LoadDialog';
+import { useState, useCallback } from 'react';
+import { useTheme } from './hooks/useTheme';
+import { DSPEditorProvider } from './contexts/DSPEditorContext';
+import Header from './components/layout/Header';
+import DSPEditor from './components/dsp/DSPEditor';
+import Footer from './components/layout/Footer';
+import SaveDialog from './components/dialogs/SaveDialog';
+import LoadDialog from './components/dialogs/LoadDialog';
 import './App.css';
 
 function App() {
-    const [isDarkTheme, setIsDarkTheme] = useState(() => {
-        const savedTheme = localStorage.getItem('dsp-theme');
-        return savedTheme === 'dark';
-    });
-
+    const { isDarkTheme, toggleTheme } = useTheme();
+    const [reactFlowInstance, setReactFlowInstance] = useState(null);
+    
+    // Состояние текущей схемы
     const [currentScheme, setCurrentScheme] = useState({
         name: 'not_saved',
-        isSaved: false
+        isSaved: true // true потому что новый проект пустой
     });
 
+    // Состояния диалогов
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
-    const [hasNodes, setHasNodes] = useState(false);
-    const [isRunning, setIsRunning] = useState(false);
+
+    // Статистика схемы
     const [stats, setStats] = useState({
         nodesCount: 0,
         connectionsCount: 0
     });
-    const isSchemeLoaded = useRef(false);
 
-    useEffect(() => {
-        localStorage.setItem('dsp-theme', isDarkTheme ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+    // Состояние симуляции
+    const [isRunning, setIsRunning] = useState(false);
 
-        if (isDarkTheme) {
-            document.body.classList.add('dark-theme');
-        } else {
-            document.body.classList.remove('dark-theme');
-        }
-    }, [isDarkTheme]);
-
-    const toggleTheme = () => {
-        setIsDarkTheme(!isDarkTheme);
-    };
-
-    const handleSave = () => {
-        if (currentScheme.name === 'not_saved') {
-            setShowSaveAsDialog(true);
-        } else {
-            setShowSaveDialog(true);
-        }
-    };
-
-    const handleSchemeUpdate = (schemeName, isSaved = true) => {
-        // Защита от сброса на not_saved после загрузки схемы
-        if (isSchemeLoaded.current && schemeName === 'not_saved') {
-            return;
-        }
-
+    /**
+     * Обновление информации о схеме
+     */
+    const handleSchemeUpdate = useCallback((schemeName, isSaved = true) => {
         setCurrentScheme({
             name: schemeName,
             isSaved
         });
-
-        // Отмечаем, что схема была загружена
-        if (schemeName !== 'not_saved' && isSaved) {
-            isSchemeLoaded.current = true;
-        }
-    };
-
-    const handleLoad = () => {
-        setShowLoadDialog(true);
-    };
-
-    const handleNodesUpdate = useCallback((hasNodes) => {
-        setHasNodes(hasNodes);
     }, []);
 
+    /**
+     * Обновление статистики
+     */
     const handleStatsUpdate = useCallback((newStats) => {
         setStats(newStats);
     }, []);
 
-    const handleStartSimulation = () => {
+    /**
+     * Обработчик сохранения
+     */
+    const handleSave = useCallback(() => {
+        if (currentScheme.name === 'not_saved') {
+            // Если схема ещё не сохранялась - показываем "Сохранить как"
+            setShowSaveAsDialog(true);
+        } else {
+            // Если схема уже есть - сохраняем поверх
+            setShowSaveDialog(true);
+        }
+    }, [currentScheme.name]);
+
+    /**
+     * Обработчик успешного сохранения
+     */
+    const handleSaveSuccess = useCallback((schemeName) => {
+        handleSchemeUpdate(schemeName, true);
+        setShowSaveDialog(false);
+        setShowSaveAsDialog(false);
+    }, [handleSchemeUpdate]);
+
+    /**
+     * Обработчик успешной загрузки
+     */
+    const handleLoadSuccess = useCallback((schemeName) => {
+        handleSchemeUpdate(schemeName, true);
+        setShowLoadDialog(false);
+    }, [handleSchemeUpdate]);
+
+    /**
+     * Запуск симуляции
+     */
+    const handleStartSimulation = useCallback(() => {
         if (stats.nodesCount === 0) {
             alert('Добавьте хотя бы один узел для запуска симуляции');
             return;
@@ -92,128 +95,85 @@ function App() {
 
         setIsRunning(true);
         console.log('Запуск симуляции схемы...');
-        // TODO: Добавить логику запуска симуляции
-    };
+        // TODO: Добавить логику запуска симуляции (будет в backend)
+    }, [stats]);
 
-    const handleStopSimulation = () => {
+    /**
+     * Остановка симуляции
+     */
+    const handleStopSimulation = useCallback(() => {
         setIsRunning(false);
         console.log('Остановка симуляции...');
-        // TODO: Добавить логику остановки симуляции
-    };
+        // TODO: Добавить логику остановки симуляции (будет в backend)
+    }, []);
 
-    const isSaveEnabled = currentScheme.name !== 'not_saved' && currentScheme.isSaved;
-    const isSaveAsEnabled = hasNodes;
+    // Условия активности кнопок
+    const isSaveEnabled = currentScheme.name !== 'not_saved' && !currentScheme.isSaved;
+    const isSaveAsEnabled = stats.nodesCount > 0;
 
     return (
-        <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <header className="app-header">
-                <div className="app-header-left">
-                    <h1>🎛️ DSP Flow Editor</h1>
-                    <p>Редактор схем цифровой обработки сигналов</p>
-                </div>
-
-                <div className="app-header-center">
-                    <div className="current-scheme-info">
-                        <div className="scheme-name" title={currentScheme.name}>
-                            {currentScheme.name}
-                        </div>
-                        {!currentScheme.isSaved && currentScheme.name !== 'not_saved' && (
-                            <div className="scheme-unsaved">
-                                (не сохранено)
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="app-header-right">
-                    <div className="header-controls">
-                        <button
-                            className="header-btn save"
-                            onClick={handleSave}
-                            title={isSaveEnabled ? "Сохранить текущую схему" : "Сначала сохраните схему как..."}
-                            disabled={!isSaveEnabled}
-                        >
-                            💾 Сохранить
-                        </button>
-
-                        <button
-                            className="header-btn save-as"
-                            onClick={() => setShowSaveAsDialog(true)}
-                            title="Сохранить под новым именем"
-                            disabled={!isSaveAsEnabled}
-                        >
-                            📝 Сохранить как
-                        </button>
-
-                        <button
-                            className="header-btn load"
-                            onClick={handleLoad}
-                            title="Загрузить сохраненную схему"
-                        >
-                            📂 Загрузить
-                        </button>
-                    </div>
-
-                    <button className="theme-toggle" onClick={toggleTheme}>
-                        {isDarkTheme ? '☀️ Светлая тема' : '🌙 Темная тема'}
-                    </button>
-                </div>
-            </header>
-
-            <DSPEditor
-                isDarkTheme={isDarkTheme}
-                currentScheme={currentScheme}
-                onSchemeUpdate={handleSchemeUpdate}
-                onNodesUpdate={handleNodesUpdate}
-                onStatsUpdate={handleStatsUpdate}
-            />
-
-            <Footer
-                isDarkTheme={isDarkTheme}
-                onStart={handleStartSimulation}
-                onStop={handleStopSimulation}
-                isRunning={isRunning}
-                nodesCount={stats.nodesCount}
-                connectionsCount={stats.connectionsCount}
-            />
-
-            {showSaveDialog && (
-                <SaveDialog
+        <DSPEditorProvider reactFlowInstance={reactFlowInstance}>
+            <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
+                <Header
                     isDarkTheme={isDarkTheme}
-                    onClose={() => setShowSaveDialog(false)}
-                    schemeName={currentScheme.name}
-                    onSaveSuccess={(newName) => {
-                        handleSchemeUpdate(newName, true);
-                        setShowSaveDialog(false);
-                    }}
-                    mode="save"
+                    toggleTheme={toggleTheme}
+                    currentScheme={currentScheme}
+                    onSave={handleSave}
+                    onSaveAs={() => setShowSaveAsDialog(true)}
+                    onLoad={() => setShowLoadDialog(true)}
+                    isSaveEnabled={isSaveEnabled}
+                    isSaveAsEnabled={isSaveAsEnabled}
                 />
-            )}
 
-            {showSaveAsDialog && (
-                <SaveDialog
+                <DSPEditor
                     isDarkTheme={isDarkTheme}
-                    onClose={() => setShowSaveAsDialog(false)}
-                    schemeName={currentScheme.name}
-                    onSaveSuccess={(newName) => {
-                        handleSchemeUpdate(newName, true);
-                        setShowSaveAsDialog(false);
-                    }}
-                    mode="saveAs"
+                    currentScheme={currentScheme}
+                    onSchemeUpdate={handleSchemeUpdate}
+                    onStatsUpdate={handleStatsUpdate}
+                    onReactFlowInit={setReactFlowInstance}
                 />
-            )}
 
-            {showLoadDialog && (
-                <LoadDialog
+                <Footer
                     isDarkTheme={isDarkTheme}
-                    onClose={() => setShowLoadDialog(false)}
-                    onLoadSuccess={(schemeName) => {
-                        handleSchemeUpdate(schemeName, true);
-                        setShowLoadDialog(false);
-                    }}
+                    onStart={handleStartSimulation}
+                    onStop={handleStopSimulation}
+                    isRunning={isRunning}
+                    nodesCount={stats.nodesCount}
+                    connectionsCount={stats.connectionsCount}
                 />
-            )}
-        </div>
+
+                {/* Диалог сохранения */}
+                {showSaveDialog && (
+                    <SaveDialog
+                        isDarkTheme={isDarkTheme}
+                        onClose={() => setShowSaveDialog(false)}
+                        schemeName={currentScheme.name}
+                        onSaveSuccess={handleSaveSuccess}
+                        mode="save"
+                    />
+                )}
+
+                {/* Диалог "Сохранить как" */}
+                {showSaveAsDialog && (
+                    <SaveDialog
+                        isDarkTheme={isDarkTheme}
+                        onClose={() => setShowSaveAsDialog(false)}
+                        schemeName={currentScheme.name}
+                        onSaveSuccess={handleSaveSuccess}
+                        mode="saveAs"
+                    />
+                )}
+
+                {/* Диалог загрузки */}
+                {showLoadDialog && (
+                    <LoadDialog
+                        isDarkTheme={isDarkTheme}
+                        onClose={() => setShowLoadDialog(false)}
+                        onLoadSuccess={handleLoadSuccess}
+                    />
+                )}
+            </div>
+        </DSPEditorProvider>
     );
 }
 

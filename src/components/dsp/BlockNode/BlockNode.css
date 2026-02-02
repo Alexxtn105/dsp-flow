@@ -1,0 +1,22 @@
+.block-node {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: 10px;
+    min-width: 180px;
+}
+
+.block-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.block-params {
+    font-size: 12px;
+}
+
+.block-param {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+}

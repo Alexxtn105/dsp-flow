@@ -1,0 +1,98 @@
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.dialog {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: var(--shadow-xl);
+}
+
+.dialog-title {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.dialog input,
+.dialog textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.dialog-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dialog-buttons button:first-child {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.dialog-buttons button:last-child {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.error-message {
+    color: var(--danger);
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.schemes-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.scheme-item {
+    padding: 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+}
+
+.scheme-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.scheme-actions button {
+    padding: 4px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 12px;
+}
