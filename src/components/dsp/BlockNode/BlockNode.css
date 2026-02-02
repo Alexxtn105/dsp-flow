@@ -1,22 +1,184 @@
 .block-node {
     background: var(--bg-secondary);
     border: 2px solid var(--border-primary);
-    border-radius: var(--radius-lg);
-    padding: 10px;
-    min-width: 180px;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    min-width: 150px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    cursor: grab;
+}
+
+.block-node:hover {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.block-node.selected {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 30%, transparent),
+    var(--shadow-md);
+    background: var(--bg-primary);
 }
 
 .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.block-icon {
+    font-size: 16px;
+}
+
+.block-name {
     font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.block-type {
+    font-size: 10px;
+    color: var(--text-tertiary);
     margin-bottom: 8px;
 }
 
 .block-params {
-    font-size: 12px;
+    margin-top: 8px;
 }
 
-.block-param {
+.param-item {
     display: flex;
     justify-content: space-between;
-    margin: 4px 0;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.param-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.param-value {
+    font-size: 10px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Темная тема */
+.dark-theme .block-node {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .block-node:hover {
+    border-color: var(--accent-primary);
+}
+
+.dark-theme .block-node.selected {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 30%, transparent),
+    var(--shadow-lg);
+}
+
+.dark-theme .block-header {
+    border-bottom-color: var(--border-secondary);
+}
+
+/* Handle для перетаскивания */
+.block-handle {
+    width: 8px !important;
+    height: 8px !important;
+    background: var(--accent-primary) !important;
+    border: 2px solid var(--bg-secondary) !important;
+    border-radius: 50% !important;
+}
+
+.block-handle:hover {
+    background: var(--accent-hover) !important;
+    transform: scale(1.2);
+}
+
+.handle-left {
+    left: -4px !important;
+}
+
+.handle-right {
+    right: -4px !important;
+}
+
+.handle-top {
+    top: -4px !important;
+}
+
+.handle-bottom {
+    bottom: -4px !important;
+}
+
+/* Порт (точка соединения) */
+.react-flow__handle {
+    width: 8px !important;
+    height: 8px !important;
+    background: var(--accent-primary) !important;
+    border: 2px solid var(--bg-secondary) !important;
+}
+
+.react-flow__handle:hover {
+    background: var(--accent-hover) !important;
+}
+
+/* Соединения */
+.react-flow__edge-path {
+    stroke: var(--accent-primary) !important;
+    stroke-width: 2px !important;
+}
+
+.react-flow__edge.animated path {
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.5s linear infinite !important;
+}
+
+@keyframes dashdraw {
+    from {
+        stroke-dashoffset: 10;
+    }
+}
+
+/* Текст на соединениях */
+.react-flow__edge-text {
+    font-size: 10px !important;
+    fill: var(--text-primary) !important;
+}
+
+/* Анимация появления */
+@keyframes nodeAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.block-node {
+    animation: nodeAppear 0.2s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .block-node {
+        min-width: 120px;
+        padding: 8px;
+    }
+
+    .block-name {
+        font-size: 11px;
+    }
 }
