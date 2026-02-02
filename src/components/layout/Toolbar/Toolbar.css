@@ -8,10 +8,12 @@
     width: 280px;
     transition: width 0.3s;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
 }
 
 .toolbar.collapsed {
-    width: 60px;
+    width: 50px;
 }
 
 .toolbar-header {
@@ -22,6 +24,7 @@
     align-items: center;
     min-height: 48px;
     flex-shrink: 0;
+    transition: padding var(--transition-fast);
 }
 
 .toolbar-header-content {
@@ -84,11 +87,15 @@
     background: var(--accent-primary);
     color: white;
     border-color: var(--accent-primary);
+    transform: scale(1.1)
 }
 
 .toolbar.collapsed .collapse-btn {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0;
+    width: 32px;
+    height: 32px;
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
 }
 
 
@@ -156,6 +163,14 @@
 .block-icon {
     font-size: 16px;
 
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
 }
 
 .block-info {
