@@ -1,6 +1,6 @@
 import { BaseEdge, getBezierPath } from '@xyflow/react';
 
-function ComplexSignalEdge({ id, sourceX, sourceY, targetX, targetY }) {
+function ComplexSignalEdge({ id, sourceX, sourceY, targetX, targetY, data }) {
     const [edgePath] = getBezierPath({
         sourceX,
         sourceY,
@@ -22,6 +22,7 @@ function ComplexSignalEdge({ id, sourceX, sourceY, targetX, targetY }) {
                     strokeDasharray: '5,5',
                     opacity: 0.5,
                     fill: 'none',
+                    animation: data?.isRunning ? 'dashdraw 0.5s linear infinite' : 'none'
                 }}
             />
             <BaseEdge
@@ -32,6 +33,7 @@ function ComplexSignalEdge({ id, sourceX, sourceY, targetX, targetY }) {
                     strokeWidth: 2,
                     strokeDasharray: '5,5',
                     fill: 'none',
+                    animation: data?.isRunning ? 'dashdraw 0.5s linear infinite' : 'none'
                 }}
             />
         </>

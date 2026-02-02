@@ -4,7 +4,7 @@
 .signal-legend {
     position: absolute;
     right: 15px;
-    top: 15px; /* Перемещаем в левый нижний угол */
+    top: 15px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-md);
@@ -15,10 +15,37 @@
     max-width: 180px;
 }
 
-.signal-legend-title {
-    font-weight: 600;
+.signal-legend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 8px;
-    color: var(--text-primary);
+}
+
+.signal-legend-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.simulation-status {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+.simulation-status.running {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.simulation-status.stopped {
+    color: #6b7280;
+    background: rgba(107, 114, 128, 0.1);
+    border: 1px solid rgba(107, 114, 128, 0.3);
 }
 
 .signal-legend-items {
@@ -39,7 +66,7 @@
     position: relative;
 }
 
-/* ИСПРАВЛЕНИЕ: делаем действительный сигнал пунктирным */
+/*  действительный сигнал - синим пунктирным */
 .signal-legend-line.real {
     background: transparent;
     border-bottom: 2px dashed #3b82f6;
@@ -77,6 +104,15 @@
     white-space: nowrap;
 }
 
+.animation-hint {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-primary);
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
 /* Темная тема */
 .dark-theme .signal-legend-line.real {
     border-bottom-color: #60a5fa;
@@ -87,10 +123,23 @@
     border-bottom-color: #a78bfa;
 }
 
+/* Подсветка при наведении */
+.react-flow__edge:hover .react-flow__edge-path {
+    stroke-width: 3px !important;
+    filter: brightness(1.2);
+}
+
+.dsp-editor.simulation-running .react-flow__edge:hover .react-flow__edge-path {
+    animation-duration: 0.3s !important; /* Ускоряем анимацию при наведении */
+}
+
 /* Анимация для соединений (скорость движения пунктира)*/
 @keyframes dashdraw {
-    from {
-        stroke-dashoffset: 10;
+    0% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: -10;
     }
 }
 
@@ -98,15 +147,31 @@
 .react-flow__edge.real .react-flow__edge-path {
     stroke: #3b82f6 !important;
     stroke-width: 2px !important;
-    stroke-dasharray: 5 !important;
-    animation: dashdraw 0.5s linear infinite !important;
+    stroke-dasharray: 5 5 !important;
 }
 
 .react-flow__edge.complex .react-flow__edge-path {
     stroke: #8b5cf6 !important;
     stroke-width: 2px !important;
-    stroke-dasharray: 5 !important;
+    stroke-dasharray: 5 5 !important;
+}
+
+/* Анимация ВКЛЮЧЕНА при запущенной симуляции */
+.dsp-editor.simulation-running .react-flow__edge.real .react-flow__edge-path {
     animation: dashdraw 0.5s linear infinite !important;
+}
+
+.dsp-editor.simulation-running .react-flow__edge.complex .react-flow__edge-path {
+    animation: dashdraw 0.5s linear infinite !important;
+}
+
+/* Анимация ВЫКЛЮЧЕНА при остановленной симуляции */
+.dsp-editor.simulation-stopped .react-flow__edge.real .react-flow__edge-path {
+    animation: none !important;
+}
+
+.dsp-editor.simulation-stopped .react-flow__edge.complex .react-flow__edge-path {
+    animation: none !important;
 }
 
 /* Для темной темы */

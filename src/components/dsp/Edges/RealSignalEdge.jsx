@@ -19,6 +19,7 @@ function RealSignalEdge({ id, sourceX, sourceY, targetX, targetY, data }) {
                 strokeWidth: 2,
                 strokeDasharray: '5,5',
                 fill: 'none',
+                animation: data?.isRunning ? 'dashdraw 0.5s linear infinite' : 'none'
             }}
         />
     );

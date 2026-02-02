@@ -117,9 +117,6 @@ function App() {
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
                 <Header
                     currentScheme={currentScheme}
-
-
-
                 />
 
                 <div className="app-content">
@@ -139,6 +136,7 @@ function App() {
                         onSchemeUpdate={handleSchemeUpdate}
                         onStatsUpdate={handleStatsUpdate}
                         onReactFlowInit={setReactFlowInstance}
+                        isRunning={isRunning}
                     />
                 </div>
 

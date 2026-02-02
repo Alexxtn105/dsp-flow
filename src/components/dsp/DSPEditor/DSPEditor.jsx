@@ -41,7 +41,8 @@ function DSPEditor({
                        currentScheme,
                        onSchemeUpdate,
                        onStatsUpdate,
-                       onReactFlowInit
+                       onReactFlowInit,
+                       isRunning
                    }) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -144,7 +145,7 @@ function DSPEditor({
             // Создаём ребро с информацией о типе сигнала
             const edge = {
                 ...params,
-                animated: true,
+                animated: isRunning, // Анимация зависит от состояния симуляции
                 type: signalType === 'complex' ? 'complex' : 'real',
                 data: {
                     signalType: signalType
@@ -158,7 +159,7 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme, onSchemeUpdate, nodes]
+        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning]
     );
 
     const onDragOver = useCallback((event) => {
@@ -204,6 +205,18 @@ function DSPEditor({
         [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate]
     );
 
+    // Обновляем анимацию существующих соединений при изменении состояния симуляции
+    useEffect(() => {
+        setEdges(eds => eds.map(edge => ({
+            ...edge,
+            animated: isRunning,
+            data: {
+                ...edge.data,
+                isRunning: isRunning
+            }
+        })));
+    }, [isRunning, setEdges]);
+
     return (
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
             <Toolbar isDarkTheme={isDarkTheme} />
@@ -241,7 +254,8 @@ DSPEditor.propTypes = {
     currentScheme: PropTypes.object.isRequired,
     onSchemeUpdate: PropTypes.func.isRequired,
     onStatsUpdate: PropTypes.func.isRequired,
-    onReactFlowInit: PropTypes.func
+    onReactFlowInit: PropTypes.func,
+    isRunning: PropTypes.bool.isRequired
 };
 
 export default DSPEditor;
