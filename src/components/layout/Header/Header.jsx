@@ -1,16 +1,7 @@
 import PropTypes from 'prop-types';
 import './Header.css';
 
-function Header({
-                    isDarkTheme,
-                    toggleTheme,
-                    currentScheme,
-                    onSave,
-                    onSaveAs,
-                    onLoad,
-                    isSaveEnabled,
-                    isSaveAsEnabled
-                }) {
+function Header({ currentScheme }) {
     return (
         <header className="app-header">
             <div className="app-header-left">
@@ -32,54 +23,17 @@ function Header({
             </div>
 
             <div className="app-header-right">
-                <div className="header-controls">
-                    <button
-                        className="header-btn save"
-                        onClick={onSave}
-                        title="Сохранить текущую схему"
-                        disabled={!isSaveEnabled}
-                    >
-                        💾 Сохранить
-                    </button>
-
-                    <button
-                        className="header-btn save-as"
-                        onClick={onSaveAs}
-                        title="Сохранить под новым именем"
-                        disabled={!isSaveAsEnabled}
-                    >
-                        📝 Сохранить как
-                    </button>
-
-                    <button
-                        className="header-btn load"
-                        onClick={onLoad}
-                        title="Загрузить сохраненную схему"
-                    >
-                        📂 Загрузить
-                    </button>
-                </div>
-
-                <button className="theme-toggle" onClick={toggleTheme}>
-                    {isDarkTheme ? '☀️ Светлая тема' : '🌙 Темная тема'}
-                </button>
+                {/* Кнопки управления перенесены в ControlToolbar */}
             </div>
         </header>
     );
 }
 
 Header.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
-    toggleTheme: PropTypes.func.isRequired,
     currentScheme: PropTypes.shape({
         name: PropTypes.string.isRequired,
         isSaved: PropTypes.bool.isRequired
-    }).isRequired,
-    onSave: PropTypes.func.isRequired,
-    onSaveAs: PropTypes.func.isRequired,
-    onLoad: PropTypes.func.isRequired,
-    isSaveEnabled: PropTypes.bool.isRequired,
-    isSaveAsEnabled: PropTypes.bool.isRequired
+    }).isRequired
 };
 
 export default Header;

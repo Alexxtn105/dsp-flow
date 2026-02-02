@@ -1,16 +1,14 @@
 .dsp-editor {
     width: 100%;
-    height: calc(100vh - 140px);
+    height: 100%;
     display: flex;
     position: relative;
+    flex: 1;
+    overflow: hidden;
 }
 
 .reactflow-wrapper {
     flex: 1;
     height: 100%;
-    margin-left: 280px;
-}
-
-.dsp-editor:has(.toolbar.collapsed) .reactflow-wrapper {
-    margin-left: 50px;
+    overflow: hidden;
 }

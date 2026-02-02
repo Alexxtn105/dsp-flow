@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { DSPEditorProvider } from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
+import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx'; // Новый импорт
 import DSPEditor from './components/dsp/DSPEditor';
 import Footer from './components/layout/Footer';
 import SaveDialog from './components/dialogs/SaveDialog';
@@ -115,23 +116,31 @@ function App() {
         <DSPEditorProvider reactFlowInstance={reactFlowInstance}>
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
                 <Header
-                    isDarkTheme={isDarkTheme}
-                    toggleTheme={toggleTheme}
                     currentScheme={currentScheme}
-                    onSave={handleSave}
-                    onSaveAs={() => setShowSaveAsDialog(true)}
-                    onLoad={() => setShowLoadDialog(true)}
-                    isSaveEnabled={isSaveEnabled}
-                    isSaveAsEnabled={isSaveAsEnabled}
+
+
+
                 />
 
-                <DSPEditor
-                    isDarkTheme={isDarkTheme}
-                    currentScheme={currentScheme}
-                    onSchemeUpdate={handleSchemeUpdate}
-                    onStatsUpdate={handleStatsUpdate}
-                    onReactFlowInit={setReactFlowInstance}
-                />
+                <div className="app-content">
+                    <ControlToolbar
+                        isDarkTheme={isDarkTheme}
+                        toggleTheme={toggleTheme}
+                        onSave={handleSave}
+                        onSaveAs={() => setShowSaveAsDialog(true)}
+                        onLoad={() => setShowLoadDialog(true)}
+                        isSaveEnabled={isSaveEnabled}
+                        isSaveAsEnabled={isSaveAsEnabled}
+                    />
+
+                    <DSPEditor
+                        isDarkTheme={isDarkTheme}
+                        currentScheme={currentScheme}
+                        onSchemeUpdate={handleSchemeUpdate}
+                        onStatsUpdate={handleStatsUpdate}
+                        onReactFlowInit={setReactFlowInstance}
+                    />
+                </div>
 
                 <Footer
                     isDarkTheme={isDarkTheme}

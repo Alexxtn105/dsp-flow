@@ -17,7 +17,7 @@ import { useAutoSave } from '../../../hooks/index.js';
 import { generateNodeId, getDefaultParams } from '../../../utils/helpers';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
-import './ReactFlowTheme.css'; // Добавляем импорт
+import './ReactFlowTheme.css';
 
 const nodeTypes = {
     block: BlockNode,
