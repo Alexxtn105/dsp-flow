@@ -50,17 +50,7 @@
 }
 
 .dark-theme .react-flow__minimap-node {
-    fill: #818cf8 !important;
-}
-
-/* Выделение ноды */
-.react-flow__node.selected {
-    box-shadow: 0 0 0 2px var(--accent-primary) !important;
-    border-radius: var(--radius-md) !important;
-}
-
-.react-flow__node.selected .block-node {
-    border-color: var(--accent-primary) !important;
+    fill: var(--accent-primary) !important;
 }
 
 /* Улучшения для темной темы */
@@ -76,6 +66,35 @@
 .dark-theme .react-flow__minimap {
     background: var(--bg-tertiary) !important;
     border-color: var(--border-secondary) !important;
+}
+
+/* Стили для ручек (handles) */
+.react-flow__handle {
+    width: 10px !important;
+    height: 10px !important;
+    background: var(--accent-primary) !important;
+    border: 2px solid var(--bg-secondary) !important;
+}
+
+.react-flow__handle:hover {
+    background: var(--accent-hover) !important;
+}
+
+/* Соединения */
+.react-flow__edge-path {
+    stroke: var(--accent-primary) !important;
+    stroke-width: 2px !important;
+}
+
+.react-flow__edge.animated path {
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.5s linear infinite !important;
+}
+
+@keyframes dashdraw {
+    from {
+        stroke-dashoffset: 10;
+    }
 }
 
 /* Адаптивность */

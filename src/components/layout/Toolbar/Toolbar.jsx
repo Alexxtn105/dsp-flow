@@ -1,7 +1,6 @@
-//import { useState } from 'prop-types';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { DSP_GROUPS } from '../../../utils/constants';
+import { DSP_GROUPS } from '../../../utils/index.js';
 import './Toolbar.css';
 
 function Toolbar({ isDarkTheme }) {
@@ -23,8 +22,15 @@ function Toolbar({ isDarkTheme }) {
     return (
         <div className={`toolbar ${isCollapsed ? 'collapsed' : ''} ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="toolbar-header">
-                <h2>Блоки DSP</h2>
-                <button className="collapse-btn" onClick={() => setIsCollapsed(!isCollapsed)}>
+                <div className="toolbar-header-content">
+                    <span className="toolbar-icon">🎛️</span>
+                    {!isCollapsed && <h2 className="toolbar-title">Блоки DSP</h2>}
+                </div>
+                <button
+                    className="collapse-btn"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    title={isCollapsed ? "Развернуть панель" : "Свернуть панель"}
+                >
                     {isCollapsed ? '▶' : '◀'}
                 </button>
             </div>
@@ -45,11 +51,17 @@ function Toolbar({ isDarkTheme }) {
                                             className="block-item"
                                             draggable
                                             onDragStart={(e) => onDragStart(e, block.name)}
+                                            title={block.description}
                                         >
                                             <span className="block-icon">{block.icon}</span>
-                                            <div className="block-info">
-                                                <div className="block-name">{block.name}</div>
-                                            </div>
+                                            {!isCollapsed && (
+                                                <div className="block-info">
+                                                    <div className="block-name">{block.name}</div>
+                                                    {block.description && (
+                                                        <div className="block-description">{block.description}</div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
