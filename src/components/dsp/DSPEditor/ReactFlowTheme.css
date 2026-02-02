@@ -206,3 +206,23 @@
         font-size: 10px;
     }
 }
+
+/* Дополнительные стили для кастомных классов */
+.dark-theme-controls .react-flow__controls-button {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-secondary) !important;
+}
+
+.dark-theme-controls .react-flow__controls-button:hover {
+    background-color: var(--accent-primary) !important;
+}
+
+.dark-theme-minimap {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-secondary) !important;
+}
+
+.dark-theme-minimap .react-flow__minimap-node {
+    fill: var(--bg-tertiary) !important;
+    stroke: var(--border-primary) !important;
+}

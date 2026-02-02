@@ -291,8 +291,21 @@ function DSPEditor({
                         gap={16}
                         size={1}
                     />
-                    <Controls />
-                    <MiniMap />
+                    <Controls
+                        className={isDarkTheme ? 'dark-theme-controls' : ''}
+                        showInteractive={false} // Можно скрыть кнопку переключения интерактивности, если не нужна
+                    />
+                    <MiniMap
+                        className={isDarkTheme ? 'dark-theme-minimap' : ''}
+                        nodeStrokeColor={(node) => {
+                            if (node.selected) return '#4F46E5';
+                            return isDarkTheme ? '#4b5563' : '#d1d5db';
+                        }}
+                        nodeColor={(node) => {
+                            return isDarkTheme ? '#374151' : '#f3f4f6';
+                        }}
+                        maskColor={isDarkTheme ? 'rgba(86, 204, 242, 0.1)' : 'rgba(240, 240, 240, 0.6)'}
+                    />
                 </ReactFlow>
                 <SignalLegend isDarkTheme={isDarkTheme} />
             </div>
