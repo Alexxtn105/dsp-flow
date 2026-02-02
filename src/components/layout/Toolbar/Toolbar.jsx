@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Icon from '../../common/Icons/Icon.jsx';
-import { DSP_GROUPS } from '../../../utils/constants';
+import { DSP_GROUPS } from '../../../utils/index.js';
 import './Toolbar.css';
 
 function Toolbar({ isDarkTheme }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [collapsedGroups, setCollapsedGroups] = useState({});
-    const [draggingBlock, setDraggingBlock] = useState(null);
+    const [, setDraggingBlock] = useState(null);
 
     const onDragStart = (event, blockName) => {
         event.dataTransfer.setData('application/reactflow', blockName);
@@ -63,7 +63,7 @@ function Toolbar({ isDarkTheme }) {
                     {DSP_GROUPS.map((group) => (
                         <div
                             key={group.id}
-                            className={`group-container ${collapsedGroups[group.id] ? 'active' : ''}`}
+                            className="group-container"
                         >
                             <div
                                 className="group-header"

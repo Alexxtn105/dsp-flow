@@ -108,8 +108,8 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: var(--bg-secondary);
-    /*box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);*/
-    /*transition: all var(--transition-normal);*/
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-normal);
 }
 
 .group-container:hover {
@@ -313,17 +313,8 @@
     min-width: 120px;
 }
 
-/* Для активной группы */
-.group-container.active {
-    /*border: 1px solid var(--accent-primary);*/
-    box-shadow: 0 0 0 1px var(--accent-primary), 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.group-header.active {
-    background: var(--accent-primary);
-    color: white;
-    border-color: var(--accent-primary);
-}
+/* Убираем синюю границу для свернутых групп */
+/* .group-container.active стиль удален */
 
 /* Мобильная адаптивность */
 @media (max-width: 768px) {
@@ -368,7 +359,7 @@
     }
 }
 
-/* Тема: светлая (уточнения) */
+/* Светлая тема */
 :root {
     .toolbar {
         background: #ffffff;
@@ -399,7 +390,7 @@
     }
 }
 
-/* Тема: темная */
+/* Темная тема */
 .dark-theme {
     .toolbar {
         background: #161b22;
