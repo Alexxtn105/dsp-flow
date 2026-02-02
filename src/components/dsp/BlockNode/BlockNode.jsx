@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Handle, Position } from '@xyflow/react';
-import Icon from '../../common/Icon';
+import Icon from '../../common/Icons/Icon.jsx';
 import {
     isGeneratorBlock,
     isVisualizationBlock,

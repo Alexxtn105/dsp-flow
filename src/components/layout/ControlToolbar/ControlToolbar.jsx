@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import Icon from '../../common/Icon';
+import Icon from '../../common/Icons/Icon.jsx';
 import './ControlToolbar.css';
 
 function ControlToolbar({

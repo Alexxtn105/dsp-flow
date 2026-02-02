@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import Icon from '../../common/Icon';
+import Icon from '../../common/Icons/Icon.jsx';
 import { DSP_GROUPS } from '../../../utils/constants';
 import './Toolbar.css';
 
