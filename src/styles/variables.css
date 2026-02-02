@@ -48,6 +48,16 @@
   --transition-fast: 150ms;
   --transition-normal: 200ms;
   --transition-slow: 300ms;
+
+  /* Дополнительные для тулбара */
+  --toolbar-bg: #ffffff;
+  --toolbar-border: #e5e7eb;
+  --toolbar-group-bg: #ffffff;
+  --toolbar-item-bg: #ffffff;
+  --toolbar-item-hover-bg: #f9fafb;
+  --toolbar-item-hover-border: #d1d5db;
+  --toolbar-icon-bg: #f3f4f6;
+  --toolbar-icon-hover-bg: #ffffff;
 }
 
 /*!* Темная тема *!*/
@@ -120,4 +130,14 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+
+  /* Дополнительные для тулбара */
+  --toolbar-bg: #161b22;
+  --toolbar-border: #30363d;
+  --toolbar-group-bg: #161b22;
+  --toolbar-item-bg: #161b22;
+  --toolbar-item-hover-bg: #21262d;
+  --toolbar-item-hover-border: #3c444d;
+  --toolbar-icon-bg: #21262d;
+  --toolbar-icon-hover-bg: #2d333b;
 }
