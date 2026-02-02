@@ -135,11 +135,12 @@
     background: var(--bg-tertiary);
 }
 
+/* ИЗМЕНЕНИЕ: Один блок на строку */
 .group-blocks {
     padding: 8px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .block-item {
@@ -149,14 +150,14 @@
     padding: 12px;
     cursor: grab;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     transition: all var(--transition-fast);
-    min-height: 80px;
+    min-height: 60px;
     position: relative;
     overflow: hidden;
     user-select: none;
+    width: 100%;
 }
 
 .block-item:hover {
@@ -181,6 +182,7 @@
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    flex-shrink: 0;
 }
 
 .block-item:hover .block-icon {
@@ -189,34 +191,29 @@
 }
 
 .block-info {
-    width: 100%;
-    text-align: center;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
 }
 
 .block-name {
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-primary);
     line-height: 1.3;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    min-height: 30px;
+    white-space: nowrap;
 }
 
 .block-description {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-secondary);
     line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    min-height: 24px;
+    white-space: nowrap;
 }
 
 /* Адаптивность для свернутого состояния */
@@ -313,9 +310,6 @@
     min-width: 120px;
 }
 
-/* Убираем синюю границу для свернутых групп */
-/* .group-container.active стиль удален */
-
 /* Мобильная адаптивность */
 @media (max-width: 768px) {
     .toolbar {
@@ -342,20 +336,29 @@
         font-size: 18px;
     }
 
+    /* ИЗМЕНЕНИЕ: Для мобильных тоже один блок на строку */
     .group-blocks {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
+        gap: 4px;
     }
 
     .block-item {
         padding: 10px;
-        min-height: 70px;
+        min-height: 56px;
+        gap: 10px;
     }
 
     .block-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .block-name {
+        font-size: 12px;
+    }
+
+    .block-description {
+        font-size: 10px;
     }
 }
 
@@ -471,4 +474,16 @@
     outline: 2px solid var(--accent-primary);
     outline-offset: -2px;
     border-radius: var(--radius-md);
+}
+
+/* ИЗМЕНЕНИЕ: Добавим визуальный разделитель между блоками для лучшей читаемости */
+.block-item + .block-item {
+    margin-top: 0;
+}
+
+/* ИЗМЕНЕНИЕ: Улучшенное отображение для длинных названий */
+.block-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
