@@ -5,7 +5,7 @@ function Header({ currentScheme }) {
     return (
         <header className="app-header">
             <div className="app-header-left">
-                <h1>🎛️ DSP Flow Editor</h1>
+                <h1>DSP Flow Editor</h1>
                 <p>Редактор схем цифровой обработки сигналов</p>
             </div>
 

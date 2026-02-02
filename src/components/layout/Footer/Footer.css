@@ -2,10 +2,13 @@
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-primary);
     padding: 12px 24px;
-    height: 70px;
+    height: 50px;
     flex-shrink: 0;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
     z-index: 10;
+    display: flow;
+    align-items: center;
+    gap: 20px;
 }
 
 .dark-theme .app-footer {
@@ -42,6 +45,7 @@
     padding: 6px 12px;
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
 }
 
 .simulation-controls {
@@ -51,16 +55,19 @@
 
 .footer-btn {
     padding: 8px 20px;
-    border: none;
+    border: 1px solid var(--border-primary);
     border-radius: var(--radius-lg);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-normal);
     min-width: 120px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .footer-btn:hover:not(:disabled) {
+    background: var(--bg-secondary);
     transform: translateY(-2px);
 }
 
@@ -70,13 +77,13 @@
 }
 
 .start-btn {
-    background: linear-gradient(135deg, var(--success) 0%, var(--success-hover) 100%);
-    color: white;
+    color: var(--success);
+    border-color: var(--success);
 }
 
 .stop-btn {
-    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-hover) 100%);
-    color: white;
+    color: var(--danger);
+    border-color: var(--danger);
 }
 
 .footer-info {
@@ -90,4 +97,58 @@
     padding: 4px 10px;
     background: var(--bg-tertiary);
     border-radius: var(--radius-sm);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+}
+
+/*!* Темная тема для футера *!*/
+/*.dark-theme .app-footer {*/
+/*    background: var(--bg-tertiary);*/
+/*    border-top-color: var(--border-secondary);*/
+/*}*/
+
+/*.dark-theme .footer-status {*/
+/*    background: var(--bg-secondary);*/
+/*    border-color: var(--border-secondary);*/
+/*    color: var(--text-secondary);*/
+/*}*/
+
+/*.dark-theme .footer-btn {*/
+/*    background: var(--bg-secondary);*/
+/*    border-color: var(--border-secondary);*/
+/*    color: var(--text-primary);*/
+/*}*/
+
+/*.dark-theme .footer-btn:hover:not(:disabled) {*/
+/*    background: var(--bg-tertiary);*/
+/*}*/
+
+/*.dark-theme .nodes-count,*/
+/*.dark-theme .connections-count {*/
+/*    background: var(--bg-secondary);*/
+/*    border-color: var(--border-secondary);*/
+/*}*/
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .app-footer {
+        padding: 10px 16px;
+        height: 60px;
+    }
+
+    .footer-btn {
+        padding: 6px 16px;
+        min-width: 100px;
+        font-size: 13px;
+    }
+
+    .footer-info {
+        gap: 10px;
+        font-size: 12px;
+    }
+
+    .nodes-count,
+    .connections-count {
+        padding: 3px 8px;
+    }
 }

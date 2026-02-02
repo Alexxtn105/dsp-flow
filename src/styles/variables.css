@@ -50,36 +50,74 @@
   --transition-slow: 300ms;
 }
 
-/* Темная тема */
+/*!* Темная тема *!*/
+/*.dark-theme,*/
+/*[data-theme='dark'] {*/
+/*  --bg-primary: #111827;*/
+/*  --bg-secondary: #1f2937;*/
+/*  --bg-tertiary: #374151;*/
+/*  */
+/*  --text-primary: #f9fafb;*/
+/*  --text-secondary: #d1d5db;*/
+/*  --text-tertiary: #9ca3af;*/
+/*  */
+/*  --border-primary: #374151;*/
+/*  --border-secondary: #4b5563;*/
+/*  --border-hover: #818cf8;*/
+/*  */
+/*  --accent-primary: #818cf8;*/
+/*  --accent-hover: #6366f1;*/
+/*  --accent-active: #4f46e5;*/
+/*  */
+/*  --success: #34d399;*/
+/*  --success-hover: #10b981;*/
+/*  */
+/*  --danger: #fca5a5;*/
+/*  --danger-hover: #ef4444;*/
+/*  */
+/*  --warning: #fbbf24;*/
+/*  --warning-hover: #f59e0b;*/
+/*  */
+/*  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);*/
+/*  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);*/
+/*  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);*/
+/*  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);*/
+/*}*/
+
+/* Темная тема (обновлено в стиле SourceCraft) */
 .dark-theme,
 [data-theme='dark'] {
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
-  --bg-tertiary: #374151;
-  
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  
-  --border-primary: #374151;
-  --border-secondary: #4b5563;
-  --border-hover: #818cf8;
-  
-  --accent-primary: #818cf8;
-  --accent-hover: #6366f1;
-  --accent-active: #4f46e5;
-  
-  --success: #34d399;
-  --success-hover: #10b981;
-  
-  --danger: #fca5a5;
-  --danger-hover: #ef4444;
-  
-  --warning: #fbbf24;
-  --warning-hover: #f59e0b;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  /* Основные фоны (иерархия от самого тёмного к светлому) */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+
+  /* Текст */
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+
+  /* Границы и разделители */
+  --border-primary: #30363d;
+  --border-secondary: #3c444d;
+  --border-hover: #58a6ff;
+
+  /* Акцентные цвета (синяя гамма для ссылок и действий) */
+  --accent-primary: #58a6ff;
+  --accent-hover: #79c0ff;
+  --accent-active: #388bfd;
+
+  /* Статусные цвета */
+  --success: #3fb950;
+  --success-hover: #56d364;
+  --danger: #f85149;
+  --danger-hover: #ff7b72;
+  --warning: #d29922;
+  --warning-hover: #e3b341;
+
+  /* Тени остаются тёмными для глубины */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
 }
