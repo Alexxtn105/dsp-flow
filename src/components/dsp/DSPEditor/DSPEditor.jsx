@@ -14,10 +14,16 @@ import '@xyflow/react/dist/style.css';
 import Toolbar from '../../layout/Toolbar/Toolbar.jsx';
 import BlockNode from '../BlockNode';
 import { useAutoSave } from '../../../hooks/index.js';
-import { generateNodeId, getDefaultParams } from '../../../utils/helpers';
+import {
+    generateNodeId,
+    getDefaultParams,
+    getBlockSignalConfig,
+    areSignalsCompatible
+} from '../../../utils/helpers';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
+import SignalLegend from './SignalLegend';
 
 const nodeTypes = {
     block: BlockNode,
@@ -39,7 +45,7 @@ function DSPEditor({
     // Получаем контекст
     const { loadedSchemeData, setLoadedSchemeData } = useDSPEditor();
 
-    // Автосохранение с исправленным race condition
+    // Автосохранение
     const { loadAutoSave, clearAutoSave } = useAutoSave(
         nodes,
         edges,
@@ -65,23 +71,11 @@ function DSPEditor({
     // Обработка загруженной схемы из контекста
     useEffect(() => {
         if (loadedSchemeData && loadedSchemeData.nodes) {
-            // Очищаем автосохранение
             clearAutoSave();
-
-            // Сбрасываем текущие узлы и соединения
             setNodes(loadedSchemeData.nodes || []);
             setEdges(loadedSchemeData.edges || []);
-
-            // Устанавливаем флаг загрузки внешней схемы
             hasLoadedExternalScheme.current = true;
-
-            // Очищаем данные загрузки в контексте
             setLoadedSchemeData(null);
-
-            console.log('Схема загружена из контекста:', {
-                nodes: loadedSchemeData.nodes?.length || 0,
-                edges: loadedSchemeData.edges?.length || 0
-            });
         }
     }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData]);
 
@@ -103,15 +97,64 @@ function DSPEditor({
         }
     }, [onReactFlowInit]);
 
+    /**
+     * Проверка допустимости соединения
+     */
+    const isValidConnection = useCallback((connection) => {
+        const sourceNode = nodes.find(node => node.id === connection.source);
+        const targetNode = nodes.find(node => node.id === connection.target);
+
+        if (!sourceNode || !targetNode) return false;
+
+        // Запрещаем соединение узла с самим собой
+        if (sourceNode.id === targetNode.id) {
+            return false;
+        }
+
+        // Проверяем типы сигналов
+        const sourceSignalType = sourceNode.data?.signalConfig?.output;
+        const targetSignalType = targetNode.data?.signalConfig?.input;
+
+        // Если у источника нет выхода или у цели нет входа
+        if (!sourceSignalType || !targetSignalType) {
+            return false;
+        }
+
+        // Проверяем совместимость типов сигналов
+        return areSignalsCompatible(sourceSignalType, targetSignalType);
+    }, [nodes]);
+
     const onConnect = useCallback(
         (params) => {
-            setEdges((eds) => addEdge({ ...params, animated: true }, eds));
+            const sourceNode = nodes.find(node => node.id === params.source);
+            const targetNode = nodes.find(node => node.id === params.target);
+
+            if (!sourceNode || !targetNode) return;
+
+            // Получаем тип сигнала от источника
+            const signalType = sourceNode.data?.signalConfig?.output || 'real';
+
+            // Создаём ребро с информацией о типе сигнала
+            const edge = {
+                ...params,
+                animated: true,
+                type: signalType === 'complex' ? 'complex' : 'real',
+                data: {
+                    signalType: signalType
+                },
+                style: {
+                    strokeWidth: signalType === 'complex' ? 4 : 2,
+                }
+            };
+
+            setEdges((eds) => addEdge(edge, eds));
+
             // Помечаем схему как несохранённую при изменении
             if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme, onSchemeUpdate]
+        [setEdges, currentScheme, onSchemeUpdate, nodes]
     );
 
     const onDragOver = useCallback((event) => {
@@ -133,6 +176,8 @@ function DSPEditor({
 
             if (!position) return;
 
+            const signalConfig = getBlockSignalConfig(blockType);
+
             const newNode = {
                 id: generateNodeId(),
                 type: 'block',
@@ -140,7 +185,8 @@ function DSPEditor({
                 data: {
                     label: blockType,
                     blockType,
-                    params: getDefaultParams(blockType)
+                    params: getDefaultParams(blockType),
+                    signalConfig: signalConfig
                 },
             };
 
@@ -168,6 +214,7 @@ function DSPEditor({
                     onDrop={onDrop}
                     onDragOver={onDragOver}
                     nodeTypes={nodeTypes}
+                    isValidConnection={isValidConnection}
                     fitView
                 >
                     <Background
@@ -178,6 +225,7 @@ function DSPEditor({
                     <Controls />
                     <MiniMap />
                 </ReactFlow>
+                <SignalLegend isDarkTheme={isDarkTheme} />
             </div>
         </div>
     );

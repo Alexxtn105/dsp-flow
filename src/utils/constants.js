@@ -3,6 +3,53 @@
  */
 
 /**
+ * Типы сигналов
+ */
+export const SIGNAL_TYPES = {
+    REAL: 'real',
+    COMPLEX: 'complex'
+};
+
+/**
+ * Конфигурация сигналов для блоков DSP
+ */
+export const BLOCK_SIGNAL_CONFIG = {
+    // Фильтры (обычно работают с действительными сигналами)
+    'КИХ-Фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+    'Полосовой КИХ-фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+    'ФВЧ КИХ-фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+    'ФНЧ КИХ-фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+
+    // Преобразователь Гильберта (преобразует в комплексный)
+    'Преобразователь Гильберта': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.COMPLEX },
+
+    'Фильтр Герцеля': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+
+    // Генераторы (создают сигналы)
+    'Входной сигнал': { input: null, output: SIGNAL_TYPES.REAL }, // нет входа
+    'Референсный синусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
+    'Референсный косинусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
+
+    // БПФ/Анализ
+    'Скользящее БПФ': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.COMPLEX },
+    'БПФ': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.COMPLEX },
+    'Спектроанализатор': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+
+    // Детекторы
+    'Фазовый детектор': { input: SIGNAL_TYPES.COMPLEX, output: SIGNAL_TYPES.REAL },
+    'Частотный детектор': { input: SIGNAL_TYPES.COMPLEX, output: SIGNAL_TYPES.REAL },
+
+    // Математические (зависит от входов)
+    'Интегратор': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+    'Сумматор': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+    'Перемножитель': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
+
+    // Визуализация (только вход)
+    'Осциллограф': { input: SIGNAL_TYPES.REAL, output: null },
+    'Фазовое созвездие': { input: SIGNAL_TYPES.COMPLEX, output: null }
+};
+
+/**
  * Маппинг иконок для блоков DSP
  */
 export const DSP_ICONS = {
@@ -20,13 +67,13 @@ export const DSP_ICONS = {
     'Косинусный генератор': 'graphic_eq',
 
     // БПФ/Анализ
-    'Скользящее БПФ': 'moving',
-    'БПФ': 'auto_graph',
+    'Скользящее БПФ': 'show_chart',
+    'БПФ': 'multiline_chart',
     'Спектроанализатор': 'analytics',
 
     // Детекторы
     'Фазовый детектор': 'speed',
-    'Частотный детектор': 'speed',
+    'Частотный детектор': 'timeline',
 
     // Математические
     'Интегратор': 'functions',

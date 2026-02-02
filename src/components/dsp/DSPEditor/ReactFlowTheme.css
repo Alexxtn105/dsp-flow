@@ -109,3 +109,159 @@
         height: 90px !important;
     }
 }
+
+/* Соединения для действительных сигналов */
+.react-flow__edge-path.real {
+    stroke: #3b82f6 !important;
+    stroke-width: 2px !important;
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.5s linear infinite !important;
+}
+
+/* Соединения для комплексных сигналов (двойная линия) */
+.react-flow__edge-path.complex {
+    stroke: #8b5cf6 !important;
+    stroke-width: 4px !important;
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.5s linear infinite !important;
+    filter: url(#double-line);
+}
+
+/* Создаем SVG фильтр для двойной линии */
+.react-flow__edges svg {
+    filter: none;
+}
+
+.react-flow__edges svg defs {
+    filter: none;
+}
+
+/* Альтернативный подход: создаем псевдоэлемент для двойной линии */
+.react-flow__edge.complex::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+            to right,
+            transparent 45%,
+            #8b5cf6 45%,
+            #8b5cf6 55%,
+            transparent 55%
+    );
+    animation: dashdraw 0.5s linear infinite;
+    z-index: -1;
+}
+
+/* Анимация для штриховой линии */
+@keyframes dashdraw {
+    from {
+        stroke-dashoffset: 10;
+    }
+}
+
+/* Темная тема */
+.dark-theme .react-flow__edge-path.real {
+    stroke: #60a5fa !important;
+}
+
+.dark-theme .react-flow__edge-path.complex {
+    stroke: #a78bfa !important;
+}
+
+/* Подсветка при наведении */
+.react-flow__edge:hover .react-flow__edge-path {
+    stroke-width: 3px !important;
+    filter: brightness(1.2);
+}
+
+.react-flow__edge.complex:hover .react-flow__edge-path {
+    stroke-width: 5px !important;
+}
+
+/* Индикатор невалидного соединения */
+.react-flow__connection-path.invalid {
+    stroke: #ef4444 !important;
+    stroke-dasharray: 5 !important;
+    animation: dashdraw 0.3s linear infinite !important;
+}
+
+/* Легенда типов сигналов */
+/*.signal-legend {*/
+/*    position: absolute;*/
+/*    bottom: 20px;*/
+/*    right: 20px;*/
+/*    background: var(--bg-secondary);*/
+/*    border: 1px solid var(--border-primary);*/
+/*    border-radius: var(--radius-md);*/
+/*    padding: 12px;*/
+/*    z-index: 10;*/
+/*    font-size: 12px;*/
+/*    box-shadow: var(--shadow-md);*/
+/*}*/
+
+.signal-legend {
+    position: absolute;
+    top: 15px;
+    right: 15px; /* Изменено с right на left */
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    z-index: 10;
+    font-size: 12px;
+    box-shadow: var(--shadow-md);
+}
+
+
+.signal-legend-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.signal-legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.signal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.signal-legend-line {
+    width: 30px;
+    height: 2px;
+}
+
+.signal-legend-line.real {
+    background: #3b82f6;
+    border-bottom: 1px dashed #3b82f6;
+}
+
+.signal-legend-line.complex {
+    background: #8b5cf6;
+    border-top: 1px dashed #8b5cf6;
+    border-bottom: 1px dashed #8b5cf6;
+    height: 4px;
+}
+
+.signal-legend-label {
+    color: var(--text-secondary);
+}
+
+.dark-theme .signal-legend-line.real {
+    background: #60a5fa;
+    border-bottom-color: #60a5fa;
+}
+
+.dark-theme .signal-legend-line.complex {
+    background: #a78bfa;
+    border-top-color: #a78bfa;
+    border-bottom-color: #a78bfa;
+}

@@ -214,3 +214,129 @@
 .block-node {
     animation: nodeAppear 0.2s ease-out;
 }
+
+.block-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.block-signal-types {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+.signal-type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+.signal-type-badge.signal-real {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.signal-type-badge.signal-complex {
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Стили для handles разных типов */
+.block-handle {
+    width: 12px !important;
+    height: 12px !important;
+    background: var(--bg-tertiary) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 50% !important;
+    transition: all var(--transition-fast) !important;
+}
+
+.block-handle.signal-real {
+    background: #3b82f6 !important;
+    border-color: var(--bg-secondary) !important;
+}
+
+/*.block-handle.signal-complex {*/
+/*    background: #8b5cf6 !important;*/
+/*    border-color: var(--bg-secondary) !important;*/
+/*    position: relative;*/
+/*}*/
+
+.block-handle.signal-complex {
+    background: #8b5cf6 !important;
+    border-color: var(--bg-secondary) !important;
+    //position: relative;
+    box-sizing: border-box;
+}
+
+/* Двойной круг для комплексного сигнала */
+/*.block-handle.signal-complex::after {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    top: -4px;*/
+/*    left: -4px;*/
+/*    right: -4px;*/
+/*    bottom: -4px;*/
+/*    border: 2px solid #8b5cf6;*/
+/*    border-radius: 50%;*/
+/*    opacity: 0.5;*/
+/*}*/
+
+.block-handle.signal-complex::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px; /* больше, чем основной круг */
+    height: 16px;
+    border: 2px solid #8b5cf6;
+    border-radius: 50%;
+    opacity: 0.5;
+    box-sizing: border-box;
+}
+
+/* Темная тема */
+.dark-theme .signal-type-badge.signal-real {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.dark-theme .signal-type-badge.signal-complex {
+    color: #a78bfa;
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.dark-theme .block-handle.signal-real {
+    background: #60a5fa !important;
+}
+
+.dark-theme .block-handle.signal-complex {
+    background: #a78bfa !important;
+}
+
+.dark-theme .block-handle.signal-complex::after {
+    border-color: #a78bfa;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .signal-type-badge {
+        font-size: 9px;
+        padding: 1px 3px;
+    }
+}

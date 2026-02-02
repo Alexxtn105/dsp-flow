@@ -2,9 +2,10 @@
  * Утилитарные функции
  */
 
-import { DEFAULT_BLOCK_PARAMS } from './constants';
-import { DSP_ICONS } from './constants';
+//import { DEFAULT_BLOCK_PARAMS } from './constants';
+//import { DSP_ICONS } from './constants';
 
+import { DSP_ICONS, BLOCK_SIGNAL_CONFIG, SIGNAL_TYPES, DEFAULT_BLOCK_PARAMS } from './constants';
 
 
 /**
@@ -331,4 +332,84 @@ export const formatParamValue = (value) => {
         return value ? 'Да' : 'Нет';
     }
     return String(value);
+};
+
+/**
+ * Получить конфигурацию сигналов для блока
+ */
+export const getBlockSignalConfig = (blockType) => {
+    return BLOCK_SIGNAL_CONFIG[blockType] || {
+        input: SIGNAL_TYPES.REAL,
+        output: SIGNAL_TYPES.REAL
+    };
+};
+
+/**
+ * Проверить, совместимы ли типы сигналов для соединения
+ */
+export const areSignalsCompatible = (sourceType, targetType) => {
+    // Если тип источника совпадает с типом цели
+    return sourceType === targetType;
+};
+
+/**
+ * Проверить, имеет ли блок вход
+ */
+export const hasInput = (blockType) => {
+    const config = getBlockSignalConfig(blockType);
+    return config.input !== null;
+};
+
+/**
+ * Проверить, имеет ли блок выход
+ */
+export const hasOutput = (blockType) => {
+    const config = getBlockSignalConfig(blockType);
+    return config.output !== null;
+};
+
+/**
+ * Получить тип входа блока
+ */
+export const getInputType = (blockType) => {
+    return getBlockSignalConfig(blockType).input;
+};
+
+/**
+ * Получить тип выхода блока
+ */
+export const getOutputType = (blockType) => {
+    return getBlockSignalConfig(blockType).output;
+};
+
+/**
+ * Получить класс CSS для типа сигнала
+ */
+export const getSignalTypeClass = (signalType) => {
+    switch(signalType) {
+        case SIGNAL_TYPES.COMPLEX: return 'signal-complex';
+        case SIGNAL_TYPES.REAL: return 'signal-real';
+        default: return '';
+    }
+};
+
+/**
+ * Получить описание типа сигнала
+ */
+export const getSignalTypeDescription = (signalType) => {
+    switch(signalType) {
+        case SIGNAL_TYPES.COMPLEX: return 'Комплексный';
+        case SIGNAL_TYPES.REAL: return 'Действительный';
+        default: return 'Неизвестный';
+    }
+};
+
+/**
+ * Получить цвет для типа сигнала
+ */
+export const getSignalTypeColor = (signalType, isDarkTheme = false) => {
+    if (isDarkTheme) {
+        return signalType === SIGNAL_TYPES.COMPLEX ? '#8b5cf6' : '#3b82f6';
+    }
+    return signalType === SIGNAL_TYPES.COMPLEX ? '#7c3aed' : '#2563eb';
 };
