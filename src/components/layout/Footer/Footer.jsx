@@ -1,6 +1,8 @@
+import PropTypes from 'prop-types';
+import Icon from '../../common/Icons/Icon.jsx';
 import './Footer.css';
 
-function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount = 0, connectionsCount = 0 }) {
+function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectionsCount }) {
     return (
         <footer className={`app-footer ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="footer-content">
@@ -16,18 +18,18 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount = 0, conne
                             className={`footer-btn start-btn ${isRunning ? 'active' : ''}`}
                             onClick={onStart}
                             disabled={isRunning}
-                            title="Запустить выполнение схемы"
                         >
-                            ▶️ Старт
+                            <Icon name="play_arrow" size="small" />
+                            {/*<span>Старт</span>*/}
                         </button>
 
                         <button
-                            className={`footer-btn stop-btn ${!isRunning ? 'disabled' : ''}`}
+                            className={`footer-btn stop-btn`}
                             onClick={onStop}
                             disabled={!isRunning}
-                            title="Остановить выполнение схемы"
                         >
-                            ⏹️ Стоп
+                            <Icon name="stop" size="small" />
+                            {/*<span>Стоп</span>*/}
                         </button>
                     </div>
                 </div>
@@ -42,5 +44,14 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount = 0, conne
         </footer>
     );
 }
+
+Footer.propTypes = {
+    isDarkTheme: PropTypes.bool.isRequired,
+    onStart: PropTypes.func.isRequired,
+    onStop: PropTypes.func.isRequired,
+    isRunning: PropTypes.bool.isRequired,
+    nodesCount: PropTypes.number.isRequired,
+    connectionsCount: PropTypes.number.isRequired
+};
 
 export default Footer;

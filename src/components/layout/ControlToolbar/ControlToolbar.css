@@ -1,0 +1,208 @@
+.control-toolbar {
+    height: 100%;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-primary);
+    width: 50px;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    transition: background var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.control-toolbar-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 48px;
+    flex-shrink: 0;
+}
+
+/*.control-toolbar-icon {*/
+/*    font-size: 24px;*/
+/*    flex-shrink: 0;*/
+/*}*/
+
+.control-toolbar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.control-toolbar-content {
+    padding: 10px 0;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    align-items: center;
+}
+
+.control-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    position: relative;
+}
+
+.control-btn:hover:not(:disabled) {
+    background: var(--bg-tertiary);
+    transform: scale(1.1);
+}
+
+.control-btn:hover:not(:disabled)::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    animation: fadeInTooltip 0.2s ease-out forwards;
+}
+
+@keyframes fadeInTooltip {
+    from { opacity: 0; transform: translateY(-50%) translateX(-5px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+.control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.control-btn:disabled:hover {
+    background: transparent;
+    transform: none;
+}
+
+/*.control-btn-icon {*/
+/*    font-size: 24px;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*}*/
+
+.control-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.control-btn-tooltip {
+    display: none;
+}
+
+/* Специфичные стили для кнопок */
+.save-btn:hover:not(:disabled) {
+    color: var(--success);
+}
+
+.save-as-btn:hover:not(:disabled) {
+    color: var(--accent-primary);
+}
+
+.load-btn:hover:not(:disabled) {
+    color: var(--warning);
+}
+
+.theme-btn:hover:not(:disabled) {
+    color: var(--text-secondary);
+}
+
+/*!* Темная тема *!*/
+/*.dark-theme .control-toolbar {*/
+/*    background: var(--bg-tertiary);*/
+/*    border-right-color: var(--border-secondary);*/
+/*}*/
+
+/*.dark-theme .control-toolbar-header {*/
+/*    border-bottom-color: var(--border-secondary);*/
+/*}*/
+
+/*.dark-theme .control-btn:hover:not(:disabled) {*/
+/*    background: var(--bg-secondary);*/
+/*}*/
+
+/*.dark-theme .control-btn:hover:not(:disabled)::after {*/
+/*    background: var(--bg-tertiary);*/
+/*    border-color: var(--border-secondary);*/
+/*}*/
+
+/* Мобильная адаптивность */
+@media (max-width: 768px) {
+    .control-toolbar {
+        width: 40px;
+    }
+
+    .control-toolbar-header {
+        padding: 10px;
+    }
+
+    .control-toolbar-icon {
+        font-size: 20px;
+    }
+
+    .control-btn {
+        width: 36px;
+        height: 36px;
+        padding: 6px;
+    }
+
+    .control-btn-icon {
+        font-size: 20px;
+    }
+}
+
+/* Скроллбар для кнопок, если их будет много */
+.control-toolbar-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.control-toolbar-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.control-toolbar-content::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 2px;
+}
+
+.control-toolbar-content::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
+}

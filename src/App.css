@@ -1,216 +1,31 @@
 * {
   box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-  sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none;
 }
 
 .app {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9fafb;
+  background: var(--bg-primary);
   transition: background-color 0.3s, color 0.3s;
-  contain: strict;
-  overflow: hidden;
 }
 
-/* Темная тема */
-.app.dark-theme {
-  background: #111827;
-  color: #f9fafb;
-}
-
-.app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 12px 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 20;
-  flex-shrink: 0;
-  height: 70px;
-  gap: 20px;
-  position: relative;
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-.app-header-left {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.app-header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.app-content {
   flex: 1;
-  min-width: 0;
-  margin: 0 20px;
-}
-
-.app-header-right {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.app-header h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.app-header p {
-  margin: 2px 0 0 0;
-  font-size: 12px;
-  opacity: 0.9;
-  white-space: nowrap;
-}
-
-.current-scheme-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  min-width: 200px;
-  max-width: 400px;
-  justify-content: center;
-  will-change: transform, opacity;
-}
-
-.scheme-name {
-  font-weight: 600;
-  font-size: 14px;
-  max-width: 300px;
+  position: relative;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
 }
 
-.scheme-unsaved {
-  font-size: 11px;
-  opacity: 0.8;
-  font-style: italic;
-  white-space: nowrap;
-}
-
-.header-controls {
+/* Расположение тулбаров */
+.toolbars-container {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.header-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-  will-change: transform, background-color;
-  transform: translateZ(0);
-}
-
-.header-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.header-btn:active {
-  transform: translateY(0);
-  transition: transform 0.05s;
-}
-
-.header-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.header-btn.save {
-  background: rgba(34, 197, 94, 0.7);
-}
-
-.header-btn.save:hover {
-  background: rgba(34, 197, 94, 0.8);
-}
-
-.header-btn.save-as {
-  background: rgba(59, 130, 246, 0.7);
-}
-
-.header-btn.save-as:hover {
-  background: rgba(59, 130, 246, 0.8);
-}
-
-.header-btn.load {
-  background: rgba(249, 115, 22, 0.7);
-}
-
-.header-btn.load:hover {
-  background: rgba(249, 115, 22, 0.8);
-}
-
-.theme-toggle {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  transition: all 0.15s;
-  white-space: nowrap;
-  will-change: transform, background-color;
-  transform: translateZ(0);
-}
-
-.theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.theme-toggle:active {
-  transform: translateY(0);
-}
-
-.dark-theme .app-header {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-}
-
-#root {
   height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.dark-theme {
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
