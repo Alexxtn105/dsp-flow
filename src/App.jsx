@@ -7,6 +7,9 @@ import DSPEditor from './components/dsp/DSPEditor';
 import Footer from './components/layout/Footer';
 import SaveDialog from './components/dialogs/SaveDialog';
 import LoadDialog from './components/dialogs/LoadDialog';
+import { observer } from 'mobx-react-lite';
+import { dspExecutionStore } from './stores/DSPExecutionStore';
+
 import './App.css';
 
 function App() {
@@ -83,30 +86,52 @@ function App() {
     /**
      * Запуск симуляции
      */
+    // const handleStartSimulation = useCallback(() => {
+    //     if (stats.nodesCount === 0) {
+    //         alert('Добавьте хотя бы один узел для запуска симуляции');
+    //         return;
+    //     }
+    //
+    //     if (stats.connectionsCount === 0) {
+    //         alert('Соедините узлы для запуска симуляции');
+    //         return;
+    //     }
+    //
+    //     setIsRunning(true);
+    //     console.log('Запуск симуляции схемы...');
+    //     // TODO: Добавить логику запуска симуляции (будет в backend)
+    // }, [stats]);
+
+
     const handleStartSimulation = useCallback(() => {
-        if (stats.nodesCount === 0) {
-            alert('Добавьте хотя бы один узел для запуска симуляции');
-            return;
-        }
+            if (stats.nodesCount === 0) {
+                alert('Добавьте хотя бы один узел для запуска симуляции');
+                return;
+            }
 
-        if (stats.connectionsCount === 0) {
-            alert('Соедините узлы для запуска симуляции');
-            return;
-        }
+            const result = dspExecutionStore.start();
 
-        setIsRunning(true);
-        console.log('Запуск симуляции схемы...');
-        // TODO: Добавить логику запуска симуляции (будет в backend)
-    }, [stats]);
+            if (!result) {
+                if (dspExecutionStore.hasErrors) {
+                    const errors = dspExecutionStore.compilationErrors
+                        .map(e => e.message)
+                        .join('\n');
+                    alert('Ошибки компиляции графа:\n' + errors);
+                }
+            }
+        }, [stats]);
 
     /**
      * Остановка симуляции
      */
     const handleStopSimulation = useCallback(() => {
-        setIsRunning(false);
-        console.log('Остановка симуляции...');
-        // TODO: Добавить логику остановки симуляции (будет в backend)
+        dspExecutionStore.stop();
     }, []);
+    // const handleStopSimulation = useCallback(() => {
+    //     setIsRunning(false);
+    //     console.log('Остановка симуляции...');
+    //     // TODO: Добавить логику остановки симуляции (будет в backend)
+    // }, []);
 
     // Условия активности кнопок
     const isSaveEnabled = true; // Всегда доступна
@@ -141,10 +166,11 @@ function App() {
                 </div>
 
                 <Footer
+                    isRunning={dspExecutionStore.isRunning}
                     isDarkTheme={isDarkTheme}
                     onStart={handleStartSimulation}
                     onStop={handleStopSimulation}
-                    isRunning={isRunning}
+                    // isRunning={isRunning}
                     nodesCount={stats.nodesCount}
                     connectionsCount={stats.connectionsCount}
                 />
