@@ -67,7 +67,7 @@ const DSPEditor = observer(({
         reactFlowInstance,
         {
             enabled: true,
-            skipWhen: () => hasLoadedExternalScheme.current
+            //skipWhen: () => hasLoadedExternalScheme.current
         }
     );
 
@@ -300,14 +300,16 @@ const DSPEditor = observer(({
                         showInteractive={false} // Можно скрыть кнопку переключения интерактивности, если не нужна
                     />
                     <MiniMap
+                        pannable={true}
+                        position={"bottom-right"}
                         className={isDarkTheme ? 'dark-theme-minimap' : ''}
                         nodeStrokeColor={(node) => {
                             if (node.selected) return '#4F46E5';
                             return isDarkTheme ? '#4b5563' : '#d1d5db';
                         }}
-                        nodeColor={(node) => {
-                            return isDarkTheme ? '#374151' : '#f3f4f6';
-                        }}
+                        // nodeColor={(node) => {
+                        //     return isDarkTheme ? '#374151' : '#f3f4f6';
+                        // }}
                         maskColor={isDarkTheme ? 'rgba(86, 204, 242, 0.1)' : 'rgba(240, 240, 240, 0.6)'}
                     />
                 </ReactFlow>
@@ -320,55 +322,6 @@ const DSPEditor = observer(({
     )}
     </>
     );
-
-    // return (
-    //     <>
-    //         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
-    //             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-    //                 <ReactFlow
-    //                     nodes={nodes}
-    //                     edges={edges}
-    //                     onNodesChange={onNodesChange}
-    //                     onEdgesChange={onEdgesChange}
-    //                     onConnect={onConnect}
-    //                     onInit={handleInit}
-    //                     onDrop={onDrop}
-    //                     onDragOver={onDragOver}
-    //                     nodeTypes={nodeTypes}
-    //                     edgeTypes={edgeTypes}
-    //                     isValidConnection={isValidConnection}
-    //                     fitView
-    //                 >
-    //                     <Background
-    //                         color={isDarkTheme ? '#374151' : '#e5e7eb'}
-    //                         gap={16}
-    //                         size={1}
-    //                     />
-    //                     <Controls
-    //                         className={isDarkTheme ? 'dark-theme-controls' : ''}
-    //                         showInteractive={false}
-    //                     />
-    //                     <MiniMap
-    //                         className={isDarkTheme ? 'dark-theme-minimap' : ''}
-    //                         nodeStrokeColor={(node) => {
-    //                             if (node.selected) return '#4F46E5';
-    //                             return isDarkTheme ? '#4b5563' : '#d1d5db';
-    //                         }}
-    //                         nodeColor={(node) => {
-    //                             return isDarkTheme ? '#374151' : '#f3f4f6';
-    //                         }}
-    //                         maskColor={isDarkTheme ? 'rgba(86, 204, 242, 0.1)' : 'rgba(240, 240, 240, 0.6)'}
-    //                     />
-    //                 </ReactFlow>
-    //                 <SignalLegend isDarkTheme={isDarkTheme} />
-    //             </div>
-    //         </div>
-    //
-    //         {showVisualization && (
-    //             <VisualizationPanel isDarkTheme={isDarkTheme} />
-    //         )}
-    //     </>
-    // );
 });
 
 DSPEditor.propTypes = {

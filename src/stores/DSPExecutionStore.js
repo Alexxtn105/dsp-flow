@@ -165,6 +165,15 @@ export class DSPExecutionStore {
             return;
         }
 
+        // TODO - Проверить ограничение FPS
+        // Ограничение FPS - ограничить до 30 FPS
+        // setTimeout(() => {
+        //     this.executeStep();
+        //     this.animationFrameId = requestAnimationFrame(() => {
+        //         this.runExecutionLoop();
+        //     });
+        // }, 1000 / 30);
+
         // Выполняем один шаг
         this.executeStep();
 
