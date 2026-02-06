@@ -2,12 +2,14 @@ import {useState, useCallback} from 'react';
 import {useTheme} from './hooks/useTheme';
 import {DSPEditorProvider} from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
-import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx'; // Новый импорт
+import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx';
 import DSPEditor from './components/dsp/DSPEditor';
-import Footer from './components/layout/Footer';
 import SaveDialog from './components/dialogs/SaveDialog';
 import LoadDialog from './components/dialogs/LoadDialog';
 import {dspExecutionStore} from './stores/DSPExecutionStore';
+
+//import Footer from './components/layout/Footer';
+
 
 import './App.css';
 
@@ -190,15 +192,15 @@ function App() {
                     />
                 </div>
 
-                <Footer
-                    isDarkTheme={isDarkTheme}
-                    isRunning={dspExecutionStore.isRunning}
-                    onStart={handleStartSimulation}
-                    onStop={handleStopSimulation}
-                    // isRunning={isRunning}
-                    nodesCount={stats.nodesCount}
-                    connectionsCount={stats.connectionsCount}
-                />
+                {/*<Footer*/}
+                {/*    isDarkTheme={isDarkTheme}*/}
+                {/*    isRunning={dspExecutionStore.isRunning}*/}
+                {/*    onStart={handleStartSimulation}*/}
+                {/*    onStop={handleStopSimulation}*/}
+                {/*    // isRunning={isRunning}*/}
+                {/*    nodesCount={stats.nodesCount}*/}
+                {/*    connectionsCount={stats.connectionsCount}*/}
+                {/*/>*/}
 
                 {/* Диалог сохранения */}
                 {showSaveDialog && (

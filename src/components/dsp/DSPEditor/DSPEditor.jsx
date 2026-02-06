@@ -17,7 +17,7 @@ import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 import SignalLegend from './SignalLegend';
-import VisualizationPanel from '../../visualization/VisualizationPanel';
+//import VisualizationPanel from '../../visualization/VisualizationPanel';
 import {dspExecutionStore} from '../../../stores/DSPExecutionStore';
 
 import {useAutoSave} from '../../../hooks/index.js';
@@ -388,16 +388,18 @@ const DSPEditor = observer(({
             </div>
         </div>
 
-            {showVisualization && (
-                <VisualizationPanel isDarkTheme={isDarkTheme} />
-            )}
+            {/*{showVisualization && (*/}
+            {/*    <VisualizationPanel isDarkTheme={isDarkTheme} />*/}
+            {/*)}*/}
 
             {/* Плавающие окна визуализации */}
+            {/*{showVisualization && (*/}
             <FloatingWindowsManager
                 visualizationWindows={visualizationWindows}
                 onCloseWindow={handleCloseVisualizationWindow}
                 isDarkTheme={isDarkTheme}
             />
+            {/*)}*/}
 
     </>
     );

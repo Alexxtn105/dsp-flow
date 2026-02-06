@@ -15,7 +15,6 @@ export const SIGNAL_TYPES = {
  * Конфигурация сигналов для блоков DSP
  */
 export const BLOCK_SIGNAL_CONFIG = {
-    'Аудио файл': { input: null, output: SIGNAL_TYPES.REAL },
 
     // Фильтры (обычно работают с действительными сигналами)
     'КИХ-Фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
@@ -29,6 +28,7 @@ export const BLOCK_SIGNAL_CONFIG = {
     'Фильтр Герцеля': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
 
     // Генераторы (создают сигналы)
+    'Аудио файл': { input: null, output: SIGNAL_TYPES.REAL },// нет входа
     'Входной сигнал': { input: null, output: SIGNAL_TYPES.REAL }, // нет входа
     'Референсный синусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
     'Референсный косинусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
@@ -255,12 +255,7 @@ export const DEFAULT_BLOCK_PARAMS = {
 
 // Обновите DSP_GROUPS с новыми иконками
 export const DSP_GROUPS = [
-    // {
-    //     id: 'audio-file',
-    //     name: DSP_BLOCK_TYPES.AUDIO_FILE,
-    //     icon: DSP_ICONS['Аудио файл'],
-    //     description: 'Загрузка WAV файла',
-    // },
+
     {
         id: 'filters',
         name: 'Фильтры',
@@ -309,6 +304,12 @@ export const DSP_GROUPS = [
         name: 'Генераторы',
         collapsed: false,
         blocks: [
+            {
+                id: 'audio-file',
+                name: DSP_BLOCK_TYPES.AUDIO_FILE,
+                icon: DSP_ICONS['Аудио файл'],
+                description: 'Загрузка WAV файла',
+            },
             {
                 id: 'input-signal',
                 name: DSP_BLOCK_TYPES.INPUT_SIGNAL,
