@@ -3,7 +3,7 @@
  */
 
 import DSPLib from './DSPLib';
-import { DSP_BLOCK_TYPES } from '../utils/constants';
+import {DSP_BLOCK_TYPES, SIGNAL_TYPES} from '../utils/constants';
 
 export class DSPEngine {
     constructor() {
@@ -113,6 +113,11 @@ export class DSPEngine {
         try {
             // Выполняем обработку в зависимости от типа блока
             switch (blockType) {
+
+                case DSP_BLOCK_TYPES.AUDIO_FILE:
+                    output = this.processAudioFile(params);
+                    break;
+
                 case DSP_BLOCK_TYPES.INPUT_SIGNAL:
                     output = this.processInputSignal(params);
                     break;
@@ -186,6 +191,38 @@ export class DSPEngine {
             console.error(`Error executing node ${node.data.label}:`, error);
             throw error;
         }
+    }
+
+//обработка аудио
+    processAudioFile(params) {
+        if (!params.audioData || !params.audioData.samples) {
+            return new Float32Array(this.bufferSize).fill(0);
+        }
+
+        // Берем следующий блок из аудио данных
+        // Здесь нужна логика работы с offset и loop
+        const samples = params.audioData.samples;
+        const offset = params._currentOffset || 0;
+
+        const output = new Float32Array(this.bufferSize);
+        const remainingSamples = samples.length - offset;
+
+        if (remainingSamples > 0) {
+            const copyLength = Math.min(this.bufferSize, remainingSamples);
+            output.set(samples.subarray(offset, offset + copyLength));
+            params._currentOffset = offset + copyLength;
+
+            // Если loop и данные закончились
+            if (copyLength < this.bufferSize && params.loop) {
+                params._currentOffset = 0;
+            }
+        } else if (params.loop) {
+            // Начинаем сначала
+            params._currentOffset = 0;
+            return this.processAudioFile(params);
+        }
+
+        return output;
     }
 
     /**

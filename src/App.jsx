@@ -23,7 +23,15 @@ dspExecutionStore.updateConfig({
 // }
 
 function App() {
-
+    const [config, setConfig] = useState({
+        sampleRate: 48000,
+        bufferSize: 1024,
+        targetFPS: 30
+    });
+    const handleConfigChange = useCallback((newConfig) => {
+        setConfig(newConfig);
+        dspExecutionStore.updateConfig(newConfig);
+    }, []);
 
     const {isDarkTheme, toggleTheme} = useTheme();
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
@@ -154,6 +162,11 @@ function App() {
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
                 <Header
                     currentScheme={currentScheme}
+                    isRunning={dspExecutionStore.isRunning}
+                    onStart={handleStartSimulation}
+                    onStop={handleStopSimulation}
+                    config={config}
+                    onConfigChange={handleConfigChange}
                 />
 
                 <div className="app-content">

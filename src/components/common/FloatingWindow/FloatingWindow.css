@@ -1,0 +1,127 @@
+.floating-window {
+    position: fixed;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+    transition: box-shadow 0.2s ease;
+}
+
+.floating-window:hover {
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+}
+
+.window-header {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.window-header:active {
+    cursor: grabbing;
+}
+
+.window-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.window-control-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    width: 24px;
+    height: 24px;
+}
+
+.window-control-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.close-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.window-content {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+.resize-handle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    transform: rotate(90deg);
+}
+
+.resize-handle:hover {
+    color: var(--text-primary);
+}
+
+/* Темная тема */
+.dark-theme.floating-window {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.dark-theme.floating-window:hover {
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+}
+
+.dark-theme .window-header {
+    background: var(--bg-tertiary);
+    border-bottom-color: var(--border-secondary);
+}
+
+/* Скроллбар для содержимого окна */
+.window-content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.window-content::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.window-content::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 4px;
+}
+
+.window-content::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
+}

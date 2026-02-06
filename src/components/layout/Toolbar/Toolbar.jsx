@@ -60,7 +60,7 @@ function Toolbar({ isDarkTheme }) {
 
             {!isCollapsed && (
                 <div className="toolbar-content">
-                    {DSP_GROUPS.map((group) => (
+                    {DSP_GROUPS && DSP_GROUPS.map((group) => (
                         <div
                             key={group.id}
                             className="group-container"
@@ -93,7 +93,7 @@ function Toolbar({ isDarkTheme }) {
                                     role="region"
                                     aria-label={`Блоки категории ${group.name}`}
                                 >
-                                    {group.blocks.map((block) => (
+                                    {group.blocks && group.blocks.map((block) => (
                                         <div
                                             key={block.id}
                                             className="block-item"

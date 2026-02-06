@@ -7,13 +7,16 @@
  */
 export const SIGNAL_TYPES = {
     REAL: 'real',
-    COMPLEX: 'complex'
+    COMPLEX: 'complex',
+    AUDIO_FILE: 'Аудио файл',
 };
 
 /**
  * Конфигурация сигналов для блоков DSP
  */
 export const BLOCK_SIGNAL_CONFIG = {
+    'Аудио файл': { input: null, output: SIGNAL_TYPES.REAL },
+
     // Фильтры (обычно работают с действительными сигналами)
     'КИХ-Фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
     'Полосовой КИХ-фильтр': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
@@ -53,6 +56,8 @@ export const BLOCK_SIGNAL_CONFIG = {
  * Маппинг иконок для блоков DSP
  */
 export const DSP_ICONS = {
+    'Аудио файл': 'audio_file',
+
     // Фильтры
     'КИХ-Фильтр': 'filter_alt',
     'Полосовой КИХ-фильтр': 'tune',
@@ -102,6 +107,8 @@ export const DSP_ICONS = {
 
 // Типы блоков DSP
 export const DSP_BLOCK_TYPES = {
+    AUDIO_FILE: 'Аудио файл',
+
     // Фильтры
     FIR_FILTER: 'КИХ-Фильтр',
     BANDPASS_FIR: 'Полосовой КИХ-фильтр',
@@ -233,11 +240,27 @@ export const DEFAULT_BLOCK_PARAMS = {
         symbolRate: 1000,
         constellation: 'QPSK',
         eyeDiagram: true,
-    }
+    },
+
+    // В DEFAULT_BLOCK_PARAMS
+    [DSP_BLOCK_TYPES.AUDIO_FILE]: {
+        fileName: '',
+        sampleRate: 48000,
+        channels: 1,
+        loop: false,
+        audioData: null
+    },
+
 };
 
 // Обновите DSP_GROUPS с новыми иконками
 export const DSP_GROUPS = [
+    // {
+    //     id: 'audio-file',
+    //     name: DSP_BLOCK_TYPES.AUDIO_FILE,
+    //     icon: DSP_ICONS['Аудио файл'],
+    //     description: 'Загрузка WAV файла',
+    // },
     {
         id: 'filters',
         name: 'Фильтры',

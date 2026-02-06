@@ -16,7 +16,11 @@ export class DSPExecutionStore {
     
     sampleRate = 48000;
     bufferSize = 1024;
-    
+
+
+    targetFPS = 30;
+    lastFrameTime = 0;
+
     executionStats = {
         totalSamples: 0,
         executionTime: 0,
@@ -161,27 +165,44 @@ export class DSPExecutionStore {
      * Цикл выполнения
      */
     runExecutionLoop() {
-        if (!this.isRunning) {
-            return;
+        if (!this.isRunning) return;
+
+        const now = performance.now();
+        const elapsed = now - this.lastFrameTime;
+        const frameInterval = 1000 / this.targetFPS;
+
+        if (elapsed >= frameInterval) {
+            this.executeStep();
+            this.lastFrameTime = now - (elapsed % frameInterval);
         }
 
-        // TODO - Проверить ограничение FPS
-        // Ограничение FPS - ограничить до 30 FPS
-        // setTimeout(() => {
-        //     this.executeStep();
-        //     this.animationFrameId = requestAnimationFrame(() => {
-        //         this.runExecutionLoop();
-        //     });
-        // }, 1000 / 30);
-
-        // Выполняем один шаг
-        this.executeStep();
-
-        // Планируем следующий шаг
         this.animationFrameId = requestAnimationFrame(() => {
             this.runExecutionLoop();
         });
     }
+
+    // runExecutionLoop() {
+    //     if (!this.isRunning) {
+    //         return;
+    //     }
+    //
+    //     // TODO - Проверить ограничение FPS
+    //     // Ограничение FPS - ограничить до 30 FPS
+    //     // setTimeout(() => {
+    //     //     this.executeStep();
+    //     //     this.animationFrameId = requestAnimationFrame(() => {
+    //     //         this.runExecutionLoop();
+    //     //     });
+    //     // }, 1000 / 30);
+    //
+    //     // Выполняем один шаг
+    //     this.executeStep();
+    //
+    //     // Планируем следующий шаг
+    //     this.animationFrameId = requestAnimationFrame(() => {
+    //         this.runExecutionLoop();
+    //     });
+    // }
 
     /**
      * Выполнение одного шага
@@ -279,7 +300,27 @@ export class DSPExecutionStore {
         if (config.bufferSize !== undefined) {
             this.bufferSize = config.bufferSize;
         }
+        if (config.targetFPS !== undefined) {
+            this.targetFPS = config.targetFPS;
+        }
+
+        // Применяем к движку
+        if (this.engine) {
+            this.engine.setConfig({
+                sampleRate: this.sampleRate,
+                bufferSize: this.bufferSize
+            });
+        }
     }
+
+    // updateConfig(config) {
+    //     if (config.sampleRate !== undefined) {
+    //         this.sampleRate = config.sampleRate;
+    //     }
+    //     if (config.bufferSize !== undefined) {
+    //         this.bufferSize = config.bufferSize;
+    //     }
+    // }
 
     /**
      * Получить данные визуализации для узла
