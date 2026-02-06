@@ -1,0 +1,79 @@
+.oscilloscope {
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.oscilloscope-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #1a1a1a;
+    border-radius: 6px;
+}
+
+.oscilloscope-header .title {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.oscilloscope-header .status {
+    color: #00ff88;
+    font-size: 12px;
+    font-weight: 600;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.oscilloscope-svg {
+    background: #0a0a0a;
+    border-radius: 6px;
+}
+
+.oscilloscope-svg .axis path,
+.oscilloscope-svg .axis line {
+    stroke: #333;
+}
+
+.oscilloscope-svg .grid line {
+    stroke: #1a1a1a;
+    stroke-opacity: 0.5;
+}
+
+/* Темная тема */
+.dark-theme .oscilloscope {
+    background: var(--bg-secondary);
+}
+
+.dark-theme .oscilloscope-header {
+    background: var(--bg-tertiary);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .oscilloscope {
+        padding: 12px;
+    }
+
+    .oscilloscope-header {
+        padding: 6px 10px;
+    }
+
+    .oscilloscope-header .title {
+        font-size: 13px;
+    }
+
+    .oscilloscope-header .status {
+        font-size: 11px;
+    }
+}

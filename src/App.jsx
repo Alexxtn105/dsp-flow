@@ -1,16 +1,31 @@
-import { useState, useCallback } from 'react';
-import { useTheme } from './hooks/useTheme';
-import { DSPEditorProvider } from './contexts/DSPEditorContext';
+import {useState, useCallback} from 'react';
+import {useTheme} from './hooks/useTheme';
+import {DSPEditorProvider} from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
 import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx'; // Новый импорт
 import DSPEditor from './components/dsp/DSPEditor';
 import Footer from './components/layout/Footer';
 import SaveDialog from './components/dialogs/SaveDialog';
 import LoadDialog from './components/dialogs/LoadDialog';
+import {dspExecutionStore} from './stores/DSPExecutionStore';
+
 import './App.css';
 
+// Настройка размера буфера
+dspExecutionStore.updateConfig({
+    sampleRate: 48000,
+    bufferSize: 1024  // Меньше = выше FPS, но больше нагрузка
+});
+
+//Отладка
+// if (process.env.NODE_ENV === 'development') {
+//     window.DSP_DEBUG = true;
+// }
+
 function App() {
-    const { isDarkTheme, toggleTheme } = useTheme();
+
+
+    const {isDarkTheme, toggleTheme} = useTheme();
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
     // Состояние текущей схемы
@@ -31,7 +46,7 @@ function App() {
     });
 
     // Состояние симуляции
-    const [isRunning, setIsRunning] = useState(false);
+    const [isRunning] = useState(false);
 
     /**
      * Обновление информации о схеме
@@ -83,30 +98,52 @@ function App() {
     /**
      * Запуск симуляции
      */
+        // const handleStartSimulation = useCallback(() => {
+        //     if (stats.nodesCount === 0) {
+        //         alert('Добавьте хотя бы один узел для запуска симуляции');
+        //         return;
+        //     }
+        //
+        //     if (stats.connectionsCount === 0) {
+        //         alert('Соедините узлы для запуска симуляции');
+        //         return;
+        //     }
+        //
+        //     setIsRunning(true);
+        //     console.log('Запуск симуляции схемы...');
+        //     // TODO: Добавить логику запуска симуляции (будет в backend)
+        // }, [stats]);
+
+
     const handleStartSimulation = useCallback(() => {
-        if (stats.nodesCount === 0) {
-            alert('Добавьте хотя бы один узел для запуска симуляции');
-            return;
-        }
+            if (stats.nodesCount === 0) {
+                alert('Добавьте хотя бы один узел для запуска симуляции');
+                return;
+            }
 
-        if (stats.connectionsCount === 0) {
-            alert('Соедините узлы для запуска симуляции');
-            return;
-        }
+            const result = dspExecutionStore.start();
 
-        setIsRunning(true);
-        console.log('Запуск симуляции схемы...');
-        // TODO: Добавить логику запуска симуляции (будет в backend)
-    }, [stats]);
+            if (!result) {
+                if (dspExecutionStore.hasErrors) {
+                    const errors = dspExecutionStore.compilationErrors
+                        .map(e => e.message)
+                        .join('\n');
+                    alert('Ошибки компиляции графа:\n' + errors);
+                }
+            }
+        }, [stats]);
 
     /**
      * Остановка симуляции
      */
     const handleStopSimulation = useCallback(() => {
-        setIsRunning(false);
-        console.log('Остановка симуляции...');
-        // TODO: Добавить логику остановки симуляции (будет в backend)
+        dspExecutionStore.stop();
     }, []);
+    // const handleStopSimulation = useCallback(() => {
+    //     setIsRunning(false);
+    //     console.log('Остановка симуляции...');
+    //     // TODO: Добавить логику остановки симуляции (будет в backend)
+    // }, []);
 
     // Условия активности кнопок
     const isSaveEnabled = true; // Всегда доступна
@@ -142,9 +179,10 @@ function App() {
 
                 <Footer
                     isDarkTheme={isDarkTheme}
+                    isRunning={dspExecutionStore.isRunning}
                     onStart={handleStartSimulation}
                     onStop={handleStopSimulation}
-                    isRunning={isRunning}
+                    // isRunning={isRunning}
                     nodesCount={stats.nodesCount}
                     connectionsCount={stats.connectionsCount}
                 />

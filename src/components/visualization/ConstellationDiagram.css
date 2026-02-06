@@ -1,0 +1,40 @@
+.constellation-diagram {
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.constellation-svg {
+    background: #0a0a0a;
+    border-radius: 6px;
+}
+
+.constellation-svg .axis path,
+.constellation-svg .axis line {
+    stroke: #333;
+}
+
+.constellation-svg .point {
+    cursor: crosshair;
+    transition: r 0.1s, opacity 0.1s;
+}
+
+.constellation-svg .point:hover {
+    r: 4;
+    opacity: 1;
+}
+
+/* Темная тема */
+.dark-theme .constellation-diagram {
+    background: var(--bg-secondary);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .constellation-diagram {
+        padding: 12px;
+    }
+}

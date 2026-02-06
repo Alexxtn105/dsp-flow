@@ -1,5 +1,6 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import {useState, useCallback, useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
+import {observer} from 'mobx-react-lite';
 import {
     ReactFlow,
     Background,
@@ -16,14 +17,17 @@ import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 import SignalLegend from './SignalLegend';
-import { useAutoSave } from '../../../hooks/index.js';
+import VisualizationPanel from '../../visualization/VisualizationPanel';
+import {dspExecutionStore} from '../../../stores/DSPExecutionStore';
+
+import {useAutoSave} from '../../../hooks/index.js';
 import {
     generateNodeId,
     getDefaultParams,
     getBlockSignalConfig,
     areSignalsCompatible
 } from '../../../utils/helpers';
-import { useDSPEditor } from '../../../contexts/DSPEditorContext';
+import {useDSPEditor} from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
 
@@ -36,31 +40,34 @@ const edgeTypes = {
     complex: ComplexSignalEdge,
 };
 
-function DSPEditor({
-                       isDarkTheme,
-                       currentScheme,
-                       onSchemeUpdate,
-                       onStatsUpdate,
-                       onReactFlowInit,
-                       isRunning
-                   }) {
+
+
+const DSPEditor = observer(({
+                                isDarkTheme,
+                                currentScheme,
+                                onSchemeUpdate,
+                                onStatsUpdate,
+                                onReactFlowInit
+                               // isRunning
+                            }) => {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const hasLoadedExternalScheme = useRef(false);
+    const [showVisualization, setShowVisualization] = useState(false);
 
     // Получаем контекст
-    const { loadedSchemeData, setLoadedSchemeData } = useDSPEditor();
+    const {loadedSchemeData, setLoadedSchemeData} = useDSPEditor();
 
     // Автосохранение
-    const { loadAutoSave, clearAutoSave } = useAutoSave(
+    const {loadAutoSave, clearAutoSave} = useAutoSave(
         nodes,
         edges,
         reactFlowInstance,
         {
             enabled: true,
-            skipWhen: () => hasLoadedExternalScheme.current
+            //skipWhen: () => hasLoadedExternalScheme.current
         }
     );
 
@@ -87,6 +94,19 @@ function DSPEditor({
         }
     }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData]);
 
+    // Компиляция графа при изменении узлов или рёбер
+    useEffect(() => {
+        if (nodes.length === 0) return;
+
+        // Компилируем граф
+        const result = dspExecutionStore.compile(nodes, edges);
+
+        if (!result.success) {
+            console.error('Compilation errors:', result.errors);
+            // Можно показать ошибки пользователю
+        }
+    }, [nodes, edges]);
+
     // Обновление статистики
     useEffect(() => {
         if (onStatsUpdate) {
@@ -97,6 +117,20 @@ function DSPEditor({
         }
     }, [nodes, edges, onStatsUpdate]);
 
+
+// Показываем панель визуализации когда есть визуализационные узлы
+    useEffect(() => {
+        const hasVisualizationNodes = nodes.some(n => { // Изменено с node на n
+            const blockType = n.data.blockType;
+            return blockType === 'Осциллограф' ||
+                blockType === 'Спектроанализатор' ||
+                blockType === 'Фазовое созвездие';
+        });
+
+        setShowVisualization(hasVisualizationNodes && dspExecutionStore.isRunning); // Исправлено на isRunning
+    }, [nodes, dspExecutionStore.isRunning]);
+
+
     // Передаём ReactFlow instance наверх
     const handleInit = useCallback((instance) => {
         setReactFlowInstance(instance);
@@ -105,65 +139,35 @@ function DSPEditor({
         }
     }, [onReactFlowInit]);
 
-    /**
-     * Проверка допустимости соединения
-     */
-    // const isValidConnection = useCallback((connection) => {
-    //     const sourceNode = nodes.find(node => node.id === connection.source);
-    //     const targetNode = nodes.find(node => node.id === connection.target);
-    //
-    //     if (!sourceNode || !targetNode) return false;
-    //
-    //     // Запрещаем соединение узла с самим собой
-    //     if (sourceNode.id === targetNode.id) {
-    //         return false;
-    //     }
-    //
-    //     // Проверяем типы сигналов
-    //     const sourceSignalType = sourceNode.data?.signalConfig?.output;
-    //     const targetSignalType = targetNode.data?.signalConfig?.input;
-    //
-    //     // Если у источника нет выхода или у цели нет входа
-    //     if (!sourceSignalType || !targetSignalType) {
-    //         return false;
-    //     }
-    //
-    //     // Проверяем совместимость типов сигналов
-    //     return areSignalsCompatible(sourceSignalType, targetSignalType);
-    // }, [nodes]);
-
+    //Проверка допустимости соединения
     const isValidConnection = useCallback((connection) => {
-            const sourceNode = nodes.find(node => node.id === connection.source);
-            const targetNode = nodes.find(node => node.id === connection.target);
+        const sourceNode = nodes.find(node => node.id === connection.source);
+        const targetNode = nodes.find(node => node.id === connection.target);
 
-            if (!sourceNode || !targetNode) return false;
+        if (!sourceNode || !targetNode) return false;
 
-            // Запрещаем соединение узла с самим собой
-            if (sourceNode.id === targetNode.id) {
-                return false;
-            }
+        // Запрещаем соединение узла с самим собой
+        if (sourceNode.id === targetNode.id) return false;
 
-            // Проверяем, не подключено ли уже что-то ко входу целевого узла
-            const existingEdgeToTarget = edges.find(edge =>
-                edge.target === connection.target && edge.targetHandle === connection.targetHandle
-            );
+        // Проверяем, не подключено ли уже что-то ко входу целевого узла
+        const existingEdgeToTarget = edges.find(edge =>
+            edge.target === connection.target && edge.targetHandle === connection.targetHandle
+        );
 
-            if (existingEdgeToTarget) {
-                return false; // Уже есть соединение на этот вход
-            }
+        // Уже есть соединение на этот вход
+        if (existingEdgeToTarget) return false;
 
-            // Проверяем типы сигналов
-            const sourceSignalType = sourceNode.data?.signalConfig?.output;
-            const targetSignalType = targetNode.data?.signalConfig?.input;
 
-            // Если у источника нет выхода или у цели нет входа
-            if (!sourceSignalType || !targetSignalType) {
-                return false;
-            }
+        // Проверяем типы сигналов
+        const sourceSignalType = sourceNode.data?.signalConfig?.output;
+        const targetSignalType = targetNode.data?.signalConfig?.input;
 
-            // Проверяем совместимость типов сигналов
-            return areSignalsCompatible(sourceSignalType, targetSignalType);
-        }, [nodes, edges]); // Добавили edges в зависимости
+        // Если у источника нет выхода или у цели нет входа
+        if (!sourceSignalType || !targetSignalType) return false;
+
+        // Проверяем совместимость типов сигналов
+        return areSignalsCompatible(sourceSignalType, targetSignalType);
+    }, [nodes, edges]);
 
     const onConnect = useCallback(
         (params) => {
@@ -179,10 +183,8 @@ function DSPEditor({
                 edge.sourceHandle === params.sourceHandle &&
                 edge.targetHandle === params.targetHandle
             );
-
-            if (connectionExists) {
-                return; // Такое соединение уже существует
-            }
+            // Такое соединение уже существует
+            if (connectionExists) return;
 
             // Получаем тип сигнала от источника
             const signalType = sourceNode.data?.signalConfig?.output || 'real';
@@ -190,10 +192,11 @@ function DSPEditor({
             // Создаём ребро с информацией о типе сигнала
             const edge = {
                 ...params,
-                animated: isRunning,
+                animated: dspExecutionStore.isRunning,
                 type: signalType === 'complex' ? 'complex' : 'real',
                 data: {
-                    signalType: signalType
+                    signalType: signalType,
+                    isRunning: dspExecutionStore.isRunning
                 }
             };
 
@@ -204,7 +207,7 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning, edges] // Добавили edges
+        [setEdges, currentScheme, onSchemeUpdate, nodes, dspExecutionStore.isRunning, edges]
     );
 
     const onDragOver = useCallback((event) => {
@@ -260,17 +263,18 @@ function DSPEditor({
     useEffect(() => {
         setEdges(eds => eds.map(edge => ({
             ...edge,
-            animated: isRunning,
+            animated: dspExecutionStore.isRunning,
             data: {
                 ...edge.data,
-                isRunning: isRunning
+                isRunning: dspExecutionStore.isRunning
             }
         })));
-    }, [isRunning, setEdges]);
+    }, [dspExecutionStore.isRunning, setEdges]); // Исправлено на isRunning
 
     return (
+        <>
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <Toolbar isDarkTheme={isDarkTheme} />
+            <Toolbar isDarkTheme={isDarkTheme}/>
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <ReactFlow
                     nodes={nodes}
@@ -296,22 +300,29 @@ function DSPEditor({
                         showInteractive={false} // Можно скрыть кнопку переключения интерактивности, если не нужна
                     />
                     <MiniMap
+                        pannable={true}
+                        position={"bottom-right"}
                         className={isDarkTheme ? 'dark-theme-minimap' : ''}
                         nodeStrokeColor={(node) => {
                             if (node.selected) return '#4F46E5';
                             return isDarkTheme ? '#4b5563' : '#d1d5db';
                         }}
-                        nodeColor={(node) => {
-                            return isDarkTheme ? '#374151' : '#f3f4f6';
-                        }}
+                        // nodeColor={(node) => {
+                        //     return isDarkTheme ? '#374151' : '#f3f4f6';
+                        // }}
                         maskColor={isDarkTheme ? 'rgba(86, 204, 242, 0.1)' : 'rgba(240, 240, 240, 0.6)'}
                     />
                 </ReactFlow>
-                <SignalLegend isDarkTheme={isDarkTheme} />
+                <SignalLegend isDarkTheme={isDarkTheme}/>
             </div>
         </div>
+
+    {showVisualization && (
+        <VisualizationPanel isDarkTheme={isDarkTheme} />
+    )}
+    </>
     );
-}
+});
 
 DSPEditor.propTypes = {
     isDarkTheme: PropTypes.bool.isRequired,
