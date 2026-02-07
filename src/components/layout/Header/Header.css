@@ -2,7 +2,7 @@
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-primary);
   padding: 12px 24px;
-  height: 50px;
+  height: 60px;
   flex-shrink: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   z-index: 20;
@@ -41,7 +41,78 @@
 .app-header-center {
   flex: 1;
   display: flex;
+  align-items: center;
+  gap: 20px;
   justify-content: center;
+}
+
+.simulation-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sim-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.sim-btn:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.sim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.start-btn {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.start-btn.active {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.start-btn:hover:not(:disabled) {
+  background: var(--success);
+  color: white;
+}
+
+.stop-btn {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.stop-btn:hover:not(:disabled) {
+  background: var(--danger);
+  color: white;
+}
+
+.config-btn {
+  padding: 8px;
+  min-width: 36px;
+}
+
+.config-btn:hover:not(:disabled) {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
 }
 
 .current-scheme-info {
@@ -65,7 +136,7 @@
 }
 
 .scheme-unsaved {
-  font-size: 14px;
+  font-size: 11px;
   color: var(--text-secondary);
   font-style: italic;
   opacity: 0.8;
@@ -74,103 +145,153 @@
 .app-header-right {
   display: flex;
   gap: 12px;
-  min-width: 100px;
+  min-width: 150px;
   justify-content: flex-end;
 }
 
-/* Кнопки в хедере (если остались) */
-/*.header-controls {*/
-/*  display: flex;*/
-/*  gap: 4px;*/
-/*}*/
-
-.header-btn {
+.config-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
   background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
-  padding: 3px 6px;
   border-radius: var(--radius-md);
-  font-size: 10px;
+  border: 1px solid var(--border-primary);
+  font-size: 12px;
+}
+
+.config-label {
+  color: var(--text-secondary);
   font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
 }
 
-.header-btn:hover:not(:disabled) {
-  background: var(--bg-secondary);
-  transform: translateY(-1px);
-}
-
-.header-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.header-btn.save {
-  color: var(--success);
-  border-color: var(--success);
-}
-
-.header-btn.save-as {
+.config-value {
   color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.config-separator {
+  color: var(--border-primary);
+  margin: 0 4px;
+}
+
+/* Диалог настроек */
+.config-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.config-dialog {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-xl);
+}
+
+.config-dialog h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.config-field {
+  margin-bottom: 16px;
+}
+
+.config-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.config-field input,
+.config-field select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast);
+}
+
+.config-field input:focus,
+.config-field select:focus {
+  outline: none;
   border-color: var(--accent-primary);
 }
 
-.header-btn.load {
-  color: var(--warning);
-  border-color: var(--warning);
+.config-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
-.theme-toggle {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
-  padding: 6px 12px;
+.config-buttons button {
+  padding: 8px 16px;
+  border: none;
   border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 12px;
   transition: all var(--transition-fast);
 }
 
-/*.theme-toggle:hover {*/
-/*  background: var(--bg-secondary);*/
-/*}*/
+.config-buttons button:first-child {
+  background: var(--accent-primary);
+  color: white;
+}
 
-/*!* Темная тема для хедера *!*/
-/*.dark-theme .app-header {*/
-/*  background: var(--bg-tertiary);*/
-/*  border-bottom-color: var(--border-secondary);*/
-/*}*/
+.config-buttons button:first-child:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
 
-/*.dark-theme .current-scheme-info {*/
-/*  background: var(--bg-secondary);*/
-/*  border-color: var(--border-secondary);*/
-/*}*/
+.config-buttons button:last-child {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
 
-/*.dark-theme .header-btn {*/
-/*  background: var(--bg-secondary);*/
-/*  border-color: var(--border-secondary);*/
-/*}*/
+.config-buttons button:last-child:hover {
+  background: var(--border-primary);
+}
 
-/*.dark-theme .header-btn:hover:not(:disabled) {*/
-/*  background: var(--bg-tertiary);*/
-/*}*/
+/* Темная тема */
+.dark-theme .config-dialog {
+  background: var(--bg-tertiary);
+}
 
-/*.dark-theme .theme-toggle {*/
-/*  background: var(--bg-secondary);*/
-/*  border-color: var(--border-secondary);*/
-/*}*/
+.dark-theme .config-field input,
+.dark-theme .config-field select {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-secondary);
+}
 
-/*.dark-theme .theme-toggle:hover {*/
-/*  background: var(--bg-tertiary);*/
-/*}*/
+.dark-theme .config-buttons button:last-child {
+  background: var(--bg-primary);
+}
 
 /* Адаптивность */
 @media (max-width: 768px) {
   .app-header {
     padding: 10px 16px;
-    height: 60px;
-    gap: 10px;
+    height: 70px;
+    flex-wrap: wrap;
   }
 
   .app-header h1 {
@@ -181,12 +302,32 @@
     font-size: 11px;
   }
 
+  .app-header-center {
+    width: 100%;
+    order: 3;
+    margin-top: 8px;
+  }
+
+  .simulation-controls {
+    gap: 8px;
+  }
+
+  .sim-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
   .scheme-name {
-    max-width: 200px;
-    font-size: 13px;
+    max-width: 150px;
+    font-size: 11px;
   }
 
   .current-scheme-info {
     padding: 6px 12px;
+  }
+  
+  .config-display {
+    font-size: 11px;
+    padding: 4px 8px;
   }
 }

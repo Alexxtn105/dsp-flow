@@ -2,12 +2,14 @@ import {useState, useCallback} from 'react';
 import {useTheme} from './hooks/useTheme';
 import {DSPEditorProvider} from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
-import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx'; // Новый импорт
+import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx';
 import DSPEditor from './components/dsp/DSPEditor';
-import Footer from './components/layout/Footer';
 import SaveDialog from './components/dialogs/SaveDialog';
 import LoadDialog from './components/dialogs/LoadDialog';
 import {dspExecutionStore} from './stores/DSPExecutionStore';
+
+//import Footer from './components/layout/Footer';
+
 
 import './App.css';
 
@@ -23,7 +25,15 @@ dspExecutionStore.updateConfig({
 // }
 
 function App() {
-
+    const [config, setConfig] = useState({
+        sampleRate: 48000,
+        bufferSize: 1024,
+        targetFPS: 30
+    });
+    const handleConfigChange = useCallback((newConfig) => {
+        setConfig(newConfig);
+        dspExecutionStore.updateConfig(newConfig);
+    }, []);
 
     const {isDarkTheme, toggleTheme} = useTheme();
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
@@ -154,6 +164,11 @@ function App() {
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
                 <Header
                     currentScheme={currentScheme}
+                    isRunning={dspExecutionStore.isRunning}
+                    onStart={handleStartSimulation}
+                    onStop={handleStopSimulation}
+                    config={config}
+                    onConfigChange={handleConfigChange}
                 />
 
                 <div className="app-content">
@@ -177,15 +192,15 @@ function App() {
                     />
                 </div>
 
-                <Footer
-                    isDarkTheme={isDarkTheme}
-                    isRunning={dspExecutionStore.isRunning}
-                    onStart={handleStartSimulation}
-                    onStop={handleStopSimulation}
-                    // isRunning={isRunning}
-                    nodesCount={stats.nodesCount}
-                    connectionsCount={stats.connectionsCount}
-                />
+                {/*<Footer*/}
+                {/*    isDarkTheme={isDarkTheme}*/}
+                {/*    isRunning={dspExecutionStore.isRunning}*/}
+                {/*    onStart={handleStartSimulation}*/}
+                {/*    onStop={handleStopSimulation}*/}
+                {/*    // isRunning={isRunning}*/}
+                {/*    nodesCount={stats.nodesCount}*/}
+                {/*    connectionsCount={stats.connectionsCount}*/}
+                {/*/>*/}
 
                 {/* Диалог сохранения */}
                 {showSaveDialog && (

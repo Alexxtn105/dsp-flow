@@ -17,7 +17,7 @@ import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 import SignalLegend from './SignalLegend';
-import VisualizationPanel from '../../visualization/VisualizationPanel';
+//import VisualizationPanel from '../../visualization/VisualizationPanel';
 import {dspExecutionStore} from '../../../stores/DSPExecutionStore';
 
 import {useAutoSave} from '../../../hooks/index.js';
@@ -30,6 +30,8 @@ import {
 import {useDSPEditor} from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
+import FloatingWindowsManager from '../../visualization/FloatingWindowsManager';
+
 
 const nodeTypes = {
     block: BlockNode,
@@ -56,6 +58,51 @@ const DSPEditor = observer(({
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const hasLoadedExternalScheme = useRef(false);
     const [showVisualization, setShowVisualization] = useState(false);
+    const [visualizationWindows, setVisualizationWindows] = useState([]);
+
+    // Обработчик переключения видимости визуализации
+    const handleToggleVisualization = useCallback((nodeId) => {
+        setNodes(nds => nds.map(node => {
+            if (node.id === nodeId) {
+                const newVisible = !node.data.visualizationVisible;
+
+                if (newVisible) {
+                    // Показываем окно
+                    const visData = dspExecutionStore.getVisualizationData(nodeId);
+                    if (visData) {
+                        setVisualizationWindows(windows => [
+                            ...windows.filter(w => w.nodeId !== nodeId),
+                            {
+                                nodeId,
+                                type: visData.type,
+                                data: visData.data,
+                                nodeLabel: node.data.label
+                            }
+                        ]);
+                    }
+                } else {
+                    // Скрываем окно
+                    setVisualizationWindows(windows =>
+                        windows.filter(w => w.nodeId !== nodeId)
+                    );
+                }
+
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        visualizationVisible: newVisible
+                    }
+                };
+            }
+            return node;
+        }));
+    }, []);
+
+    // Обработчик закрытия окна
+    const handleCloseVisualizationWindow = useCallback((nodeId) => {
+        handleToggleVisualization(nodeId);
+    }, [handleToggleVisualization]);
 
     // Получаем контекст
     const {loadedSchemeData, setLoadedSchemeData} = useDSPEditor();
@@ -244,7 +291,9 @@ const DSPEditor = observer(({
                     label: blockType,
                     blockType,
                     params: getDefaultParams(blockType),
-                    signalConfig: signalConfig
+                    signalConfig: signalConfig,
+                    visualizationVisible: false,
+                    onToggleVisualization: handleToggleVisualization  // ✨ ДОБАВИТЬ
                 },
             };
 
@@ -270,6 +319,28 @@ const DSPEditor = observer(({
             }
         })));
     }, [dspExecutionStore.isRunning, setEdges]); // Исправлено на isRunning
+
+    // Обновление данных визуализации при выполнении
+    useEffect(() => {
+        if (!dspExecutionStore.isRunning) return;
+
+        const interval = setInterval(() => {
+            setVisualizationWindows(windows =>
+                windows.map(window => {
+                    const visData = dspExecutionStore.getVisualizationData(window.nodeId);
+                    if (visData) {
+                        return {
+                            ...window,
+                            data: visData.data
+                        };
+                    }
+                    return window;
+                })
+            );
+        }, 100); // Обновляем каждые 100мс
+
+        return () => clearInterval(interval);
+    }, [dspExecutionStore.isRunning]);
 
     return (
         <>
@@ -317,9 +388,19 @@ const DSPEditor = observer(({
             </div>
         </div>
 
-    {showVisualization && (
-        <VisualizationPanel isDarkTheme={isDarkTheme} />
-    )}
+            {/*{showVisualization && (*/}
+            {/*    <VisualizationPanel isDarkTheme={isDarkTheme} />*/}
+            {/*)}*/}
+
+            {/* Плавающие окна визуализации */}
+            {/*{showVisualization && (*/}
+            <FloatingWindowsManager
+                visualizationWindows={visualizationWindows}
+                onCloseWindow={handleCloseVisualizationWindow}
+                isDarkTheme={isDarkTheme}
+            />
+            {/*)}*/}
+
     </>
     );
 });

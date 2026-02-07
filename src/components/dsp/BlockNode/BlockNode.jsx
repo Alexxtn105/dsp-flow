@@ -19,12 +19,21 @@ import {
 } from '../../../utils/helpers';
 import './BlockNode.css';
 
-function BlockNode({data, selected}) {
+function BlockNode({data, selected, id}) {
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
     const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
+    const isVisualization = isVisualizationBlock(data.blockType);
+    
+    // Обработчик показа/скрытия окна визуализации
+    const handleToggleVisualization = (e) => {
+        e.stopPropagation();
+        if (data.onToggleVisualization) {
+            data.onToggleVisualization(id);
+        }
+    };
 
 
     return (
@@ -51,22 +60,21 @@ function BlockNode({data, selected}) {
                         <div className="block-name">{data.label}</div>
                         <div className="block-type">{description} </div>
                     </div>
-                    {/*<div>*/}
-                    {/*    /!*БЛОК ТИПОВ СИГНАЛОВ*!/*/}
-                    {/*    {signalConfig.input && signalConfig.output && (*/}
-                    {/*        <div className="block-signal-types">*/}
-                    {/*            <span className={`signal-type-badge ${getSignalTypeClass(signalConfig.input)}`}>*/}
-                    {/*                {signalConfig.input === 'complex' ? 'Cplx' : 'Re'}→*/}
-                    {/*            </span>*/}
-                    {/*            <span className={`signal-type-badge ${getSignalTypeClass(signalConfig.output)}`}>*/}
-                    {/*                →{signalConfig.output === 'complex' ? 'Cplx' : 'Re'}*/}
-                    {/*            </span>*/}
-                    {/*        </div>*/}
-                    {/*    )}*/}
-                    {/*</div>*/}
                 </div>
-
-
+                
+                {/* Кнопка показа/скрытия визуализации для блоков визуализации */}
+                {isVisualization && (
+                    <button 
+                        className="visualization-toggle-btn"
+                        onClick={handleToggleVisualization}
+                        title={data.visualizationVisible ? "Скрыть визуализацию" : "Показать визуализацию"}
+                    >
+                        <Icon 
+                            name={data.visualizationVisible ? "visibility" : "visibility_off"} 
+                            size="small" 
+                        />
+                    </button>
+                )}
             </div>
 
             {data.params && Object.keys(data.params).length > 0 && (
@@ -106,9 +114,12 @@ BlockNode.propTypes = {
     data: PropTypes.shape({
         label: PropTypes.string.isRequired,
         blockType: PropTypes.string.isRequired,
-        params: PropTypes.object
+        params: PropTypes.object,
+        visualizationVisible: PropTypes.bool,
+        onToggleVisualization: PropTypes.func
     }).isRequired,
-    selected: PropTypes.bool.isRequired
+    selected: PropTypes.bool.isRequired,
+    id: PropTypes.string.isRequired
 };
 
 export default memo(BlockNode);
