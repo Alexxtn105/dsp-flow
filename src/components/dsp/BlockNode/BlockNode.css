@@ -3,13 +3,61 @@
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-lg);
     padding: 12px;
-    min-width: 180px;
-    max-width: 220px;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-fast);
+    min-width: 120px;
+    max-width: 400px;
+    min-height: 120px;
+    max-height: 400px;  box-shadow: var(--shadow-sm);
+    //transition: all var(--transition-fast);
     cursor: grab;
     position: relative;
+
+    resize: both;
+    overflow: auto;
+    transition: width 0.2s ease, height 0.2s ease;
+
 }
+
+/* Сохранение размеров между сессиями */
+.block-node:active {
+    transition: none;
+}
+
+/* Стили для маркера изменения размера */
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    cursor: nwse-resize;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.block-node:hover .resize-handle {
+    opacity: 0.5;
+}
+
+/* Улучшенные стили для прокрутки параметров */
+.block-params {
+    max-height: calc(100% - 60px);
+    overflow-y: auto;
+    margin-bottom: 15px; /* Место для resize-handle */
+}
+
+
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--border-primary);
+    border-bottom: 2px solid var(--border-primary);
+    border-radius: 2px;
+}
+
 
 /*.block-node:hover {*/
 /*    border-color: var(--accent-primary);*/
