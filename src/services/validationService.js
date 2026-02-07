@@ -104,6 +104,16 @@ class ValidationService {
      */
     static validateBlockParams(blockType, params) {
         const validators = {
+            'Аудио-файл': (p) => {
+                const errors = [];
+                if (!p.audioFile) {
+                    errors.push('Необходимо выбрать аудио-файл');
+                }
+                if (p.sampleRate && (p.sampleRate < 8000 || p.sampleRate > 192000)) {
+                    errors.push('Частота дискретизации должна быть от 8000 до 192000 Гц');
+                }
+                return errors;
+            },
             'КИХ-Фильтр': (p) => {
                 const errors = [];
                 if (!p.order || p.order < 1 || p.order > 1024) {
