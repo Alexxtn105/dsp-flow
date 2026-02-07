@@ -14,10 +14,11 @@ import '@xyflow/react/dist/style.css';
 
 import Toolbar from '../../layout/Toolbar/Toolbar.jsx';
 import BlockNode from '../BlockNode';
+import AudioFileNode from '../../nodes/AudioFileNode';
+import BlockParamsModal from '../../common/BlockParamsModal';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 import SignalLegend from './SignalLegend';
-//import VisualizationPanel from '../../visualization/VisualizationPanel';
 import {dspExecutionStore} from '../../../stores/DSPExecutionStore';
 
 import {useAutoSave} from '../../../hooks/index.js';
@@ -35,6 +36,7 @@ import FloatingWindowsManager from '../../visualization/FloatingWindowsManager';
 
 const nodeTypes = {
     block: BlockNode,
+    audioFile: AudioFileNode,
 };
 
 const edgeTypes = {
@@ -59,6 +61,16 @@ const DSPEditor = observer(({
     const hasLoadedExternalScheme = useRef(false);
     const [showVisualization, setShowVisualization] = useState(false);
     const [visualizationWindows, setVisualizationWindows] = useState([]);
+
+
+    // Состояние для модального окна параметров
+    const [paramsModal, setParamsModal] = useState({
+        isOpen: false,
+        nodeId: null,
+        blockType: null,
+        currentParams: {}
+    });
+
 
     // Обработчик переключения видимости визуализации
     const handleToggleVisualization = useCallback((nodeId) => {
@@ -97,7 +109,7 @@ const DSPEditor = observer(({
             }
             return node;
         }));
-    }, []);
+    }, [setNodes]);
 
     // Обработчик закрытия окна
     const handleCloseVisualizationWindow = useCallback((nodeId) => {
@@ -174,9 +186,86 @@ const DSPEditor = observer(({
                 blockType === 'Фазовое созвездие';
         });
 
-        setShowVisualization(hasVisualizationNodes && dspExecutionStore.isRunning); // Исправлено на isRunning
+        //setShowVisualization(hasVisualizationNodes && dspExecutionStore.isRunning); // Исправлено на isRunning
     }, [nodes, dspExecutionStore.isRunning]);
 
+
+    // Обработчик двойного клика по узлу
+    const handleNodeDoubleClick = useCallback((nodeId, blockType, currentParams) => {
+        console.log('Opening params modal:', { nodeId, blockType, currentParams });
+        setParamsModal({
+            isOpen: true,
+            nodeId,
+            blockType,
+            currentParams: currentParams || {}
+        });
+    }, []);
+
+    // Обработчик сохранения параметров
+    const handleParamsSave = useCallback((newParams) => {
+        if (!paramsModal.nodeId) return;
+
+        setNodes(nds => nds.map(node => {
+            if (node.id === paramsModal.nodeId) {
+                const updatedData = {
+                    ...node.data,
+                    params: {
+                        ...node.data.params,
+                        ...newParams
+                    }
+                };
+
+                // Для аудиофайла сохраняем аудиофайл отдельно
+                if (paramsModal.blockType === 'Аудио файл') {
+                    if (newParams.audioFile) {
+                        updatedData.audioFile = newParams.audioFile;
+                    } else {
+                        updatedData.audioFile = null;
+                    }
+                }
+
+                return {
+                    ...node,
+                    data: updatedData
+                };
+            }
+            return node;
+        }));
+
+        // Помечаем схему как несохранённую
+        if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
+            onSchemeUpdate(currentScheme.name, false);
+        }
+
+        setParamsModal({
+            isOpen: false,
+            nodeId: null,
+            blockType: null,
+            currentParams: {}
+        });
+    }, [paramsModal.nodeId, paramsModal.blockType, setNodes, currentScheme, onSchemeUpdate]);
+
+
+    // Обработчик загрузки аудиофайла
+    const handleAudioFileLoad = useCallback((nodeId, fileInfo) => {
+        setNodes(nds => nds.map(node => {
+            if (node.id === nodeId) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        audioFile: fileInfo
+                    }
+                };
+            }
+            return node;
+        }));
+
+        // Помечаем схему как несохранённую
+        if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
+            onSchemeUpdate(currentScheme.name, false);
+        }
+    }, [setNodes, currentScheme, onSchemeUpdate]);
 
     // Передаём ReactFlow instance наверх
     const handleInit = useCallback((instance) => {
@@ -283,9 +372,25 @@ const DSPEditor = observer(({
 
             const signalConfig = getBlockSignalConfig(blockType);
 
+            // const newNode = {
+            //     id: generateNodeId(), // Теперь гарантированно уникальный
+            //     type: 'block',
+            //     position,
+            //     data: {
+            //         label: blockType,
+            //         blockType,
+            //         params: getDefaultParams(blockType),
+            //         signalConfig: signalConfig,
+            //         visualizationVisible: false,
+            //         onToggleVisualization: handleToggleVisualization  // ✨ ДОБАВИТЬ
+            //     },
+            // };
+            // Определяем тип узла
+            const nodeType = blockType === 'Аудио файл' ? 'audioFile' : 'block';
+
             const newNode = {
-                id: generateNodeId(), // Теперь гарантированно уникальный
-                type: 'block',
+                id: generateNodeId(),
+                type: nodeType,
                 position,
                 data: {
                     label: blockType,
@@ -293,7 +398,9 @@ const DSPEditor = observer(({
                     params: getDefaultParams(blockType),
                     signalConfig: signalConfig,
                     visualizationVisible: false,
-                    onToggleVisualization: handleToggleVisualization  // ✨ ДОБАВИТЬ
+                    onNodeDoubleClick: handleNodeDoubleClick,
+                    onFileLoad: blockType === 'Аудио файл' ? handleAudioFileLoad : undefined,
+                    onToggleVisualization: handleToggleVisualization
                 },
             };
 
@@ -304,7 +411,7 @@ const DSPEditor = observer(({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, reactFlowWrapper]
+        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, reactFlowWrapper, handleNodeDoubleClick, handleAudioFileLoad]
     );
 
 
@@ -399,7 +506,22 @@ const DSPEditor = observer(({
                 onCloseWindow={handleCloseVisualizationWindow}
                 isDarkTheme={isDarkTheme}
             />
-            {/*)}*/}
+
+            {/* Модальное окно для редактирования параметров */}
+            <BlockParamsModal
+                isOpen={paramsModal.isOpen}
+                onClose={() => setParamsModal({
+                    isOpen: false,
+                    nodeId: null,
+                    blockType: null,
+                    currentParams: {}
+                })}
+                onSave={handleParamsSave}
+                blockType={paramsModal.blockType}
+                currentParams={paramsModal.currentParams}
+                isDarkTheme={isDarkTheme}
+            />
+
 
     </>
     );
@@ -410,8 +532,8 @@ DSPEditor.propTypes = {
     currentScheme: PropTypes.object.isRequired,
     onSchemeUpdate: PropTypes.func.isRequired,
     onStatsUpdate: PropTypes.func.isRequired,
-    onReactFlowInit: PropTypes.func,
-    isRunning: PropTypes.bool.isRequired
+    onReactFlowInit: PropTypes.func//,
+    //isRunning: PropTypes.bool.isRequired
 };
 
 export default DSPEditor;

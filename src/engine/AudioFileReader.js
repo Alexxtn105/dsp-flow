@@ -1,5 +1,5 @@
 /**
- * AudioFileReader - модуль для чтения аудио файлов (WAV)
+ * AudioFileReader - модуль для чтения аудио файлов
  */
 
 export class AudioFileReader {
@@ -7,29 +7,39 @@ export class AudioFileReader {
      * Загрузка WAV файла
      */
     static async loadWavFile(file) {
-        try {
-            const arrayBuffer = await file.arrayBuffer();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
-            // Создаем аудио контекст
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            reader.onload = async (e) => {
+                try {
+                    const arrayBuffer = e.target.result;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-            // Декодируем аудио данные
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    // Извлекаем сэмплы из первого канала
+                    const samples = audioBuffer.getChannelData(0);
 
-            // Извлекаем сэмплы из первого канала
-            const samples = audioBuffer.getChannelData(0);
-
-            return {
-                samples: new Float32Array(samples),
-                sampleRate: audioBuffer.sampleRate,
-                duration: audioBuffer.duration,
-                numberOfChannels: audioBuffer.numberOfChannels,
-                length: audioBuffer.length
+                    resolve({
+                        fileName: file.name,
+                        samples: new Float32Array(samples),
+                        sampleRate: audioBuffer.sampleRate,
+                        duration: audioBuffer.duration,
+                        numberOfChannels: audioBuffer.numberOfChannels,
+                        length: audioBuffer.length,
+                        fileSize: file.size,
+                        audioBuffer: audioBuffer // Сохраняем оригинальный буфер
+                    });
+                } catch (error) {
+                    reject(new Error('Ошибка декодирования аудио файла'));
+                }
             };
-        } catch (error) {
-            console.error('Ошибка загрузки аудио файла:', error);
-            throw error;
-        }
+
+            reader.onerror = () => {
+                reject(new Error('Ошибка чтения файла'));
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
     }
 
     /**
@@ -57,12 +67,13 @@ export class AudioFileReader {
     }
 
     /**
-     * Создание циклического генератора (для loop)
+     * Проверка формата файла
      */
-    static *loopingGenerator(audioData, blockSize) {
-        while (true) {
-            yield* this.generateBlocks(audioData, blockSize);
-        }
+    static isValidWavFile(file) {
+        const validExtensions = ['.wav', '.wave'];
+        const fileName = file.name.toLowerCase();
+
+        return validExtensions.some(ext => fileName.endsWith(ext));
     }
 }
 

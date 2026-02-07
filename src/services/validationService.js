@@ -106,11 +106,10 @@ class ValidationService {
         const validators = {
             'Аудио-файл': (p) => {
                 const errors = [];
-                if (!p.audioFile) {
-                    errors.push('Необходимо выбрать аудио-файл');
-                }
-                if (p.sampleRate && (p.sampleRate < 8000 || p.sampleRate > 192000)) {
-                    errors.push('Частота дискретизации должна быть от 8000 до 192000 Гц');
+                // Для аудиофайла не требуется обязательная валидация параметров
+                // Можно добавить проверку, если нужно
+                if (p.loop && typeof p.loop !== 'boolean') {
+                    errors.push('Параметр loop должен быть boolean');
                 }
                 return errors;
             },

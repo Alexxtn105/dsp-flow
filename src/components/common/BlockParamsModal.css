@@ -1,0 +1,333 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+}
+
+.block-params-modal {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    width: 400px;
+    max-width: 90vw;
+    max-height: 80vh;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.block-params-modal.wide {
+    width: 500px; /* Чуть шире для аудиофайлов */
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-tertiary);
+    flex-shrink: 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.close-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modal-content {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-content h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.file-upload-section,
+.params-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.param-field {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.param-field:last-child {
+    margin-bottom: 0;
+}
+
+.param-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.param-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.param-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.param-input.error {
+    border-color: var(--danger);
+}
+
+.error-text {
+    color: var(--danger);
+    font-weight: normal;
+    font-size: 11px;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+/* Стили для чекбокса */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-input {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    position: relative;
+    transition: all var(--transition-fast);
+    margin-right: 8px;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label:hover .checkbox-custom {
+    border-color: var(--accent-primary);
+}
+
+/* Общие ошибки */
+.general-errors {
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-md);
+}
+
+.general-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--danger);
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.general-error:last-child {
+    margin-bottom: 0;
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    background: var(--bg-tertiary);
+    flex-shrink: 0;
+}
+
+.cancel-btn, .save-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 80px;
+}
+
+.cancel-btn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+}
+
+.cancel-btn:hover {
+    background: var(--bg-tertiary);
+}
+
+.save-btn {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.save-btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Темная тема */
+.dark-theme .block-params-modal {
+    background: var(--bg-tertiary);
+}
+
+.dark-theme .modal-header {
+    background: var(--bg-secondary);
+}
+
+.dark-theme .param-input {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .modal-footer {
+    background: var(--bg-secondary);
+}
+
+.dark-theme .cancel-btn {
+    background: var(--bg-tertiary);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .block-params-modal {
+        width: 95vw;
+        max-height: 85vh;
+    }
+
+    .block-params-modal.wide {
+        width: 95vw;
+    }
+
+    .modal-content {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .modal-header {
+        padding: 12px 16px;
+    }
+
+    .modal-header h3 {
+        font-size: 14px;
+        max-width: 200px;
+    }
+
+    .param-field {
+        margin-bottom: 10px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px;
+    }
+
+    .cancel-btn, .save-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content h4 {
+        font-size: 13px;
+    }
+
+    .param-label {
+        font-size: 11px;
+    }
+
+    .param-input {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    .modal-header h3 {
+        max-width: 150px;
+    }
+}
