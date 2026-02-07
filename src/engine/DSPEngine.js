@@ -194,32 +194,81 @@ export class DSPEngine {
     }
 
 //обработка аудио
+//     processAudioFile(params) {
+//         if (!params.audioData || !params.audioData.samples) {
+//             return new Float32Array(this.bufferSize).fill(0);
+//         }
+//
+//         // Берем следующий блок из аудио данных
+//         // Здесь нужна логика работы с offset и loop
+//         const samples = params.audioData.samples;
+//         const offset = params._currentOffset || 0;
+//
+//         const output = new Float32Array(this.bufferSize);
+//         const remainingSamples = samples.length - offset;
+//
+//         if (remainingSamples > 0) {
+//             const copyLength = Math.min(this.bufferSize, remainingSamples);
+//             output.set(samples.subarray(offset, offset + copyLength));
+//             params._currentOffset = offset + copyLength;
+//
+//             // Если loop и данные закончились
+//             if (copyLength < this.bufferSize && params.loop) {
+//                 params._currentOffset = 0;
+//             }
+//         } else if (params.loop) {
+//             // Начинаем сначала
+//             params._currentOffset = 0;
+//             return this.processAudioFile(params);
+//         }
+//
+//         return output;
+//     }
+
     processAudioFile(params) {
         if (!params.audioData || !params.audioData.samples) {
+            // Если нет аудиоданных, возвращаем нули
             return new Float32Array(this.bufferSize).fill(0);
         }
 
-        // Берем следующий блок из аудио данных
-        // Здесь нужна логика работы с offset и loop
+        // Инициализируем смещение если его нет
+        if (!params._currentOffset) {
+            params._currentOffset = 0;
+        }
+
         const samples = params.audioData.samples;
-        const offset = params._currentOffset || 0;
-
+        const offset = params._currentOffset;
         const output = new Float32Array(this.bufferSize);
-        const remainingSamples = samples.length - offset;
 
-        if (remainingSamples > 0) {
-            const copyLength = Math.min(this.bufferSize, remainingSamples);
-            output.set(samples.subarray(offset, offset + copyLength));
+        // Копируем данные из аудиобуфера
+        const remainingSamples = samples.length - offset;
+        const copyLength = Math.min(this.bufferSize, remainingSamples);
+
+        if (copyLength > 0) {
+            // Копируем доступные сэмплы
+            for (let i = 0; i < copyLength; i++) {
+                output[i] = samples[offset + i];
+            }
+
+            // Дополняем нулями если нужно
+            if (copyLength < this.bufferSize) {
+                output.fill(0, copyLength);
+            }
+
+            // Обновляем смещение
             params._currentOffset = offset + copyLength;
 
-            // Если loop и данные закончились
-            if (copyLength < this.bufferSize && params.loop) {
+            // Если включен цикл и достигли конца
+            if (params._currentOffset >= samples.length && params.loop) {
                 params._currentOffset = 0;
             }
         } else if (params.loop) {
-            // Начинаем сначала
+            // Начинаем сначала если включен цикл
             params._currentOffset = 0;
             return this.processAudioFile(params);
+        } else {
+            // Если не цикл и данные закончились - возвращаем нули
+            output.fill(0);
         }
 
         return output;

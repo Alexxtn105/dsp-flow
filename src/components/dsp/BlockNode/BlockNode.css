@@ -381,6 +381,42 @@
     border-color: #a78bfa;
 }
 
+.node-hint {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-primary);
+    text-align: center;
+}
+
+.hint-text {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+}
+
+.block-node:hover .hint-text {
+    opacity: 1;
+}
+
+.visualization-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.visualization-toggle-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
     .signal-type-badge {
