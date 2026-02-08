@@ -197,6 +197,7 @@ class DSPProcessor {
 
     /**
      * Возвращает процессор для типа блока
+     * @param {string} blockType
      */
     getBlockProcessor(blockType) {
         const processorMap = {
@@ -215,8 +216,8 @@ class DSPProcessor {
             'Перемножитель': DSPBlocks.MultiplierBlock,
             'БПФ': DSPBlocks.FFTBlock,
             'Осциллограф': DSPBlocks.PassthroughBlock,
-            'Спектроанализатор': DSPBlocks.FFTBlock,
-            'Водопад': DSPBlocks.FFTBlock,
+            'Спектроанализатор': DSPBlocks.SpectrumAnalyzerBlock,
+            'Водопад': DSPBlocks.SpectrumAnalyzerBlock, // Используем анализатор спектра для водопада
         };
 
         return processorMap[blockType] || DSPBlocks.PassthroughBlock;

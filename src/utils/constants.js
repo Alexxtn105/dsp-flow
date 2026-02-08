@@ -243,9 +243,14 @@ export const DEFAULT_BLOCK_PARAMS = {
     },
     [DSP_BLOCK_TYPES.SPECTRUM_ANALYZER]: {
         fftSize: 2048,
+        windowFunction: 'blackman-harris',
         frequencyRange: 'full',
         dBScale: true,
         averaging: 5,
+    },
+    [DSP_BLOCK_TYPES.WATERFALL]: {
+        fftSize: 2048,
+        windowFunction: 'blackman-harris',
     },
     [DSP_BLOCK_TYPES.PHASE_DETECTOR]: {
         referenceFrequency: 1000,

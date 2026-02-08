@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
-import { getBlockDescription, formatParamName } from '../../../utils/helpers';
+import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
 import { BLOCK_PARAM_OPTIONS } from '../../../utils/constants';
 import './BlockParamsDialog.css';
 
@@ -13,10 +13,16 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
     const [wavFileName, setWavFileName] = useState('');
 
     useEffect(() => {
-        if (node?.data?.params) {
-            setLocalParams({ ...node.data.params });
-            if (node.data.params.wavFile) {
-                setWavFileName(node.data.params.wavFile.name || 'Файл выбран');
+        if (node?.data) {
+            const blockType = node.data.blockType;
+            const defaultParams = getDefaultParams(blockType);
+            const currentParams = node.data.params || {};
+
+            // Merge defaults with current to ensure all fields exist
+            setLocalParams({ ...defaultParams, ...currentParams });
+
+            if (currentParams.wavFile) {
+                setWavFileName(currentParams.wavFile.name || 'Файл выбран');
             }
         }
     }, [node]);

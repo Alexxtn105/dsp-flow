@@ -395,3 +395,76 @@ export const FFTBlock = {
         return this.computeMagnitudeDB(real, imag);
     }
 };
+
+/**
+ * Спектроанализатор / Водопад
+ * Выполняет БПФ с применением оконной функции
+ */
+export const SpectrumAnalyzerBlock = {
+    states: new Map(),
+
+    process(inputs, params, chunkSize, nodeId) {
+        const input = inputs[0];
+        if (!input) return new Float32Array(chunkSize / 2);
+
+        // Параметры
+        const fftSize = params.fftSize || 2048; // Используем параметр fftSize
+        const windowName = params.windowFunction || 'blackman-harris';
+
+        // Получаем функцию окна
+        const windowFunc = WindowFunctions[windowName] || WindowFunctions['blackman-harris'];
+
+        // Подготовка данных
+        // Если размер входных данных меньше fftSize, дополняем нулями
+        // Если больше - берём последние (или первые?) fftSize. Обычно для анализатора - текущий чанк.
+        // Но chunkSize может быть меньше fftSize. Требуется буферизация?
+        // Пока предполагаем, что chunkSize достаточно велик или мы обрабатываем то, что есть.
+        // Для корректного FFT размер должен быть степенью двойки.
+
+        // В текущей архитектуре chunkSize фиксирован (например 1024 или 2048).
+        // Если fftSize > chunkSize, нам нужен внутренний буфер (RingBuffer).
+
+        if (!this.states.has(nodeId)) {
+            this.states.set(nodeId, {
+                buffer: new Float32Array(fftSize),
+                pointer: 0
+            });
+        }
+
+        const state = this.states.get(nodeId);
+        const { buffer } = state;
+        let { pointer } = state;
+
+        // Записываем входные данные в кольцевой буфер
+        for (let i = 0; i < input.length; i++) {
+            buffer[pointer] = input[i];
+            pointer = (pointer + 1) % fftSize;
+        }
+        state.pointer = pointer;
+
+        // Для FFT нам нужно собрать упорядоченный буфер от старых к новым
+        const processingBuffer = new Float32Array(fftSize);
+        for (let i = 0; i < fftSize; i++) {
+            processingBuffer[i] = buffer[(pointer + i) % fftSize];
+        }
+
+        // Применяем окно
+        for (let i = 0; i < fftSize; i++) {
+            processingBuffer[i] *= windowFunc(i, fftSize);
+        }
+
+        // Выполняем FFT
+        // Используем логику из FFTBlock (нужно вынести fft функцию или дублировать)
+        // Чтобы не дублировать, вызовем метод FFTBlock
+        const real = new Float32Array(fftSize);
+        const imag = new Float32Array(fftSize);
+
+        // Копируем (processingBuffer уже Float32)
+        real.set(processingBuffer);
+
+        FFTBlock.fft(real, imag);
+
+        // Возвращаем магнитуду в дБ (половина спектра)
+        return FFTBlock.computeMagnitudeDB(real, imag);
+    }
+};
