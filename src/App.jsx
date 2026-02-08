@@ -183,7 +183,6 @@ function App() {
             DSPProcessor.onComplete = () => {
                 setIsRunning(false);
                 console.log('Обработка завершена');
-                alert('Обработка завершена');
             };
 
             DSPProcessor.onError = (error) => {

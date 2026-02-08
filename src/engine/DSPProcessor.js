@@ -40,6 +40,7 @@ class DSPProcessor {
 
         this.compiledGraph = result.executionOrder;
         this.blockStates.clear();
+        this.currentSample = 0;
 
         // Инициализируем состояния для каждого блока
         for (const block of this.compiledGraph) {
