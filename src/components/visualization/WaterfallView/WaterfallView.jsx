@@ -10,14 +10,41 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
     const tempCanvasRef = useRef(null);
     const [colorMap, setColorMap] = useState('audition'); // Default to Adobe Audition style
 
-    // Инициализация временного канваса для хранения истории
+    // Управление размером временного канваса с сохранением содержимого
     useEffect(() => {
+        const dpr = window.devicePixelRatio || 1;
+        const targetWidth = width * dpr;
+        const targetHeight = height * dpr;
+
         if (!tempCanvasRef.current) {
-            tempCanvasRef.current = document.createElement('canvas');
-            tempCanvasRef.current.width = width;
-            tempCanvasRef.current.height = height;
+            // Инициализация
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+            ctx.fillRect(0, 0, targetWidth, targetHeight);
+            tempCanvasRef.current = canvas;
+        } else {
+            // Ресайз с сохранением
+            const oldCanvas = tempCanvasRef.current;
+            if (oldCanvas.width !== targetWidth || oldCanvas.height !== targetHeight) {
+                const newCanvas = document.createElement('canvas');
+                newCanvas.width = targetWidth;
+                newCanvas.height = targetHeight;
+                const newCtx = newCanvas.getContext('2d');
+
+                // Заливаем фон
+                newCtx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+                newCtx.fillRect(0, 0, targetWidth, targetHeight);
+
+                // Рисуем старое изображение растянутым
+                newCtx.drawImage(oldCanvas, 0, 0, targetWidth, targetHeight);
+
+                tempCanvasRef.current = newCanvas;
+            }
         }
-    }, [width, height]);
+    }, [width, height, isDarkTheme]);
 
     // Функция получения цвета в зависимости от значения и карты
     const getColor = useCallback((normalized, mapType) => {
@@ -117,32 +144,28 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
 
         const dpr = window.devicePixelRatio || 1;
+        const targetWidth = width * dpr;
+        const targetHeight = height * dpr;
 
-        // Настраиваем основной канвас если размеры изменились
-        if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            ctx.scale(dpr, dpr);
-
-            // Заливаем фон
-            ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
-            ctx.fillRect(0, 0, width, height);
+        // 1. Настройка размеров основного канваса
+        if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            // После ресайза канвас очищается, это нормально, 
+            // мы восстановим изображение из tempCanvas на следующем шаге
         }
 
-        // 1. Сдвигаем старое изображение вниз на 1 пиксель
-        // Копируем текущий канвас во временный
-        tempCtx.drawImage(canvas, 0, 0, width * dpr, height * dpr);
+        // 2. Рисуем историю из tempCanvas на основной канвас со сдвигом вниз
+        // Сдвигаем на 1 реальный пиксель (dpr) или больше для скорости
+        const shiftY = dpr;
 
-        // Рисуем обратно со сдвигом вниз
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.drawImage(tempCanvas, 0, 0, width * dpr, height * dpr - dpr, 0, dpr, width * dpr, height * dpr - dpr);
-        ctx.restore();
+        // Рисуем всё изображение из tempCanvas в основной canvas, сдвинув вниз
+        // tempCanvas уже имеет правильный размер (благодаря useEffect)
+        ctx.drawImage(tempCanvas, 0, 0, targetWidth, targetHeight, 0, shiftY, targetWidth, targetHeight);
 
-        // 2. Рисуем новую строку сверху
-        const linePixelHeight = 1;
+        // 3. Рисуем новую строку сверху (высотой shiftY)
         const numBins = data.length;
-        const binWidth = width / numBins;
+        const binWidth = targetWidth / numBins;
 
         for (let i = 0; i < numBins; i++) {
             // Нормализуем значение дБ (-100...0) в 0...1
@@ -150,8 +173,12 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
             const normalized = Math.max(0, Math.min(1, (db + 100) / 100));
 
             ctx.fillStyle = getColor(normalized, colorMap);
-            ctx.fillRect(i * binWidth, 0, Math.ceil(binWidth), linePixelHeight);
+            // Рисуем прямоугольник с перекрытием чтобы не было щелей
+            ctx.fillRect(Math.floor(i * binWidth), 0, Math.ceil(binWidth), shiftY);
         }
+
+        // 4. Обновляем tempCanvas актуальным состоянием
+        tempCtx.drawImage(canvas, 0, 0);
 
     }, [data, isDarkTheme, width, height, colorMap, getColor]);
 

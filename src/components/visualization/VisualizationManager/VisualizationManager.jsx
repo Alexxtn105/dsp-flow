@@ -46,7 +46,9 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                 nodeId,
                 vizType,
                 title: node.data.label,
-                position
+                position,
+                width: 400,
+                height: 300
             });
             return next;
         });
@@ -62,6 +64,26 @@ const VisualizationManager = forwardRef(function VisualizationManager({
         setWindowData(prev => {
             const next = new Map(prev);
             next.delete(windowId);
+            return next;
+        });
+    }, []);
+
+    // Resize window
+    const handleResize = useCallback((windowId, width, height) => {
+        setOpenWindows(prev => {
+            const next = new Map(prev);
+            const config = next.get(windowId);
+            if (config) {
+                // Enforce limits: 100x100 to 1600x1600
+                const newWidth = Math.max(100, Math.min(1600, width));
+                const newHeight = Math.max(100, Math.min(1600, height));
+
+                next.set(windowId, {
+                    ...config,
+                    width: newWidth,
+                    height: newHeight
+                });
+            }
             return next;
         });
     }, []);
@@ -97,26 +119,33 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                     title={config.title}
                     isDarkTheme={isDarkTheme}
                     onClose={closeWindow}
+                    onResize={handleResize}
                     initialPosition={config.position}
-                    width={420}
-                    height={280}
+                    width={config.width}
+                    height={config.height}
                 >
                     {config.vizType === 'spectrum' ? (
                         <SpectrumView
                             data={data}
                             sampleRate={sampleRate}
                             isDarkTheme={isDarkTheme}
+                            width={config.width}
+                            height={config.height - 40}
                         />
                     ) : config.vizType === 'waterfall' ? (
                         <WaterfallView
                             data={data}
                             sampleRate={sampleRate}
                             isDarkTheme={isDarkTheme}
+                            width={config.width}
+                            height={config.height - 40}
                         />
                     ) : (
                         <OscilloscopeView
                             data={data}
                             isDarkTheme={isDarkTheme}
+                            width={config.width}
+                            height={config.height - 40}
                         />
                     )}
                 </VisualizationWindow>
