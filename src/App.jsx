@@ -2,11 +2,12 @@ import { useState, useCallback } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { DSPEditorProvider } from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
-import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx'; // Новый импорт
+import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx';
 import DSPEditor from './components/dsp/DSPEditor';
 import Footer from './components/layout/Footer';
 import SaveDialog from './components/dialogs/SaveDialog';
 import LoadDialog from './components/dialogs/LoadDialog';
+import SettingsDialog from './components/dialogs/SettingsDialog';
 import './App.css';
 
 function App() {
@@ -23,6 +24,10 @@ function App() {
     const [showSaveDialog, setShowSaveDialog] = useState(false);
     const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
     const [showLoadDialog, setShowLoadDialog] = useState(false);
+    const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+
+    // Частота дискретизации (глобальная настройка схемы)
+    const [sampleRate, setSampleRate] = useState(48000);
 
     // Статистика схемы
     const [stats, setStats] = useState({
@@ -49,6 +54,32 @@ function App() {
     const handleStatsUpdate = useCallback((newStats) => {
         setStats(newStats);
     }, []);
+
+    /**
+     * Создание новой схемы
+     */
+    const handleNewScheme = useCallback(() => {
+        if (!currentScheme.isSaved) {
+            const confirmed = window.confirm(
+                'Текущая схема не сохранена. Создать новую схему?'
+            );
+            if (!confirmed) return;
+        }
+
+        // Сброс к начальному состоянию
+        if (reactFlowInstance) {
+            reactFlowInstance.setNodes([]);
+            reactFlowInstance.setEdges([]);
+            reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1 });
+        }
+
+        setCurrentScheme({
+            name: 'not_saved',
+            isSaved: true
+        });
+
+        console.log('Создана новая схема');
+    }, [currentScheme.isSaved, reactFlowInstance]);
 
     /**
      * Обработчик сохранения
@@ -108,6 +139,19 @@ function App() {
         // TODO: Добавить логику остановки симуляции (будет в backend)
     }, []);
 
+    /**
+     * Изменение частоты дискретизации
+     */
+    const handleSampleRateChange = useCallback((newRate) => {
+        setSampleRate(newRate);
+        console.log('Частота дискретизации изменена на:', newRate, 'Гц');
+        // Помечаем схему как несохранённую
+        setCurrentScheme(prev => ({
+            ...prev,
+            isSaved: false
+        }));
+    }, []);
+
     // Условия активности кнопок
     const isSaveEnabled = true; // Всегда доступна
     const isSaveAsEnabled = true; // Всегда доступна
@@ -126,8 +170,13 @@ function App() {
                         onSave={handleSave}
                         onSaveAs={() => setShowSaveAsDialog(true)}
                         onLoad={() => setShowLoadDialog(true)}
+                        onNewScheme={handleNewScheme}
+                        onSettings={() => setShowSettingsDialog(true)}
+                        onStart={handleStartSimulation}
+                        onStop={handleStopSimulation}
                         isSaveEnabled={isSaveEnabled}
                         isSaveAsEnabled={isSaveAsEnabled}
+                        isRunning={isRunning}
                     />
 
                     <DSPEditor
@@ -142,11 +191,10 @@ function App() {
 
                 <Footer
                     isDarkTheme={isDarkTheme}
-                    onStart={handleStartSimulation}
-                    onStop={handleStopSimulation}
                     isRunning={isRunning}
                     nodesCount={stats.nodesCount}
                     connectionsCount={stats.connectionsCount}
+                    sampleRate={sampleRate}
                 />
 
                 {/* Диалог сохранения */}
@@ -177,6 +225,16 @@ function App() {
                         isDarkTheme={isDarkTheme}
                         onClose={() => setShowLoadDialog(false)}
                         onLoadSuccess={handleLoadSuccess}
+                    />
+                )}
+
+                {/* Диалог настроек */}
+                {showSettingsDialog && (
+                    <SettingsDialog
+                        isDarkTheme={isDarkTheme}
+                        onClose={() => setShowSettingsDialog(false)}
+                        sampleRate={sampleRate}
+                        onSampleRateChange={handleSampleRateChange}
                     />
                 )}
             </div>

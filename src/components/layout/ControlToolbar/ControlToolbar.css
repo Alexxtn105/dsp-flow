@@ -95,8 +95,15 @@
 }
 
 @keyframes fadeInTooltip {
-    from { opacity: 0; transform: translateY(-50%) translateX(-5px); }
-    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
 }
 
 .control-btn:disabled {
@@ -143,6 +150,36 @@
 
 .theme-btn:hover:not(:disabled) {
     color: var(--text-secondary);
+}
+
+/* Новые кнопки */
+.new-btn:hover:not(:disabled) {
+    color: var(--accent-primary);
+}
+
+.start-btn:hover:not(:disabled) {
+    color: var(--success);
+}
+
+.start-btn.active {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+}
+
+.stop-btn:hover:not(:disabled) {
+    color: var(--danger);
+}
+
+.settings-btn:hover:not(:disabled) {
+    color: var(--accent-secondary);
+}
+
+/* Разделитель между группами кнопок */
+.control-divider {
+    width: 30px;
+    height: 1px;
+    background: var(--border-primary);
+    margin: 4px 0;
 }
 
 /*!* Темная тема *!*/

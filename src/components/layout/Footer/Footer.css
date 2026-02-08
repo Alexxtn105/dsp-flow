@@ -48,9 +48,14 @@
     border: 1px solid var(--border-primary);
 }
 
-.simulation-controls {
-    display: flex;
-    gap: 12px;
+.footer-sample-rate {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
 }
 
 .footer-btn {

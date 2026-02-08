@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
-import Icon from '../../common/Icons/Icon.jsx';
 import './Footer.css';
 
-function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectionsCount }) {
+function Footer({ isDarkTheme, isRunning, nodesCount, connectionsCount, sampleRate }) {
     return (
         <footer className={`app-footer ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="footer-content">
@@ -13,25 +12,9 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectio
                 </div>
 
                 <div className="footer-center">
-                    <div className="simulation-controls">
-                        <button
-                            className={`footer-btn start-btn ${isRunning ? 'active' : ''}`}
-                            onClick={onStart}
-                            disabled={isRunning}
-                        >
-                            <Icon name="play_arrow" size="small" />
-                            {/*<span>Старт</span>*/}
-                        </button>
-
-                        <button
-                            className={`footer-btn stop-btn`}
-                            onClick={onStop}
-                            disabled={!isRunning}
-                        >
-                            <Icon name="stop" size="small" />
-                            {/*<span>Стоп</span>*/}
-                        </button>
-                    </div>
+                    <span className="footer-sample-rate">
+                        Частота дискретизации: {sampleRate >= 1000 ? `${sampleRate / 1000}k` : sampleRate} Гц
+                    </span>
                 </div>
 
                 <div className="footer-right">
@@ -47,11 +30,10 @@ function Footer({ isDarkTheme, onStart, onStop, isRunning, nodesCount, connectio
 
 Footer.propTypes = {
     isDarkTheme: PropTypes.bool.isRequired,
-    onStart: PropTypes.func.isRequired,
-    onStop: PropTypes.func.isRequired,
     isRunning: PropTypes.bool.isRequired,
     nodesCount: PropTypes.number.isRequired,
-    connectionsCount: PropTypes.number.isRequired
+    connectionsCount: PropTypes.number.isRequired,
+    sampleRate: PropTypes.number.isRequired
 };
 
 export default Footer;
