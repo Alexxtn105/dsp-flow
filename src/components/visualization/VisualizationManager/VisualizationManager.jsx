@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import VisualizationWindow from '../VisualizationWindow';
 import OscilloscopeView from '../OscilloscopeView';
 import SpectrumView from '../SpectrumView';
+import WaterfallView from '../WaterfallView';
 
 /**
  * Менеджер окон визуализации
@@ -28,6 +29,8 @@ const VisualizationManager = forwardRef(function VisualizationManager({
         let vizType = 'oscilloscope';
         if (blockType === 'Спектроанализатор' || blockType === 'БПФ') {
             vizType = 'spectrum';
+        } else if (blockType === 'Водопад') {
+            vizType = 'waterfall';
         }
 
         // Позиционирование окна
@@ -100,6 +103,12 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                 >
                     {config.vizType === 'spectrum' ? (
                         <SpectrumView
+                            data={data}
+                            sampleRate={sampleRate}
+                            isDarkTheme={isDarkTheme}
+                        />
+                    ) : config.vizType === 'waterfall' ? (
+                        <WaterfallView
                             data={data}
                             sampleRate={sampleRate}
                             isDarkTheme={isDarkTheme}

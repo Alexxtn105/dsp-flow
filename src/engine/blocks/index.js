@@ -22,6 +22,78 @@ export const InputSignalBlock = {
 };
 
 /**
+ * Синусный генератор
+ */
+export const SineGeneratorBlock = {
+    // Состояние фазы для каждого экземпляра блока
+    states: new Map(),
+
+    process(inputs, params, chunkSize, nodeId) {
+        const output = new Float32Array(chunkSize);
+        const frequency = params.frequency || 1000;
+        const amplitude = params.amplitude !== undefined ? params.amplitude : 1.0;
+        const phaseOffset = (params.phase || 0) * (Math.PI / 180); // в радианы
+        const sampleRate = params.sampleRate || 48000;
+
+        // Получаем или инициализируем состояние
+        if (!this.states.has(nodeId)) {
+            this.states.set(nodeId, { currentPhase: 0 });
+        }
+        const state = this.states.get(nodeId);
+
+        const phaseIncrement = (2 * Math.PI * frequency) / sampleRate;
+
+        for (let i = 0; i < chunkSize; i++) {
+            output[i] = amplitude * Math.sin(state.currentPhase + phaseOffset);
+            state.currentPhase += phaseIncrement;
+
+            // Предотвращаем переполнение phase
+            if (state.currentPhase > 2 * Math.PI) {
+                state.currentPhase -= 2 * Math.PI;
+            }
+        }
+
+        return output;
+    }
+};
+
+/**
+ * Косинусный генератор
+ */
+export const CosineGeneratorBlock = {
+    // Состояние фазы для каждого экземпляра блока
+    states: new Map(),
+
+    process(inputs, params, chunkSize, nodeId) {
+        const output = new Float32Array(chunkSize);
+        const frequency = params.frequency || 1000;
+        const amplitude = params.amplitude !== undefined ? params.amplitude : 1.0;
+        const phaseOffset = (params.phase || 0) * (Math.PI / 180); // в радианы
+        const sampleRate = params.sampleRate || 48000;
+
+        // Получаем или инициализируем состояние
+        if (!this.states.has(nodeId)) {
+            this.states.set(nodeId, { currentPhase: 0 });
+        }
+        const state = this.states.get(nodeId);
+
+        const phaseIncrement = (2 * Math.PI * frequency) / sampleRate;
+
+        for (let i = 0; i < chunkSize; i++) {
+            output[i] = amplitude * Math.cos(state.currentPhase + phaseOffset);
+            state.currentPhase += phaseIncrement;
+
+            // Предотвращаем переполнение phase
+            if (state.currentPhase > 2 * Math.PI) {
+                state.currentPhase -= 2 * Math.PI;
+            }
+        }
+
+        return output;
+    }
+};
+
+/**
  * Сумматор - складывает все входные сигналы
  */
 export const SummerBlock = {

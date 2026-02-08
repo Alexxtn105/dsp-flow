@@ -127,13 +127,21 @@ function App() {
         setNodes(currentNodes);
 
         const inputNode = currentNodes.find(n => n.data.blockType === 'Входной сигнал');
-        if (!inputNode) {
-            alert('Добавьте блок "Входной сигнал" для запуска');
+
+        // Проверяем наличие других генераторов
+        const hasGenerators = currentNodes.some(n =>
+            ['Синусный генератор', 'Косинусный генератор', 'Референсный синусный генератор', 'Референсный косинусный генератор'].includes(n.data.blockType) ||
+            n.data.blockType === 'Входной сигнал'
+        );
+
+        if (!hasGenerators) {
+            alert('Добавьте хотя бы один источник сигнала (Входной сигнал или Генератор) для запуска');
             return;
         }
 
-        const wavFile = inputNode.data.params?.wavFile;
-        if (!wavFile) {
+        const wavFile = inputNode?.data?.params?.wavFile;
+        // Если есть блок "Входной сигнал", но не выбран файл - ошибка
+        if (inputNode && !wavFile) {
             alert('Выберите WAV файл в блоке "Входной сигнал"');
             return;
         }
@@ -149,8 +157,17 @@ function App() {
 
         setCompilationErrors([]);
 
-        WavFileService.loadFile(wavFile).then((fileInfo) => {
-            setSampleRate(fileInfo.sampleRate);
+        const startProcessing = (fileSampleRate = null) => {
+            // Если есть rate из файла - используем его, иначе текущий из настроек
+            const rate = fileSampleRate || sampleRate;
+
+            if (fileSampleRate) {
+                setSampleRate(fileSampleRate);
+            }
+
+            DSPProcessor.setSampleRate(rate);
+            DSPProcessor.setFileMode(!!fileSampleRate);
+
             DSPProcessor.initialize(currentNodes, edges);
 
             DSPProcessor.onProgress = (progress) => {
@@ -166,6 +183,7 @@ function App() {
             DSPProcessor.onComplete = () => {
                 setIsRunning(false);
                 console.log('Обработка завершена');
+                alert('Обработка завершена');
             };
 
             DSPProcessor.onError = (error) => {
@@ -175,10 +193,19 @@ function App() {
 
             DSPProcessor.start();
             setIsRunning(true);
-            console.log('Запуск обработки. Sample rate:', fileInfo.sampleRate);
-        }).catch(error => {
-            alert(`Ошибка загрузки WAV файла: ${error.message}`);
-        });
+            console.log(`Запуск обработки. Sample rate: ${rate} Hz, Mode: ${fileSampleRate ? 'File' : 'Generator'}`);
+        };
+
+        if (wavFile) {
+            WavFileService.loadFile(wavFile).then((fileInfo) => {
+                startProcessing(fileInfo.sampleRate);
+            }).catch(error => {
+                alert(`Ошибка загрузки WAV файла: ${error.message}`);
+            });
+        } else {
+            // Запуск без файла (генераторы)
+            startProcessing(null);
+        }
     }, [reactFlowInstance, stats.nodesCount]);
 
     const handleStopSimulation = useCallback(() => {

@@ -46,7 +46,8 @@ export const BLOCK_SIGNAL_CONFIG = {
 
     // Визуализация (только вход)
     'Осциллограф': { input: SIGNAL_TYPES.REAL, output: null },
-    'Фазовое созвездие': { input: SIGNAL_TYPES.COMPLEX, output: null }
+    'Фазовое созвездие': { input: SIGNAL_TYPES.COMPLEX, output: null },
+    'Водопад': { input: SIGNAL_TYPES.REAL, output: null }
 };
 
 /**
@@ -83,6 +84,7 @@ export const DSP_ICONS = {
     // Визуализация
     'Осциллограф': 'show_chart',
     'Фазовое созвездие': 'star',
+    'Водопад': 'waterfall_chart',
 
     // Действия
     'save': 'save',
@@ -131,7 +133,8 @@ export const DSP_BLOCK_TYPES = {
 
     // Визуализация
     OSCILLOSCOPE: 'Осциллограф',
-    CONSTELLATION: 'Фазовое созвездие'
+    CONSTELLATION: 'Фазовое созвездие',
+    WATERFALL: 'Водопад'
 };
 
 // Параметры по умолчанию для блоков
@@ -233,6 +236,11 @@ export const DEFAULT_BLOCK_PARAMS = {
         symbolRate: 1000,
         constellation: 'QPSK',
         eyeDiagram: true,
+    },
+    [DSP_BLOCK_TYPES.WATERFALL]: {
+        fftSize: 1024,
+        speed: 1,
+        colorMap: 'jet'
     }
 };
 
@@ -392,6 +400,12 @@ export const DSP_GROUPS = [
                 icon: DSP_ICONS['Фазовое созвездие'],
                 description: 'Фазовое созвездие',
             },
+            {
+                id: 'waterfall',
+                name: DSP_BLOCK_TYPES.WATERFALL,
+                icon: DSP_ICONS['Водопад'],
+                description: 'Спектрограмма (Водопад)',
+            },
         ]
     }
 ];
@@ -427,5 +441,6 @@ export const INPUT_NODE_TYPES = [
 export const OUTPUT_NODE_TYPES = [
     DSP_BLOCK_TYPES.OSCILLOSCOPE,
     DSP_BLOCK_TYPES.SPECTRUM_ANALYZER,
-    DSP_BLOCK_TYPES.CONSTELLATION
+    DSP_BLOCK_TYPES.CONSTELLATION,
+    DSP_BLOCK_TYPES.WATERFALL
 ];

@@ -1,0 +1,39 @@
+.waterfall-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #f9fafb;
+}
+
+.waterfall-view.dark-theme {
+    background-color: #1f2937;
+}
+
+.waterfall-canvas {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.waterfall-labels-x {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 5px;
+    font-size: 10px;
+    color: #6b7280;
+    font-family: monospace;
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+}
+
+.waterfall-view.dark-theme .waterfall-labels-x {
+    color: #9ca3af;
+    background-color: rgba(31, 41, 55, 0.5);
+}

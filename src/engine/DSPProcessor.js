@@ -21,6 +21,8 @@ class DSPProcessor {
         this.onBlockOutput = null;
         this.onComplete = null;
         this.onError = null;
+        this.sampleRate = 48000;
+        this.isFileMode = false;
     }
 
     /**
@@ -62,7 +64,9 @@ class DSPProcessor {
         }
 
         this.isRunning = true;
-        const sampleRate = WavFileService.getSampleRate();
+
+        // В режиме файла берём sample rate из файла, иначе используем установленный
+        const sampleRate = this.isFileMode ? WavFileService.getSampleRate() : this.sampleRate;
 
         // Рассчитываем интервал обработки
         // По умолчанию обрабатываем в реальном времени
@@ -98,8 +102,8 @@ class DSPProcessor {
      * Обрабатывает следующий чанк данных
      */
     processNextChunk() {
-        // Проверяем, не достигнут ли конец файла
-        if (WavFileService.isEndOfFile(this.currentSample)) {
+        // Проверяем, не достигнут ли конец файла (только в режиме файла)
+        if (this.isFileMode && WavFileService.isEndOfFile(this.currentSample)) {
             this.stop();
             if (this.onComplete) {
                 this.onComplete();
@@ -127,10 +131,13 @@ class DSPProcessor {
 
             // Уведомляем о прогрессе
             if (this.onProgress) {
+                const totalSamples = this.isFileMode ? WavFileService.getTotalSamples() : 0;
+                const progress = totalSamples > 0 ? this.currentSample / totalSamples : 0;
+
                 this.onProgress({
                     currentSample: this.currentSample,
-                    totalSamples: WavFileService.getTotalSamples(),
-                    progress: this.currentSample / WavFileService.getTotalSamples()
+                    totalSamples: totalSamples,
+                    progress: progress
                 });
             }
         } catch (error) {
@@ -166,13 +173,17 @@ class DSPProcessor {
         }
 
         // Для генераторов (Входной сигнал) - читаем из WAV
-        if (block.blockType === 'Входной сигнал') {
+        if (block.blockType === 'Входной сигнал' && this.isFileMode) {
             return WavFileService.readChunk(this.currentSample, this.chunkSize) ||
                 new Float32Array(this.chunkSize);
         }
 
+        // Передаем nodeId для блоков, которым нужно сохранять состояние (например, генераторы)
+        // Добавляем sampleRate в params
+        const paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
+
         // Выполняем блок
-        return BlockProcessor.process(inputs, block.params, this.chunkSize);
+        return BlockProcessor.process(inputs, paramsWithSampleRate, this.chunkSize, block.nodeId);
     }
 
     /**
@@ -181,6 +192,12 @@ class DSPProcessor {
     getBlockProcessor(blockType) {
         const processorMap = {
             'Входной сигнал': DSPBlocks.InputSignalBlock,
+            'Реф. синус. ген.': DSPBlocks.SineGeneratorBlock,
+            'Реф. косинус. ген.': DSPBlocks.CosineGeneratorBlock,
+            'Референсный синусный генератор': DSPBlocks.SineGeneratorBlock,
+            'Референсный косинусный генератор': DSPBlocks.CosineGeneratorBlock,
+            'Синусный генератор': DSPBlocks.SineGeneratorBlock,
+            'Косинусный генератор': DSPBlocks.CosineGeneratorBlock,
             'КИХ-Фильтр': DSPBlocks.FIRFilterBlock,
             'Полосовой КИХ-фильтр': DSPBlocks.FIRFilterBlock,
             'ФВЧ КИХ-фильтр': DSPBlocks.FIRFilterBlock,
@@ -190,6 +207,7 @@ class DSPProcessor {
             'БПФ': DSPBlocks.FFTBlock,
             'Осциллограф': DSPBlocks.PassthroughBlock,
             'Спектроанализатор': DSPBlocks.FFTBlock,
+            'Водопад': DSPBlocks.FFTBlock,
         };
 
         return processorMap[blockType] || DSPBlocks.PassthroughBlock;
@@ -206,6 +224,7 @@ class DSPProcessor {
      * Переход к определённой позиции
      */
     seekTo(sample) {
+        if (!this.isFileMode) return;
         this.currentSample = Math.max(0, Math.min(sample, WavFileService.getTotalSamples()));
     }
 
@@ -213,8 +232,23 @@ class DSPProcessor {
      * Переход к определённому проценту
      */
     seekToPercent(percent) {
+        if (!this.isFileMode) return;
         const sample = Math.floor(WavFileService.getTotalSamples() * percent);
         this.seekTo(sample);
+    }
+
+    /**
+     * Устанавливает частоту дискретизации
+     */
+    setSampleRate(rate) {
+        this.sampleRate = rate;
+    }
+
+    /**
+     * Устанавливает режим работы (файл или генератор)
+     */
+    setFileMode(isFile) {
+        this.isFileMode = isFile;
     }
 }
 

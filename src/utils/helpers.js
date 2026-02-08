@@ -131,7 +131,8 @@ export const isVisualizationBlock = (blockType) => {
     const visualizations = [
         'Осциллограф',
         'Спектроанализатор',
-        'Фазовое созвездие'
+        'Фазовое созвездие',
+        'Водопад'
     ];
     return visualizations.includes(blockType);
 };
@@ -149,7 +150,7 @@ export const isValidEmail = (email) => {
  */
 export const throttle = (func, limit) => {
     let inThrottle;
-    return function(...args) {
+    return function (...args) {
         if (!inThrottle) {
             func.apply(this, args);
             inThrottle = true;
@@ -398,7 +399,7 @@ export const getOutputType = (blockType) => {
  * Получить класс CSS для типа сигнала
  */
 export const getSignalTypeClass = (signalType) => {
-    switch(signalType) {
+    switch (signalType) {
         case SIGNAL_TYPES.COMPLEX: return 'signal-complex';
         case SIGNAL_TYPES.REAL: return 'signal-real';
         default: return '';
@@ -409,7 +410,7 @@ export const getSignalTypeClass = (signalType) => {
  * Получить описание типа сигнала
  */
 export const getSignalTypeDescription = (signalType) => {
-    switch(signalType) {
+    switch (signalType) {
         case SIGNAL_TYPES.COMPLEX: return 'Комплексный';
         case SIGNAL_TYPES.REAL: return 'Действительный';
         default: return 'Неизвестный';
