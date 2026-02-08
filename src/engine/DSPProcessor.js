@@ -151,8 +151,8 @@ class DSPProcessor {
                     this.onBlockOutput(block.nodeId, outputCopy);
                 }
 
-                // Если это Audio File и не замьючен - воспроизводим
-                if (block.blockType === 'Audio File' && !block.params.muted && output && this.audioContext) {
+                // Если это Speaker и не замьючен - воспроизводим
+                if (block.blockType === 'Динамик' && !block.params.muted && output && this.audioContext) {
                     this.playAudioChunk(output);
                 }
             }
@@ -240,6 +240,7 @@ class DSPProcessor {
             'Осциллограф': DSPBlocks.PassthroughBlock,
             'Спектроанализатор': DSPBlocks.SpectrumAnalyzerBlock,
             'Водопад': DSPBlocks.SpectrumAnalyzerBlock, // Используем анализатор спектра для водопада
+            'Динамик': DSPBlocks.SpeakerBlock,
         };
 
         return processorMap[blockType] || DSPBlocks.PassthroughBlock;

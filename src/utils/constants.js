@@ -101,7 +101,8 @@ export const BLOCK_SIGNAL_CONFIG = {
     // Визуализация (только вход)
     'Осциллограф': { input: SIGNAL_TYPES.REAL, output: null },
     'Фазовое созвездие': { input: SIGNAL_TYPES.COMPLEX, output: null },
-    'Водопад': { input: SIGNAL_TYPES.REAL, output: null }
+    'Водопад': { input: SIGNAL_TYPES.REAL, output: null },
+    'Динамик': { input: SIGNAL_TYPES.REAL, output: null }
 };
 
 /**
@@ -141,6 +142,7 @@ export const DSP_ICONS = {
     'Осциллограф': 'show_chart',
     'Фазовое созвездие': 'star',
     'Водопад': 'waterfall_chart',
+    'Динамик': 'volume_up',
 
     // Действия
     'save': 'save',
@@ -192,7 +194,8 @@ export const DSP_BLOCK_TYPES = {
     // Визуализация
     OSCILLOSCOPE: 'Осциллограф',
     CONSTELLATION: 'Фазовое созвездие',
-    WATERFALL: 'Водопад'
+    WATERFALL: 'Водопад',
+    SPEAKER: 'Динамик'
 };
 
 // Параметры по умолчанию для блоков
@@ -313,6 +316,9 @@ export const DEFAULT_BLOCK_PARAMS = {
         constellation: 'QPSK',
         eyeDiagram: true,
     },
+    [DSP_BLOCK_TYPES.SPEAKER]: {
+        muted: false
+    }
 
 };
 
@@ -490,6 +496,19 @@ export const DSP_GROUPS = [
                 icon: DSP_ICONS['Водопад'],
                 description: 'Спектрограмма (Водопад)',
             },
+        ]
+    },
+    {
+        id: 'output',
+        name: 'Вывод',
+        collapsed: false,
+        blocks: [
+            {
+                id: 'speaker',
+                name: DSP_BLOCK_TYPES.SPEAKER,
+                icon: DSP_ICONS['Динамик'],
+                description: 'Аудио выход',
+            }
         ]
     }
 ];

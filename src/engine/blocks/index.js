@@ -397,6 +397,18 @@ export const FFTBlock = {
 };
 
 /**
+ * Динамик (Audio Output)
+ * Просто пропускает сигнал, используется как маркер для вывода звука
+ */
+export const SpeakerBlock = {
+    process(inputs, params, chunkSize) {
+        // Просто возвращаем входной сигнал (или тишину)
+        // DSPProcessor сам заберет данные для воспроизведения
+        return inputs[0] || new Float32Array(chunkSize);
+    }
+};
+
+/**
  * Спектроанализатор / Водопад
  * Выполняет БПФ с применением оконной функции
  */
