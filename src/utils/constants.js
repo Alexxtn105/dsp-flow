@@ -11,6 +11,30 @@ export const SIGNAL_TYPES = {
 };
 
 /**
+ * Опции для параметров (выпадающие списки)
+ */
+export const BLOCK_PARAM_OPTIONS = {
+    windowFunction: [
+        { value: 'rectangular', label: 'Прямоугольное (Rectangular)' },
+        { value: 'hamming', label: 'Хэмминг (Hamming)' },
+        { value: 'hanning', label: 'Хэннинг (Hanning)' },
+        { value: 'blackman', label: 'Блэкман (Blackman)' },
+        { value: 'blackman-harris', label: 'Блэкман-Харрис (Blackman-Harris)' },
+        { value: 'nuttall', label: 'Натолл (Nuttall)' },
+        { value: 'flattop', label: 'Flat Top' }
+    ],
+    designMethod: [
+        { value: 'window', label: 'Windowed Sinc' },
+        { value: 'remez', label: 'Remez Exchange (Approx)' }
+    ],
+    filterType: [
+        { value: 'lowpass', label: 'ФНЧ (Lowpass)' },
+        { value: 'highpass', label: 'ФВЧ (Highpass)' },
+        { value: 'bandpass', label: 'Полосовой (Bandpass)' }
+    ]
+};
+
+/**
  * Конфигурация сигналов для блоков DSP
  */
 export const BLOCK_SIGNAL_CONFIG = {

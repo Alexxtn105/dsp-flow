@@ -9,6 +9,7 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
     const [colorMap, setColorMap] = useState('audition'); // Default to Adobe Audition style
+    const [isNormalized, setIsNormalized] = useState(false); // Checkbox for normalization
 
     // Управление размером временного канваса с сохранением содержимого
     useEffect(() => {
@@ -167,10 +168,33 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         const numBins = data.length;
         const binWidth = targetWidth / numBins;
 
+        // Find min/max for normalization if enabled
+        let minDb = -100; // Default floor
+        let maxDb = 0;    // Default ceil
+
+        if (isNormalized) {
+            minDb = Infinity;
+            maxDb = -Infinity;
+            for (let i = 0; i < numBins; i++) {
+                if (data[i] < minDb) minDb = data[i];
+                if (data[i] > maxDb) maxDb = data[i];
+            }
+            // Avoid division by zero
+            if (maxDb === minDb) maxDb = minDb + 1;
+        }
+
         for (let i = 0; i < numBins; i++) {
-            // Нормализуем значение дБ (-100...0) в 0...1
             const db = data[i];
-            const normalized = Math.max(0, Math.min(1, (db + 100) / 100));
+            let normalized;
+
+            if (isNormalized) {
+                normalized = (db - minDb) / (maxDb - minDb);
+            } else {
+                // Fixed range logic (-100dB to 0dB)
+                normalized = (db + 100) / 100;
+            }
+
+            normalized = Math.max(0, Math.min(1, normalized));
 
             ctx.fillStyle = getColor(normalized, colorMap);
             // Рисуем прямоугольник с перекрытием чтобы не было щелей
@@ -180,7 +204,7 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         // 4. Обновляем tempCanvas актуальным состоянием
         tempCtx.drawImage(canvas, 0, 0);
 
-    }, [data, isDarkTheme, width, height, colorMap, getColor]);
+    }, [data, isDarkTheme, width, height, colorMap, getColor, isNormalized]);
 
     useEffect(() => {
         drawWaterfall();
@@ -199,6 +223,14 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
                     <option value="hot">Hot</option>
                     <option value="grayscale">Grayscale</option>
                 </select>
+                <label className="waterfall-checkbox">
+                    <input
+                        type="checkbox"
+                        checked={isNormalized}
+                        onChange={(e) => setIsNormalized(e.target.checked)}
+                    />
+                    Norm.
+                </label>
             </div>
             <canvas
                 ref={canvasRef}

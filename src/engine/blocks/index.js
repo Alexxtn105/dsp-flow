@@ -12,6 +12,14 @@ const WindowFunctions = {
     hamming: (n, N) => 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / (N - 1)),
     hanning: (n, N) => 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1))),
     blackman: (n, N) => 0.42 - 0.5 * Math.cos((2 * Math.PI * n) / (N - 1)) + 0.08 * Math.cos((4 * Math.PI * n) / (N - 1)),
+    'blackman-harris': (n, N) =>
+        0.35875 - 0.48829 * Math.cos((2 * Math.PI * n) / (N - 1))
+        + 0.14128 * Math.cos((4 * Math.PI * n) / (N - 1))
+        - 0.01168 * Math.cos((6 * Math.PI * n) / (N - 1)),
+    nuttall: (n, N) =>
+        0.355768 - 0.487396 * Math.cos((2 * Math.PI * n) / (N - 1))
+        + 0.144232 * Math.cos((4 * Math.PI * n) / (N - 1))
+        - 0.012604 * Math.cos((6 * Math.PI * n) / (N - 1)),
     flattop: (n, N) =>
         1 - 1.93 * Math.cos((2 * Math.PI * n) / (N - 1))
         + 1.29 * Math.cos((4 * Math.PI * n) / (N - 1))
@@ -354,9 +362,24 @@ export const FFTBlock = {
         for (let i = 0; i < n / 2; i++) {
             magnitude[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
         }
-        const maxMag = Math.max(...magnitude) || 1e-10;
+
+        // No auto-normalization to peak. Return absolute dB values.
+        // Assuming input is within [-1, 1], magnitude is within [0, N/2].
+        // To get dBFS (roughly), normalize by N/2 or keep as is?
+        // Usually 20*log10(mag).
+        // Let's just return 20*log10(mag + epsilon).
+        // If we want consistent levels regardless of FFT size, we should normalize by fftSize.
+        // But for "absolute" values relative to full scale sine wave:
+        // A full scale sine wave (amp 1.0) has peak magnitude N/2.
+        // So normalized mag = mag / (N/2).
+
+        const N = n; // FFT size
+        const scale = 2 / N; // To normalize so sine amplitude 1.0 -> 1.0
+
         for (let i = 0; i < magnitude.length; i++) {
-            magnitude[i] = 20 * Math.log10(magnitude[i] / maxMag + 1e-10);
+            // Apply scaling to get 0dB for full scale sine
+            const mag = magnitude[i] * scale;
+            magnitude[i] = 20 * Math.log10(mag + 1e-10);
         }
         return magnitude;
     },

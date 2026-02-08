@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { getBlockDescription, formatParamName } from '../../../utils/helpers';
+import { BLOCK_PARAM_OPTIONS } from '../../../utils/constants';
 import './BlockParamsDialog.css';
 
 /**
@@ -80,7 +81,8 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
         onClose();
     };
 
-    const getInputType = (value) => {
+    const getInputType = (key, value) => {
+        if (BLOCK_PARAM_OPTIONS[key]) return 'select-options';
         if (typeof value === 'number') return 'number';
         if (typeof value === 'boolean') return 'select';
         return 'text';
@@ -150,12 +152,24 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
                                 return null;
                             }
 
-                            const inputType = getInputType(value);
+                            const inputType = getInputType(key, value);
 
                             return (
                                 <div key={key} className="param-row">
                                     <label className="param-label">{formatParamName(key)}</label>
-                                    {inputType === 'select' ? (
+                                    {inputType === 'select-options' ? (
+                                        <select
+                                            value={value}
+                                            onChange={(e) => handleParamChange(key, e.target.value, 'text')}
+                                            className="param-input"
+                                        >
+                                            {BLOCK_PARAM_OPTIONS[key].map(opt => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : inputType === 'select' ? (
                                         <select
                                             value={String(value)}
                                             onChange={(e) => handleParamChange(key, e.target.value, 'boolean')}
