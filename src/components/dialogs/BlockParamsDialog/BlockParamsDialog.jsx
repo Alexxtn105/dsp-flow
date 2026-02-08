@@ -21,7 +21,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
     }, [node]);
 
     const blockType = node?.data?.blockType || 'Неизвестный блок';
-    const isInputSignal = blockType === 'Входной сигнал';
+    const isInputSignal = blockType === 'Audio File';
 
     const handleParamChange = (key, value, type = 'text') => {
         let parsedValue = value;

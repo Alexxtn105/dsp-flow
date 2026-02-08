@@ -2,6 +2,81 @@
  * Базовые DSP блоки
  */
 
+// --- Helper Classes & Functions ---
+
+/**
+ * Window Functions
+ */
+const WindowFunctions = {
+    rectangular: (n, N) => 1,
+    hamming: (n, N) => 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / (N - 1)),
+    hanning: (n, N) => 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1))),
+    blackman: (n, N) => 0.42 - 0.5 * Math.cos((2 * Math.PI * n) / (N - 1)) + 0.08 * Math.cos((4 * Math.PI * n) / (N - 1)),
+    flattop: (n, N) =>
+        1 - 1.93 * Math.cos((2 * Math.PI * n) / (N - 1))
+        + 1.29 * Math.cos((4 * Math.PI * n) / (N - 1))
+        - 0.388 * Math.cos((6 * Math.PI * n) / (N - 1))
+        + 0.032 * Math.cos((8 * Math.PI * n) / (N - 1))
+};
+
+/**
+ * Sinc function
+ */
+const sinc = (x) => {
+    if (x === 0) return 1;
+    const piX = Math.PI * x;
+    return Math.sin(piX) / piX;
+};
+
+/**
+ * Filter Design: Windowed Sinc
+ */
+const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) => {
+    // order is number of taps
+    const M = order - 1;
+    const fc = cutoff / sampleRate;
+    const coeffs = new Float32Array(order);
+    const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
+
+    for (let i = 0; i < order; i++) {
+        if (i === M / 2) {
+            coeffs[i] = 2 * fc;
+        } else {
+            coeffs[i] = 2 * fc * sinc(2 * fc * (i - M / 2));
+        }
+        coeffs[i] *= window(i, order);
+    }
+
+    // Normalize for unity gain at DC
+    let sum = 0;
+    for (let i = 0; i < order; i++) sum += coeffs[i];
+    if (sum !== 0 && type === 'lowpass') {
+        for (let i = 0; i < order; i++) coeffs[i] /= sum;
+    }
+
+    // Spectral Inversion for Highpass
+    if (type === 'highpass') {
+        for (let i = 0; i < order; i++) coeffs[i] *= -1;
+        coeffs[Math.floor(M / 2)] += 1;
+    }
+
+    // Bandpass via spectral transformation (simplified)
+    // Real implementation needs 2 cutoffs.
+    // This function assumes one cutoff. Bandpass needs a separate call or logic.
+
+    return coeffs;
+};
+
+/**
+ * Filter Design: Placeholder for Remez
+ */
+const designRemez = (type, cutoff, sampleRate, order) => {
+    console.warn("Полноценный алгоритм Ремеза требует сложного итеративного решателя. Используется Windowed Sinc (Blackman) как качественное приближение.");
+    return designWindowedSinc(type, cutoff, sampleRate, order, 'blackman');
+};
+
+// --- Block Implementations ---
+
 /**
  * Пропускающий блок (для визуализаторов)
  */
@@ -15,8 +90,10 @@ export const PassthroughBlock = {
  * Блок входного сигнала (обрабатывается особым образом в DSPProcessor)
  */
 export const InputSignalBlock = {
+    // Rename inputs/outputs to match
     process(inputs, params, chunkSize) {
-        // Этот блок обрабатывается в DSPProcessor
+        // Этот блок обрабатывается в DSPProcessor (читает файл)
+        // Если вызван process, возвращаем тишину
         return new Float32Array(chunkSize);
     }
 };
@@ -25,17 +102,16 @@ export const InputSignalBlock = {
  * Синусный генератор
  */
 export const SineGeneratorBlock = {
-    // Состояние фазы для каждого экземпляра блока
     states: new Map(),
 
     process(inputs, params, chunkSize, nodeId) {
         const output = new Float32Array(chunkSize);
         const frequency = params.frequency || 1000;
+        // amplitude is used directly
         const amplitude = params.amplitude !== undefined ? params.amplitude : 1.0;
-        const phaseOffset = (params.phase || 0) * (Math.PI / 180); // в радианы
+        const phaseOffset = (params.phase || 0) * (Math.PI / 180);
         const sampleRate = params.sampleRate || 48000;
 
-        // Получаем или инициализируем состояние
         if (!this.states.has(nodeId)) {
             this.states.set(nodeId, { currentPhase: 0 });
         }
@@ -46,8 +122,6 @@ export const SineGeneratorBlock = {
         for (let i = 0; i < chunkSize; i++) {
             output[i] = amplitude * Math.sin(state.currentPhase + phaseOffset);
             state.currentPhase += phaseIncrement;
-
-            // Предотвращаем переполнение phase
             if (state.currentPhase > 2 * Math.PI) {
                 state.currentPhase -= 2 * Math.PI;
             }
@@ -61,17 +135,15 @@ export const SineGeneratorBlock = {
  * Косинусный генератор
  */
 export const CosineGeneratorBlock = {
-    // Состояние фазы для каждого экземпляра блока
     states: new Map(),
 
     process(inputs, params, chunkSize, nodeId) {
         const output = new Float32Array(chunkSize);
         const frequency = params.frequency || 1000;
         const amplitude = params.amplitude !== undefined ? params.amplitude : 1.0;
-        const phaseOffset = (params.phase || 0) * (Math.PI / 180); // в радианы
+        const phaseOffset = (params.phase || 0) * (Math.PI / 180);
         const sampleRate = params.sampleRate || 48000;
 
-        // Получаем или инициализируем состояние
         if (!this.states.has(nodeId)) {
             this.states.set(nodeId, { currentPhase: 0 });
         }
@@ -82,8 +154,6 @@ export const CosineGeneratorBlock = {
         for (let i = 0; i < chunkSize; i++) {
             output[i] = amplitude * Math.cos(state.currentPhase + phaseOffset);
             state.currentPhase += phaseIncrement;
-
-            // Предотвращаем переполнение phase
             if (state.currentPhase > 2 * Math.PI) {
                 state.currentPhase -= 2 * Math.PI;
             }
@@ -94,16 +164,12 @@ export const CosineGeneratorBlock = {
 };
 
 /**
- * Сумматор - складывает все входные сигналы
+ * Сумматор
  */
 export const SummerBlock = {
     process(inputs, params, chunkSize) {
-        if (inputs.length === 0) {
-            return new Float32Array(chunkSize);
-        }
-
+        if (inputs.length === 0) return new Float32Array(chunkSize);
         const output = new Float32Array(chunkSize);
-
         for (const input of inputs) {
             if (input) {
                 for (let i = 0; i < Math.min(chunkSize, input.length); i++) {
@@ -111,23 +177,17 @@ export const SummerBlock = {
                 }
             }
         }
-
         return output;
     }
 };
 
 /**
- * Перемножитель - умножает все входные сигналы
+ * Перемножитель
  */
 export const MultiplierBlock = {
     process(inputs, params, chunkSize) {
-        if (inputs.length === 0) {
-            return new Float32Array(chunkSize);
-        }
-
-        // Инициализируем выход единицами
+        if (inputs.length === 0) return new Float32Array(chunkSize);
         const output = new Float32Array(chunkSize).fill(1);
-
         for (const input of inputs) {
             if (input) {
                 for (let i = 0; i < Math.min(chunkSize, input.length); i++) {
@@ -135,117 +195,113 @@ export const MultiplierBlock = {
                 }
             }
         }
-
         return output;
     }
 };
 
 /**
  * FIR фильтр (Фильтр с конечной импульсной характеристикой)
+ * Оптимизирован с использованием кольцевого буфера и предварительного расчета
  */
 export const FIRFilterBlock = {
-    // Буфер для хранения предыдущих отсчётов
-    buffers: new Map(),
+    states: new Map(),
 
-    /**
-     * Генерирует коэффициенты для ФНЧ (sinc)
-     */
-    generateLowpassCoefficients(cutoff, sampleRate, order = 31) {
-        const fc = cutoff / sampleRate;
-        const coefficients = new Float32Array(order);
-        const middle = Math.floor(order / 2);
-
-        for (let i = 0; i < order; i++) {
-            const n = i - middle;
-            if (n === 0) {
-                coefficients[i] = 2 * fc;
-            } else {
-                coefficients[i] = Math.sin(2 * Math.PI * fc * n) / (Math.PI * n);
-            }
-            // Применяем окно Хэмминга
-            coefficients[i] *= 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (order - 1));
-        }
-
-        // Нормализация
-        const sum = coefficients.reduce((a, b) => a + b, 0);
-        for (let i = 0; i < order; i++) {
-            coefficients[i] /= sum;
-        }
-
-        return coefficients;
+    // Helpers for generating coefficients (kept for legacy or specific uses if needed)
+    generateLowpassCoefficients(cutoff, sampleRate, order) {
+        return designWindowedSinc('lowpass', cutoff, sampleRate, order, 'hamming');
     },
 
-    /**
-     * Генерирует коэффициенты для ФВЧ
-     */
-    generateHighpassCoefficients(cutoff, sampleRate, order = 31) {
-        const lowpass = this.generateLowpassCoefficients(cutoff, sampleRate, order);
-        const highpass = new Float32Array(order);
-        const middle = Math.floor(order / 2);
-
-        for (let i = 0; i < order; i++) {
-            if (i === middle) {
-                highpass[i] = 1 - lowpass[i];
-            } else {
-                highpass[i] = -lowpass[i];
-            }
-        }
-
-        return highpass;
-    },
-
-    /**
-     * Генерирует коэффициенты для полосового фильтра
-     */
-    generateBandpassCoefficients(lowCutoff, highCutoff, sampleRate, order = 31) {
-        const lowpass = this.generateLowpassCoefficients(highCutoff, sampleRate, order);
-        const highpass = this.generateHighpassCoefficients(lowCutoff, sampleRate, order);
-        const bandpass = new Float32Array(order);
-
-        for (let i = 0; i < order; i++) {
-            bandpass[i] = lowpass[i] + highpass[i];
-        }
-
-        return bandpass;
-    },
-
-    process(inputs, params, chunkSize) {
-        if (inputs.length === 0 || !inputs[0]) {
-            return new Float32Array(chunkSize);
-        }
-
-        const input = inputs[0];
-        const cutoff = params.cutoffFrequency || params.frequency || 1000;
-        const sampleRate = params.sampleRate || 48000;
+    // Initialization: Calculate coefficients and setup buffer
+    init(nodeId, params, sampleRate) {
         const order = params.order || 31;
-        const filterType = params.filterType || 'lowpass';
+        const cutoff = params.cutoffFrequency || params.frequency || 1000;
+        const type = params.filterType || 'lowpass';
+        const windowName = params.windowFunction || 'hamming';
+        const designMethod = params.designMethod || 'window';
 
-        // Получаем или генерируем коэффициенты
-        let coefficients;
-        switch (filterType) {
-            case 'highpass':
-                coefficients = this.generateHighpassCoefficients(cutoff, sampleRate, order);
-                break;
-            case 'bandpass':
-                const lowCutoff = params.lowCutoff || cutoff * 0.8;
-                const highCutoff = params.highCutoff || cutoff * 1.2;
-                coefficients = this.generateBandpassCoefficients(lowCutoff, highCutoff, sampleRate, order);
-                break;
-            default:
-                coefficients = this.generateLowpassCoefficients(cutoff, sampleRate, order);
+        let coeffs;
+
+        // Handle Bandpass separately or inside design function
+        if (type === 'bandpass') {
+            const lowCutoff = params.lowCutoff || cutoff * 0.8;
+            const highCutoff = params.highCutoff || cutoff * 1.2;
+
+            // Generate lowpass and highpass then combine? 
+            // Standard windowed sinc bandpass: 
+            // h[n] = 2*f_high*sinc(2*f_high*(n-M/2)) - 2*f_low*sinc(2*f_low*(n-M/2))
+            const M = order - 1;
+            const fHigh = highCutoff / sampleRate;
+            const fLow = lowCutoff / sampleRate;
+            coeffs = new Float32Array(order);
+            const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
+
+            for (let i = 0; i < order; i++) {
+                if (i === M / 2) {
+                    coeffs[i] = 2 * (fHigh - fLow);
+                } else {
+                    coeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - M / 2)) - 2 * fLow * sinc(2 * fLow * (i - M / 2));
+                }
+                coeffs[i] *= window(i, order);
+            }
+        } else {
+            if (designMethod === 'remez') {
+                coeffs = designRemez(type, cutoff, sampleRate, order);
+            } else {
+                coeffs = designWindowedSinc(type, cutoff, sampleRate, order, windowName);
+            }
         }
 
-        // Применяем свёртку
+        // Initialize Ring Buffer (Float32Array)
+        const buffer = new Float32Array(order);
+
+        this.states.set(nodeId, {
+            coeffs,
+            buffer,
+            pointer: 0,
+            order
+        });
+    },
+
+    process(inputs, params, chunkSize, nodeId) {
+        const input = inputs[0];
+        if (!input) return new Float32Array(chunkSize);
+
+        let state = this.states.get(nodeId);
+
+        // Auto-init fallback
+        if (!state) {
+            const sampleRate = params.sampleRate || 48000;
+            this.init(nodeId, params, sampleRate);
+            state = this.states.get(nodeId);
+        }
+
+        const { coeffs, buffer, order } = state;
         const output = new Float32Array(chunkSize);
+        let { pointer } = state;
+        const bufferLen = buffer.length;
 
         for (let i = 0; i < chunkSize; i++) {
-            let sum = 0;
-            for (let j = 0; j < coefficients.length && i - j >= 0; j++) {
-                sum += input[i - j] * coefficients[j];
+            // Write to circular buffer
+            buffer[pointer] = input[i];
+
+            // Convolution using circular buffer
+            let acc = 0;
+            let p = pointer;
+
+            for (let j = 0; j < order; j++) {
+                acc += coeffs[j] * buffer[p];
+                p--;
+                if (p < 0) p = bufferLen - 1;
             }
-            output[i] = sum;
+
+            output[i] = acc;
+
+            // Advance pointer
+            pointer++;
+            if (pointer >= bufferLen) pointer = 0;
         }
 
+        state.pointer = pointer;
         return output;
     }
 };
@@ -254,49 +310,36 @@ export const FIRFilterBlock = {
  * БПФ (Быстрое преобразование Фурье)
  */
 export const FFTBlock = {
-    /**
-     * Вычисляет БПФ методом Кули-Тьюки
-     */
     fft(real, imag) {
         const n = real.length;
-
         if (n <= 1) return;
 
-        // Bit-reversal перестановка
         for (let i = 1, j = 0; i < n; i++) {
             let bit = n >> 1;
-            for (; j & bit; bit >>= 1) {
-                j ^= bit;
-            }
+            for (; j & bit; bit >>= 1) j ^= bit;
             j ^= bit;
-
             if (i < j) {
                 [real[i], real[j]] = [real[j], real[i]];
                 [imag[i], imag[j]] = [imag[j], imag[i]];
             }
         }
 
-        // Кули-Тьюки итеративно
         for (let len = 2; len <= n; len <<= 1) {
             const angle = (2 * Math.PI) / len;
             const wReal = Math.cos(angle);
             const wImag = Math.sin(angle);
-
             for (let i = 0; i < n; i += len) {
                 let curReal = 1;
                 let curImag = 0;
-
                 for (let j = 0; j < len / 2; j++) {
                     const uReal = real[i + j];
                     const uImag = imag[i + j];
                     const vReal = real[i + j + len / 2] * curReal - imag[i + j + len / 2] * curImag;
                     const vImag = real[i + j + len / 2] * curImag + imag[i + j + len / 2] * curReal;
-
                     real[i + j] = uReal + vReal;
                     imag[i + j] = uImag + vImag;
                     real[i + j + len / 2] = uReal - vReal;
                     imag[i + j + len / 2] = uImag - vImag;
-
                     const temp = curReal * wReal - curImag * wImag;
                     curImag = curReal * wImag + curImag * wReal;
                     curReal = temp;
@@ -305,55 +348,27 @@ export const FFTBlock = {
         }
     },
 
-    /**
-     * Вычисляет магнитуду спектра
-     */
-    computeMagnitude(real, imag) {
+    computeMagnitudeDB(real, imag) {
         const n = real.length;
         const magnitude = new Float32Array(n / 2);
-
         for (let i = 0; i < n / 2; i++) {
             magnitude[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
         }
-
-        return magnitude;
-    },
-
-    /**
-     * Вычисляет магнитуду в дБ
-     */
-    computeMagnitudeDB(real, imag) {
-        const magnitude = this.computeMagnitude(real, imag);
-        const maxMag = Math.max(...magnitude);
-
+        const maxMag = Math.max(...magnitude) || 1e-10;
         for (let i = 0; i < magnitude.length; i++) {
             magnitude[i] = 20 * Math.log10(magnitude[i] / maxMag + 1e-10);
         }
-
         return magnitude;
     },
 
     process(inputs, params, chunkSize) {
-        if (inputs.length === 0 || !inputs[0]) {
-            return new Float32Array(chunkSize / 2);
-        }
-
+        if (inputs.length === 0 || !inputs[0]) return new Float32Array(chunkSize / 2);
         const input = inputs[0];
-
-        // Дополняем до степени двойки
         const fftSize = Math.pow(2, Math.ceil(Math.log2(input.length)));
         const real = new Float32Array(fftSize);
         const imag = new Float32Array(fftSize);
-
-        // Копируем входные данные
-        for (let i = 0; i < input.length; i++) {
-            real[i] = input[i];
-        }
-
-        // Выполняем БПФ
+        for (let i = 0; i < input.length; i++) real[i] = input[i];
         this.fft(real, imag);
-
-        // Возвращаем магнитуду в дБ
         return this.computeMagnitudeDB(real, imag);
     }
 };

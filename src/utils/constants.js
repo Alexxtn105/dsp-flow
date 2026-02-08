@@ -26,9 +26,11 @@ export const BLOCK_SIGNAL_CONFIG = {
     'Фильтр Герцеля': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.REAL },
 
     // Генераторы (создают сигналы)
-    'Входной сигнал': { input: null, output: SIGNAL_TYPES.REAL }, // нет входа
-    'Референсный синусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
-    'Референсный косинусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
+    'Audio File': { input: null, output: SIGNAL_TYPES.REAL },
+    'Синусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
+    'Косинусный генератор': { input: null, output: SIGNAL_TYPES.REAL },
+    'Референсный синусный генератор': { input: null, output: SIGNAL_TYPES.COMPLEX },
+    'Референсный косинусный генератор': { input: null, output: SIGNAL_TYPES.COMPLEX },
 
     // БПФ/Анализ
     'Скользящее БПФ': { input: SIGNAL_TYPES.REAL, output: SIGNAL_TYPES.COMPLEX },
@@ -62,10 +64,12 @@ export const DSP_ICONS = {
     'Преобразователь Гильберта': 'transform',
     'Фильтр Герцеля': 'psychology',
 
-    // Генераторы
-    'Входной сигнал': 'network_ping',
+    // Источники
+    'Audio File': 'audio_file',
     'Синусный генератор': 'waves',
     'Косинусный генератор': 'graphic_eq',
+    'Референсный синусный генератор': 'waves',
+    'Референсный косинусный генератор': 'graphic_eq',
 
     // БПФ/Анализ
     'Скользящее БПФ': 'show_chart',
@@ -113,9 +117,11 @@ export const DSP_BLOCK_TYPES = {
     GOERTZEL_FILTER: 'Фильтр Герцеля',
 
     // Генераторы
-    INPUT_SIGNAL: 'Входной сигнал',
-    REF_SINE_GEN: 'Синусный генератор',
-    REF_COSINE_GEN: 'Косинусный генератор',
+    AUDIO_FILE: 'Audio File',
+    SINE_GENERATOR: 'Синусный генератор',
+    COSINE_GENERATOR: 'Косинусный генератор',
+    REF_SINE_GEN: 'Референсный синусный генератор',
+    REF_COSINE_GEN: 'Референсный косинусный генератор',
 
     // БПФ/Анализ
     SLIDING_FFT: 'Скользящее БПФ',
@@ -140,9 +146,11 @@ export const DSP_BLOCK_TYPES = {
 // Параметры по умолчанию для блоков
 export const DEFAULT_BLOCK_PARAMS = {
     [DSP_BLOCK_TYPES.FIR_FILTER]: {
-        order: 64,
-        cutoff: 1000,
         filterType: 'lowpass',
+        cutoffFrequency: 1000,
+        order: 31,
+        windowFunction: 'hamming',
+        designMethod: 'window'
     },
     [DSP_BLOCK_TYPES.BANDPASS_FIR]: {
         order: 64,
@@ -169,10 +177,18 @@ export const DEFAULT_BLOCK_PARAMS = {
         samplingRate: 48000,
         N: 256,
     },
-    [DSP_BLOCK_TYPES.INPUT_SIGNAL]: {
+    [DSP_BLOCK_TYPES.AUDIO_FILE]: {
+        wavFile: null
+    },
+    [DSP_BLOCK_TYPES.SINE_GENERATOR]: {
         frequency: 1000,
         amplitude: 1.0,
-        signalType: 'sine',
+        phase: 0,
+    },
+    [DSP_BLOCK_TYPES.COSINE_GENERATOR]: {
+        frequency: 1000,
+        amplitude: 1.0,
+        phase: 0,
     },
     [DSP_BLOCK_TYPES.REF_SINE_GEN]: {
         frequency: 1000,
@@ -295,15 +311,27 @@ export const DSP_GROUPS = [
         collapsed: false,
         blocks: [
             {
-                id: 'input-signal',
-                name: DSP_BLOCK_TYPES.INPUT_SIGNAL,
-                icon: DSP_ICONS['Входной сигнал'],
-                description: 'Генератор входного сигнала',
+                id: 'audio-file',
+                name: DSP_BLOCK_TYPES.AUDIO_FILE,
+                icon: DSP_ICONS['Audio File'],
+                description: 'Источник аудиофайла',
+            },
+            {
+                id: 'sine-generator',
+                name: DSP_BLOCK_TYPES.SINE_GENERATOR,
+                icon: DSP_ICONS['Синусный генератор'],
+                description: 'Синусный генератор',
+            },
+            {
+                id: 'cosine-generator',
+                name: DSP_BLOCK_TYPES.COSINE_GENERATOR,
+                icon: DSP_ICONS['Косинусный генератор'],
+                description: 'Косинусный генератор',
             },
             {
                 id: 'ref-sine-generator',
                 name: DSP_BLOCK_TYPES.REF_SINE_GEN,
-                icon: DSP_ICONS['Синусный генератор'],
+                icon: DSP_ICONS['Референсный синусный генератор'],
                 description: 'Управляемый референсный синусный генератор',
             },
             {

@@ -117,9 +117,9 @@ export const formatFileSize = (bytes) => {
  */
 export const isGeneratorBlock = (blockType) => {
     const generators = [
-        'Входной сигнал',
-        'Референсный синусный генератор',
-        'Референсный косинусный генератор'
+        'Audio File',
+        'Синусный генератор',
+        'Косинусный генератор',
     ];
     return generators.includes(blockType);
 };

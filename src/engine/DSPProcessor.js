@@ -48,6 +48,14 @@ class DSPProcessor {
                 output: null,
                 initialized: false
             });
+
+            // Если у блока есть метод init, вызываем его для предварительного расчета (например, коэффициентов фильтра)
+            const BlockProcessor = this.getBlockProcessor(block.blockType);
+            if (BlockProcessor && typeof BlockProcessor.init === 'function') {
+                // Передаем params и sampleRate
+                const paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
+                BlockProcessor.init(block.nodeId, paramsWithSampleRate, this.sampleRate);
+            }
         }
 
         return result;
@@ -174,7 +182,7 @@ class DSPProcessor {
         }
 
         // Для генераторов (Входной сигнал) - читаем из WAV
-        if (block.blockType === 'Входной сигнал' && this.isFileMode) {
+        if (block.blockType === 'Audio File' && this.isFileMode) {
             return WavFileService.readChunk(this.currentSample, this.chunkSize) ||
                 new Float32Array(this.chunkSize);
         }
@@ -192,7 +200,7 @@ class DSPProcessor {
      */
     getBlockProcessor(blockType) {
         const processorMap = {
-            'Входной сигнал': DSPBlocks.InputSignalBlock,
+            'Audio File': DSPBlocks.InputSignalBlock,
             'Реф. синус. ген.': DSPBlocks.SineGeneratorBlock,
             'Реф. косинус. ген.': DSPBlocks.CosineGeneratorBlock,
             'Референсный синусный генератор': DSPBlocks.SineGeneratorBlock,

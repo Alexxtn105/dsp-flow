@@ -126,23 +126,24 @@ function App() {
         const edges = reactFlowInstance.getEdges();
         setNodes(currentNodes);
 
-        const inputNode = currentNodes.find(n => n.data.blockType === 'Входной сигнал');
+        // Поиск узла с файлом (ранее Входной сигнал)
+        const inputNode = currentNodes.find(n => n.data.blockType === 'Audio File');
 
         // Проверяем наличие других генераторов
         const hasGenerators = currentNodes.some(n =>
             ['Синусный генератор', 'Косинусный генератор', 'Референсный синусный генератор', 'Референсный косинусный генератор'].includes(n.data.blockType) ||
-            n.data.blockType === 'Входной сигнал'
+            n.data.blockType === 'Audio File'
         );
 
         if (!hasGenerators) {
-            alert('Добавьте хотя бы один источник сигнала (Входной сигнал или Генератор) для запуска');
+            alert('Добавьте хотя бы один источник сигнала (Audio File или Генератор) для запуска');
             return;
         }
 
         const wavFile = inputNode?.data?.params?.wavFile;
-        // Если есть блок "Входной сигнал", но не выбран файл - ошибка
+        // Если есть блок "Audio File", но не выбран файл - ошибка
         if (inputNode && !wavFile) {
-            alert('Выберите WAV файл в блоке "Входной сигнал"');
+            alert('Выберите WAV файл в блоке "Audio File"');
             return;
         }
 
