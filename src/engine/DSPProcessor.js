@@ -23,6 +23,10 @@ class DSPProcessor {
         this.onError = null;
         this.sampleRate = 48000;
         this.isFileMode = false;
+
+        // Audio playback context
+        this.audioContext = null;
+        this.nextAudioStartTime = 0;
     }
 
     /**
@@ -82,6 +86,15 @@ class DSPProcessor {
         const effectiveSpeed = processingSpeed || sampleRate;
         const intervalMs = (this.chunkSize / effectiveSpeed) * 1000;
 
+        // Инициализируем AudioContext для воспроизведения
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+        this.nextAudioStartTime = this.audioContext.currentTime;
+
         this.processingInterval = setInterval(() => {
             this.processNextChunk();
         }, intervalMs);
@@ -95,6 +108,10 @@ class DSPProcessor {
         if (this.processingInterval) {
             clearInterval(this.processingInterval);
             this.processingInterval = null;
+        }
+
+        if (this.audioContext) {
+            this.audioContext.suspend();
         }
     }
 
@@ -128,10 +145,15 @@ class DSPProcessor {
                     output,
                     initialized: true
                 });
+                if (output && this.onBlockOutput) {
+                    // Clone buffer for visualization to avoid mutation issues
+                    const outputCopy = new Float32Array(output);
+                    this.onBlockOutput(block.nodeId, outputCopy);
+                }
 
-                // Уведомляем о выходных данных блока (для визуализации)
-                if (this.onBlockOutput) {
-                    this.onBlockOutput(block.nodeId, output, block.blockType);
+                // Если это Audio File и не замьючен - воспроизводим
+                if (block.blockType === 'Audio File' && !block.params.muted && output && this.audioContext) {
+                    this.playAudioChunk(output);
                 }
             }
 
@@ -259,6 +281,34 @@ class DSPProcessor {
      */
     setFileMode(isFile) {
         this.isFileMode = isFile;
+    }
+
+    /**
+     * Воспроизводит чанк аудио через Web Audio API
+     */
+    playAudioChunk(chunkData) {
+        if (!this.audioContext) return;
+
+        // Создаем буфер
+        const buffer = this.audioContext.createBuffer(1, chunkData.length, this.sampleRate);
+        const channelData = buffer.getChannelData(0);
+
+        // Копируем данные
+        for (let i = 0; i < chunkData.length; i++) {
+            channelData[i] = chunkData[i];
+        }
+
+        // Создаем источник
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.audioContext.destination);
+
+        // Планируем воспроизведение без разрывов
+        const startTime = Math.max(this.audioContext.currentTime, this.nextAudioStartTime);
+        source.start(startTime);
+
+        // Обновляем время следующего чанка
+        this.nextAudioStartTime = startTime + buffer.duration;
     }
 }
 

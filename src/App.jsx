@@ -231,6 +231,13 @@ function App() {
         }
     }, [reactFlowInstance]);
 
+    // Sync nodes for VisualizationManager when graph changes (e.g. delete node)
+    useEffect(() => {
+        if (reactFlowInstance) {
+            setNodes(reactFlowInstance.getNodes());
+        }
+    }, [stats.nodesCount, reactFlowInstance]);
+
     useEffect(() => {
         return () => {
             DSPProcessor.stop();

@@ -23,6 +23,15 @@ function BlockNode({ data, selected }) {
     const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
     const canVisualize = isVisualizationBlock(data.blockType);
+    const isAudioFile = data.blockType === 'Audio File';
+    const isMuted = data.params?.muted || false;
+
+    const handleToggleMute = (e) => {
+        e.stopPropagation();
+        if (data.onParamUpdate) {
+            data.onParamUpdate(data.nodeId, 'muted', !isMuted);
+        }
+    };
 
     const handleOpenParams = (e) => {
         e.stopPropagation();
@@ -69,6 +78,15 @@ function BlockNode({ data, selected }) {
                         <Icon name="visibility" size="small" />
                     </button>
                 )}
+                {isAudioFile && (
+                    <button
+                        className="block-action-btn mute-btn"
+                        onClick={handleToggleMute}
+                        title={isMuted ? "Включить звук" : "Выключить звук"}
+                    >
+                        <Icon name={isMuted ? "volume_off" : "volume_up"} size="small" />
+                    </button>
+                )}
             </div>
 
             <div className="block-header">
@@ -86,36 +104,40 @@ function BlockNode({ data, selected }) {
                 </div>
             </div>
 
-            {data.params && Object.keys(data.params).length > 0 && (
-                <div className="block-params">
-                    {Object.entries(data.params).slice(0, 3).map(([key, value]) => (
-                        <div key={key} className="block-param">
-                            <span className="param-label">{formatParamName(key)}:</span>
-                            <span className="param-value">{formatParamValue(value)}</span>
-                        </div>
-                    ))}
-                    {Object.keys(data.params).length > 3 && (
-                        <div className="block-param">
-                            <span className="param-label">...</span>
-                            <span className="param-value">
-                                еще {Object.keys(data.params).length - 3}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            )}
+            {
+                data.params && Object.keys(data.params).length > 0 && (
+                    <div className="block-params">
+                        {Object.entries(data.params).slice(0, 3).map(([key, value]) => (
+                            <div key={key} className="block-param">
+                                <span className="param-label">{formatParamName(key)}:</span>
+                                <span className="param-value">{formatParamValue(value)}</span>
+                            </div>
+                        ))}
+                        {Object.keys(data.params).length > 3 && (
+                            <div className="block-param">
+                                <span className="param-label">...</span>
+                                <span className="param-value">
+                                    еще {Object.keys(data.params).length - 3}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )
+            }
 
-            {hasOutput && (
-                <Handle
-                    type="source"
-                    position={Position.Right}
-                    id="output"
-                    className={`block-handle ${getSignalTypeClass(signalConfig.output)}`}
-                    data-signal-type={signalConfig.output}
-                    title={`Выход: ${getSignalTypeDescription(signalConfig.output)} сигнал`}
-                />
-            )}
-        </div>
+            {
+                hasOutput && (
+                    <Handle
+                        type="source"
+                        position={Position.Right}
+                        id="output"
+                        className={`block-handle ${getSignalTypeClass(signalConfig.output)}`}
+                        data-signal-type={signalConfig.output}
+                        title={`Выход: ${getSignalTypeDescription(signalConfig.output)} сигнал`}
+                    />
+                )
+            }
+        </div >
     );
 }
 
@@ -126,7 +148,8 @@ BlockNode.propTypes = {
         params: PropTypes.object,
         nodeId: PropTypes.string,
         onOpenParams: PropTypes.func,
-        onOpenVisualization: PropTypes.func
+        onOpenVisualization: PropTypes.func,
+        onParamUpdate: PropTypes.func
     }).isRequired,
     selected: PropTypes.bool.isRequired
 };

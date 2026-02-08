@@ -107,6 +107,30 @@ function DSPEditor({
         }
     }, [setNodes, currentScheme, onSchemeUpdate]);
 
+    // Обработчик обновления одного параметра (для быстрого переключения)
+    const handleParamUpdate = useCallback((nodeId, paramName, paramValue) => {
+        setNodes(nds => nds.map(node => {
+            if (node.id === nodeId) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        params: {
+                            ...node.data.params,
+                            [paramName]: paramValue
+                        }
+                    }
+                };
+            }
+            return node;
+        }));
+
+        // Помечаем схему как несохранённую
+        if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
+            onSchemeUpdate(currentScheme.name, false);
+        }
+    }, [setNodes, currentScheme, onSchemeUpdate]);
+
     // Загрузка автосохранённой схемы при старте
     useEffect(() => {
         if (!hasLoadedExternalScheme.current) {
@@ -138,10 +162,11 @@ function DSPEditor({
                 ...node.data,
                 nodeId: node.id,
                 onOpenParams: handleOpenParams,
-                onOpenVisualization: handleOpenVisualization
+                onOpenVisualization: handleOpenVisualization,
+                onParamUpdate: handleParamUpdate
             }
         })));
-    }, [handleOpenParams, handleOpenVisualization, setNodes]);
+    }, [handleOpenParams, handleOpenVisualization, handleParamUpdate, setNodes]);
 
     // Обновление статистики
     useEffect(() => {
@@ -277,7 +302,8 @@ function DSPEditor({
                     signalConfig: signalConfig,
                     nodeId: nodeId,
                     onOpenParams: handleOpenParams,
-                    onOpenVisualization: handleOpenVisualization
+                    onOpenVisualization: handleOpenVisualization,
+                    onParamUpdate: handleParamUpdate
                 },
             };
 
@@ -288,7 +314,7 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, handleOpenParams, handleOpenVisualization]
+        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, handleOpenParams, handleOpenVisualization, handleParamUpdate]
     );
 
     // Обновляем анимацию существующих соединений при изменении состояния симуляции

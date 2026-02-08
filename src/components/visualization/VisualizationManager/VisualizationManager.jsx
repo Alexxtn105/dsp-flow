@@ -1,4 +1,4 @@
-import { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { useState, useCallback, useImperativeHandle, forwardRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import VisualizationWindow from '../VisualizationWindow';
 import OscilloscopeView from '../OscilloscopeView';
@@ -53,6 +53,45 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             return next;
         });
     }, [nodes, openWindows.size]);
+
+    // Закрываем окна удалённых блоков
+    // This useState call was incorrectly placed and not used to declare state.
+    // The comment indicates it was meant for a side effect, which should be useEffect.
+    // The actual side effect logic is correctly implemented in the useEffect below.
+
+    // Эффект для автоматического закрытия окон при удалении узлов
+    // Используем setTimeout чтобы не блокировать рендер, или просто useEffect
+    useEffect(() => {
+        setOpenWindows(prev => {
+            let changed = false;
+            const next = new Map(prev);
+
+            for (const [windowId, config] of prev.entries()) {
+                const nodeExists = nodes.some(n => n.id === config.nodeId);
+                if (!nodeExists) {
+                    next.delete(windowId);
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                // Также чистим данные
+                setWindowData(prevData => {
+                    const nextData = new Map(prevData);
+                    // Находим удаленные ключи
+                    // Note: windowId === nodeId in openWindow logic
+                    for (const [winId] of prev) {
+                        if (!next.has(winId)) {
+                            nextData.delete(winId);
+                        }
+                    }
+                    return nextData;
+                });
+                return next;
+            }
+            return prev;
+        });
+    }, [nodes]); // Зависимость от списка узлов
 
     // Закрыть окно
     const closeWindow = useCallback((windowId) => {
