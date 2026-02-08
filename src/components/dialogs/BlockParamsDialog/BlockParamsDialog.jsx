@@ -9,6 +9,8 @@ import './BlockParamsDialog.css';
  * Диалог редактирования параметров блока
  */
 function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
+    // Debug: Ensure params are loaded correctly
+
     const [localParams, setLocalParams] = useState({});
     const [wavFileName, setWavFileName] = useState('');
 
