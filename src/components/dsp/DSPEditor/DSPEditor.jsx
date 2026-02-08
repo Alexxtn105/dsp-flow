@@ -16,6 +16,7 @@ import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 import SignalLegend from './SignalLegend';
+import BlockParamsDialog from '../../dialogs/BlockParamsDialog';
 import { useAutoSave } from '../../../hooks/index.js';
 import {
     generateNodeId,
@@ -37,18 +38,22 @@ const edgeTypes = {
 };
 
 function DSPEditor({
-                       isDarkTheme,
-                       currentScheme,
-                       onSchemeUpdate,
-                       onStatsUpdate,
-                       onReactFlowInit,
-                       isRunning
-                   }) {
+    isDarkTheme,
+    currentScheme,
+    onSchemeUpdate,
+    onStatsUpdate,
+    onReactFlowInit,
+    isRunning,
+    onOpenVisualization
+}) {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const hasLoadedExternalScheme = useRef(false);
+
+    // Состояние диалога параметров
+    const [paramsDialogNode, setParamsDialogNode] = useState(null);
 
     // Получаем контекст
     const { loadedSchemeData, setLoadedSchemeData } = useDSPEditor();
@@ -63,6 +68,42 @@ function DSPEditor({
             skipWhen: () => hasLoadedExternalScheme.current
         }
     );
+
+    // Обработчик открытия диалога параметров
+    const handleOpenParams = useCallback((nodeId) => {
+        const node = nodes.find(n => n.id === nodeId);
+        if (node) {
+            setParamsDialogNode(node);
+        }
+    }, [nodes]);
+
+    // Обработчик открытия визуализации
+    const handleOpenVisualization = useCallback((nodeId) => {
+        if (onOpenVisualization) {
+            onOpenVisualization(nodeId);
+        }
+    }, [onOpenVisualization]);
+
+    // Обработчик сохранения параметров
+    const handleSaveParams = useCallback((nodeId, newParams) => {
+        setNodes(nds => nds.map(node => {
+            if (node.id === nodeId) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        params: newParams
+                    }
+                };
+            }
+            return node;
+        }));
+
+        // Помечаем схему как несохранённую
+        if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
+            onSchemeUpdate(currentScheme.name, false);
+        }
+    }, [setNodes, currentScheme, onSchemeUpdate]);
 
     // Загрузка автосохранённой схемы при старте
     useEffect(() => {
@@ -87,6 +128,19 @@ function DSPEditor({
         }
     }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData]);
 
+    // Добавляем обработчики к узлам
+    useEffect(() => {
+        setNodes(nds => nds.map(node => ({
+            ...node,
+            data: {
+                ...node.data,
+                nodeId: node.id,
+                onOpenParams: handleOpenParams,
+                onOpenVisualization: handleOpenVisualization
+            }
+        })));
+    }, [handleOpenParams, handleOpenVisualization, setNodes]);
+
     // Обновление статистики
     useEffect(() => {
         if (onStatsUpdate) {
@@ -108,62 +162,38 @@ function DSPEditor({
     /**
      * Проверка допустимости соединения
      */
-    // const isValidConnection = useCallback((connection) => {
-    //     const sourceNode = nodes.find(node => node.id === connection.source);
-    //     const targetNode = nodes.find(node => node.id === connection.target);
-    //
-    //     if (!sourceNode || !targetNode) return false;
-    //
-    //     // Запрещаем соединение узла с самим собой
-    //     if (sourceNode.id === targetNode.id) {
-    //         return false;
-    //     }
-    //
-    //     // Проверяем типы сигналов
-    //     const sourceSignalType = sourceNode.data?.signalConfig?.output;
-    //     const targetSignalType = targetNode.data?.signalConfig?.input;
-    //
-    //     // Если у источника нет выхода или у цели нет входа
-    //     if (!sourceSignalType || !targetSignalType) {
-    //         return false;
-    //     }
-    //
-    //     // Проверяем совместимость типов сигналов
-    //     return areSignalsCompatible(sourceSignalType, targetSignalType);
-    // }, [nodes]);
-
     const isValidConnection = useCallback((connection) => {
-            const sourceNode = nodes.find(node => node.id === connection.source);
-            const targetNode = nodes.find(node => node.id === connection.target);
+        const sourceNode = nodes.find(node => node.id === connection.source);
+        const targetNode = nodes.find(node => node.id === connection.target);
 
-            if (!sourceNode || !targetNode) return false;
+        if (!sourceNode || !targetNode) return false;
 
-            // Запрещаем соединение узла с самим собой
-            if (sourceNode.id === targetNode.id) {
-                return false;
-            }
+        // Запрещаем соединение узла с самим собой
+        if (sourceNode.id === targetNode.id) {
+            return false;
+        }
 
-            // Проверяем, не подключено ли уже что-то ко входу целевого узла
-            const existingEdgeToTarget = edges.find(edge =>
-                edge.target === connection.target && edge.targetHandle === connection.targetHandle
-            );
+        // Проверяем, не подключено ли уже что-то ко входу целевого узла
+        const existingEdgeToTarget = edges.find(edge =>
+            edge.target === connection.target && edge.targetHandle === connection.targetHandle
+        );
 
-            if (existingEdgeToTarget) {
-                return false; // Уже есть соединение на этот вход
-            }
+        if (existingEdgeToTarget) {
+            return false; // Уже есть соединение на этот вход
+        }
 
-            // Проверяем типы сигналов
-            const sourceSignalType = sourceNode.data?.signalConfig?.output;
-            const targetSignalType = targetNode.data?.signalConfig?.input;
+        // Проверяем типы сигналов
+        const sourceSignalType = sourceNode.data?.signalConfig?.output;
+        const targetSignalType = targetNode.data?.signalConfig?.input;
 
-            // Если у источника нет выхода или у цели нет входа
-            if (!sourceSignalType || !targetSignalType) {
-                return false;
-            }
+        // Если у источника нет выхода или у цели нет входа
+        if (!sourceSignalType || !targetSignalType) {
+            return false;
+        }
 
-            // Проверяем совместимость типов сигналов
-            return areSignalsCompatible(sourceSignalType, targetSignalType);
-        }, [nodes, edges]); // Добавили edges в зависимости
+        // Проверяем совместимость типов сигналов
+        return areSignalsCompatible(sourceSignalType, targetSignalType);
+    }, [nodes, edges]);
 
     const onConnect = useCallback(
         (params) => {
@@ -204,7 +234,7 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning, edges] // Добавили edges
+        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning, edges]
     );
 
     const onDragOver = useCallback((event) => {
@@ -232,16 +262,20 @@ function DSPEditor({
             if (!position) return;
 
             const signalConfig = getBlockSignalConfig(blockType);
+            const nodeId = generateNodeId();
 
             const newNode = {
-                id: generateNodeId(), // Теперь гарантированно уникальный
+                id: nodeId,
                 type: 'block',
                 position,
                 data: {
                     label: blockType,
                     blockType,
                     params: getDefaultParams(blockType),
-                    signalConfig: signalConfig
+                    signalConfig: signalConfig,
+                    nodeId: nodeId,
+                    onOpenParams: handleOpenParams,
+                    onOpenVisualization: handleOpenVisualization
                 },
             };
 
@@ -252,9 +286,8 @@ function DSPEditor({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, reactFlowWrapper]
+        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, handleOpenParams, handleOpenVisualization]
     );
-
 
     // Обновляем анимацию существующих соединений при изменении состояния симуляции
     useEffect(() => {
@@ -293,7 +326,7 @@ function DSPEditor({
                     />
                     <Controls
                         className={isDarkTheme ? 'dark-theme-controls' : ''}
-                        showInteractive={false} // Можно скрыть кнопку переключения интерактивности, если не нужна
+                        showInteractive={false}
                     />
                     <MiniMap
                         className={isDarkTheme ? 'dark-theme-minimap' : ''}
@@ -301,7 +334,7 @@ function DSPEditor({
                             if (node.selected) return '#4F46E5';
                             return isDarkTheme ? '#4b5563' : '#d1d5db';
                         }}
-                        nodeColor={(node) => {
+                        nodeColor={() => {
                             return isDarkTheme ? '#374151' : '#f3f4f6';
                         }}
                         maskColor={isDarkTheme ? 'rgba(86, 204, 242, 0.1)' : 'rgba(240, 240, 240, 0.6)'}
@@ -309,6 +342,16 @@ function DSPEditor({
                 </ReactFlow>
                 <SignalLegend isDarkTheme={isDarkTheme} />
             </div>
+
+            {/* Диалог редактирования параметров блока */}
+            {paramsDialogNode && (
+                <BlockParamsDialog
+                    isDarkTheme={isDarkTheme}
+                    onClose={() => setParamsDialogNode(null)}
+                    node={paramsDialogNode}
+                    onSave={handleSaveParams}
+                />
+            )}
         </div>
     );
 }
@@ -319,7 +362,8 @@ DSPEditor.propTypes = {
     onSchemeUpdate: PropTypes.func.isRequired,
     onStatsUpdate: PropTypes.func.isRequired,
     onReactFlowInit: PropTypes.func,
-    isRunning: PropTypes.bool.isRequired
+    isRunning: PropTypes.bool.isRequired,
+    onOpenVisualization: PropTypes.func
 };
 
 export default DSPEditor;

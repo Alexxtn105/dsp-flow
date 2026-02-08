@@ -1,0 +1,24 @@
+.oscilloscope-view {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.oscilloscope-canvas {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+
+.oscilloscope-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding-left: 6px;
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.dark-theme .oscilloscope-canvas {
+    border-color: var(--border-secondary);
+}

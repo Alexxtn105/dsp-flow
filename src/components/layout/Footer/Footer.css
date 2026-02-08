@@ -48,6 +48,37 @@
     border: 1px solid var(--border-primary);
 }
 
+/* Progress bar */
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+.progress-bar {
+    width: 120px;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    border: 1px solid var(--border-primary);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--success));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 35px;
+}
+
 .footer-sample-rate {
     font-size: 13px;
     color: var(--text-secondary);
