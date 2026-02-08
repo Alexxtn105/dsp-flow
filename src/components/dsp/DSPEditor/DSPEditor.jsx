@@ -70,12 +70,14 @@ function DSPEditor({
     );
 
     // Обработчик открытия диалога параметров
+    // Обработчик открытия диалога параметров
     const handleOpenParams = useCallback((nodeId) => {
-        const node = nodes.find(n => n.id === nodeId);
+        if (!reactFlowInstance) return;
+        const node = reactFlowInstance.getNode(nodeId);
         if (node) {
             setParamsDialogNode(node);
         }
-    }, [nodes]);
+    }, [reactFlowInstance]);
 
     // Обработчик открытия визуализации
     const handleOpenVisualization = useCallback((nodeId) => {
