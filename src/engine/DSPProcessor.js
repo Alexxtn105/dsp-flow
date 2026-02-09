@@ -23,10 +23,21 @@ class DSPProcessor {
         this.onError = null;
         this.sampleRate = 48000;
         this.isFileMode = false;
+        this.isManualMode = false;
 
         // Audio playback context
         this.audioContext = null;
         this.nextAudioStartTime = 0;
+    }
+
+    /**
+     * Toggles manual mode
+     */
+    setManualMode(enabled) {
+        this.isManualMode = enabled;
+        if (enabled && this.isRunning) {
+            this.stop(); // Stop real-time interval if switching to manual
+        }
     }
 
     /**
@@ -95,9 +106,32 @@ class DSPProcessor {
         }
         this.nextAudioStartTime = this.audioContext.currentTime;
 
-        this.processingInterval = setInterval(() => {
-            this.processNextChunk();
-        }, intervalMs);
+        if (!this.isManualMode) {
+            this.processingInterval = setInterval(() => {
+                this.processNextChunk();
+            }, intervalMs);
+        }
+    }
+
+    /**
+     * Выполняет один шаг обработки (только для ручного режима)
+     * @param {number} numSamples - количество отсчетов
+     */
+    step(numSamples) {
+        if (!this.compiledGraph) return;
+
+        // Temporarily set chunkSize to the requested step size
+        const originalChunkSize = this.chunkSize;
+        this.chunkSize = numSamples;
+
+        this.isRunning = true;
+        this.processNextChunk();
+
+        // If it was stopped by processNextChunk (e.g. End of File), keep it false
+        // Otherwise, in manual mode we usually consider it "running" while waiting for next step?
+        // Actually, we'll keep isRunning=true if simulation is active.
+
+        this.chunkSize = originalChunkSize;
     }
 
     /**

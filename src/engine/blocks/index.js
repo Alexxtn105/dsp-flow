@@ -292,11 +292,11 @@ export const FIRFilterBlock = {
         }
 
         const { coeffs, buffer, order } = state;
-        const output = new Float32Array(chunkSize);
+        const output = new Float32Array(input.length);
         let { pointer } = state;
         const bufferLen = buffer.length;
 
-        for (let i = 0; i < chunkSize; i++) {
+        for (let i = 0; i < input.length; i++) {
             // Write to circular buffer
             buffer[pointer] = input[i];
 

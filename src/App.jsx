@@ -54,6 +54,10 @@ function App() {
     // Nodes для визуализации
     const [nodes, setNodes] = useState([]);
 
+    // Manual Mode State
+    const [isManualMode, setIsManualMode] = useState(false);
+    const [manualStepSize, setManualStepSize] = useState(1024);
+
     const handleSchemeUpdate = useCallback((schemeName, isSaved = true) => {
         setCurrentScheme({
             name: schemeName,
@@ -114,6 +118,19 @@ function App() {
         setShowLoadDialog(false);
     }, [handleSchemeUpdate]);
 
+    const handleToggleManualMode = useCallback((enabled) => {
+        setIsManualMode(enabled);
+        DSPProcessor.setManualMode(enabled);
+    }, []);
+
+    const handleManualStep = useCallback(() => {
+        if (!isRunning) {
+            handleStartSimulation();
+        } else {
+            DSPProcessor.step(manualStepSize);
+        }
+    }, [isRunning, manualStepSize]);
+
     const handleStartSimulation = useCallback(() => {
         if (!reactFlowInstance) return;
 
@@ -168,6 +185,7 @@ function App() {
 
             DSPProcessor.setSampleRate(rate);
             DSPProcessor.setFileMode(!!fileSampleRate);
+            DSPProcessor.setManualMode(isManualMode);
 
             DSPProcessor.initialize(currentNodes, edges);
 
@@ -287,6 +305,13 @@ function App() {
                     connectionsCount={stats.connectionsCount}
                     sampleRate={sampleRate}
                     progress={processingProgress.progress}
+                    isManualMode={isManualMode}
+                    manualStepSize={manualStepSize}
+                    currentSample={processingProgress.currentSample}
+                    totalSamples={processingProgress.totalSamples}
+                    onToggleManual={handleToggleManualMode}
+                    onStep={handleManualStep}
+                    onStepSizeChange={setManualStepSize}
                 />
 
                 {/* Менеджер окон визуализации */}

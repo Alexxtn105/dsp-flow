@@ -1,14 +1,17 @@
 .app-footer {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-primary);
-    padding: 12px 24px;
-    height: 50px;
+    padding: 8px 24px 0 24px;
+    /* Reduced bottom padding for timeline */
+    height: 70px;
+    /* Increased height */
     flex-shrink: 0;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
     z-index: 10;
-    display: flow;
-    align-items: center;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    /* Stack content and timeline */
+    justify-content: space-between;
 }
 
 .dark-theme .app-footer {
@@ -38,17 +41,100 @@
     justify-content: flex-end;
 }
 
+.status-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .footer-status {
     font-size: 13px;
     color: var(--text-secondary);
     font-weight: 500;
-    padding: 6px 12px;
+}
+
+.sample-counter {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.sample-counter strong {
+    color: var(--accent-primary);
+}
+
+/* Manual Mode Controls */
+.manual-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.manual-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.step-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px;
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-primary);
 }
 
-/* Progress bar */
+.step-size-input {
+    width: 70px;
+    padding: 4px 8px;
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.step-btn {
+    min-width: 100px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+/* Timeline */
+.footer-timeline {
+    width: calc(100% + 48px);
+    /* Compensate for footer padding */
+    margin: 0 -24px;
+    height: 4px;
+    background: var(--bg-tertiary);
+    position: relative;
+    cursor: pointer;
+}
+
+.timeline-progress {
+    height: 100%;
+    background: var(--accent-primary);
+    transition: width 0.1s linear;
+}
+
+.timeline-handle {
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+}
+
+/* Progress bar (legacy, keep for non-manual) */
 .progress-container {
     display: flex;
     align-items: center;
@@ -80,13 +166,11 @@
 }
 
 .footer-sample-rate {
-    font-size: 13px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    padding: 6px 12px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-primary);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 
 .footer-btn {
@@ -137,54 +221,21 @@
     color: var(--text-primary);
 }
 
-/*!* Темная тема для футера *!*/
-/*.dark-theme .app-footer {*/
-/*    background: var(--bg-tertiary);*/
-/*    border-top-color: var(--border-secondary);*/
-/*}*/
-
-/*.dark-theme .footer-status {*/
-/*    background: var(--bg-secondary);*/
-/*    border-color: var(--border-secondary);*/
-/*    color: var(--text-secondary);*/
-/*}*/
-
-/*.dark-theme .footer-btn {*/
-/*    background: var(--bg-secondary);*/
-/*    border-color: var(--border-secondary);*/
-/*    color: var(--text-primary);*/
-/*}*/
-
-/*.dark-theme .footer-btn:hover:not(:disabled) {*/
-/*    background: var(--bg-tertiary);*/
-/*}*/
-
-/*.dark-theme .nodes-count,*/
-/*.dark-theme .connections-count {*/
-/*    background: var(--bg-secondary);*/
-/*    border-color: var(--border-secondary);*/
-/*}*/
-
 /* Адаптивность */
 @media (max-width: 768px) {
     .app-footer {
-        padding: 10px 16px;
-        height: 60px;
+        padding: 10px 16px 0 16px;
+        height: 90px;
     }
 
-    .footer-btn {
-        padding: 6px 16px;
-        min-width: 100px;
-        font-size: 13px;
+    .manual-controls {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
     }
 
-    .footer-info {
-        gap: 10px;
-        font-size: 12px;
-    }
-
-    .nodes-count,
-    .connections-count {
-        padding: 3px 8px;
+    .footer-timeline {
+        width: calc(100% + 32px);
+        margin: 0 -16px;
     }
 }
