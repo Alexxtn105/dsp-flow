@@ -175,7 +175,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                             sampleRate={sampleRate}
                             isDarkTheme={isDarkTheme}
                             width={config.width}
-                            height={config.height - 40}
+                            height={config.height - 70}
                         />
                     ) : config.vizType === 'waterfall' ? (
                         <WaterfallView
@@ -183,14 +183,14 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                             sampleRate={sampleRate}
                             isDarkTheme={isDarkTheme}
                             width={config.width}
-                            height={config.height - 40}
+                            height={config.height - 70}
                         />
                     ) : (
                         <OscilloscopeView
                             data={data}
                             isDarkTheme={isDarkTheme}
                             width={config.width}
-                            height={config.height - 40}
+                            height={config.height - 70}
                         />
                     )}
                 </VisualizationWindow>

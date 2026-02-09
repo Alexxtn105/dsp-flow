@@ -107,7 +107,7 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
 
             if (isMajor) {
                 let label = f < 1000 ? `${f}` : `${f / 1000}k`;
-                ctx.fillText(label, x, height - 2);
+                ctx.fillText(label, x, height - 12);
 
                 if (f > 0) {
                     ctx.save();
