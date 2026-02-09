@@ -251,7 +251,7 @@ function App() {
     return (
         <DSPEditorProvider reactFlowInstance={reactFlowInstance}>
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
-                <Header currentScheme={currentScheme} />
+                <Header currentScheme={currentScheme} isDarkTheme={isDarkTheme} />
 
                 <div className="app-content">
                     <ControlToolbar

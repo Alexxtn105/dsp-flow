@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import './OscilloscopeView.css';
 
@@ -7,6 +7,9 @@ import './OscilloscopeView.css';
  */
 function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
     const canvasRef = useRef(null);
+    const [visibleSamples, setVisibleSamples] = useState(1000); // Default visible count
+
+    // Zoom levels logic could be complex, for now simple input
 
     const drawWaveform = useCallback(() => {
         const canvas = canvasRef.current;
@@ -16,8 +19,11 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
         const dpr = window.devicePixelRatio || 1;
 
         // Установка размера с учётом DPR
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
+        if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+        }
+        ctx.resetTransform();
         ctx.scale(dpr, dpr);
 
         // Очистка
@@ -28,7 +34,7 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
         ctx.strokeStyle = isDarkTheme ? '#374151' : '#e5e7eb';
         ctx.lineWidth = 0.5;
 
-        // Горизонтальные линии
+        // H-lines
         for (let i = 0; i <= 4; i++) {
             const y = (height / 4) * i;
             ctx.beginPath();
@@ -37,7 +43,7 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
             ctx.stroke();
         }
 
-        // Вертикальные линии
+        // V-lines (Time)
         for (let i = 0; i <= 8; i++) {
             const x = (width / 8) * i;
             ctx.beginPath();
@@ -46,7 +52,7 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
             ctx.stroke();
         }
 
-        // Центральная линия (ноль)
+        // Center line
         ctx.strokeStyle = isDarkTheme ? '#6b7280' : '#9ca3af';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -54,32 +60,46 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
         ctx.lineTo(width, height / 2);
         ctx.stroke();
 
-        // Отрисовка сигнала
+        // Signal
         if (!data || data.length === 0) return;
 
         ctx.strokeStyle = isDarkTheme ? '#60a5fa' : '#3b82f6';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
 
-        const step = Math.max(1, Math.floor(data.length / width));
+        // We only show 'visibleSamples' amount of data.
+        // If data.length < visibleSamples, we show all data stretched or partial?
+        // Usually oscilloscopes show what is available buffer.
+        // We will scale x axis so visibleSamples fits width.
 
-        for (let i = 0; i < width; i++) {
-            const dataIndex = Math.floor(i * step);
-            if (dataIndex >= data.length) break;
+        const pointsToDraw = Math.min(visibleSamples, data.length);
+        const stepX = width / (visibleSamples - 1);
 
-            const sample = data[dataIndex];
-            // Нормализация: предполагаем, что данные в диапазоне [-1, 1]
-            const y = height / 2 - (sample * height / 2);
+        for (let i = 0; i < pointsToDraw; i++) {
+            const x = i * stepX;
+            const val = data[i];
+            // y maps [-1, 1] -> [height, 0]
+            const y = height / 2 - (val * height / 2);
 
-            if (i === 0) {
-                ctx.moveTo(i, y);
-            } else {
-                ctx.lineTo(i, y);
-            }
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
         }
-
         ctx.stroke();
-    }, [data, isDarkTheme, width, height]);
+
+        // Axis Labels
+        ctx.fillStyle = isDarkTheme ? '#9ca3af' : '#6b7280';
+        ctx.font = '10px sans-serif';
+
+        // Y-axis
+        ctx.fillText('+1.0', 2, 10);
+        ctx.fillText('0.0', 2, height / 2 - 2);
+        ctx.fillText('-1.0', 2, height - 2);
+
+        // X-axis (Samples count)
+        ctx.textAlign = 'right';
+        ctx.fillText(`${visibleSamples} samples`, width - 2, height - 2);
+
+    }, [data, isDarkTheme, width, height, visibleSamples]);
 
     useEffect(() => {
         drawWaveform();
@@ -87,16 +107,22 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
 
     return (
         <div className={`oscilloscope-view ${isDarkTheme ? 'dark-theme' : ''}`}>
+            <div className="viz-toolbar"> {/* Reuse styles */}
+                <span style={{ marginRight: 8, fontSize: 11 }}>Zoom:</span>
+                <input
+                    type="number"
+                    value={visibleSamples}
+                    onChange={(e) => setVisibleSamples(Math.max(10, parseInt(e.target.value) || 1000))}
+                    className="viz-select"
+                    style={{ width: 60 }}
+                    step="100"
+                />
+            </div>
             <canvas
                 ref={canvasRef}
                 style={{ width, height }}
                 className="oscilloscope-canvas"
             />
-            <div className="oscilloscope-labels">
-                <span className="label-max">+1.0</span>
-                <span className="label-zero">0.0</span>
-                <span className="label-min">-1.0</span>
-            </div>
         </div>
     );
 }

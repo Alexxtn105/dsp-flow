@@ -33,10 +33,16 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             vizType = 'waterfall';
         }
 
-        // Позиционирование окна
+        // Позиционирование окна (ближе к правому краю)
         const existingCount = openWindows.size;
+        const defaultWidth = 400;
+        const screenWidth = window.innerWidth;
+
+        // Отступ справа 20px, смещение для каждого следующего окна
+        const startX = screenWidth - defaultWidth - 50;
+
         const position = {
-            x: 150 + existingCount * 30,
+            x: Math.max(50, startX - (existingCount * 30)), // Сдвигаем влево каждое новое, чтобы было видно
             y: 100 + existingCount * 30
         };
 

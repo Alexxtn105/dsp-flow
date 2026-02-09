@@ -176,14 +176,19 @@ export const CosineGeneratorBlock = {
  */
 export const SummerBlock = {
     process(inputs, params, chunkSize) {
-        if (inputs.length === 0) return new Float32Array(chunkSize);
+        // Ожидаем 2 входа
+        const input1 = inputs[0] || new Float32Array(chunkSize);
+        // inputs[1] might be undefined if not connected, treat as zeros
+        const input2 = inputs[1] || new Float32Array(chunkSize);
+
         const output = new Float32Array(chunkSize);
-        for (const input of inputs) {
-            if (input) {
-                for (let i = 0; i < Math.min(chunkSize, input.length); i++) {
-                    output[i] += input[i];
-                }
-            }
+
+        // (A + B) / 2
+        for (let i = 0; i < chunkSize; i++) {
+            // Handle potentially different lengths safely, though usually they match
+            const v1 = i < input1.length ? input1[i] : 0;
+            const v2 = i < input2.length ? input2[i] : 0;
+            output[i] = (v1 + v2) / 2;
         }
         return output;
     }
@@ -194,14 +199,17 @@ export const SummerBlock = {
  */
 export const MultiplierBlock = {
     process(inputs, params, chunkSize) {
-        if (inputs.length === 0) return new Float32Array(chunkSize);
-        const output = new Float32Array(chunkSize).fill(1);
-        for (const input of inputs) {
-            if (input) {
-                for (let i = 0; i < Math.min(chunkSize, input.length); i++) {
-                    output[i] *= input[i];
-                }
-            }
+        // Ожидаем 2 входа
+        const input1 = inputs[0] || new Float32Array(chunkSize);
+        const input2 = inputs[1] || new Float32Array(chunkSize);
+
+        const output = new Float32Array(chunkSize);
+
+        // A * B
+        for (let i = 0; i < chunkSize; i++) {
+            const v1 = i < input1.length ? input1[i] : 0;
+            const v2 = i < input2.length ? input2[i] : 0;
+            output[i] = v1 * v2;
         }
         return output;
     }

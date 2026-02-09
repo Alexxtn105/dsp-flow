@@ -45,8 +45,8 @@ function ControlToolbar({
                     <button
                         className="control-btn save-btn"
                         onClick={onSave}
-                        title="Сохранить текущую схему"
-                        disabled={!isSaveEnabled}
+                        title={isRunning ? "Остановите симуляцию для сохранения" : "Сохранить текущую схему"}
+                        disabled={!isSaveEnabled || isRunning}
                     >
                         <Icon name="save" size="large" className="control-btn-icon" />
                         <span className="control-btn-tooltip">Сохранить</span>
@@ -56,8 +56,8 @@ function ControlToolbar({
                     <button
                         className="control-btn save-as-btn"
                         onClick={onSaveAs}
-                        title="Сохранить под новым именем"
-                        disabled={!isSaveAsEnabled}
+                        title={isRunning ? "Остановите симуляцию для сохранения" : "Сохранить под новым именем"}
+                        disabled={!isSaveAsEnabled || isRunning}
                     >
                         <Icon name="save_as" size="large" className="control-btn-icon" />
                         <span className="control-btn-tooltip">Сохранить как</span>

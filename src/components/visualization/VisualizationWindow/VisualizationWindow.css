@@ -95,3 +95,93 @@
 .viz-window-resize-handle:hover::after {
     border-color: transparent transparent #3b82f6 transparent;
 }
+
+/* Shared Toolbar Styles */
+.viz-toolbar {
+    background: #f3f4f6;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.visualization-window.dark-theme .viz-toolbar {
+    background: #111827;
+    border-color: #374151;
+}
+
+.viz-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 8px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.visualization-window.dark-theme .viz-toolbar-group {
+    border-color: #374151;
+}
+
+.viz-select {
+    font-size: 11px;
+    padding: 2px 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 3px;
+    background: white;
+    color: #374151;
+}
+
+.visualization-window.dark-theme .viz-select {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+.viz-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    user-select: none;
+    color: #374151;
+}
+
+.visualization-window.dark-theme .viz-checkbox {
+    color: #e5e7eb;
+}
+
+.viz-btn {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1d5db;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    padding: 0;
+}
+
+.visualization-window.dark-theme .viz-btn {
+    background: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+.viz-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #2563eb;
+}
+
+.visualization-window.dark-theme .viz-btn.active {
+    background: #3b82f6;
+    border-color: #2563eb;
+    color: white;
+}

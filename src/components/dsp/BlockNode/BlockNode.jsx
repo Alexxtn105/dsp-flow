@@ -50,14 +50,31 @@ function BlockNode({ data, selected }) {
     return (
         <div className={`block-node ${selected ? 'selected' : ''}`}>
             {hasInput && (
-                <Handle
-                    type="target"
-                    position={Position.Left}
-                    id="input"
-                    className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
-                    data-signal-type={signalConfig.input}
-                    title={`Вход: ${getSignalTypeDescription(signalConfig.input)} сигнал`}
-                />
+                signalConfig.inputsCount && signalConfig.inputsCount > 1 ? (
+                    // Multiple inputs
+                    Array.from({ length: signalConfig.inputsCount }).map((_, i) => (
+                        <Handle
+                            key={`input-${i}`}
+                            type="target"
+                            position={Position.Left}
+                            id={`input-${i}`}
+                            className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
+                            style={{ top: `${((i + 1) * 100) / (signalConfig.inputsCount + 1)}%` }}
+                            data-signal-type={signalConfig.input}
+                            title={`Вход ${i + 1}`}
+                        />
+                    ))
+                ) : (
+                    // Single input (default)
+                    <Handle
+                        type="target"
+                        position={Position.Left}
+                        id="input"
+                        className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
+                        data-signal-type={signalConfig.input}
+                        title={`Вход: ${getSignalTypeDescription(signalConfig.input)} сигнал`}
+                    />
+                )
             )}
 
             {/* Кнопки управления блоком */}

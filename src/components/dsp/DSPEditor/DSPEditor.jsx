@@ -15,7 +15,7 @@ import Toolbar from '../../layout/Toolbar/Toolbar.jsx';
 import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
-import SignalLegend from './SignalLegend';
+
 import BlockParamsDialog from '../../dialogs/BlockParamsDialog';
 import { useAutoSave } from '../../../hooks/index.js';
 import {
@@ -368,7 +368,7 @@ function DSPEditor({
                     {/*    maskColor={isDarkTheme ? 'rgba(86, 204, 242, 0.1)' : 'rgba(240, 240, 240, 0.6)'}*/}
                     {/*/>*/}
                 </ReactFlow>
-                <SignalLegend isDarkTheme={isDarkTheme} />
+
             </div>
 
             {/* Диалог редактирования параметров блока */}

@@ -9,7 +9,11 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
     const [colorMap, setColorMap] = useState('audition'); // Default to Adobe Audition style
-    const [isNormalized, setIsNormalized] = useState(false); // Checkbox for normalization
+    const [windowFunction, setWindowFunction] = useState('blackman-harris');
+    const [isNormalized, setIsNormalized] = useState(false);
+    const [showLegend, setShowLegend] = useState(true);
+    const [mouseFreq, setMouseFreq] = useState(null);
+    const [cursorX, setCursorX] = useState(null);
 
     // Управление размером временного канваса с сохранением содержимого
     useEffect(() => {
@@ -81,57 +85,11 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
                     b = Math.floor(((normalized - 0.8) / 0.2) * 255);
                 }
                 break;
-
-            case 'jet':
-                // Jet: Blue -> Cyan -> Green -> Yellow -> Red
-                if (normalized < 0.25) {
-                    r = 0;
-                    g = Math.floor(4 * normalized * 255);
-                    b = 255;
-                } else if (normalized < 0.5) {
-                    r = 0;
-                    g = 255;
-                    b = Math.floor((1 - 4 * (normalized - 0.25)) * 255);
-                } else if (normalized < 0.75) {
-                    r = Math.floor(4 * (normalized - 0.5) * 255);
-                    g = 255;
-                    b = 0;
-                } else {
-                    r = 255;
-                    g = Math.floor((1 - 4 * (normalized - 0.75)) * 255);
-                    b = 0;
-                }
-                break;
-
-            case 'hot':
-                // Hot: Black -> Red -> Yellow -> White
-                if (normalized < 0.33) {
-                    r = Math.floor((normalized / 0.33) * 255);
-                    g = 0;
-                    b = 0;
-                } else if (normalized < 0.66) {
-                    r = 255;
-                    g = Math.floor(((normalized - 0.33) / 0.33) * 255);
-                    b = 0;
-                } else {
-                    r = 255;
-                    g = 255;
-                    b = Math.floor(((normalized - 0.66) / 0.34) * 255);
-                }
-                break;
-
-            case 'grayscale':
-                // Black -> White
-                const val = Math.floor(normalized * 255);
-                r = g = b = val;
-                break;
-
             default:
-                // Fallback to Grayscale
+                // Grayscale fallback
                 const v = Math.floor(normalized * 255);
                 r = g = b = v;
         }
-
         return `rgb(${r},${g},${b})`;
     }, []);
 
@@ -148,29 +106,43 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         const targetWidth = width * dpr;
         const targetHeight = height * dpr;
 
-        // 1. Настройка размеров основного канваса
+        // 1. Настройка размеров
         if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
             canvas.width = targetWidth;
             canvas.height = targetHeight;
-            // После ресайза канвас очищается, это нормально, 
-            // мы восстановим изображение из tempCanvas на следующем шаге
         }
+        ctx.scale(dpr, dpr);
 
-        // 2. Рисуем историю из tempCanvas на основной канвас со сдвигом вниз
-        // Сдвигаем на 1 реальный пиксель (dpr) или больше для скорости
-        const shiftY = dpr;
+        // 2. Рисуем историю
+        const shiftY = 1; // 1 logical pixel
+        // Draw from tempCanvas (source is dpr sized)
+        // Draw into context (scaled), so destination coords are logical
+        // But drawImage with canvas source ignores context scale for source reading?
+        // Actually, best to handle history manipulation in tempCanvas pixel space,
+        // then render tempCanvas to main canvas.
 
-        // Рисуем всё изображение из tempCanvas в основной canvas, сдвинув вниз
-        // tempCanvas уже имеет правильный размер (благодаря useEffect)
-        ctx.drawImage(tempCanvas, 0, 0, targetWidth, targetHeight, 0, shiftY, targetWidth, targetHeight);
+        // Shift tempCanvas content down
+        // We need to copy tempCanvas to itself shifted.
+        // Create a buffer or draw self? Draw self works if source is same.
+        // To avoid artifacts, better to have a snapshot.
+        // Actually simplest:
+        // 1. Draw new line on top of tempCanvas (at 0)
+        // But we need to shift existent.
+        // Copy existing tempCanvas to main canvas, shifted down.
+        // Draw new line on main canvas at top.
+        // Copy main canvas back to tempCanvas.
 
-        // 3. Рисуем новую строку сверху (высотой shiftY)
+        // Work with tempCanvas directly (pixel space)
+        tempCtx.globalCompositeOperation = 'copy';
+        tempCtx.drawImage(tempCanvas, 0, 0, targetWidth, targetHeight, 0, shiftY * dpr, targetWidth, targetHeight);
+        tempCtx.globalCompositeOperation = 'source-over';
+
+        // 3. Draw new line at top of tempCanvas
         const numBins = data.length;
         const binWidth = targetWidth / numBins;
 
-        // Find min/max for normalization if enabled
-        let minDb = -100; // Default floor
-        let maxDb = 0;    // Default ceil
+        let minDb = -100;
+        let maxDb = 0;
 
         if (isNormalized) {
             minDb = Infinity;
@@ -179,68 +151,197 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
                 if (data[i] < minDb) minDb = data[i];
                 if (data[i] > maxDb) maxDb = data[i];
             }
-            // Avoid division by zero
             if (maxDb === minDb) maxDb = minDb + 1;
         }
 
         for (let i = 0; i < numBins; i++) {
             const db = data[i];
             let normalized;
-
             if (isNormalized) {
                 normalized = (db - minDb) / (maxDb - minDb);
             } else {
-                // Fixed range logic (-100dB to 0dB)
                 normalized = (db + 100) / 100;
             }
-
             normalized = Math.max(0, Math.min(1, normalized));
-
-            ctx.fillStyle = getColor(normalized, colorMap);
-            // Рисуем прямоугольник с перекрытием чтобы не было щелей
-            ctx.fillRect(Math.floor(i * binWidth), 0, Math.ceil(binWidth), shiftY);
+            tempCtx.fillStyle = getColor(normalized, colorMap);
+            tempCtx.fillRect(Math.floor(i * binWidth), 0, Math.ceil(binWidth), shiftY * dpr);
         }
 
-        // 4. Обновляем tempCanvas актуальным состоянием
-        tempCtx.drawImage(canvas, 0, 0);
+        // 4. Render tempCanvas to main canvas
+        // Clear main first via fill
+        ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+        ctx.fillRect(0, 0, width, height);
 
-    }, [data, isDarkTheme, width, height, colorMap, getColor, isNormalized]);
+        // Draw tempCanvas (which is pixel-device sized) to logical sized canvas
+        ctx.drawImage(tempCanvas, 0, 0, width, height);
+
+        // 5. Draw Axis (Major/Minor ticks)
+        ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = isDarkTheme ? '#aaa' : '#555';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        const maxFreq = sampleRate / 2;
+        // Step 100Hz
+        const pixelsPerHz = width / maxFreq;
+
+        // Determine grid interval based on width
+        // Try 100Hz, if too crowded, 500Hz, 1k, etc.
+        let stepHz = 100;
+        if (pixelsPerHz * 100 < 40) stepHz = 500;
+        if (pixelsPerHz * 500 < 40) stepHz = 1000;
+        if (pixelsPerHz * 1000 < 40) stepHz = 5000;
+
+        // Minor ticks
+        const minorStepHz = stepHz / 5;
+
+        // Draw Ticks
+        const drawTick = (freq, isMajor) => {
+            if (freq > maxFreq) return;
+            const x = (freq / maxFreq) * width;
+
+            ctx.beginPath();
+            ctx.moveTo(x, height);
+            ctx.lineTo(x, height - (isMajor ? 10 : 5));
+            ctx.stroke();
+
+            if (isMajor) {
+                let label = freq < 1000 ? `${freq}` : `${freq / 1000}k`;
+                ctx.fillText(label, x, height - 22);
+            }
+        };
+
+        for (let f = 0; f <= maxFreq; f += minorStepHz) {
+            const isMajor = f % stepHz === 0;
+            drawTick(f, isMajor);
+
+            // Draw vertical grid line for major
+            if (isMajor && f > 0) {
+                const x = (f / maxFreq) * width;
+                ctx.save();
+                ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        // 6. Draw Mouse Cursor
+        if (cursorX !== null) {
+            ctx.strokeStyle = isDarkTheme ? '#ffffff' : '#000000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cursorX, 0);
+            ctx.lineTo(cursorX, height);
+            ctx.stroke();
+
+            // Draw Frequency Label
+            if (mouseFreq !== null) {
+                const label = `${Math.round(mouseFreq)} Hz`;
+                const labelWidth = ctx.measureText(label).width + 8;
+                let lx = cursorX + 5;
+                if (lx + labelWidth > width) lx = cursorX - labelWidth - 5;
+
+                ctx.fillStyle = isDarkTheme ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)';
+                ctx.fillRect(lx, 10, labelWidth, 16);
+
+                ctx.fillStyle = isDarkTheme ? '#fff' : '#000';
+                ctx.textAlign = 'left';
+                ctx.fillText(label, lx + 4, 12);
+            }
+        }
+
+    }, [data, isDarkTheme, width, height, colorMap, getColor, isNormalized, sampleRate, cursorX, mouseFreq]);
 
     useEffect(() => {
         drawWaterfall();
     }, [drawWaterfall]);
 
+    const handleMouseMove = useCallback((e) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        // Clamp x
+        const clampedX = Math.max(0, Math.min(width, x));
+
+        setCursorX(clampedX);
+        const freq = (clampedX / width) * (sampleRate / 2);
+        setMouseFreq(freq);
+    }, [width, sampleRate]);
+
+    const handleMouseLeave = useCallback(() => {
+        setCursorX(null);
+        setMouseFreq(null);
+    }, []);
+
     return (
         <div className={`waterfall-view ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <div className="waterfall-controls">
-                <select
-                    value={colorMap}
-                    onChange={(e) => setColorMap(e.target.value)}
-                    className="waterfall-select"
+            <div className="viz-toolbar">
+                <div className="viz-toolbar-group">
+                    <select
+                        value={windowFunction}
+                        onChange={e => setWindowFunction(e.target.value)}
+                        className="viz-select"
+                        title="Оконная функция"
+                    >
+                        <option value="blackman-harris">Blackman-Harris</option>
+                        <option value="hamming">Hamming</option>
+                        <option value="rectangular">Rectangular</option>
+                    </select>
+                </div>
+                <div className="viz-toolbar-group">
+                    <select
+                        value={colorMap}
+                        onChange={(e) => setColorMap(e.target.value)}
+                        className="viz-select"
+                        title="Цветовая схема"
+                    >
+                        <option value="audition">Audition</option>
+                        <option value="grayscale">Grayscale</option>
+                    </select>
+                    <label className="viz-checkbox">
+                        <input
+                            type="checkbox"
+                            checked={isNormalized}
+                            onChange={(e) => setIsNormalized(e.target.checked)}
+                        />
+                        Norm
+                    </label>
+                </div>
+                <button
+                    className={`viz-btn ${showLegend ? 'active' : ''}`}
+                    onClick={() => setShowLegend(!showLegend)}
+                    title="Легенда цветовой схемы"
                 >
-                    <option value="audition">Audition</option>
-                    <option value="jet">Jet</option>
-                    <option value="hot">Hot</option>
-                    <option value="grayscale">Grayscale</option>
-                </select>
-                <label className="waterfall-checkbox">
-                    <input
-                        type="checkbox"
-                        checked={isNormalized}
-                        onChange={(e) => setIsNormalized(e.target.checked)}
-                    />
-                    Norm.
-                </label>
+                    L
+                </button>
             </div>
-            <canvas
-                ref={canvasRef}
-                style={{ width, height }}
-                className="waterfall-canvas"
-            />
-            <div className="waterfall-labels-x">
-                <span>0</span>
-                <span>{Math.round(sampleRate / 4)}</span>
-                <span>{Math.round(sampleRate / 2)} Hz</span>
+
+            <div className="waterfall-container">
+                <canvas
+                    ref={canvasRef}
+                    style={{ width, height }}
+                    className="waterfall-canvas"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                />
+
+                {showLegend && (
+                    <div className="waterfall-legend-overlay">
+                        <div className="legend-gradient" style={{
+                            background: colorMap === 'audition'
+                                ? 'linear-gradient(to top, black, purple, red, orange, yellow, white)'
+                                : 'linear-gradient(to top, black, white)'
+                        }}></div>
+                        <div className="legend-labels">
+                            <span>0dB</span>
+                            <span>-50</span>
+                            <span>-100</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

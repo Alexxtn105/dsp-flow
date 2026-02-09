@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import './Dialog.css';
 
@@ -51,7 +52,7 @@ function Dialog({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="dialog-overlay" onClick={handleOverlayClick}>
             <div
                 className={`dialog ${className}`}
@@ -62,7 +63,8 @@ function Dialog({
                     {children}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

@@ -351,7 +351,20 @@ export const formatParamValue = (value) => {
  * Получить конфигурацию сигналов для блока
  */
 export const getBlockSignalConfig = (blockType) => {
-    return BLOCK_SIGNAL_CONFIG[blockType] || {
+    if (BLOCK_SIGNAL_CONFIG[blockType]) {
+        return BLOCK_SIGNAL_CONFIG[blockType];
+    }
+
+    // Special handling for multi-input blocks
+    if (blockType === 'Сумматор' || blockType === 'Перемножитель') {
+        return {
+            input: SIGNAL_TYPES.REAL,
+            output: SIGNAL_TYPES.REAL,
+            inputsCount: 2
+        };
+    }
+
+    return {
         input: SIGNAL_TYPES.REAL,
         output: SIGNAL_TYPES.REAL
     };

@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import './Header.css';
 
-function Header({ currentScheme }) {
+import SignalLegend from '../../dsp/DSPEditor/SignalLegend';
+
+function Header({ currentScheme, isDarkTheme }) {
     return (
         <header className="app-header">
             <div className="app-header-left">
@@ -23,7 +25,7 @@ function Header({ currentScheme }) {
             </div>
 
             <div className="app-header-right">
-                {/* Кнопки управления перенесены в ControlToolbar */}
+                <SignalLegend isDarkTheme={isDarkTheme} />
             </div>
         </header>
     );
@@ -33,7 +35,8 @@ Header.propTypes = {
     currentScheme: PropTypes.shape({
         name: PropTypes.string.isRequired,
         isSaved: PropTypes.bool.isRequired
-    }).isRequired
+    }).isRequired,
+    isDarkTheme: PropTypes.bool
 };
 
 export default Header;
