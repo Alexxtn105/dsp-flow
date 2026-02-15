@@ -1,0 +1,37 @@
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/*.app-content {*/
+/*  position: relative;*/
+/*  flex: 1;*/
+/*  overflow: hidden;*/
+/*}*/
+
+/* Расположение тулбаров */
+.toolbars-container {
+  display: flex;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.dark-theme {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}

@@ -1,0 +1,80 @@
+/**
+ * AudioFileReader - модуль для чтения аудио файлов
+ */
+
+export class AudioFileReader {
+    /**
+     * Загрузка WAV файла
+     */
+    static async loadWavFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = async (e) => {
+                try {
+                    const arrayBuffer = e.target.result;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                    // Извлекаем сэмплы из первого канала
+                    const samples = audioBuffer.getChannelData(0);
+
+                    resolve({
+                        fileName: file.name,
+                        samples: new Float32Array(samples),
+                        sampleRate: audioBuffer.sampleRate,
+                        duration: audioBuffer.duration,
+                        numberOfChannels: audioBuffer.numberOfChannels,
+                        length: audioBuffer.length,
+                        fileSize: file.size,
+                        audioBuffer: audioBuffer // Сохраняем оригинальный буфер
+                    });
+                } catch (error) {
+                    reject(new Error('Ошибка декодирования аудио файла'));
+                }
+            };
+
+            reader.onerror = () => {
+                reject(new Error('Ошибка чтения файла'));
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    /**
+     * Генератор блоков данных из аудио файла
+     */
+    static *generateBlocks(audioData, blockSize) {
+        const { samples } = audioData;
+        let offset = 0;
+
+        while (offset < samples.length) {
+            const remainingSamples = samples.length - offset;
+            const currentBlockSize = Math.min(blockSize, remainingSamples);
+
+            const block = new Float32Array(blockSize);
+            block.set(samples.subarray(offset, offset + currentBlockSize));
+
+            // Если блок неполный - дополняем нулями
+            if (currentBlockSize < blockSize) {
+                block.fill(0, currentBlockSize);
+            }
+
+            yield block;
+            offset += currentBlockSize;
+        }
+    }
+
+    /**
+     * Проверка формата файла
+     */
+    static isValidWavFile(file) {
+        const validExtensions = ['.wav', '.wave'];
+        const fileName = file.name.toLowerCase();
+
+        return validExtensions.some(ext => fileName.endsWith(ext));
+    }
+}
+
+export default AudioFileReader;

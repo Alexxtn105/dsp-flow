@@ -1,0 +1,227 @@
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.dialog {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: var(--shadow-xl);
+}
+
+.dialog-title {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.dialog input,
+.dialog textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+}
+
+.dialog input:focus,
+.dialog textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.dialog-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.dialog-buttons button:first-child {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.dialog-buttons button:first-child:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.dialog-buttons button:last-child {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.dialog-buttons button:last-child:hover {
+    background: var(--border-primary);
+}
+
+.error-message {
+    color: var(--danger);
+    margin-bottom: 12px;
+    font-size: 13px;
+    padding: 8px;
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--danger);
+}
+
+/* Стили для списка схем */
+.schemes-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.scheme-item {
+    padding: 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+    background: var(--bg-primary);
+    transition: all var(--transition-fast);
+}
+
+.scheme-item:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.scheme-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.scheme-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.scheme-date {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+}
+
+.scheme-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.scheme-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex: 1;
+}
+
+.scheme-actions button:first-child {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.scheme-actions button:first-child:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.scheme-actions button:last-child {
+    background: var(--danger);
+    color: white;
+}
+
+.scheme-actions button:last-child:hover {
+    background: var(--danger-hover);
+    transform: translateY(-1px);
+}
+
+/* Темная тема для диалогов */
+.dark-theme .dialog {
+    background: var(--bg-tertiary);
+}
+
+.dark-theme .scheme-item {
+    background: var(--bg-secondary);
+}
+
+.dark-theme .dialog input,
+.dark-theme .dialog textarea {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .dialog-buttons button:last-child {
+    background: var(--bg-primary);
+}
+
+/* Состояние пустого списка */
+.schemes-list:empty::before {
+    content: "Нет сохраненных схем";
+    display: block;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* Стили для сообщения о загрузке */
+.loading-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .dialog {
+        padding: 16px;
+        width: 95vw;
+    }
+
+    .scheme-actions {
+        flex-direction: column;
+    }
+
+    .scheme-actions button {
+        width: 100%;
+    }
+}

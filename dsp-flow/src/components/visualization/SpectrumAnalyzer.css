@@ -1,0 +1,106 @@
+.spectrum-analyzer {
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.spectrum-analyzer .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 8px;
+    background: #1a1a1a;
+    border-radius: 6px;
+}
+
+.spectrum-analyzer .controls button {
+    padding: 8px 16px;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.spectrum-analyzer .controls button:hover {
+    background: #3a3a3a;
+    color: #fff;
+    border-color: #00ff88;
+}
+
+.spectrum-analyzer .controls button.active {
+    background: #00ff88;
+    color: #000;
+    border-color: #00ff88;
+}
+
+.visualization-container {
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.spectrum-svg {
+    background: #0a0a0a;
+}
+
+.waterfall-canvas {
+    background: #000;
+    display: block;
+}
+
+.spectrum-svg .axis path,
+.spectrum-svg .axis line {
+    stroke: #333;
+}
+
+.spectrum-svg .grid line {
+    stroke: #1a1a1a;
+    stroke-opacity: 0.3;
+}
+
+/* Темная тема */
+.dark-theme .spectrum-analyzer {
+    background: var(--bg-secondary);
+}
+
+.dark-theme .spectrum-analyzer .controls {
+    background: var(--bg-tertiary);
+}
+
+.dark-theme .spectrum-analyzer .controls button {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-secondary);
+}
+
+.dark-theme .spectrum-analyzer .controls button:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.dark-theme .spectrum-analyzer .controls button.active {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .spectrum-analyzer {
+        padding: 12px;
+    }
+
+    .spectrum-analyzer .controls button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,210 @@
+.audio-file-node {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    min-width: 180px;
+    max-width: 220px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    cursor: grab;
+    position: relative;
+}
+
+.audio-file-node.selected {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 20%, transparent),
+    var(--shadow-md);
+    background: var(--bg-primary);
+}
+
+.audio-file-node-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.node-icon-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.node-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.node-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.node-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.node-type {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+.audio-file-content {
+    margin-bottom: 8px;
+}
+
+.file-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.file-status-icon {
+    flex-shrink: 0;
+}
+
+.file-status-icon.loaded {
+    color: var(--success);
+}
+
+.file-status-icon.empty {
+    color: var(--warning);
+}
+
+.file-status-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.file-details-compact {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    border: 1px solid var(--border-primary);
+}
+
+.file-name-compact {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 4px;
+}
+
+.file-info-compact {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+}
+
+.audio-file-node .block-handle {
+    width: 12px !important;
+    height: 12px !important;
+    background: var(--bg-tertiary) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 50% !important;
+    transition: all var(--transition-fast) !important;
+}
+
+.audio-file-node .block-handle.signal-real {
+    background: #3b82f6 !important;
+    border-color: var(--bg-secondary) !important;
+}
+
+/* Темная тема */
+.dark-theme .audio-file-node {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .audio-file-node.selected {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+}
+
+.dark-theme .audio-file-node-header {
+    border-bottom-color: var(--border-secondary);
+}
+
+.dark-theme .node-icon {
+    background: var(--bg-secondary);
+}
+
+.dark-theme .file-details-compact {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .audio-file-node {
+        min-width: 160px;
+        padding: 8px;
+    }
+
+    .node-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .node-name {
+        font-size: 12px;
+    }
+
+    .node-type {
+        font-size: 10px;
+    }
+}
+
+/* Анимация появления */
+@keyframes nodeAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.audio-file-node {
+    animation: nodeAppear 0.2s ease-out;
+}
+
+/* Подсказка */
+.audio-file-node .node-hint {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-primary);
+    text-align: center;
+}
+
+.audio-file-node .hint-text {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+}
+
+.audio-file-node:hover .hint-text {
+    opacity: 1;
+}

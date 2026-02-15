@@ -1,0 +1,133 @@
+/*.params-editor .dialog-content {*/
+/*    min-width: 500px;*/
+/*    max-width: 600px;*/
+/*    width: auto !important;*/
+/*}*/
+
+.params-editor-content {
+    padding: 16px 0;
+}
+
+.params-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.param-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.param-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.param-input {
+    padding: 10px 12px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+}
+
+.param-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.param-input-file {
+    display: none;
+}
+
+.file-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.file-input-label {
+    padding: 10px 16px;
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-primary);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.file-input-label:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.file-info {
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-primary);
+}
+
+.file-name {
+    font-size: 12px;
+    color: var(--text-primary);
+    font-family: monospace;
+}
+
+.no-params {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Темная тема */
+.dark-theme .param-input {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .file-input-label {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .file-input-label:hover {
+    background: var(--bg-tertiary);
+}
+
+.dark-theme .file-info {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .param-input-group {
+        gap: 4px;
+    }
+
+    .param-label {
+        font-size: 12px;
+    }
+
+    .param-input {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .file-input-label {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
