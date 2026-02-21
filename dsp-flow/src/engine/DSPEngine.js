@@ -12,6 +12,7 @@ export class DSPEngine {
         this.bufferSize = 1024; // Размер буфера
         this.isRunning = false;
         this.nodeOutputs = new Map(); // Храним выходные данные каждого узла
+        this.nodeState = new Map(); // Runtime-состояние узлов (фазы, аккумуляторы, смещения)
         this.executionStats = {
             totalSamples: 0,
             executionTime: 0,
@@ -29,6 +30,7 @@ export class DSPEngine {
         this.sampleRate = config.sampleRate || this.sampleRate;
         this.bufferSize = config.bufferSize || this.bufferSize;
         this.nodeOutputs.clear();
+        this.nodeState.clear();
 
         console.log('✅ DSP Engine initialized:', {
             nodes: compiledGraph.executionOrder.length,
@@ -50,6 +52,7 @@ export class DSPEngine {
 
         console.log('▶️ DSP Engine: Starting...');
         this.isRunning = true;
+        this.nodeState.clear();
         this.executionStats.cyclesExecuted = 0;
         
         return true;
@@ -115,19 +118,19 @@ export class DSPEngine {
             switch (blockType) {
 
                 case DSP_BLOCK_TYPES.AUDIO_FILE:
-                    output = this.processAudioFile(params);
+                    output = this.processAudioFile(params, node.id);
                     break;
 
                 case DSP_BLOCK_TYPES.INPUT_SIGNAL:
-                    output = this.processInputSignal(params);
+                    output = this.processInputSignal(params, node.id);
                     break;
 
                 case DSP_BLOCK_TYPES.REF_SINE_GEN:
-                    output = this.processSineGenerator(params);
+                    output = this.processSineGenerator(params, node.id);
                     break;
 
                 case DSP_BLOCK_TYPES.REF_COSINE_GEN:
-                    output = this.processCosineGenerator(params);
+                    output = this.processCosineGenerator(params, node.id);
                     break;
 
                 case DSP_BLOCK_TYPES.FIR_FILTER:
@@ -153,7 +156,7 @@ export class DSPEngine {
                     break;
 
                 case DSP_BLOCK_TYPES.INTEGRATOR:
-                    output = this.processIntegrator(inputs[0], params);
+                    output = this.processIntegrator(inputs[0], params, node.id);
                     break;
 
                 case DSP_BLOCK_TYPES.SUMMER:
@@ -193,82 +196,34 @@ export class DSPEngine {
         }
     }
 
-//обработка аудио
-//     processAudioFile(params) {
-//         if (!params.audioData || !params.audioData.samples) {
-//             return new Float32Array(this.bufferSize).fill(0);
-//         }
-//
-//         // Берем следующий блок из аудио данных
-//         // Здесь нужна логика работы с offset и loop
-//         const samples = params.audioData.samples;
-//         const offset = params._currentOffset || 0;
-//
-//         const output = new Float32Array(this.bufferSize);
-//         const remainingSamples = samples.length - offset;
-//
-//         if (remainingSamples > 0) {
-//             const copyLength = Math.min(this.bufferSize, remainingSamples);
-//             output.set(samples.subarray(offset, offset + copyLength));
-//             params._currentOffset = offset + copyLength;
-//
-//             // Если loop и данные закончились
-//             if (copyLength < this.bufferSize && params.loop) {
-//                 params._currentOffset = 0;
-//             }
-//         } else if (params.loop) {
-//             // Начинаем сначала
-//             params._currentOffset = 0;
-//             return this.processAudioFile(params);
-//         }
-//
-//         return output;
-//     }
-
-    processAudioFile(params) {
+    processAudioFile(params, nodeId) {
         if (!params.audioData || !params.audioData.samples) {
-            // Если нет аудиоданных, возвращаем нули
-            return new Float32Array(this.bufferSize).fill(0);
+            return new Float32Array(this.bufferSize);
         }
 
-        // Инициализируем смещение если его нет
-        if (!params._currentOffset) {
-            params._currentOffset = 0;
+        const state = this.getNodeState(nodeId);
+        if (state.offset == null) {
+            state.offset = 0;
         }
 
         const samples = params.audioData.samples;
-        const offset = params._currentOffset;
         const output = new Float32Array(this.bufferSize);
+        let written = 0;
 
-        // Копируем данные из аудиобуфера
-        const remainingSamples = samples.length - offset;
-        const copyLength = Math.min(this.bufferSize, remainingSamples);
-
-        if (copyLength > 0) {
-            // Копируем доступные сэмплы
-            for (let i = 0; i < copyLength; i++) {
-                output[i] = samples[offset + i];
+        while (written < this.bufferSize) {
+            const remaining = samples.length - state.offset;
+            if (remaining <= 0) {
+                if (params.loop) {
+                    state.offset = 0;
+                    continue;
+                }
+                break;
             }
 
-            // Дополняем нулями если нужно
-            if (copyLength < this.bufferSize) {
-                output.fill(0, copyLength);
-            }
-
-            // Обновляем смещение
-            params._currentOffset = offset + copyLength;
-
-            // Если включен цикл и достигли конца
-            if (params._currentOffset >= samples.length && params.loop) {
-                params._currentOffset = 0;
-            }
-        } else if (params.loop) {
-            // Начинаем сначала если включен цикл
-            params._currentOffset = 0;
-            return this.processAudioFile(params);
-        } else {
-            // Если не цикл и данные закончились - возвращаем нули
-            output.fill(0);
+            const toCopy = Math.min(this.bufferSize - written, remaining);
+            output.set(samples.subarray(state.offset, state.offset + toCopy), written);
+            state.offset += toCopy;
+            written += toCopy;
         }
 
         return output;
@@ -283,26 +238,50 @@ export class DSPEngine {
     }
 
     /**
+     * Получение runtime-состояния узла (фаза, аккумулятор и т.д.)
+     */
+    getNodeState(nodeId) {
+        if (!this.nodeState.has(nodeId)) {
+            this.nodeState.set(nodeId, {});
+        }
+        return this.nodeState.get(nodeId);
+    }
+
+    /**
      * Обработчики блоков
      */
-    processInputSignal(params) {
+    processInputSignal(params, nodeId) {
+        const state = this.getNodeState(nodeId);
         const { frequency = 1000, amplitude = 1.0, signalType = 'sine' } = params;
-        
+        const currentPhase = state.phase ?? 0;
+
+        let output;
         if (signalType === 'sine') {
-            return DSPLib.generateSine(frequency, amplitude, this.sampleRate, this.bufferSize);
+            output = DSPLib.generateSine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
         } else {
-            return DSPLib.generateCosine(frequency, amplitude, this.sampleRate, this.bufferSize);
+            output = DSPLib.generateCosine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
         }
+
+        state.phase = currentPhase + 2 * Math.PI * frequency / this.sampleRate * this.bufferSize;
+        return output;
     }
 
-    processSineGenerator(params) {
+    processSineGenerator(params, nodeId) {
+        const state = this.getNodeState(nodeId);
         const { frequency = 1000, amplitude = 1.0, phase = 0 } = params;
-        return DSPLib.generateSine(frequency, amplitude, this.sampleRate, this.bufferSize, phase);
+        const currentPhase = state.phase ?? phase;
+        const output = DSPLib.generateSine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
+        state.phase = currentPhase + 2 * Math.PI * frequency / this.sampleRate * this.bufferSize;
+        return output;
     }
 
-    processCosineGenerator(params) {
+    processCosineGenerator(params, nodeId) {
+        const state = this.getNodeState(nodeId);
         const { frequency = 1000, amplitude = 1.0, phase = 0 } = params;
-        return DSPLib.generateCosine(frequency, amplitude, this.sampleRate, this.bufferSize, phase);
+        const currentPhase = state.phase ?? phase;
+        const output = DSPLib.generateCosine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
+        state.phase = currentPhase + 2 * Math.PI * frequency / this.sampleRate * this.bufferSize;
+        return output;
     }
 
     processFIRFilter(input, params) {
@@ -342,9 +321,13 @@ export class DSPEngine {
         return DSPLib.slidingFFT(input, windowSize, hopSize, fftSize);
     }
 
-    processIntegrator(input, params) {
+    processIntegrator(input, params, nodeId) {
         if (!input) return new Float32Array(this.bufferSize);
-        return DSPLib.integrate(input);
+        const state = this.getNodeState(nodeId);
+        const initialValue = state.accumulator ?? 0;
+        const output = DSPLib.integrate(input, initialValue);
+        state.accumulator = output[output.length - 1];
+        return output;
     }
 
     processSummer(inputs, params) {

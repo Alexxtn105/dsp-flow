@@ -32,34 +32,38 @@ export class DSPLib {
         const coefficients = new Float32Array(order);
         const fc = cutoff / sampleRate; // Нормализованная частота среза
         const M = order - 1;
+        const center = M / 2;
 
         for (let n = 0; n < order; n++) {
             // Идеальная импульсная характеристика
             let h;
-            if (n === M / 2) {
+            const diff = n - center;
+            if (Math.abs(diff) < 1e-10) {
                 h = 2 * fc;
             } else {
-                const x = 2 * Math.PI * fc * (n - M / 2);
-                h = Math.sin(x) / (Math.PI * (n - M / 2));
+                const x = 2 * Math.PI * fc * diff;
+                h = Math.sin(x) / (Math.PI * diff);
             }
 
             // Окно Хэмминга
-            const window = 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / M);
-            coefficients[n] = h * window;
+            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / M);
+            coefficients[n] = h * w;
+        }
 
-            // Инверсия для ФВЧ
-            if (filterType === 'highpass') {
-                coefficients[n] = -coefficients[n];
-                if (n === M / 2) {
-                    coefficients[n] += 1;
-                }
+        // Нормализация по алгебраической сумме (DC gain = 1 для ФНЧ)
+        const sum = coefficients.reduce((a, b) => a + b, 0);
+        if (Math.abs(sum) > 1e-10) {
+            for (let i = 0; i < order; i++) {
+                coefficients[i] /= sum;
             }
         }
 
-        // Нормализация
-        const sum = coefficients.reduce((a, b) => a + Math.abs(b), 0);
-        for (let i = 0; i < order; i++) {
-            coefficients[i] /= sum;
+        // Спектральная инверсия для ФВЧ (после нормализации)
+        if (filterType === 'highpass') {
+            for (let n = 0; n < order; n++) {
+                coefficients[n] = -coefficients[n];
+            }
+            coefficients[Math.round(center)] += 1;
         }
 
         return coefficients;
@@ -90,22 +94,24 @@ export class DSPLib {
     static hilbertTransform(input, order = 64) {
         const coefficients = new Float32Array(order);
         const M = order - 1;
+        const center = M / 2;
 
         for (let n = 0; n < order; n++) {
-            if (n === M / 2) {
+            const diff = n - center;
+            if (Math.abs(diff) < 1e-10) {
                 coefficients[n] = 0;
             } else {
-                const k = n - M / 2;
+                const k = Math.round(diff);
                 if (k % 2 !== 0) {
-                    coefficients[n] = 2 / (Math.PI * k);
+                    coefficients[n] = 2 / (Math.PI * diff);
                 } else {
                     coefficients[n] = 0;
                 }
             }
 
             // Окно Хэмминга
-            const window = 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / M);
-            coefficients[n] *= window;
+            const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / M);
+            coefficients[n] *= w;
         }
 
         const imaginary = this.firFilter(input, coefficients);
@@ -260,9 +266,18 @@ export class DSPLib {
     static phaseDetector(complexSignal, referenceFrequency, sampleRate) {
         const { real, imag } = complexSignal;
         const output = new Float32Array(real.length);
+        const refAngularFreq = 2 * Math.PI * referenceFrequency / sampleRate;
 
         for (let i = 0; i < real.length; i++) {
-            output[i] = Math.atan2(imag[i], real[i]) * 180 / Math.PI;
+            const instantPhase = Math.atan2(imag[i], real[i]);
+            const refPhase = refAngularFreq * i;
+            let phaseDiff = instantPhase - refPhase;
+
+            // Нормализация фазы в [-π, π]
+            while (phaseDiff > Math.PI) phaseDiff -= 2 * Math.PI;
+            while (phaseDiff < -Math.PI) phaseDiff += 2 * Math.PI;
+
+            output[i] = phaseDiff * 180 / Math.PI;
         }
 
         return output;
@@ -273,7 +288,7 @@ export class DSPLib {
      */
     static frequencyDetector(complexSignal, sampleRate) {
         const { real, imag } = complexSignal;
-        const output = new Float32Array(real.length - 1);
+        const output = new Float32Array(real.length);
 
         for (let i = 0; i < real.length - 1; i++) {
             const phase1 = Math.atan2(imag[i], real[i]);
@@ -285,6 +300,11 @@ export class DSPLib {
             if (phaseDiff < -Math.PI) phaseDiff += 2 * Math.PI;
 
             output[i] = phaseDiff * sampleRate / (2 * Math.PI);
+        }
+
+        // Последний сэмпл — повтор предпоследнего
+        if (real.length > 1) {
+            output[real.length - 1] = output[real.length - 2];
         }
 
         return output;
