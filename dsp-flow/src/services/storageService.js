@@ -40,20 +40,20 @@ class StorageService {
             };
         }
 
+        const serialized = JSON.stringify(data);
+        const sizeInMB = new Blob([serialized]).size / (1024 * 1024);
+
+        if (sizeInMB > this.MAX_SIZE_MB) {
+            console.warn(`Data too large: ${sizeInMB.toFixed(2)}MB`);
+            return {
+                success: false,
+                error: 'DATA_TOO_LARGE',
+                message: `Данные слишком большие (${sizeInMB.toFixed(2)}MB). Максимум ${this.MAX_SIZE_MB}MB`,
+                size: sizeInMB
+            };
+        }
+
         try {
-            const serialized = JSON.stringify(data);
-            const sizeInMB = new Blob([serialized]).size / (1024 * 1024);
-
-            if (sizeInMB > this.MAX_SIZE_MB) {
-                console.warn(`Data too large: ${sizeInMB.toFixed(2)}MB`);
-                return {
-                    success: false,
-                    error: 'DATA_TOO_LARGE',
-                    message: `Данные слишком большие (${sizeInMB.toFixed(2)}MB). Максимум ${this.MAX_SIZE_MB}MB`,
-                    size: sizeInMB
-                };
-            }
-
             localStorage.setItem(key, serialized);
 
             return {
@@ -67,9 +67,9 @@ class StorageService {
                 // Попытка очистить старые данные
                 this.cleanupOldAutoSaves();
 
-                // Повторная попытка
+                // Повторная попытка с уже сериализованными данными
                 try {
-                    localStorage.setItem(key, JSON.stringify(data));
+                    localStorage.setItem(key, serialized);
                     return { success: true };
                 } catch (retryError) {
                     return {
@@ -161,9 +161,10 @@ class StorageService {
         }
 
         let total = 0;
-        for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key)) {
-                total += localStorage[key].length + key.length;
+        for (const key of Object.values(this.KEYS)) {
+            const value = localStorage.getItem(key);
+            if (value) {
+                total += value.length + key.length;
             }
         }
 

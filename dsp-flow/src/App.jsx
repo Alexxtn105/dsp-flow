@@ -55,9 +55,6 @@ function App() {
         connectionsCount: 0
     });
 
-    // Состояние симуляции
-    const [isRunning] = useState(false);
-
     /**
      * Обновление информации о схеме
      */
@@ -188,7 +185,7 @@ function App() {
                         onSchemeUpdate={handleSchemeUpdate}
                         onStatsUpdate={handleStatsUpdate}
                         onReactFlowInit={setReactFlowInstance}
-                        isRunning={isRunning}
+                        isRunning={dspExecutionStore.isRunning}
                     />
                 </div>
 
