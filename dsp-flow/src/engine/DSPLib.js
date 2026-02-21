@@ -5,6 +5,34 @@
 import FFT from 'fft.js';
 
 export class DSPLib {
+    // Кеш FFT-инстансов по размеру (избегаем создания нового объекта каждый вызов)
+    static _fftCache = new Map();
+
+    static _getFFT(size) {
+        let instance = this._fftCache.get(size);
+        if (!instance) {
+            instance = new FFT(size);
+            this._fftCache.set(size, instance);
+        }
+        return instance;
+    }
+
+    // Кеш окон Хэмминга по размеру
+    static _hammingCache = new Map();
+
+    static _getHammingWindow(windowSize) {
+        let window = this._hammingCache.get(windowSize);
+        if (!window) {
+            window = new Float32Array(windowSize);
+            const M = windowSize - 1;
+            for (let j = 0; j < windowSize; j++) {
+                window[j] = 0.54 - 0.46 * Math.cos((2 * Math.PI * j) / M);
+            }
+            this._hammingCache.set(windowSize, window);
+        }
+        return window;
+    }
+
     /**
      * FIR фильтр (КИХ-фильтр)
      */
@@ -129,8 +157,8 @@ export class DSPLib {
         const paddedInput = new Float32Array(size);
         paddedInput.set(input.slice(0, size));
 
-        // Создаём FFT объект
-        const fft = new FFT(size);
+        // Получаем FFT объект из кеша
+        const fft = this._getFFT(size);
         const complexOutput = fft.createComplexArray();
 
         // Вычисляем БПФ для действительного входа
@@ -158,7 +186,7 @@ export class DSPLib {
         const spectrum = new Float32Array(real.length);
 
         for (let i = 0; i < real.length; i++) {
-            spectrum[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
+            spectrum[i] = Math.hypot(real[i], imag[i]);
         }
 
         return spectrum;
@@ -321,20 +349,21 @@ export class DSPLib {
         const numWindows = Math.floor((input.length - windowSize) / hopSize) + 1;
         const results = [];
 
+        // Предвычисленное окно Хэмминга (из кеша)
+        const hammingWindow = this._getHammingWindow(windowSize);
+
         for (let i = 0; i < numWindows; i++) {
             const start = i * hopSize;
-            const window = input.slice(start, start + windowSize);
-            
+
             // Применяем окно Хэмминга
             const windowed = new Float32Array(windowSize);
             for (let j = 0; j < windowSize; j++) {
-                const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * j) / (windowSize - 1));
-                windowed[j] = window[j] * w;
+                windowed[j] = input[start + j] * hammingWindow[j];
             }
 
             const fftResult = this.fft(windowed, size);
             const spectrum = this.powerSpectrum(fftResult);
-            
+
             results.push({
                 spectrum: this.toDecibels(spectrum),
                 timestamp: start / input.length

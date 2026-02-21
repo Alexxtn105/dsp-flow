@@ -54,7 +54,7 @@ const DSPEditor = observer(({
                                 onReactFlowInit
                                // isRunning
                             }) => {
-    const isRunning = isRunning;
+    const isRunning = dspExecutionStore.isRunning;
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);

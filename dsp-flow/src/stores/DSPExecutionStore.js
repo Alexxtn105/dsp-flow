@@ -262,7 +262,7 @@ export class DSPExecutionStore {
     computeMagnitude(real, imag) {
         const magnitude = new Float32Array(real.length);
         for (let i = 0; i < real.length; i++) {
-            magnitude[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
+            magnitude[i] = Math.hypot(real[i], imag[i]);
         }
         return magnitude;
     }

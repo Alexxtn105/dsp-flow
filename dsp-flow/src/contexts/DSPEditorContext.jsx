@@ -6,15 +6,27 @@ import { DSPEditorContext } from './dspEditorContextDef.js';
  * Provider для DSP Editor контекста
  */
 export const DSPEditorProvider = ({ children, reactFlowInstance }) => {
-    const schemeStorage = useSchemeStorage();
+    const {
+        saveScheme,
+        loadScheme,
+        deleteScheme,
+        getSavedSchemes,
+        exportScheme,
+        importScheme
+    } = useSchemeStorage();
     const [loadedSchemeData, setLoadedSchemeData] = useState(null);
 
     const value = useMemo(() => ({
         reactFlowInstance,
         loadedSchemeData,
         setLoadedSchemeData,
-        ...schemeStorage
-    }), [reactFlowInstance, loadedSchemeData, schemeStorage]);
+        saveScheme,
+        loadScheme,
+        deleteScheme,
+        getSavedSchemes,
+        exportScheme,
+        importScheme
+    }), [reactFlowInstance, loadedSchemeData, saveScheme, loadScheme, deleteScheme, getSavedSchemes, exportScheme, importScheme]);
 
     return (
         <DSPEditorContext.Provider value={value}>

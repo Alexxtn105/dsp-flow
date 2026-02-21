@@ -2,14 +2,13 @@
  * SpectrumAnalyzer - компонент визуализации спектра с водопадом
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react-lite';
 import * as d3 from 'd3';
 import DSPLib from '../../engine/DSPLib';
 import './SpectrumAnalyzer.css';
 
-const SpectrumAnalyzer = observer(({ data, width = 800, height = 600, mode = 'both' }) => {
+const SpectrumAnalyzer = memo(({ data, width = 800, height = 600, mode = 'both' }) => {
     const canvasRef = useRef(null);
     const svgRef = useRef(null);
     const waterfallDataRef = useRef([]);

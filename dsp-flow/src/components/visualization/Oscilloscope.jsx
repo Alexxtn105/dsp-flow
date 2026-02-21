@@ -2,13 +2,12 @@
  * Oscilloscope - компонент визуализации временной области сигнала
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react-lite';
 import * as d3 from 'd3';
 import './Oscilloscope.css';
 
-const Oscilloscope = observer(({ data, width = 800, height = 400, channels: _channels = 1 }) => {
+const Oscilloscope = memo(({ data, width = 800, height = 400, channels: _channels = 1 }) => {
     const svgRef = useRef(null);
 
     useEffect(() => {

@@ -3,10 +3,16 @@
  */
 
 export class AudioFileReader {
+    static MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+
     /**
      * Загрузка WAV файла
      */
     static async loadWavFile(file) {
+        if (file.size > this.MAX_FILE_SIZE) {
+            throw new Error(`Файл слишком большой (${(file.size / 1024 / 1024).toFixed(1)} МБ). Максимум: ${this.MAX_FILE_SIZE / 1024 / 1024} МБ`);
+        }
+
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 

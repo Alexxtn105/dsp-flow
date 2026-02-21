@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, Component} from 'react';
 import {observer} from 'mobx-react-lite';
 import {useTheme} from './hooks/useTheme';
 import {DSPEditorProvider} from './contexts/DSPEditorContext';
@@ -13,6 +13,60 @@ import {dspExecutionStore} from './stores/DSPExecutionStore';
 
 
 import './App.css';
+
+/**
+ * ErrorBoundary — перехватывает ошибки рендеринга и предотвращает падение всего приложения
+ */
+class ErrorBoundary extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('ErrorBoundary caught error:', error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{
+                    padding: '20px',
+                    margin: '20px',
+                    background: '#1a1a2e',
+                    border: '1px solid #e74c3c',
+                    borderRadius: '8px',
+                    color: '#ecf0f1'
+                }}>
+                    <h3 style={{ color: '#e74c3c', margin: '0 0 10px' }}>
+                        Произошла ошибка
+                    </h3>
+                    <p style={{ margin: '0 0 10px', color: '#bdc3c7' }}>
+                        {this.state.error?.message || 'Неизвестная ошибка'}
+                    </p>
+                    <button
+                        onClick={() => this.setState({ hasError: false, error: null })}
+                        style={{
+                            padding: '8px 16px',
+                            background: '#3498db',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Попробовать снова
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 // Настройка размера буфера
 dspExecutionStore.updateConfig({
@@ -160,6 +214,7 @@ const App = observer(function App() {
     return (
         <DSPEditorProvider reactFlowInstance={reactFlowInstance}>
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
+                <ErrorBoundary>
                 <Header
                     currentScheme={currentScheme}
                     isRunning={dspExecutionStore.isRunning}
@@ -230,6 +285,7 @@ const App = observer(function App() {
                         onLoadSuccess={handleLoadSuccess}
                     />
                 )}
+                </ErrorBoundary>
             </div>
         </DSPEditorProvider>
     );

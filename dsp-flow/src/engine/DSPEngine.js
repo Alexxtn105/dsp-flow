@@ -12,6 +12,7 @@ export class DSPEngine {
         this.isRunning = false;
         this.nodeOutputs = new Map();
         this.nodeState = new Map();
+        this._emptyBuffer = new Float32Array(this.bufferSize);
         this.executionStats = {
             totalSamples: 0,
             executionTime: 0,
@@ -121,7 +122,7 @@ export class DSPEngine {
                 output = processor(ctx);
             } else {
                 console.warn(`Unknown block type: ${blockType}`);
-                output = inputs[0] || new Float32Array(this.bufferSize);
+                output = inputs[0] || this._emptyBuffer;
             }
 
             this.nodeOutputs.set(node.id, output);
@@ -191,7 +192,10 @@ export class DSPEngine {
      */
     setConfig(config) {
         if (config.sampleRate) this.sampleRate = config.sampleRate;
-        if (config.bufferSize) this.bufferSize = config.bufferSize;
+        if (config.bufferSize) {
+            this.bufferSize = config.bufferSize;
+            this._emptyBuffer = new Float32Array(this.bufferSize);
+        }
     }
 }
 

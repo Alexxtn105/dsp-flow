@@ -2,13 +2,12 @@
  * ConstellationDiagram - диаграмма фазового созвездия для комплексных сигналов
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react-lite';
 import * as d3 from 'd3';
 import './ConstellationDiagram.css';
 
-const ConstellationDiagram = observer(({ data, width = 600, height = 600 }) => {
+const ConstellationDiagram = memo(({ data, width = 600, height = 600 }) => {
     const svgRef = useRef(null);
 
     useEffect(() => {
