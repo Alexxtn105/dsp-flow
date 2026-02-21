@@ -28,6 +28,19 @@ export class GraphCompiler {
         this.errors = [];
         this.compiledGraph = null;
 
+        // Предвычисляем lookup-структуры — O(n + m) один раз
+        this.nodeMap = new Map(nodes.map(n => [n.id, n]));
+        this.outEdges = new Map();
+        this.inEdges = new Map();
+        for (const node of nodes) {
+            this.outEdges.set(node.id, []);
+            this.inEdges.set(node.id, []);
+        }
+        for (const edge of edges) {
+            this.outEdges.get(edge.source)?.push(edge);
+            this.inEdges.get(edge.target)?.push(edge);
+        }
+
         console.log('🔧 Graph Compiler: Starting compilation...');
         
         // 1. Валидация типов соединений
@@ -77,8 +90,8 @@ export class GraphCompiler {
         console.log('🔍 Validating connections...');
         
         for (const edge of this.edges) {
-            const sourceNode = this.nodes.find(n => n.id === edge.source);
-            const targetNode = this.nodes.find(n => n.id === edge.target);
+            const sourceNode = this.nodeMap.get(edge.source);
+            const targetNode = this.nodeMap.get(edge.target);
 
             if (!sourceNode || !targetNode) {
                 this.errors.push({
@@ -119,8 +132,9 @@ export class GraphCompiler {
         const visited = new Set();
         const recursionStack = new Set();
         const cycles = [];
+        const path = [];
 
-        const dfs = (nodeId, path = []) => {
+        const dfs = (nodeId) => {
             if (recursionStack.has(nodeId)) {
                 // Найден цикл
                 const cycleStart = path.indexOf(nodeId);
@@ -136,13 +150,12 @@ export class GraphCompiler {
             recursionStack.add(nodeId);
             path.push(nodeId);
 
-            // Получаем все исходящие рёбра
-            const outgoingEdges = this.edges.filter(e => e.source === nodeId);
-            
-            for (const edge of outgoingEdges) {
-                dfs(edge.target, [...path]);
+            const outgoing = this.outEdges.get(nodeId) || [];
+            for (const edge of outgoing) {
+                dfs(edge.target);
             }
 
+            path.pop();
             recursionStack.delete(nodeId);
         };
 
@@ -188,13 +201,12 @@ export class GraphCompiler {
 
         while (queue.length > 0) {
             const nodeId = queue.shift();
-            const node = this.nodes.find(n => n.id === nodeId);
-            sorted.push(node);
+            sorted.push(this.nodeMap.get(nodeId));
 
             // Уменьшаем входящие степени для всех соседей
-            const outgoingEdges = this.edges.filter(e => e.source === nodeId);
-            
-            for (const edge of outgoingEdges) {
+            const outgoing = this.outEdges.get(nodeId) || [];
+
+            for (const edge of outgoing) {
                 const newDegree = inDegree.get(edge.target) - 1;
                 inDegree.set(edge.target, newDegree);
                 
@@ -223,35 +235,17 @@ export class GraphCompiler {
     generateExecutionPlan(sortedNodes) {
         console.log('📋 Generating execution plan...');
         
-        // Находим источники (узлы без входов)
-        const sourceNodes = sortedNodes.filter(node => {
-            const hasIncomingEdges = this.edges.some(e => e.target === node.id);
-            return !hasIncomingEdges;
-        });
-
-        // Находим стоки (узлы без выходов)
-        const sinkNodes = sortedNodes.filter(node => {
-            const hasOutgoingEdges = this.edges.some(e => e.source === node.id);
-            return !hasOutgoingEdges;
-        });
-
-        // Строим карту зависимостей
+        // Строим карты зависимостей и выходов из предвычисленных индексов
         const dependencies = new Map();
-        sortedNodes.forEach(node => {
-            const inputs = this.edges
-                .filter(e => e.target === node.id)
-                .map(e => e.source);
-            dependencies.set(node.id, inputs);
-        });
-
-        // Строим карту выходов
         const outputs = new Map();
         sortedNodes.forEach(node => {
-            const nodeOutputs = this.edges
-                .filter(e => e.source === node.id)
-                .map(e => e.target);
-            outputs.set(node.id, nodeOutputs);
+            dependencies.set(node.id, (this.inEdges.get(node.id) || []).map(e => e.source));
+            outputs.set(node.id, (this.outEdges.get(node.id) || []).map(e => e.target));
         });
+
+        // Источники (нет входов) и стоки (нет выходов) — из уже построенных карт
+        const sourceNodes = sortedNodes.filter(node => dependencies.get(node.id).length === 0);
+        const sinkNodes = sortedNodes.filter(node => outputs.get(node.id).length === 0);
 
         return {
             executionOrder: sortedNodes,
