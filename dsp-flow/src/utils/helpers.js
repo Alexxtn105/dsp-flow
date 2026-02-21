@@ -47,16 +47,13 @@ export const deepClone = (obj) => {
     if (obj === null || typeof obj !== 'object') {
         return obj;
     }
-
-    if (obj instanceof Date) {
-        return new Date(obj.getTime());
-    }
-
-    if (obj instanceof Array) {
-        return obj.map(item => deepClone(item));
-    }
-
-    if (obj instanceof Object) {
+    try {
+        return structuredClone(obj);
+    } catch {
+        // Fallback for non-cloneable values (functions, DOM nodes)
+        if (obj instanceof Array) {
+            return obj.map(item => deepClone(item));
+        }
         const clonedObj = {};
         for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -85,11 +82,11 @@ export const formatDate = (timestamp) => {
  * Форматирование размера файла
  */
 export const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
+    if (!bytes || bytes <= 0) return '0 Bytes';
 
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
 
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 };
@@ -106,28 +103,6 @@ export const isGeneratorBlock = (blockType) => {
  */
 export const isVisualizationBlock = (blockType) => {
     return registry.isVisualization(blockType);
-};
-
-/**
- * Проверка валидности email
- */
-export const isValidEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-};
-
-/**
- * Throttle функция
- */
-export const throttle = (func, limit) => {
-    let inThrottle;
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    };
 };
 
 /**
@@ -163,28 +138,6 @@ export const downloadFile = (data, filename, mimeType = 'application/json') => {
 export const getFileExtension = (filename) => {
     return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
 };
-
-/**
- * Проверка, является ли устройство мобильным
- */
-export const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-};
-
-/**
- * Получить случайное число в диапазоне
- */
-export const randomInRange = (min, max) => {
-    return Math.random() * (max - min) + min;
-};
-
-/**
- * Получить случайный элемент из массива
- */
-export const randomElement = (array) => {
-    return array[Math.floor(Math.random() * array.length)];
-};
-
 
 /* ================================ ДЛЯ ТИПОВ БЛОКА============================*/
 

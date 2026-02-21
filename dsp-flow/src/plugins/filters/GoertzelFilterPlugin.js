@@ -6,17 +6,27 @@ export default {
     group: 'filters',
     groupOrder: 5,
     signals: { input: 'real', output: 'real' },
-    defaultParams: { targetFrequency: 1000, samplingRate: 48000, N: 256 },
+    defaultParams: { targetFrequency: 1000, N: 256 },
     paramFields: [
         { name: 'targetFrequency', label: 'Целевая частота (Гц)', type: 'number', min: 1, max: 24000, step: 10, defaultValue: 1000 },
         { name: 'N', label: 'Размер блока (N)', type: 'number', min: 16, max: 4096, step: 16, defaultValue: 256 },
     ],
+    validate(params) {
+        const errors = [];
+        if (!params.targetFrequency || params.targetFrequency <= 0) {
+            errors.push('Целевая частота должна быть больше 0');
+        }
+        if (!params.N || params.N <= 0) {
+            errors.push('Размер блока N должен быть больше 0');
+        }
+        return errors;
+    },
     process(ctx) {
-        const { inputs, params, bufferSize } = ctx;
+        const { inputs, params, sampleRate, bufferSize } = ctx;
         if (!inputs[0]) return new Float32Array(bufferSize);
 
-        const { targetFrequency = 1000, samplingRate = 48000, N = 256 } = params;
-        const k = Math.round(N * targetFrequency / samplingRate);
+        const { targetFrequency = 1000, N = 256 } = params;
+        const k = Math.round(N * targetFrequency / sampleRate);
         const w = 2 * Math.PI * k / N;
         const coeff = 2 * Math.cos(w);
         const input = inputs[0];

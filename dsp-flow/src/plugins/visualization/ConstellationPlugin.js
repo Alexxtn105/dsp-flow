@@ -7,7 +7,9 @@ export default {
     groupOrder: 1,
     signals: { input: 'complex', output: null },
     visualizationType: 'constellation',
-    defaultParams: { symbolRate: 1000, constellation: 'QPSK', eyeDiagram: true },
+    defaultParams: {},
+    paramFields: [],
+    validate() { return []; },
     process(ctx) {
         const { inputs } = ctx;
         return inputs[0];

@@ -126,6 +126,7 @@ function FloatingWindow({
                         className="window-control-btn close-btn"
                         onClick={onClose}
                         title="Закрыть"
+                        aria-label="Закрыть окно"
                     >
                         <Icon name="close" size="small" />
                     </button>

@@ -8,7 +8,17 @@ export default {
     group: 'detectors',
     groupOrder: 0,
     signals: { input: 'complex', output: 'real' },
-    defaultParams: { referenceFrequency: 1000, sensitivity: 1.0, outputRange: '±180°' },
+    defaultParams: { referenceFrequency: 1000 },
+    paramFields: [
+        { name: 'referenceFrequency', label: 'Опорная частота (Гц)', type: 'number', min: 1, max: 24000, step: 10, defaultValue: 1000 },
+    ],
+    validate(params) {
+        const errors = [];
+        if (!params.referenceFrequency || params.referenceFrequency <= 0) {
+            errors.push('Опорная частота должна быть больше 0');
+        }
+        return errors;
+    },
     process(ctx) {
         const { inputs, params, sampleRate, bufferSize } = ctx;
         if (!inputs[0] || !inputs[0].real) return new Float32Array(bufferSize);

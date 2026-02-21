@@ -155,7 +155,10 @@ export class DSPLib {
         
         // Дополняем нулями если нужно
         const paddedInput = new Float32Array(size);
-        paddedInput.set(input.slice(0, size));
+        if (input.length > size) {
+            console.warn(`FFT: input truncated from ${input.length} to ${size} samples`);
+        }
+        paddedInput.set(input.subarray(0, Math.min(input.length, size)));
 
         // Получаем FFT объект из кеша
         const fft = this._getFFT(size);

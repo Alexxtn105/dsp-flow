@@ -8,7 +8,9 @@ export default {
     group: 'detectors',
     groupOrder: 1,
     signals: { input: 'complex', output: 'real' },
-    defaultParams: { centerFrequency: 1000, bandwidth: 100, sensitivity: 1.0 },
+    defaultParams: {},
+    paramFields: [],
+    validate() { return []; },
     process(ctx) {
         const { inputs, sampleRate, bufferSize } = ctx;
         if (!inputs[0] || !inputs[0].real) return new Float32Array(bufferSize);

@@ -80,13 +80,12 @@ dspExecutionStore.updateConfig({
 // }
 
 const App = observer(function App() {
-    const [config, setConfig] = useState({
-        sampleRate: 48000,
-        bufferSize: 1024,
-        targetFPS: 30
-    });
+    const config = {
+        sampleRate: dspExecutionStore.sampleRate,
+        bufferSize: dspExecutionStore.bufferSize,
+        targetFPS: dspExecutionStore.targetFPS
+    };
     const handleConfigChange = useCallback((newConfig) => {
-        setConfig(newConfig);
         dspExecutionStore.updateConfig(newConfig);
     }, []);
 

@@ -8,7 +8,9 @@ export default {
     group: 'math-blocks',
     groupOrder: 2,
     signals: { input: 'real', output: 'real' },
-    defaultParams: { numInputs: 2, operation: 'multiply', scaleFactor: 1.0 },
+    defaultParams: {},
+    paramFields: [],
+    validate() { return []; },
     process(ctx) {
         const { inputs, bufferSize } = ctx;
         if (!inputs || inputs.length < 2) return new Float32Array(bufferSize);

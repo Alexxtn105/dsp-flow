@@ -7,7 +7,9 @@ export default {
     groupOrder: 2,
     signals: { input: 'real', output: 'real' },
     visualizationType: 'spectrum',
-    defaultParams: { fftSize: 2048, frequencyRange: 'full', dBScale: true, averaging: 5 },
+    defaultParams: {},
+    paramFields: [],
+    validate() { return []; },
     process(ctx) {
         const { inputs } = ctx;
         return inputs[0];

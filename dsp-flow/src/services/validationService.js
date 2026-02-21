@@ -2,6 +2,7 @@
  * ValidationService - сервис для валидации данных
  */
 import registry from '../plugins/index';
+import { VALIDATION_RULES } from '../utils/constants';
 
 class ValidationService {
     /**
@@ -17,7 +18,7 @@ class ValidationService {
                 errors.push('Название слишком длинное (максимум 100 символов)');
             }
 
-            if (!/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/.test(name)) {
+            if (!VALIDATION_RULES.SCHEME_NAME.PATTERN.test(name)) {
                 errors.push('Название может содержать только буквы, цифры, пробелы, дефисы и подчеркивания');
             }
         }

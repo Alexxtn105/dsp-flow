@@ -164,7 +164,7 @@ class StorageService {
         for (const key of Object.values(this.KEYS)) {
             const value = localStorage.getItem(key);
             if (value) {
-                total += value.length + key.length;
+                total += new Blob([value]).size + new Blob([key]).size;
             }
         }
 

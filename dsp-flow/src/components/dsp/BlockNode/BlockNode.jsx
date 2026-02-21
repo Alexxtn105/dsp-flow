@@ -79,6 +79,7 @@ function BlockNode({ data, selected, id }) {
                         className="visualization-toggle-btn"
                         onClick={handleToggleVisualization}
                         title={data.visualizationVisible ? "Скрыть визуализацию" : "Показать визуализацию"}
+                        aria-label={data.visualizationVisible ? "Скрыть визуализацию" : "Показать визуализацию"}
                     >
                         <Icon
                             name={data.visualizationVisible ? "visibility" : "visibility_off"}

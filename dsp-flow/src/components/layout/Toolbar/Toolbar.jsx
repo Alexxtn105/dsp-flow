@@ -141,25 +141,6 @@ function Toolbar({ isDarkTheme }) {
                 </div>
             )}
 
-            {isCollapsed && !collapsedGroups && (
-                <div className="toolbar-content">
-                    {DSP_GROUPS.flatMap(group => group.blocks).map((block) => (
-                        <div
-                            key={block.id}
-                            className="block-item"
-                            draggable
-                            onDragStart={(e) => onDragStart(e, block.name)}
-                            onDragEnd={onDragEnd}
-                            title={`${block.name}: ${block.description}`}
-                        >
-                            <Icon
-                                name={block.icon}
-                                size="medium"
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
         </div>
     );
 }
