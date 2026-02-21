@@ -14,11 +14,18 @@ const ConstellationDiagram = observer(({ data, width = 600, height = 600 }) => {
     useEffect(() => {
         if (!data || !svgRef.current) return;
 
-        drawConstellation(data);
+        const calculateEVM = (points) => {
+            if (points.length === 0) return 0;
+            const avgMagnitude = d3.mean(points, d => d.magnitude);
+            const errorSquares = points.map(p => {
+                const error = p.magnitude - avgMagnitude;
+                return error * error;
+            });
+            const rmsError = Math.sqrt(d3.mean(errorSquares));
+            return (rmsError / avgMagnitude) * 100;
+        };
 
-    }, [data]);
-
-    const drawConstellation = (complexData) => {
+        const complexData = data;
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
@@ -28,7 +35,7 @@ const ConstellationDiagram = observer(({ data, width = 600, height = 600 }) => {
 
         // Извлекаем действительную и мнимую части
         let real, imag;
-        
+
         if (complexData.real && complexData.imag) {
             real = Array.from(complexData.real);
             imag = Array.from(complexData.imag);
@@ -210,32 +217,13 @@ const ConstellationDiagram = observer(({ data, width = 600, height = 600 }) => {
                 .style('font-family', 'monospace')
                 .text(text);
         });
-    };
-
-    /**
-     * Вычисление Error Vector Magnitude (EVM)
-     */
-    const calculateEVM = (points) => {
-        if (points.length === 0) return 0;
-
-        // Находим среднюю магнитуду (идеальную)
-        const avgMagnitude = d3.mean(points, d => d.magnitude);
-        
-        // Вычисляем среднеквадратичное отклонение
-        const errorSquares = points.map(p => {
-            const error = p.magnitude - avgMagnitude;
-            return error * error;
-        });
-
-        const rmsError = Math.sqrt(d3.mean(errorSquares));
-        return (rmsError / avgMagnitude) * 100;
-    };
+    }, [data, width, height]);
 
     return (
         <div className="constellation-diagram">
-            <svg 
-                ref={svgRef} 
-                width={width} 
+            <svg
+                ref={svgRef}
+                width={width}
                 height={height}
                 className="constellation-svg"
             />

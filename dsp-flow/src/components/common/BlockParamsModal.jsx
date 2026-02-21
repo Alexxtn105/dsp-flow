@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import PropTypes from 'prop-types';
 import Icon from './Icons/Icon.jsx';
 import ValidationService from '../../services/validationService';
@@ -19,13 +19,14 @@ function BlockParamsModal({
     const [params, setParams] = useState(currentParams || {});
     const [errors, setErrors] = useState({});
     const [fileInfo, setFileInfo] = useState(currentParams?.audioFile || null);
+    const [prevDeps, setPrevDeps] = useState({ currentParams, isOpen });
 
-
-    useEffect(() => {
+    if (prevDeps.currentParams !== currentParams || prevDeps.isOpen !== isOpen) {
+        setPrevDeps({ currentParams, isOpen });
         setParams(currentParams || {});
         setFileInfo(currentParams?.audioFile || null);
         setErrors({});
-    }, [currentParams, isOpen]);
+    }
 
     const handleFileSelect = async (event) => {
         const file = event.target.files?.[0];

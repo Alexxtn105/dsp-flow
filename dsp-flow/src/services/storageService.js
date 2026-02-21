@@ -71,7 +71,7 @@ class StorageService {
                 try {
                     localStorage.setItem(key, serialized);
                     return { success: true };
-                } catch (retryError) {
+                } catch (_retryError) {
                     return {
                         success: false,
                         error: 'QUOTA_EXCEEDED',

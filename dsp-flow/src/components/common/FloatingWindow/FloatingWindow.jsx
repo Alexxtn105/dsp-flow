@@ -25,8 +25,10 @@ function FloatingWindow({
     const positionRef = useRef(position);
 
     // Синхронизация refs с state
-    sizeRef.current = size;
-    positionRef.current = position;
+    useEffect(() => {
+        sizeRef.current = size;
+        positionRef.current = position;
+    }, [size, position]);
 
     // Обработчик начала перемещения
     const handleMouseDownDrag = useCallback((e) => {

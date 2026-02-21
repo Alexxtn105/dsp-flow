@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog';
-import { useDSPEditor } from '../../../contexts/DSPEditorContext';
+import { useDSPEditor } from '../../../hooks/useDSPEditor';
 import { formatDate } from '../../../utils/helpers';
 
 function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import './ReactFlowTheme.css';
 
-function SignalLegend({ isDarkTheme }) {
+function SignalLegend({ isDarkTheme: _isDarkTheme }) {
     return (
         <div className="signal-legend">
             <div className="signal-legend-title">Типы сигналов</div>

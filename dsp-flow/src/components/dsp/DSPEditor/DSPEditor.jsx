@@ -28,7 +28,7 @@ import {
     getBlockSignalConfig,
     areSignalsCompatible
 } from '../../../utils/helpers';
-import {useDSPEditor} from '../../../contexts/DSPEditorContext';
+import {useDSPEditor} from '../../../hooks/useDSPEditor';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
 import FloatingWindowsManager from '../../visualization/FloatingWindowsManager';
@@ -54,6 +54,7 @@ const DSPEditor = observer(({
                                 onReactFlowInit
                                // isRunning
                             }) => {
+    const isRunning = isRunning;
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -316,11 +317,11 @@ const DSPEditor = observer(({
             // Создаём ребро с информацией о типе сигнала
             const edge = {
                 ...params,
-                animated: dspExecutionStore.isRunning,
+                animated: isRunning,
                 type: signalType === 'complex' ? 'complex' : 'real',
                 data: {
                     signalType: signalType,
-                    isRunning: dspExecutionStore.isRunning
+                    isRunning: isRunning
                 }
             };
 
@@ -331,7 +332,7 @@ const DSPEditor = observer(({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [setEdges, currentScheme, onSchemeUpdate, nodes, dspExecutionStore.isRunning, edges]
+        [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning, edges]
     );
 
     const onDragOver = useCallback((event) => {
@@ -399,7 +400,7 @@ const DSPEditor = observer(({
                 onSchemeUpdate(currentScheme.name, false);
             }
         },
-        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, reactFlowWrapper, handleNodeDoubleClick, handleAudioFileLoad]
+        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate, reactFlowWrapper, handleNodeDoubleClick, handleAudioFileLoad, handleToggleVisualization]
     );
 
 
@@ -407,17 +408,17 @@ const DSPEditor = observer(({
     useEffect(() => {
         setEdges(eds => eds.map(edge => ({
             ...edge,
-            animated: dspExecutionStore.isRunning,
+            animated: isRunning,
             data: {
                 ...edge.data,
-                isRunning: dspExecutionStore.isRunning
+                isRunning: isRunning
             }
         })));
-    }, [dspExecutionStore.isRunning, setEdges]); // Исправлено на isRunning
+    }, [isRunning, setEdges]); // Исправлено на isRunning
 
     // Обновление данных визуализации при выполнении
     useEffect(() => {
-        if (!dspExecutionStore.isRunning) return;
+        if (!isRunning) return;
 
         const interval = setInterval(() => {
             setVisualizationWindows(windows =>
@@ -435,7 +436,7 @@ const DSPEditor = observer(({
         }, 100); // Обновляем каждые 100мс
 
         return () => clearInterval(interval);
-    }, [dspExecutionStore.isRunning]);
+    }, [isRunning]);
 
     return (
         <>

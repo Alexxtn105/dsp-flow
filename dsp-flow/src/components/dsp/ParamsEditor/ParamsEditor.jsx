@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog';
 import ValidationService from '../../../services/validationService';
@@ -12,13 +12,15 @@ function ParamsEditor({ isOpen, onClose, blockType, currentParams, onSave, isDar
     const [params, setParams] = useState(currentParams || {});
     const [errors, setErrors] = useState([]);
     const [audioFileName, setAudioFileName] = useState('');
+    const [prevDeps, setPrevDeps] = useState({ currentParams, isOpen });
 
-    useEffect(() => {
+    if (prevDeps.currentParams !== currentParams || prevDeps.isOpen !== isOpen) {
+        setPrevDeps({ currentParams, isOpen });
         if (isOpen) {
             setParams(currentParams || {});
             setErrors([]);
         }
-    }, [isOpen, currentParams]);
+    }
 
     const handleParamChange = (paramName, value) => {
         setParams(prev => ({

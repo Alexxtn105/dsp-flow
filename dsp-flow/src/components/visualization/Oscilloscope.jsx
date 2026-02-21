@@ -8,18 +8,14 @@ import { observer } from 'mobx-react-lite';
 import * as d3 from 'd3';
 import './Oscilloscope.css';
 
-const Oscilloscope = observer(({ data, width = 800, height = 400, channels = 1 }) => {
+const Oscilloscope = observer(({ data, width = 800, height = 400, channels: _channels = 1 }) => {
     const svgRef = useRef(null);
 
     useEffect(() => {
         if (!data || !svgRef.current) return;
 
         const signal = Array.isArray(data) ? data : Array.from(data);
-        drawOscilloscope(signal);
 
-    }, [data, channels]);
-
-    const drawOscilloscope = (signal) => {
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
@@ -163,7 +159,7 @@ const Oscilloscope = observer(({ data, width = 800, height = 400, channels = 1 }
                 .style('font-family', 'monospace')
                 .text(text);
         });
-    };
+    }, [data, width, height]);
 
     return (
         <div className="oscilloscope">
@@ -171,9 +167,9 @@ const Oscilloscope = observer(({ data, width = 800, height = 400, channels = 1 }
                 <span className="title">Осциллограф</span>
                 <span className="status">● Live</span>
             </div>
-            <svg 
-                ref={svgRef} 
-                width={width} 
+            <svg
+                ref={svgRef}
+                width={width}
                 height={height}
                 className="oscilloscope-svg"
             />

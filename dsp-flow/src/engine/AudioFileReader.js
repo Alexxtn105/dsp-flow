@@ -29,7 +29,7 @@ export class AudioFileReader {
                         length: audioBuffer.length,
                         fileSize: file.size
                     });
-                } catch (error) {
+                } catch (_error) {
                     reject(new Error('Ошибка декодирования аудио файла'));
                 } finally {
                     if (audioContext) {

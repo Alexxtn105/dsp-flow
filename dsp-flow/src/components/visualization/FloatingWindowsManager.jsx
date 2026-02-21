@@ -12,7 +12,7 @@ import './FloatingWindowsManager.css';
 
 function FloatingWindowsManager({ visualizationWindows, onCloseWindow, isDarkTheme }) {
     // Состояние позиций окон (можно сохранять в localStorage)
-    const [windowPositions, setWindowPositions] = useState({});
+    const [windowPositions, _setWindowPositions] = useState({});
 
     const getInitialPosition = useCallback((nodeId) => {
         if (windowPositions[nodeId]) {
@@ -28,7 +28,7 @@ function FloatingWindowsManager({ visualizationWindows, onCloseWindow, isDarkThe
     }, [windowPositions]);
 
     const renderVisualization = (window) => {
-        const { nodeId, type, data, nodeLabel } = window;
+        const { nodeId, type, data } = window;
 
         switch (type) {
             case 'oscilloscope':

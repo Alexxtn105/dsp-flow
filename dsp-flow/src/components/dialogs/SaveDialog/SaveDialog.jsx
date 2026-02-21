@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
-import { useDSPEditor } from '../../../contexts/DSPEditorContext';
+import { useDSPEditor } from '../../../hooks/useDSPEditor';
 import ValidationService from '../../../services/validationService';
 
 function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode }) {

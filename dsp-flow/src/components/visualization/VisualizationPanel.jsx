@@ -13,12 +13,13 @@ import './VisualizationPanel.css';
 
 const VisualizationPanel = observer(({ isDarkTheme }) => {
     const [activeVisualizations, setActiveVisualizations] = useState([]);
+    const visualizationData = dspExecutionStore.visualizationData;
 
     useEffect(() => {
         // Обновляем список активных визуализаций при изменении данных
         const visualizations = [];
-        
-        dspExecutionStore.visualizationData.forEach((data, nodeId) => {
+
+        visualizationData.forEach((data, nodeId) => {
             visualizations.push({
                 nodeId,
                 type: data.type,
@@ -28,7 +29,7 @@ const VisualizationPanel = observer(({ isDarkTheme }) => {
         });
 
         setActiveVisualizations(visualizations);
-    }, [dspExecutionStore.visualizationData]);
+    }, [visualizationData]);
 
     const renderVisualization = (vis) => {
         const key = `${vis.nodeId}-${vis.timestamp}`;

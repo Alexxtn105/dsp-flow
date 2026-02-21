@@ -1,7 +1,6 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSchemeStorage } from '../hooks/index.js';
-
-const DSPEditorContext = createContext(null);
+import { DSPEditorContext } from './dspEditorContextDef.js';
 
 /**
  * Provider для DSP Editor контекста
@@ -22,17 +21,4 @@ export const DSPEditorProvider = ({ children, reactFlowInstance }) => {
             {children}
         </DSPEditorContext.Provider>
     );
-};
-
-/**
- * Хук для использования DSP Editor контекста
- */
-export const useDSPEditor = () => {
-    const context = useContext(DSPEditorContext);
-
-    if (!context) {
-        throw new Error('useDSPEditor must be used within DSPEditorProvider');
-    }
-
-    return context;
 };
