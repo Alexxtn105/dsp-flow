@@ -2,60 +2,42 @@
  * Утилитарные функции
  */
 
-//import { DEFAULT_BLOCK_PARAMS } from './constants';
-//import { DSP_ICONS } from './constants';
-
-import { DSP_ICONS, BLOCK_SIGNAL_CONFIG, SIGNAL_TYPES, DEFAULT_BLOCK_PARAMS } from './constants';
+import { SIGNAL_TYPES } from './constants';
+import registry from '../plugins/index';
 
 /**
  * Генератор уникальных ID для узлов
  */
 export const generateNodeId = () => {
-    // Используем timestamp + случайное число для уникальности
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 9);
     return `node_${timestamp}_${random}`;
 };
 
 /**
- * Генератор уникальных ID для узлов
- */
-// let nodeIdCounter = 0;
-// export const generateNodeId = () => {
-//     nodeIdCounter++;
-//     return `node_${nodeIdCounter}`;
-// };
-
-
-
-/**
  * Debounce функция
  */
 export const debounce = (func, wait) => {
     let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
+    const debounced = function(...args) {
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => {
+            timeout = null;
+            func(...args);
+        }, wait);
     };
+    debounced.cancel = () => {
+        clearTimeout(timeout);
+        timeout = null;
+    };
+    return debounced;
 };
-
-
-/**
- * Сброс счётчика ID (для тестов)
- */
-// export const resetNodeIdCounter = () => {
-//     nodeIdCounter = 0;
-// };
 
 /**
  * Получить параметры по умолчанию для блока
  */
 export const getDefaultParams = (blockType) => {
-    return DEFAULT_BLOCK_PARAMS[blockType] || {};
+    return registry.getBlockDefaultParams(blockType);
 };
 
 /**
@@ -116,24 +98,14 @@ export const formatFileSize = (bytes) => {
  * Проверка, является ли блок генератором (без входов)
  */
 export const isGeneratorBlock = (blockType) => {
-    const generators = [
-        'Входной сигнал',
-        'Референсный синусный генератор',
-        'Референсный косинусный генератор'
-    ];
-    return generators.includes(blockType);
+    return registry.isGenerator(blockType);
 };
 
 /**
  * Проверка, является ли блок визуализацией (без выходов)
  */
 export const isVisualizationBlock = (blockType) => {
-    const visualizations = [
-        'Осциллограф',
-        'Спектроанализатор',
-        'Фазовое созвездие'
-    ];
-    return visualizations.includes(blockType);
+    return registry.isVisualization(blockType);
 };
 
 /**
@@ -217,94 +189,17 @@ export const randomElement = (array) => {
 /* ================================ ДЛЯ ТИПОВ БЛОКА============================*/
 
 /**
- * Получить иконку для типа блока
- */
-/**
  * Получить иконку для типа блока (Material Icons)
  */
 export const getBlockIcon = (blockType) => {
-    return DSP_ICONS[blockType] || 'widgets'; // Иконка по умолчанию
+    return registry.getBlockIcon(blockType);
 };
-
-// export const getBlockIcon = (blockType) => {
-//     const iconMap = {
-//         'КИХ-Фильтр': '⚡',
-//         'Полосовой КИХ-фильтр': '🎛️',
-//         'ФВЧ КИХ-фильтр': '📈',
-//         'ФНЧ КИХ-фильтр': '📉',
-//         'Преобразователь Гильберта': '🌀',
-//         'Фильтр Герцеля': '🔍',
-//         'Входной сигнал': '〰️',
-//         'Референсный синусный генератор': '📐',
-//         'Референсный косинусный генератор': '📏',
-//         'Скользящее БПФ': '🌀',
-//         'БПФ': '⚡',
-//         'Спектроанализатор': '📊',
-//         'Фазовый детектор': '📐',
-//         'Частотный детектор': '📏',
-//         'Интегратор': '∫',
-//         'Сумматор': '➕',
-//         'Перемножитель': '✖️',
-//         'Осциллограф': '📊',
-//         'Фазовое созвездие': '⭐',
-//         'КИХ': '⚡',
-//         'Генератор': '〰️',
-//         'БПФ/Анализ': '📊',
-//         'Детектор': '📐',
-//         'Математический': '∫',
-//         'Визуализация': '📊'
-//     };
-//
-//     // Сначала ищем точное совпадение
-//     if (iconMap[blockType]) {
-//         return iconMap[blockType];
-//     }
-//
-//     // Если точного совпадения нет, ищем по части имени
-//     for (const [key, icon] of Object.entries(iconMap)) {
-//         if (blockType.includes(key) || key.includes(blockType)) {
-//             return icon;
-//         }
-//     }
-//
-//     // Иконка по умолчанию на основе категории
-//     if (blockType.includes('фильтр') || blockType.includes('Фильтр')) return '⚡';
-//     if (blockType.includes('генератор') || blockType.includes('Генератор')) return '〰️';
-//     if (blockType.includes('БПФ') || blockType.includes('анализатор')) return '📊';
-//     if (blockType.includes('детектор') || blockType.includes('Детектор')) return '📐';
-//     if (blockType.includes('сумма') || blockType.includes('умнож') || blockType.includes('интегр')) return '∫';
-//     if (blockType.includes('осциллограф') || blockType.includes('созвездие') || blockType.includes('визуал')) return '📊';
-//
-//     return '📦'; // Иконка по умолчанию
-// };
 
 /**
  * Получить описание для типа блока
  */
 export const getBlockDescription = (blockType) => {
-    const descriptions = {
-        'КИХ-Фильтр': 'КИХ-фильтр (FIR)',
-        'Полосовой КИХ-фильтр': 'Полосовой фильтр',
-        'ФВЧ КИХ-фильтр': 'ФВЧ фильтр',
-        'ФНЧ КИХ-фильтр': 'ФНЧ фильтр',
-        'Преобразователь Гильберта': 'Преобразователь Гильберта',
-        'Фильтр Герцеля': 'Фильтр Герцеля',
-        'Входной сигнал': 'Генератор сигнала',
-        'Референсный синусный генератор': 'Синусный генератор',
-        'Референсный косинусный генератор': 'Косинусный генератор',
-        'Скользящее БПФ': 'Скользящее БПФ',
-        'БПФ': 'Быстрое преобразование Фурье',
-        'Спектроанализатор': 'Спектральный анализ',
-        'Фазовый детектор': 'Детектор фазы',
-        'Частотный детектор': 'Детектор частоты',
-        'Интегратор': 'Интегратор сигнала',
-        'Сумматор': 'Сумматор сигналов',
-        'Перемножитель': 'Перемножитель сигналов',
-        'Осциллограф': 'Визуализация сигнала',
-        'Фазовое созвездие': 'Фазовое созвездие'
-    };
-
-    return descriptions[blockType] || blockType;
+    return registry.getBlockDescription(blockType);
 };
 
 /**
@@ -350,17 +245,13 @@ export const formatParamValue = (value) => {
  * Получить конфигурацию сигналов для блока
  */
 export const getBlockSignalConfig = (blockType) => {
-    return BLOCK_SIGNAL_CONFIG[blockType] || {
-        input: SIGNAL_TYPES.REAL,
-        output: SIGNAL_TYPES.REAL
-    };
+    return registry.getBlockSignalConfig(blockType);
 };
 
 /**
  * Проверить, совместимы ли типы сигналов для соединения
  */
 export const areSignalsCompatible = (sourceType, targetType) => {
-    // Если тип источника совпадает с типом цели
     return sourceType === targetType;
 };
 

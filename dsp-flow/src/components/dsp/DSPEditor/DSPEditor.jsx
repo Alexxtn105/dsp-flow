@@ -26,7 +26,8 @@ import {
     generateNodeId,
     getDefaultParams,
     getBlockSignalConfig,
-    areSignalsCompatible
+    areSignalsCompatible,
+    isVisualizationBlock
 } from '../../../utils/helpers';
 import {useDSPEditor} from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
@@ -179,12 +180,7 @@ const DSPEditor = observer(({
 
 // Показываем панель визуализации когда есть визуализационные узлы
     useEffect(() => {
-        const hasVisualizationNodes = nodes.some(n => { // Изменено с node на n
-            const blockType = n.data.blockType;
-            return blockType === 'Осциллограф' ||
-                blockType === 'Спектроанализатор' ||
-                blockType === 'Фазовое созвездие';
-        });
+        const hasVisualizationNodes = nodes.some(n => isVisualizationBlock(n.data.blockType));
 
         //setShowVisualization(hasVisualizationNodes && dspExecutionStore.isRunning); // Исправлено на isRunning
     }, [nodes, dspExecutionStore.isRunning]);

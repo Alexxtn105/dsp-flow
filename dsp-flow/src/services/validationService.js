@@ -1,6 +1,8 @@
 /**
  * ValidationService - сервис для валидации данных
  */
+import registry from '../plugins/index';
+
 class ValidationService {
     /**
      * Валидация названия схемы
@@ -100,78 +102,10 @@ class ValidationService {
     }
 
     /**
-     * Валидация параметров блока
+     * Валидация параметров блока (делегирует плагину)
      */
     static validateBlockParams(blockType, params) {
-        const validators = {
-            'Аудио-файл': (p) => {
-                const errors = [];
-                // Для аудиофайла не требуется обязательная валидация параметров
-                // Можно добавить проверку, если нужно
-                if (p.loop && typeof p.loop !== 'boolean') {
-                    errors.push('Параметр loop должен быть boolean');
-                }
-                return errors;
-            },
-            'КИХ-Фильтр': (p) => {
-                const errors = [];
-                if (!p.order || p.order < 1 || p.order > 1024) {
-                    errors.push('Порядок фильтра должен быть от 1 до 1024');
-                }
-                if (!p.cutoff || p.cutoff <= 0) {
-                    errors.push('Частота среза должна быть положительной');
-                }
-                return errors;
-            },
-            'Полосовой КИХ-фильтр': (p) => {
-                const errors = [];
-                if (!p.order || p.order < 1 || p.order > 1024) {
-                    errors.push('Порядок фильтра должен быть от 1 до 1024');
-                }
-                if (!p.lowCutoff || p.lowCutoff <= 0) {
-                    errors.push('Нижняя частота среза должна быть положительной');
-                }
-                if (!p.highCutoff || p.highCutoff <= 0) {
-                    errors.push('Верхняя частота среза должна быть положительной');
-                }
-                if (p.lowCutoff && p.highCutoff && p.lowCutoff >= p.highCutoff) {
-                    errors.push('Нижняя частота должна быть меньше верхней');
-                }
-                return errors;
-            },
-            'Входной сигнал': (p) => {
-                const errors = [];
-                if (!p.frequency || p.frequency <= 0) {
-                    errors.push('Частота должна быть положительной');
-                }
-                if (p.amplitude === undefined || p.amplitude <= 0) {
-                    errors.push('Амплитуда должна быть положительной');
-                }
-                return errors;
-            },
-            'Референсный синусный генератор': (p) => {
-                const errors = [];
-                if (!p.frequency || p.frequency <= 0) {
-                    errors.push('Частота должна быть положительной');
-                }
-                if (p.amplitude === undefined || p.amplitude <= 0) {
-                    errors.push('Амплитуда должна быть положительной');
-                }
-                return errors;
-            },
-            'Референсный косинусный генератор': (p) => {
-                const errors = [];
-                if (!p.frequency || p.frequency <= 0) {
-                    errors.push('Частота должна быть положительной');
-                }
-                if (p.amplitude === undefined || p.amplitude <= 0) {
-                    errors.push('Амплитуда должна быть положительной');
-                }
-                return errors;
-            }
-        };
-
-        const validator = validators[blockType];
+        const validator = registry.getValidator(blockType);
         if (!validator) {
             return { isValid: true, errors: [] };
         }

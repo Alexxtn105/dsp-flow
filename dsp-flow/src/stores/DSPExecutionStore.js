@@ -5,6 +5,7 @@
 import { makeObservable, observable, action, computed, reaction } from 'mobx';
 import GraphCompiler from '../engine/GraphCompiler';
 import DSPEngine from '../engine/DSPEngine';
+import registry from '../plugins/index';
 
 export class DSPExecutionStore {
     // Observable state
@@ -181,29 +182,6 @@ export class DSPExecutionStore {
         });
     }
 
-    // runExecutionLoop() {
-    //     if (!this.isRunning) {
-    //         return;
-    //     }
-    //
-    //     // TODO - Проверить ограничение FPS
-    //     // Ограничение FPS - ограничить до 30 FPS
-    //     // setTimeout(() => {
-    //     //     this.executeStep();
-    //     //     this.animationFrameId = requestAnimationFrame(() => {
-    //     //         this.runExecutionLoop();
-    //     //     });
-    //     // }, 1000 / 30);
-    //
-    //     // Выполняем один шаг
-    //     this.executeStep();
-    //
-    //     // Планируем следующий шаг
-    //     this.animationFrameId = requestAnimationFrame(() => {
-    //         this.runExecutionLoop();
-    //     });
-    // }
-
     /**
      * Выполнение одного шага
      */
@@ -235,25 +213,20 @@ export class DSPExecutionStore {
         Object.entries(outputs).forEach(([nodeId, output]) => {
             const node = output.node;
             const blockType = node.data.blockType;
+            const visType = registry.getVisualizationType(blockType);
 
-            // Обрабатываем в зависимости от типа блока визуализации
-            if (blockType === 'Осциллограф') {
-                this.visualizationData.set(nodeId, {
-                    type: 'oscilloscope',
-                    data: output.data,
-                    timestamp: Date.now()
-                });
-            } else if (blockType === 'Спектроанализатор') {
-                // Вычисляем спектр
+            if (!visType) return;
+
+            if (visType === 'spectrum') {
                 const spectrum = this.computeSpectrum(output.data);
                 this.visualizationData.set(nodeId, {
-                    type: 'spectrum',
+                    type: visType,
                     data: spectrum,
                     timestamp: Date.now()
                 });
-            } else if (blockType === 'Фазовое созвездие') {
+            } else {
                 this.visualizationData.set(nodeId, {
-                    type: 'constellation',
+                    type: visType,
                     data: output.data,
                     timestamp: Date.now()
                 });
@@ -312,15 +285,6 @@ export class DSPExecutionStore {
             });
         }
     }
-
-    // updateConfig(config) {
-    //     if (config.sampleRate !== undefined) {
-    //         this.sampleRate = config.sampleRate;
-    //     }
-    //     if (config.bufferSize !== undefined) {
-    //         this.bufferSize = config.bufferSize;
-    //     }
-    // }
 
     /**
      * Получить данные визуализации для узла

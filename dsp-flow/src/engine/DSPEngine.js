@@ -2,17 +2,16 @@
  * DSP Engine - движок выполнения графа обработки сигналов
  */
 
-import DSPLib from './DSPLib';
-import {DSP_BLOCK_TYPES, SIGNAL_TYPES} from '../utils/constants';
+import registry from '../plugins/index';
 
 export class DSPEngine {
     constructor() {
         this.compiledGraph = null;
-        this.sampleRate = 48000; // Частота дискретизации по умолчанию
-        this.bufferSize = 1024; // Размер буфера
+        this.sampleRate = 48000;
+        this.bufferSize = 1024;
         this.isRunning = false;
-        this.nodeOutputs = new Map(); // Храним выходные данные каждого узла
-        this.nodeState = new Map(); // Runtime-состояние узлов (фазы, аккумуляторы, смещения)
+        this.nodeOutputs = new Map();
+        this.nodeState = new Map();
         this.executionStats = {
             totalSamples: 0,
             executionTime: 0,
@@ -25,7 +24,7 @@ export class DSPEngine {
      */
     initialize(compiledGraph, config = {}) {
         console.log('🚀 DSP Engine: Initializing...');
-        
+
         this.compiledGraph = compiledGraph;
         this.sampleRate = config.sampleRate || this.sampleRate;
         this.bufferSize = config.bufferSize || this.bufferSize;
@@ -54,7 +53,7 @@ export class DSPEngine {
         this.isRunning = true;
         this.nodeState.clear();
         this.executionStats.cyclesExecuted = 0;
-        
+
         return true;
     }
 
@@ -64,7 +63,7 @@ export class DSPEngine {
     stop() {
         console.log('⏸️ DSP Engine: Stopping...');
         this.isRunning = false;
-        
+
         return true;
     }
 
@@ -77,12 +76,10 @@ export class DSPEngine {
         }
 
         const startTime = performance.now();
-        
+
         try {
-            // Очищаем предыдущие выходы
             this.nodeOutputs.clear();
 
-            // Выполняем узлы в порядке топологической сортировки
             for (const node of this.compiledGraph.executionOrder) {
                 this.executeNode(node);
             }
@@ -91,9 +88,8 @@ export class DSPEngine {
             this.executionStats.executionTime = performance.now() - startTime;
             this.executionStats.totalSamples += this.bufferSize;
 
-            // Возвращаем выходы всех sink узлов
             return this.getSinkOutputs();
-            
+
         } catch (error) {
             console.error('❌ Execution error:', error);
             this.stop();
@@ -102,131 +98,38 @@ export class DSPEngine {
     }
 
     /**
-     * Выполнение отдельного узла
+     * Выполнение отдельного узла через реестр плагинов
      */
     executeNode(node) {
         const blockType = node.data.blockType;
         const params = node.data.params;
-
-        // Получаем входные данные от зависимостей
         const inputs = this.getNodeInputs(node);
 
-        let output;
-
         try {
-            // Выполняем обработку в зависимости от типа блока
-            switch (blockType) {
+            const processor = registry.getProcessor(blockType);
+            let output;
 
-                case DSP_BLOCK_TYPES.AUDIO_FILE:
-                    output = this.processAudioFile(params, node.id);
-                    break;
-
-                case DSP_BLOCK_TYPES.INPUT_SIGNAL:
-                    output = this.processInputSignal(params, node.id);
-                    break;
-
-                case DSP_BLOCK_TYPES.REF_SINE_GEN:
-                    output = this.processSineGenerator(params, node.id);
-                    break;
-
-                case DSP_BLOCK_TYPES.REF_COSINE_GEN:
-                    output = this.processCosineGenerator(params, node.id);
-                    break;
-
-                case DSP_BLOCK_TYPES.FIR_FILTER:
-                case DSP_BLOCK_TYPES.LOWPASS_FIR:
-                case DSP_BLOCK_TYPES.HIGHPASS_FIR:
-                    output = this.processFIRFilter(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.BANDPASS_FIR:
-                    output = this.processBandpassFilter(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.HILBERT_TRANSFORMER:
-                    output = this.processHilbertTransform(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.FFT:
-                    output = this.processFFT(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.SLIDING_FFT:
-                    output = this.processSlidingFFT(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.INTEGRATOR:
-                    output = this.processIntegrator(inputs[0], params, node.id);
-                    break;
-
-                case DSP_BLOCK_TYPES.SUMMER:
-                    output = this.processSummer(inputs, params);
-                    break;
-
-                case DSP_BLOCK_TYPES.MULTIPLIER:
-                    output = this.processMultiplier(inputs, params);
-                    break;
-
-                case DSP_BLOCK_TYPES.PHASE_DETECTOR:
-                    output = this.processPhaseDetector(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.FREQUENCY_DETECTOR:
-                    output = this.processFrequencyDetector(inputs[0], params);
-                    break;
-
-                case DSP_BLOCK_TYPES.OSCILLOSCOPE:
-                case DSP_BLOCK_TYPES.SPECTRUM_ANALYZER:
-                case DSP_BLOCK_TYPES.CONSTELLATION:
-                    // Узлы визуализации не производят выход
-                    output = inputs[0];
-                    break;
-
-                default:
-                    console.warn(`Unknown block type: ${blockType}`);
-                    output = inputs[0] || new Float32Array(this.bufferSize);
+            if (processor) {
+                const ctx = {
+                    inputs,
+                    params,
+                    state: this.getNodeState(node.id),
+                    sampleRate: this.sampleRate,
+                    bufferSize: this.bufferSize,
+                    nodeId: node.id,
+                };
+                output = processor(ctx);
+            } else {
+                console.warn(`Unknown block type: ${blockType}`);
+                output = inputs[0] || new Float32Array(this.bufferSize);
             }
 
-            // Сохраняем выход узла
             this.nodeOutputs.set(node.id, output);
 
         } catch (error) {
             console.error(`Error executing node ${node.data.label}:`, error);
             throw error;
         }
-    }
-
-    processAudioFile(params, nodeId) {
-        if (!params.audioData || !params.audioData.samples) {
-            return new Float32Array(this.bufferSize);
-        }
-
-        const state = this.getNodeState(nodeId);
-        if (state.offset == null) {
-            state.offset = 0;
-        }
-
-        const samples = params.audioData.samples;
-        const output = new Float32Array(this.bufferSize);
-        let written = 0;
-
-        while (written < this.bufferSize) {
-            const remaining = samples.length - state.offset;
-            if (remaining <= 0) {
-                if (params.loop) {
-                    state.offset = 0;
-                    continue;
-                }
-                break;
-            }
-
-            const toCopy = Math.min(this.bufferSize - written, remaining);
-            output.set(samples.subarray(state.offset, state.offset + toCopy), written);
-            state.offset += toCopy;
-            written += toCopy;
-        }
-
-        return output;
     }
 
     /**
@@ -248,115 +151,11 @@ export class DSPEngine {
     }
 
     /**
-     * Обработчики блоков
-     */
-    processInputSignal(params, nodeId) {
-        const state = this.getNodeState(nodeId);
-        const { frequency = 1000, amplitude = 1.0, signalType = 'sine' } = params;
-        const currentPhase = state.phase ?? 0;
-
-        let output;
-        if (signalType === 'sine') {
-            output = DSPLib.generateSine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
-        } else {
-            output = DSPLib.generateCosine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
-        }
-
-        state.phase = currentPhase + 2 * Math.PI * frequency / this.sampleRate * this.bufferSize;
-        return output;
-    }
-
-    processSineGenerator(params, nodeId) {
-        const state = this.getNodeState(nodeId);
-        const { frequency = 1000, amplitude = 1.0, phase = 0 } = params;
-        const currentPhase = state.phase ?? phase;
-        const output = DSPLib.generateSine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
-        state.phase = currentPhase + 2 * Math.PI * frequency / this.sampleRate * this.bufferSize;
-        return output;
-    }
-
-    processCosineGenerator(params, nodeId) {
-        const state = this.getNodeState(nodeId);
-        const { frequency = 1000, amplitude = 1.0, phase = 0 } = params;
-        const currentPhase = state.phase ?? phase;
-        const output = DSPLib.generateCosine(frequency, amplitude, this.sampleRate, this.bufferSize, currentPhase);
-        state.phase = currentPhase + 2 * Math.PI * frequency / this.sampleRate * this.bufferSize;
-        return output;
-    }
-
-    processFIRFilter(input, params) {
-        if (!input) return new Float32Array(this.bufferSize);
-        
-        const { order = 64, cutoff = 1000, filterType = 'lowpass' } = params;
-        const coefficients = DSPLib.generateFIRCoefficients(order, cutoff, this.sampleRate, filterType);
-        return DSPLib.firFilter(input, coefficients);
-    }
-
-    processBandpassFilter(input, params) {
-        if (!input) return new Float32Array(this.bufferSize);
-        
-        const { order = 64, lowCutoff = 1000, highCutoff = 3000 } = params;
-        return DSPLib.bandpassFilter(input, order, lowCutoff, highCutoff, this.sampleRate);
-    }
-
-    processHilbertTransform(input, params) {
-        if (!input) return { real: new Float32Array(this.bufferSize), imag: new Float32Array(this.bufferSize) };
-        
-        const { order = 64 } = params;
-        return DSPLib.hilbertTransform(input, order);
-    }
-
-    processFFT(input, params) {
-        if (!input) return { real: new Float32Array(this.bufferSize / 2), imag: new Float32Array(this.bufferSize / 2) };
-        
-        const { fftSize = this.bufferSize } = params;
-        return DSPLib.fft(input, fftSize);
-    }
-
-    processSlidingFFT(input, params) {
-        if (!input) return [];
-        
-        const { windowSize = 1024, overlap = 512, fftSize = 1024 } = params;
-        const hopSize = windowSize - overlap;
-        return DSPLib.slidingFFT(input, windowSize, hopSize, fftSize);
-    }
-
-    processIntegrator(input, params, nodeId) {
-        if (!input) return new Float32Array(this.bufferSize);
-        const state = this.getNodeState(nodeId);
-        const initialValue = state.accumulator ?? 0;
-        const output = DSPLib.integrate(input, initialValue);
-        state.accumulator = output[output.length - 1];
-        return output;
-    }
-
-    processSummer(inputs, params) {
-        if (!inputs || inputs.length === 0) return new Float32Array(this.bufferSize);
-        return DSPLib.sum(inputs);
-    }
-
-    processMultiplier(inputs, params) {
-        if (!inputs || inputs.length < 2) return new Float32Array(this.bufferSize);
-        return DSPLib.multiply(inputs[0], inputs[1]);
-    }
-
-    processPhaseDetector(input, params) {
-        if (!input || !input.real) return new Float32Array(this.bufferSize);
-        const { referenceFrequency = 1000 } = params;
-        return DSPLib.phaseDetector(input, referenceFrequency, this.sampleRate);
-    }
-
-    processFrequencyDetector(input, params) {
-        if (!input || !input.real) return new Float32Array(this.bufferSize);
-        return DSPLib.frequencyDetector(input, this.sampleRate);
-    }
-
-    /**
      * Получить выходы узлов-стоков
      */
     getSinkOutputs() {
         const outputs = {};
-        
+
         for (const sinkNode of this.compiledGraph.sinkNodes) {
             const output = this.nodeOutputs.get(sinkNode.id);
             outputs[sinkNode.id] = {

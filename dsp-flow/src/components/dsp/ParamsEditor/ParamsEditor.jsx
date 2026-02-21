@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog';
 import ValidationService from '../../../services/validationService';
+import registry from '../../../plugins/index';
 import './ParamsEditor.css';
 
 /**
@@ -133,50 +134,7 @@ function ParamsEditor({ isOpen, onClose, blockType, currentParams, onSave, isDar
         }
     };
 
-    const getParamConfig = () => {
-        const configs = {
-            'Аудио-файл': [
-                { name: 'audioFile', type: 'file', label: 'Аудио файл' },
-                { name: 'sampleRate', type: 'number', label: 'Частота дискретизации (Гц)', min: 8000, max: 192000, step: 1000 },
-                { name: 'channels', type: 'select', label: 'Каналы', options: ['mono', 'stereo'] }
-            ],
-            'Входной сигнал': [
-                { name: 'frequency', type: 'number', label: 'Частота (Гц)', min: 1, max: 24000, step: 1 },
-                { name: 'amplitude', type: 'number', label: 'Амплитуда', min: 0, max: 10, step: 0.1 },
-                { name: 'signalType', type: 'select', label: 'Тип сигнала', options: ['sine', 'cosine', 'square', 'triangle'] }
-            ],
-            'Референсный синусный генератор': [
-                { name: 'frequency', type: 'number', label: 'Частота (Гц)', min: 1, max: 24000, step: 1 },
-                { name: 'amplitude', type: 'number', label: 'Амплитуда', min: 0, max: 10, step: 0.1 },
-                { name: 'phase', type: 'number', label: 'Фаза (градусы)', min: -180, max: 180, step: 1 }
-            ],
-            'Референсный косинусный генератор': [
-                { name: 'frequency', type: 'number', label: 'Частота (Гц)', min: 1, max: 24000, step: 1 },
-                { name: 'amplitude', type: 'number', label: 'Амплитуда', min: 0, max: 10, step: 0.1 },
-                { name: 'phase', type: 'number', label: 'Фаза (градусы)', min: -180, max: 180, step: 1 }
-            ],
-            'КИХ-Фильтр': [
-                { name: 'order', type: 'number', label: 'Порядок фильтра', min: 8, max: 1024, step: 8 },
-                { name: 'cutoff', type: 'number', label: 'Частота среза (Гц)', min: 1, max: 24000, step: 1 },
-                { name: 'filterType', type: 'select', label: 'Тип фильтра', options: ['lowpass', 'highpass', 'bandpass'] }
-            ],
-            'ФНЧ КИХ-фильтр': [
-                { name: 'order', type: 'number', label: 'Порядок фильтра', min: 8, max: 1024, step: 8 },
-                { name: 'cutoff', type: 'number', label: 'Частота среза (Гц)', min: 1, max: 24000, step: 1 }
-            ],
-            'ФВЧ КИХ-фильтр': [
-                { name: 'order', type: 'number', label: 'Порядок фильтра', min: 8, max: 1024, step: 8 },
-                { name: 'cutoff', type: 'number', label: 'Частота среза (Гц)', min: 1, max: 24000, step: 1 }
-            ],
-            'Полосовой КИХ-фильтр': [
-                { name: 'order', type: 'number', label: 'Порядок фильтра', min: 8, max: 1024, step: 8 },
-                { name: 'lowCutoff', type: 'number', label: 'Нижняя частота (Гц)', min: 1, max: 24000, step: 1 },
-                { name: 'highCutoff', type: 'number', label: 'Верхняя частота (Гц)', min: 1, max: 24000, step: 1 }
-            ]
-        };
-
-        return configs[blockType] || [];
-    };
+    const getParamConfig = () => registry.getParamFields(blockType);
 
     const paramConfigs = getParamConfig();
 
