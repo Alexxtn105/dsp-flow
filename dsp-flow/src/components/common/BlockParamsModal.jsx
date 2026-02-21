@@ -49,15 +49,15 @@ function BlockParamsModal({
             const arrayBuffer = await file.arrayBuffer();
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            await audioContext.close();
 
             const info = {
                 fileName: file.name,
                 sampleRate: audioBuffer.sampleRate,
                 duration: audioBuffer.duration,
                 channels: audioBuffer.numberOfChannels,
-                samples: audioBuffer.getChannelData(0),
-                fileSize: file.size,
-                audioBuffer: audioBuffer
+                samples: new Float32Array(audioBuffer.getChannelData(0)),
+                fileSize: file.size
             };
 
             setFileInfo(info);

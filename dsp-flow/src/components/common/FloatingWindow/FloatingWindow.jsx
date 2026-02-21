@@ -17,44 +17,50 @@ function FloatingWindow({
     const [size, setSize] = useState(initialSize);
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
-    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-    const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
     const windowRef = useRef(null);
+    const dragOffsetRef = useRef({ x: 0, y: 0 });
+    const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
+    const sizeRef = useRef(size);
+    const positionRef = useRef(position);
+
+    // Синхронизация refs с state
+    sizeRef.current = size;
+    positionRef.current = position;
 
     // Обработчик начала перемещения
     const handleMouseDownDrag = useCallback((e) => {
         if (e.target.closest('.window-controls')) return;
 
         setIsDragging(true);
-        setDragOffset({
-            x: e.clientX - position.x,
-            y: e.clientY - position.y
-        });
-    }, [position]);
+        dragOffsetRef.current = {
+            x: e.clientX - positionRef.current.x,
+            y: e.clientY - positionRef.current.y
+        };
+    }, []);
 
     // Обработчик начала изменения размера
     const handleMouseDownResize = useCallback((e) => {
         e.stopPropagation();
         setIsResizing(true);
-        setResizeStart({
+        resizeStartRef.current = {
             x: e.clientX,
             y: e.clientY,
-            width: size.width,
-            height: size.height
-        });
-    }, [size]);
+            width: sizeRef.current.width,
+            height: sizeRef.current.height
+        };
+    }, []);
 
-    // Обработчик движения мыши
+    // Обработчик движения мыши — listeners добавляются только при начале drag/resize
     useEffect(() => {
         const handleMouseMove = (e) => {
             if (isDragging) {
-                const newX = e.clientX - dragOffset.x;
-                const newY = e.clientY - dragOffset.y;
+                const newX = e.clientX - dragOffsetRef.current.x;
+                const newY = e.clientY - dragOffsetRef.current.y;
 
-                // Ограничиваем позицию в пределах экрана
-                const maxX = window.innerWidth - size.width;
-                const maxY = window.innerHeight - size.height;
+                const curSize = sizeRef.current;
+                const maxX = window.innerWidth - curSize.width;
+                const maxY = window.innerHeight - curSize.height;
 
                 setPosition({
                     x: Math.max(0, Math.min(newX, maxX)),
@@ -63,15 +69,16 @@ function FloatingWindow({
             }
 
             if (isResizing) {
-                const deltaX = e.clientX - resizeStart.x;
-                const deltaY = e.clientY - resizeStart.y;
+                const start = resizeStartRef.current;
+                const curPos = positionRef.current;
+                const deltaX = e.clientX - start.x;
+                const deltaY = e.clientY - start.y;
 
-                const newWidth = Math.max(minWidth, resizeStart.width + deltaX);
-                const newHeight = Math.max(minHeight, resizeStart.height + deltaY);
+                const newWidth = Math.max(minWidth, start.width + deltaX);
+                const newHeight = Math.max(minHeight, start.height + deltaY);
 
-                // Ограничиваем размер в пределах экрана
-                const maxWidth = window.innerWidth - position.x;
-                const maxHeight = window.innerHeight - position.y;
+                const maxWidth = window.innerWidth - curPos.x;
+                const maxHeight = window.innerHeight - curPos.y;
 
                 setSize({
                     width: Math.min(newWidth, maxWidth),
@@ -94,7 +101,7 @@ function FloatingWindow({
                 document.removeEventListener('mouseup', handleMouseUp);
             };
         }
-    }, [isDragging, isResizing, dragOffset, position, size, resizeStart, minWidth, minHeight]);
+    }, [isDragging, isResizing, minWidth, minHeight]);
 
     return (
         <div
