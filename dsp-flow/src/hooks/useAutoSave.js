@@ -97,16 +97,20 @@ export const useAutoSave = (
         }
     }, [reactFlowInstance, nodes, edges, skipWhen]);
 
-    // Создаём debounced версию автосохранения
-    // Используем useRef для хранения debounced функции
-    const debouncedAutoSaveRef = useRef(null);
+    // Храним актуальную autoSave в ref, чтобы debounce не пересоздавался
+    const autoSaveRef = useRef(autoSave);
+    useEffect(() => {
+        autoSaveRef.current = autoSave;
+    }, [autoSave]);
 
-    // Инициализируем debounced функцию при первом рендере
+    // Создаём debounced функцию ОДИН РАЗ (пересоздаём только при смене delay)
+    const debouncedAutoSaveRef = useRef(null);
     useEffect(() => {
         debouncedAutoSaveRef.current = debounce(() => {
-            autoSave();
+            autoSaveRef.current();
         }, delay);
-    }, [autoSave, delay]);
+        return () => debouncedAutoSaveRef.current?.cancel();
+    }, [delay]);
 
     /**
      * Загрузить автосохраненные данные

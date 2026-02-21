@@ -11,9 +11,10 @@ export class AudioFileReader {
             const reader = new FileReader();
 
             reader.onload = async (e) => {
+                let audioContext = null;
                 try {
                     const arrayBuffer = e.target.result;
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
                     // Извлекаем сэмплы из первого канала
@@ -26,11 +27,14 @@ export class AudioFileReader {
                         duration: audioBuffer.duration,
                         numberOfChannels: audioBuffer.numberOfChannels,
                         length: audioBuffer.length,
-                        fileSize: file.size,
-                        audioBuffer: audioBuffer // Сохраняем оригинальный буфер
+                        fileSize: file.size
                     });
                 } catch (error) {
                     reject(new Error('Ошибка декодирования аудио файла'));
+                } finally {
+                    if (audioContext) {
+                        audioContext.close();
+                    }
                 }
             };
 

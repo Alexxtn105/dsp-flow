@@ -1,4 +1,5 @@
 import {useState, useCallback} from 'react';
+import {observer} from 'mobx-react-lite';
 import {useTheme} from './hooks/useTheme';
 import {DSPEditorProvider} from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
@@ -24,7 +25,7 @@ dspExecutionStore.updateConfig({
 //     window.DSP_DEBUG = true;
 // }
 
-function App() {
+const App = observer(function App() {
     const [config, setConfig] = useState({
         sampleRate: 48000,
         bufferSize: 1024,
@@ -232,6 +233,6 @@ function App() {
             </div>
         </DSPEditorProvider>
     );
-}
+});
 
 export default App;

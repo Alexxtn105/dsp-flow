@@ -26,8 +26,7 @@ import {
     generateNodeId,
     getDefaultParams,
     getBlockSignalConfig,
-    areSignalsCompatible,
-    isVisualizationBlock
+    areSignalsCompatible
 } from '../../../utils/helpers';
 import {useDSPEditor} from '../../../contexts/DSPEditorContext';
 import './DSPEditor.css';
@@ -60,7 +59,6 @@ const DSPEditor = observer(({
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const hasLoadedExternalScheme = useRef(false);
-    const [showVisualization, setShowVisualization] = useState(false);
     const [visualizationWindows, setVisualizationWindows] = useState([]);
 
 
@@ -156,14 +154,16 @@ const DSPEditor = observer(({
 
     // Компиляция графа при изменении узлов или рёбер
     useEffect(() => {
-        if (nodes.length === 0) return;
+        if (nodes.length === 0) {
+            dspExecutionStore.cleanup();
+            return;
+        }
 
         // Компилируем граф
         const result = dspExecutionStore.compile(nodes, edges);
 
         if (!result.success) {
             console.error('Compilation errors:', result.errors);
-            // Можно показать ошибки пользователю
         }
     }, [nodes, edges]);
 
@@ -176,14 +176,6 @@ const DSPEditor = observer(({
             });
         }
     }, [nodes, edges, onStatsUpdate]);
-
-
-// Показываем панель визуализации когда есть визуализационные узлы
-    useEffect(() => {
-        const hasVisualizationNodes = nodes.some(n => isVisualizationBlock(n.data.blockType));
-
-        //setShowVisualization(hasVisualizationNodes && dspExecutionStore.isRunning); // Исправлено на isRunning
-    }, [nodes, dspExecutionStore.isRunning]);
 
 
     // Обработчик двойного клика по узлу

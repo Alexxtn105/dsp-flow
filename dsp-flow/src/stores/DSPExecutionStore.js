@@ -35,6 +35,9 @@ export class DSPExecutionStore {
     // Animation frame ID
     animationFrameId = null;
 
+    // Disposer для MobX reaction
+    _disposeConfigReaction = null;
+
     constructor() {
         makeObservable(this, {
             // Observables
@@ -54,6 +57,7 @@ export class DSPExecutionStore {
             updateConfig: action,
             executeStep: action,
             updateVisualizationData: action,
+            cleanup: action,
 
             // Computed
             hasErrors: computed,
@@ -64,8 +68,8 @@ export class DSPExecutionStore {
         this.compiler = new GraphCompiler();
         this.engine = new DSPEngine();
 
-        // Реакция на изменение конфигурации
-        reaction(
+        // Реакция на изменение конфигурации (сохраняем disposer)
+        this._disposeConfigReaction = reaction(
             () => ({ sampleRate: this.sampleRate, bufferSize: this.bufferSize }),
             (config) => {
                 if (this.engine) {
@@ -301,7 +305,7 @@ export class DSPExecutionStore {
     }
 
     /**
-     * Очистка
+     * Очистка состояния
      */
     cleanup() {
         this.stop();
@@ -309,6 +313,17 @@ export class DSPExecutionStore {
         this.compilationErrors = [];
         this.executionData.clear();
         this.visualizationData.clear();
+    }
+
+    /**
+     * Полная утилизация store (отписка от reactions)
+     */
+    dispose() {
+        this.cleanup();
+        if (this._disposeConfigReaction) {
+            this._disposeConfigReaction();
+            this._disposeConfigReaction = null;
+        }
     }
 }
 

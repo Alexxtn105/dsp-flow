@@ -101,12 +101,8 @@ export class DSPLib {
             if (Math.abs(diff) < 1e-10) {
                 coefficients[n] = 0;
             } else {
-                const k = Math.round(diff);
-                if (k % 2 !== 0) {
-                    coefficients[n] = 2 / (Math.PI * diff);
-                } else {
-                    coefficients[n] = 0;
-                }
+                // Обобщённая формула: корректна для любого порядка (чётного и нечётного)
+                coefficients[n] = (1 - Math.cos(Math.PI * diff)) / (Math.PI * diff);
             }
 
             // Окно Хэмминга
@@ -116,9 +112,8 @@ export class DSPLib {
 
         const imaginary = this.firFilter(input, coefficients);
 
-        // Возвращаем комплексный сигнал
         return {
-            real: input,
+            real: new Float32Array(input),
             imag: imaginary
         };
     }
@@ -136,18 +131,18 @@ export class DSPLib {
 
         // Создаём FFT объект
         const fft = new FFT(size);
-        const complexInput = fft.createComplexArray();
         const complexOutput = fft.createComplexArray();
 
-        // Заполняем комплексный массив (действительная часть)
+        // Вычисляем БПФ для действительного входа
         fft.realTransform(complexOutput, paddedInput);
         fft.completeSpectrum(complexOutput);
 
-        // Разделяем на действительную и мнимую части
-        const real = new Float32Array(size / 2);
-        const imag = new Float32Array(size / 2);
+        // Разделяем на действительную и мнимую части (включая Nyquist bin)
+        const numBins = size / 2 + 1;
+        const real = new Float32Array(numBins);
+        const imag = new Float32Array(numBins);
 
-        for (let i = 0; i < size / 2; i++) {
+        for (let i = 0; i < numBins; i++) {
             real[i] = complexOutput[2 * i];
             imag[i] = complexOutput[2 * i + 1];
         }
@@ -174,10 +169,11 @@ export class DSPLib {
      */
     static toDecibels(spectrum, referenceValue = 1.0) {
         const dbSpectrum = new Float32Array(spectrum.length);
+        const ref = Math.max(Math.abs(referenceValue), 1e-10);
 
         for (let i = 0; i < spectrum.length; i++) {
-            const value = spectrum[i] / referenceValue;
-            dbSpectrum[i] = 20 * Math.log10(Math.max(value, 1e-10)); // Избегаем log(0)
+            const value = spectrum[i] / ref;
+            dbSpectrum[i] = 20 * Math.log10(Math.max(value, 1e-10));
         }
 
         return dbSpectrum;
@@ -273,9 +269,8 @@ export class DSPLib {
             const refPhase = refAngularFreq * i;
             let phaseDiff = instantPhase - refPhase;
 
-            // Нормализация фазы в [-π, π]
-            while (phaseDiff > Math.PI) phaseDiff -= 2 * Math.PI;
-            while (phaseDiff < -Math.PI) phaseDiff += 2 * Math.PI;
+            // Нормализация фазы в [-π, π] за O(1)
+            phaseDiff = ((phaseDiff % (2 * Math.PI)) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
 
             output[i] = phaseDiff * 180 / Math.PI;
         }
@@ -314,6 +309,7 @@ export class DSPLib {
      * Следующая степень двойки
      */
     static nextPowerOf2(n) {
+        if (n <= 1) return 1;
         return Math.pow(2, Math.ceil(Math.log2(n)));
     }
 

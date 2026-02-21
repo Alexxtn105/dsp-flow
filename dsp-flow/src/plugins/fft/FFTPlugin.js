@@ -11,8 +11,11 @@ export default {
     defaultParams: { fftSize: 8192, windowType: 'hann', normalize: true },
     process(ctx) {
         const { inputs, params, bufferSize } = ctx;
-        if (!inputs[0]) return { real: new Float32Array(bufferSize / 2), imag: new Float32Array(bufferSize / 2) };
         const { fftSize = bufferSize } = params;
+        if (!inputs[0]) {
+            const numBins = fftSize / 2 + 1;
+            return { real: new Float32Array(numBins), imag: new Float32Array(numBins) };
+        }
         return DSPLib.fft(inputs[0], fftSize);
     },
 };
