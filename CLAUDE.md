@@ -21,7 +21,7 @@ npm run preview      # предпросмотр production-сборки
 
 ## Tech Stack
 
-React 19 + Vite 7, @xyflow/react (React Flow) для графового редактора, MobX для состояния выполнения, d3 для визуализации, fft.js для БПФ. Язык — JavaScript/JSX (без TypeScript). CSS — покомпонентный (BEM).
+React 19 + Vite 7, @xyflow/react (React Flow) для графового редактора, MobX + mobx-react-lite для состояния выполнения, d3 для визуализации, fft.js для БПФ. Язык — JavaScript/JSX (без TypeScript). CSS — покомпонентный (BEM), глобальные переменные темы в `src/styles/variables.css`.
 
 ## Architecture
 
@@ -29,7 +29,7 @@ React 19 + Vite 7, @xyflow/react (React Flow) для графового реда
 
 Каждый DSP-блок — отдельный файл-плагин. Центральный `PluginRegistry` (singleton) управляет регистрацией, индексацией и поиском блоков. При старте приложения `src/plugins/index.js` регистрирует все плагины и вызывает `registry.freeze()` — после этого реестр неизменяем.
 
-Плагины организованы по категориям: `filters/`, `generators/`, `fft/`, `detectors/`, `math/`, `visualization/`.
+Плагины организованы по категориям: `filters/`, `generators/`, `fft/`, `detectors/`, `math/`, `visualization/`. Группы в UI используют ID: `'filters'`, `'generators'`, `'fft-blocks'`, `'math-blocks'`, `'detectors'`, `'visualization'`.
 
 **Структура плагина** (на примере генератора):
 ```javascript
@@ -45,6 +45,7 @@ export default {
     paramFields: [                    // описание UI для ParamsEditor
         { name: 'frequency', label: 'Частота (Гц)', type: 'number', min: 1, max: 20000, step: 10, defaultValue: 1000 },
     ],
+    visualizationType: 'oscilloscope', // только для sink-блоков: 'oscilloscope' | 'spectrum' | 'constellation'
     validate(params) { return []; },  // массив строк-ошибок
     process(ctx) { ... return Float32Array | {real, imag} | null; },
 };
@@ -56,14 +57,14 @@ export default {
 - `state` — персистентное runtime-состояние (фазы, аккумуляторы, буферы)
 - `sampleRate`, `bufferSize`, `nodeId`
 
-**Legacy-совместимость**: `src/utils/constants.js` реэкспортирует `DSP_BLOCK_TYPES`, `BLOCK_SIGNAL_CONFIG`, `DSP_ICONS`, `DEFAULT_BLOCK_PARAMS`, `DSP_GROUPS` из `src/plugins/index.js`. Собственные константы в `constants.js` — только `SIGNAL_TYPES`, `STORAGE_CONFIG`, `VALIDATION_RULES`.
+**Legacy-совместимость**: `src/utils/constants.js` реэкспортирует `DSP_BLOCK_TYPES`, `BLOCK_SIGNAL_CONFIG`, `DSP_ICONS`, `DEFAULT_BLOCK_PARAMS`, `DSP_GROUPS`, `INPUT_NODE_TYPES`, `OUTPUT_NODE_TYPES` из `src/plugins/index.js`. Собственные константы в `constants.js` — только `SIGNAL_TYPES`, `STORAGE_CONFIG`, `VALIDATION_RULES`.
 
 ### Три слоя движка обработки (`src/engine/`)
 
 1. **GraphCompiler** — валидация типов сигналов между блоками, обнаружение циклов (DFS), топологическая сортировка (Kahn's algorithm), генерация execution plan. Использует предвычисленные lookup Maps (`nodeMap`, `outEdges`, `inEdges`) для O(n+m) компиляции.
 2. **DSPEngine** — исполнение графа: проход узлов в топологическом порядке, получение процессоров через `registry.getProcessor(blockType)`, кеширование выходов (`nodeOutputs` Map), runtime-состояние узлов (`nodeState` Map).
 3. **DSPLib** — чистые статические функции обработки сигналов (FIR, FFT, Hilbert, детекторы, генераторы). Плагины импортируют DSPLib напрямую.
-4. **AudioFileReader** — декодирование WAV-файлов для блока `Аудио-файл`.
+4. **AudioFileReader** — декодирование аудиофайлов (WAV, MP3, OGG и др. через Web Audio API `AudioContext`) для блока `Аудио-файл`. Лимит: 100 MB.
 
 ### Поток данных
 
@@ -71,13 +72,13 @@ export default {
 
 ### Компонентное дерево (верхний уровень)
 
-`App` → `DSPEditorProvider` (React Context) → `Header` (запуск/остановка) + `ControlToolbar` (тема, сохранение/загрузка) + `DSPEditor` (ReactFlow canvas с `BlockNode`, кастомные edges). Диалоги `SaveDialog`/`LoadDialog` монтируются условно из `App`.
+`App` (observer) → `DSPEditorProvider` → `ErrorBoundary` → `Header` (запуск/остановка, диалог настроек sampleRate/bufferSize/FPS) + `ControlToolbar` (тема, сохранение/загрузка) + `DSPEditor` (ReactFlow canvas с двумя типами узлов: `BlockNode` и `AudioFileNode`, кастомные edges). Диалоги `SaveDialog`/`LoadDialog` монтируются условно из `App`. Переиспользуемые примитивы (`Dialog`, `FloatingWindow`, `Icon`, `CompactFileUploader`) — в `src/components/common/`.
 
 ### Управление состоянием
 
 - **MobX singleton** (`src/stores/DSPExecutionStore.js`) — единственный store, содержит `isRunning`, `compiledGraph`, `compilationErrors`, `executionData`, `visualizationData`. Computed: `hasErrors`, `canStart`, `totalNodes`. Оркестрирует `GraphCompiler` и `DSPEngine` внутри себя.
-- **React Context** (`src/contexts/DSPEditorContext.jsx`) — ReactFlow instance, данные текущей схемы, методы сохранения (через `useSchemeStorage` hook).
-- Hooks (`src/hooks/`) — useAutoSave, useTheme, useSchemeStorage, useNodeParams.
+- **React Context** (`src/contexts/DSPEditorContext.jsx` + `dspEditorContextDef.js`) — данные текущей схемы, методы сохранения/экспорта/импорта (через `useSchemeStorage` hook). Контекст читается через хук `useDSPEditor`.
+- Hooks (`src/hooks/`) — useDSPEditor, useAutoSave, useTheme, useSchemeStorage, useNodeParams.
 
 ### Система типов сигналов
 
@@ -89,7 +90,7 @@ export default {
 
 ### Сервисы (`src/services/`)
 
-- **storageService.js** — работа с localStorage (сохранение/загрузка схем, лимит 4 MB, до 50 схем)
+- **storageService.js** — статический класс для работы с localStorage (сохранение/загрузка схем, тема, автосохранение). Лимит: 4 MB, до 50 схем. Обрабатывает `QuotaExceededError` с автоочисткой
 - **validationService.js** — валидация имён схем, описаний, структуры данных, параметров блоков (делегирует в `plugin.validate()`)
 
 ## Key Files
@@ -120,5 +121,5 @@ export default {
 - Иконки — Google Material Icons (через CSS-класс `material-symbols-outlined`)
 - Персистентность — только localStorage (backend на Go планируется, но не реализован). Лимит: 4 MB, до 50 схем, автосохранение каждые 5 сек
 - Функциональные компоненты с hooks, `memo()` для оптимизации рендера
-- ESLint: `no-unused-vars` игнорирует переменные начинающиеся с заглавной буквы или `_` (паттерн `^[A-Z_]`)
+- ESLint: flat config (ESLint 9, `eslint.config.js`). `no-unused-vars` — `varsIgnorePattern: ^[A-Z_]`, `argsIgnorePattern: ^_`, `caughtErrorsIgnorePattern: ^_`
 - Дефолтная конфигурация движка: sampleRate=48000, bufferSize=1024, targetFPS=30
