@@ -61,31 +61,29 @@ const VisualizationManager = forwardRef(function VisualizationManager({
     }, [nodes, openWindows.size]);
 
     // Закрываем окна удалённых блоков
-    // This useState call was incorrectly placed and not used to declare state.
-    // The comment indicates it was meant for a side effect, which should be useEffect.
-    // The actual side effect logic is correctly implemented in the useEffect below.
+    const cleanupClosedWindows = useCallback((prevWindows, currentNodes) => {
+        const next = new Map(prevWindows);
+        let changed = false;
+
+        for (const [windowId, config] of prevWindows.entries()) {
+            const nodeExists = currentNodes.some(n => n.id === config.nodeId);
+            if (!nodeExists) {
+                next.delete(windowId);
+                changed = true;
+            }
+        }
+
+        return changed ? next : null;
+    }, []);
 
     // Эффект для автоматического закрытия окон при удалении узлов
-    // Используем setTimeout чтобы не блокировать рендер, или просто useEffect
     useEffect(() => {
         setOpenWindows(prev => {
-            let changed = false;
-            const next = new Map(prev);
-
-            for (const [windowId, config] of prev.entries()) {
-                const nodeExists = nodes.some(n => n.id === config.nodeId);
-                if (!nodeExists) {
-                    next.delete(windowId);
-                    changed = true;
-                }
-            }
-
-            if (changed) {
+            const next = cleanupClosedWindows(prev, nodes);
+            if (next) {
                 // Также чистим данные
                 setWindowData(prevData => {
                     const nextData = new Map(prevData);
-                    // Находим удаленные ключи
-                    // Note: windowId === nodeId in openWindow logic
                     for (const [winId] of prev) {
                         if (!next.has(winId)) {
                             nextData.delete(winId);
@@ -97,7 +95,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             }
             return prev;
         });
-    }, [nodes]); // Зависимость от списка узлов
+    }, [nodes, cleanupClosedWindows]);
 
     // Закрыть окно
     const closeWindow = useCallback((windowId) => {

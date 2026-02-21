@@ -6,7 +6,7 @@ const DSPEditorContext = createContext(null);
 /**
  * Provider для DSP Editor контекста
  */
-export const DSPEditorProvider = ({ children, reactFlowInstance }) => {
+export function DSPEditorProvider({ children, reactFlowInstance }) {
     const schemeStorage = useSchemeStorage();
     const [loadedSchemeData, setLoadedSchemeData] = useState(null);
 
@@ -22,12 +22,12 @@ export const DSPEditorProvider = ({ children, reactFlowInstance }) => {
             {children}
         </DSPEditorContext.Provider>
     );
-};
+}
 
 /**
  * Хук для использования DSP Editor контекста
  */
-export const useDSPEditor = () => {
+export function useDSPEditor() {
     const context = useContext(DSPEditorContext);
 
     if (!context) {
@@ -35,4 +35,4 @@ export const useDSPEditor = () => {
     }
 
     return context;
-};
+}

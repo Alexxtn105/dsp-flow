@@ -50,15 +50,6 @@ export const BLOCK_PARAM_OPTIONS = {
         { value: 'jet', label: 'Jet' },
         { value: 'hot', label: 'Hot' },
         { value: 'grayscale', label: 'Grayscale' }
-    ],
-    windowFunction: [
-        { value: 'rectangular', label: 'Прямоугольное (Rectangular)' },
-        { value: 'hamming', label: 'Хэмминга (Hamming)' },
-        { value: 'hanning', label: 'Ханна (Hanning)' },
-        { value: 'blackman', label: 'Блэкмана (Blackman)' },
-        { value: 'blackman-harris', label: 'Блэкмана-Харриса (Blackman-Harris)' },
-        { value: 'nuttall', label: 'Наттолла (Nuttall)' },
-        { value: 'flattop', label: 'Flat Top' }
     ]
 };
 

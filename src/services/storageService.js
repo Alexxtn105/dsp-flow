@@ -71,7 +71,7 @@ class StorageService {
                 try {
                     localStorage.setItem(key, JSON.stringify(data));
                     return { success: true };
-                } catch (retryError) {
+                } catch {
                     return {
                         success: false,
                         error: 'QUOTA_EXCEEDED',
@@ -162,7 +162,7 @@ class StorageService {
 
         let total = 0;
         for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
                 total += localStorage[key].length + key.length;
             }
         }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
@@ -9,12 +9,11 @@ import './BlockParamsDialog.css';
  * Диалог редактирования параметров блока
  */
 function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
-    // Debug: Ensure params are loaded correctly
-
     const [localParams, setLocalParams] = useState({});
     const [wavFileName, setWavFileName] = useState('');
+    const prevNodeIdRef = useRef(null);
 
-    useEffect(() => {
+    const initializeParams = useCallback(() => {
         if (node?.data) {
             const blockType = node.data.blockType;
             const defaultParams = getDefaultParams(blockType);
@@ -27,7 +26,14 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
                 setWavFileName(currentParams.wavFile.name || 'Файл выбран');
             }
         }
-    }, [node]);
+    }, [node?.data]);
+
+    useEffect(() => {
+        if (node?.id !== prevNodeIdRef.current) {
+            initializeParams();
+            prevNodeIdRef.current = node?.id;
+        }
+    }, [node?.id, initializeParams]);
 
     const blockType = node?.data?.blockType || 'Неизвестный блок';
     const isInputSignal = blockType === 'Audio File';

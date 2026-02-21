@@ -54,9 +54,10 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
                     r = 255; g = 255; b = Math.floor(((normalized - 0.8) / 0.2) * 255);
                 }
                 break;
-            default:
+            default: {
                 const v = Math.floor(normalized * 255);
                 r = g = b = v;
+            }
         }
         return `rgb(${r},${g},${b})`;
     }, []);
@@ -201,7 +202,7 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
 
         // Trigger scene drawing
         drawScene();
-    }, [data, isNormalized, colorMap, getColor]); // Removed width and drawScene to prevent mouse-movement trigger
+    }, [data, isNormalized, colorMap, getColor, drawScene]);
 
     // Re-render on cursor changes when simulation is stopped
     useEffect(() => {

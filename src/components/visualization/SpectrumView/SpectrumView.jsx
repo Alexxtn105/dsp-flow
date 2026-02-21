@@ -10,6 +10,7 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
     const [windowFunction, setWindowFunction] = useState('blackman-harris');
     const [accumulate, setAccumulate] = useState(false);
     const [accumulatedData, setAccumulatedData] = useState(null);
+    const prevAccumulateRef = useRef(null);
 
     // Mouse tracking
     const [cursorX, setCursorX] = useState(null);
@@ -17,11 +18,12 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
     const [hoverFreq, setHoverFreq] = useState(null);
     const [hoverDb, setHoverDb] = useState(null);
 
-    // Reset accumulated data when stopped or toggled
+    // Reset accumulated data when accumulate is turned off
     useEffect(() => {
-        if (!accumulate) {
+        if (!accumulate && prevAccumulateRef.current) {
             setAccumulatedData(null);
         }
+        prevAccumulateRef.current = accumulate;
     }, [accumulate]);
 
     // Update accumulated data

@@ -48,9 +48,6 @@ function App() {
         progress: 0
     });
 
-    // Ошибки компиляции
-    const [compilationErrors, setCompilationErrors] = useState([]);
-
     // Nodes для визуализации
     const [nodes, setNodes] = useState([]);
 
@@ -93,7 +90,6 @@ function App() {
             isSaved: true
         });
         setProcessingProgress({ currentSample: 0, totalSamples: 0, progress: 0 });
-        setCompilationErrors([]);
         setNodes([]);
 
         console.log('Создана новая схема');
@@ -122,14 +118,6 @@ function App() {
         setIsManualMode(enabled);
         DSPProcessor.setManualMode(enabled);
     }, []);
-
-    const handleManualStep = useCallback(() => {
-        if (!isRunning) {
-            handleStartSimulation();
-        } else {
-            DSPProcessor.step(manualStepSize);
-        }
-    }, [isRunning, manualStepSize]);
 
     const handleStartSimulation = useCallback(() => {
         if (!reactFlowInstance) return;
@@ -167,13 +155,10 @@ function App() {
         const compilationResult = GraphCompiler.compile(currentNodes, edges);
 
         if (!compilationResult.success) {
-            setCompilationErrors(compilationResult.errors);
             const errorMessages = compilationResult.errors.map(e => e.message).join('\n');
             alert(`Ошибки компиляции:\n${errorMessages}`);
             return;
         }
-
-        setCompilationErrors([]);
 
         const startProcessing = (fileSampleRate = null) => {
             // Если есть rate из файла - используем его, иначе текущий из настроек
@@ -193,7 +178,7 @@ function App() {
                 setProcessingProgress(progress);
             };
 
-            DSPProcessor.onBlockOutput = (nodeId, output, blockType) => {
+            DSPProcessor.onBlockOutput = (nodeId, output) => {
                 if (visualizationManagerRef.current) {
                     visualizationManagerRef.current.updateData(nodeId, output);
                 }
@@ -224,7 +209,15 @@ function App() {
             // Запуск без файла (генераторы)
             startProcessing(null);
         }
-    }, [reactFlowInstance, stats.nodesCount]);
+    }, [reactFlowInstance, stats.nodesCount, isManualMode, sampleRate]);
+
+    const handleManualStep = useCallback(() => {
+        if (!isRunning) {
+            handleStartSimulation();
+        } else {
+            DSPProcessor.step(manualStepSize);
+        }
+    }, [isRunning, manualStepSize, handleStartSimulation]);
 
     const handleStopSimulation = useCallback(() => {
         DSPProcessor.stop();

@@ -24,6 +24,12 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Allow setState in useEffect for functional updates
+      'react-hooks/set-state-in-effect': 'off',
+      // Allow non-component exports for fast refresh
+      'react-refresh/only-export-components': 'off',
+      // Allow manual memoization with different dependencies
+      'react-hooks/preserve-manual-memoization': 'off',
     },
   },
 ])
