@@ -73,6 +73,40 @@ describe('FIRFilterPlugin', () => {
     });
 });
 
+describe('FIRFilterPlugin Remez', () => {
+    it('инициализация с designMethod: remez создаёт корректные коэффициенты', () => {
+        const proc = createFIRProcessor();
+        proc.init('fir_remez1', {
+            filterType: 'lowpass',
+            cutoffFrequency: 2000,
+            order: 31,
+            designMethod: 'remez'
+        }, 48000);
+        const state = proc.states.get('fir_remez1');
+        expect(state).toBeDefined();
+        expect(state.coeffs).toBeInstanceOf(Float32Array);
+        expect(state.coeffs.length).toBe(31);
+        expect(state.coeffs._remezFallback).toBeUndefined();
+    });
+
+    it('Remez lowpass: DC проходит через фильтр', () => {
+        const proc = createFIRProcessor();
+        const params = {
+            filterType: 'lowpass',
+            cutoffFrequency: 5000,
+            order: 31,
+            designMethod: 'remez',
+            sampleRate: 48000
+        };
+        const dcInput = new Float32Array(1024).fill(1.0);
+        proc.process([dcInput], params, 1024, 'fir_remez_dc');
+        proc.process([dcInput], params, 1024, 'fir_remez_dc');
+        const output = proc.process([dcInput], params, 1024, 'fir_remez_dc');
+        const dcValue = output[output.length - 1];
+        expect(dcValue).toBeCloseTo(1.0, 1);
+    });
+});
+
 describe('GoertzelFilterPlugin', () => {
     it('обнаруживает целевую частоту', () => {
         const proc = GoertzelFilterPlugin.processor;

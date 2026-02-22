@@ -1,5 +1,5 @@
 import WindowFunctions from '../_shared/WindowFunctions.js';
-import { sinc, designWindowedSinc, designRemez } from '../_shared/FilterDesign.js';
+import { sinc, designWindowedSinc, designRemez, designRemezBandpass } from '../_shared/FilterDesign.js';
 
 /**
  * Фабрика FIR-процессора. Каждый вызов создаёт новый экземпляр
@@ -22,19 +22,24 @@ export function createFIRProcessor() {
             if (type === 'bandpass') {
                 const lowCutoff = params.lowCutoff || cutoff * 0.8;
                 const highCutoff = params.highCutoff || cutoff * 1.2;
-                const M = order - 1;
-                const fHigh = highCutoff / sampleRate;
-                const fLow = lowCutoff / sampleRate;
-                coeffs = new Float32Array(order);
-                const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
 
-                for (let i = 0; i < order; i++) {
-                    if (i === M / 2) {
-                        coeffs[i] = 2 * (fHigh - fLow);
-                    } else {
-                        coeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - M / 2)) - 2 * fLow * sinc(2 * fLow * (i - M / 2));
+                if (designMethod === 'remez') {
+                    coeffs = designRemezBandpass(lowCutoff, highCutoff, sampleRate, order);
+                } else {
+                    const M = order - 1;
+                    const fHigh = highCutoff / sampleRate;
+                    const fLow = lowCutoff / sampleRate;
+                    coeffs = new Float32Array(order);
+                    const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
+
+                    for (let i = 0; i < order; i++) {
+                        if (i === M / 2) {
+                            coeffs[i] = 2 * (fHigh - fLow);
+                        } else {
+                            coeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - M / 2)) - 2 * fLow * sinc(2 * fLow * (i - M / 2));
+                        }
+                        coeffs[i] *= window(i, order);
                     }
-                    coeffs[i] *= window(i, order);
                 }
             } else {
                 if (designMethod === 'remez') {

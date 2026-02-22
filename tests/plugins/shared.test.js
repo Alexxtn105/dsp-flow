@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import WindowFunctions from '../../src/engine/plugins/_shared/WindowFunctions.js';
-import { sinc, designWindowedSinc } from '../../src/engine/plugins/_shared/FilterDesign.js';
+import { sinc, designWindowedSinc, designRemez } from '../../src/engine/plugins/_shared/FilterDesign.js';
 import { fft, computeMagnitudeDB } from '../../src/engine/plugins/_shared/FFTUtils.js';
 
 describe('WindowFunctions', () => {
@@ -52,6 +52,40 @@ describe('designWindowedSinc', () => {
         let sum = 0;
         for (let i = 0; i < coeffs.length; i++) sum += coeffs[i];
         expect(sum).toBeCloseTo(1.0, 1);
+    });
+});
+
+describe('designRemez', () => {
+    it('возвращает Float32Array правильной длины', () => {
+        const coeffs = designRemez('lowpass', 1000, 48000, 31);
+        expect(coeffs).toBeInstanceOf(Float32Array);
+        expect(coeffs.length).toBe(31);
+    });
+
+    it('lowpass: сумма коэффициентов ≈ 1 (unity gain at DC)', () => {
+        const coeffs = designRemez('lowpass', 5000, 48000, 31);
+        let sum = 0;
+        for (let i = 0; i < coeffs.length; i++) sum += coeffs[i];
+        expect(sum).toBeCloseTo(1.0, 1);
+    });
+
+    it('highpass: подавляет DC, пропускает Nyquist', () => {
+        const coeffs = designRemez('highpass', 5000, 48000, 31);
+        // DC gain — сумма коэффициентов — должна быть ≈ 0
+        let dcSum = 0;
+        for (let i = 0; i < coeffs.length; i++) dcSum += coeffs[i];
+        expect(Math.abs(dcSum)).toBeLessThan(0.2);
+        // Nyquist gain — знакочередующая сумма — должна быть ≈ 1
+        let nyqSum = 0;
+        for (let i = 0; i < coeffs.length; i++) {
+            nyqSum += coeffs[i] * ((i % 2 === 0) ? 1 : -1);
+        }
+        expect(Math.abs(nyqSum)).toBeCloseTo(1.0, 0);
+    });
+
+    it('не содержит _remezFallback', () => {
+        const coeffs = designRemez('lowpass', 2000, 48000, 31);
+        expect(coeffs._remezFallback).toBeUndefined();
     });
 });
 
