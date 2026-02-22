@@ -4,6 +4,7 @@ import VisualizationWindow from '../VisualizationWindow';
 import OscilloscopeView from '../OscilloscopeView';
 import SpectrumView from '../SpectrumView';
 import WaterfallView from '../WaterfallView';
+import ConstellationView from '../ConstellationView';
 import { ErrorBoundary } from '../../common';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 
@@ -33,6 +34,8 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             vizType = 'spectrum';
         } else if (blockType === 'Водопад') {
             vizType = 'waterfall';
+        } else if (blockType === 'Фазовое созвездие') {
+            vizType = 'constellation';
         }
 
         // Позиционирование окна (ближе к правому краю)
@@ -183,6 +186,12 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                             <WaterfallView
                                 data={data}
                                 sampleRate={sampleRate}
+                                            width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'constellation' ? (
+                            <ConstellationView
+                                data={data}
                                             width={config.width}
                                 height={config.height - 70}
                             />

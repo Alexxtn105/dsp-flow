@@ -1,0 +1,14 @@
+.constellation-view {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.constellation-canvas {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+
+.dark-theme .constellation-canvas {
+    border-color: var(--border-secondary);
+}

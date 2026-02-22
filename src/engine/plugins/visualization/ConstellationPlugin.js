@@ -12,7 +12,7 @@ export default {
     },
     processor: {
         process(inputs, params, chunkSize) {
-            return inputs[0] || new Float32Array(chunkSize);
+            return inputs[0] || new Float32Array(chunkSize * 2);
         }
     }
 };
