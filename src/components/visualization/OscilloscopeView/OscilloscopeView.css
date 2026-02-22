@@ -22,3 +22,12 @@
 .dark-theme .oscilloscope-canvas {
     border-color: var(--border-secondary);
 }
+
+.viz-toolbar-label {
+    margin-right: 8px;
+    font-size: 11px;
+}
+
+.viz-zoom-input {
+    width: 60px;
+}

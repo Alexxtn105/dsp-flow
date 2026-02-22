@@ -24,6 +24,7 @@ import {
     areSignalsCompatible
 } from '../../../utils/helpers';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
 
@@ -37,7 +38,6 @@ const edgeTypes = {
 };
 
 function DSPEditor({
-    isDarkTheme,
     currentScheme,
     onSchemeUpdate,
     onStatsUpdate,
@@ -45,6 +45,7 @@ function DSPEditor({
     isRunning,
     onOpenVisualization
 }) {
+    const { isDarkTheme } = useThemeContext();
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -361,7 +362,7 @@ function DSPEditor({
 
     return (
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <Toolbar isDarkTheme={isDarkTheme} />
+            <Toolbar />
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <ReactFlow
                     nodes={nodes}
@@ -393,7 +394,6 @@ function DSPEditor({
             {/* Диалог редактирования параметров блока */}
             {paramsDialogNode && (
                 <BlockParamsDialog
-                    isDarkTheme={isDarkTheme}
                     onClose={() => setParamsDialogNode(null)}
                     node={paramsDialogNode}
                     onSave={handleSaveParams}
@@ -404,7 +404,6 @@ function DSPEditor({
 }
 
 DSPEditor.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     currentScheme: PropTypes.object.isRequired,
     onSchemeUpdate: PropTypes.func.isRequired,
     onStatsUpdate: PropTypes.func.isRequired,

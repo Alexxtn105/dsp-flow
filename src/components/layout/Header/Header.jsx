@@ -3,7 +3,7 @@ import './Header.css';
 
 import SignalLegend from '../../dsp/DSPEditor/SignalLegend';
 
-function Header({ currentScheme, isDarkTheme }) {
+function Header({ currentScheme }) {
     return (
         <header className="app-header">
             <div className="app-header-left">
@@ -25,7 +25,7 @@ function Header({ currentScheme, isDarkTheme }) {
             </div>
 
             <div className="app-header-right">
-                <SignalLegend isDarkTheme={isDarkTheme} />
+                <SignalLegend />
             </div>
         </header>
     );
@@ -35,8 +35,7 @@ Header.propTypes = {
     currentScheme: PropTypes.shape({
         name: PropTypes.string.isRequired,
         isSaved: PropTypes.bool.isRequired
-    }).isRequired,
-    isDarkTheme: PropTypes.bool
+    }).isRequired
 };
 
 export default Header;

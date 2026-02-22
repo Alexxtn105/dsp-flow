@@ -12,7 +12,8 @@ describe('FFTPlugin', () => {
 
     it('DC-вход: пик на нулевой частоте', () => {
         const input = new Float32Array(1024).fill(1.0);
-        const output = FFTPlugin.processor.process([input], {}, 1024);
+        // Rectangular window для чистого DC-теста (без спектральной утечки от оконной функции)
+        const output = FFTPlugin.processor.process([input], { windowType: 'rectangular' }, 1024);
         // Bin 0 (DC) должен быть значительно больше остальных
         const dcBin = output[0];
         const otherMax = Math.max(...output.slice(1));

@@ -23,8 +23,8 @@ export default {
 
             const windowSize = params.windowSize ?? 1024;
             const fftSize = params.fftSize ?? windowSize;
-            const overlap = params.overlap ?? (windowSize >> 1);
-            const hopSize = windowSize - overlap;
+            const overlap = Math.min(params.overlap ?? (windowSize >> 1), windowSize - 1);
+            const hopSize = Math.max(1, windowSize - overlap);
             const halfSpectrum = fftSize >> 1;
             const windowFn = WindowFunctions.hanning;
 

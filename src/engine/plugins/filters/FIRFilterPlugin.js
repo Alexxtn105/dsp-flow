@@ -52,7 +52,8 @@ export function createFIRProcessor() {
                 pointer: 0,
                 order,
                 _cutoff: cutoff,
-                _order: order
+                _order: order,
+                _filterType: type
             });
         },
 
@@ -70,7 +71,8 @@ export function createFIRProcessor() {
                 // Проверяем, изменились ли параметры — пересчитываем коэффициенты
                 const currentCutoff = params.cutoffFrequency || params.cutoff || params.frequency || 1000;
                 const currentOrder = params.order || 31;
-                if (state._cutoff !== currentCutoff || state._order !== currentOrder) {
+                const currentFilterType = params.filterType || 'lowpass';
+                if (state._cutoff !== currentCutoff || state._order !== currentOrder || state._filterType !== currentFilterType) {
                     const oldBuffer = state.buffer;
                     const oldPointer = state.pointer;
                     this.init(nodeId, params, sampleRate);

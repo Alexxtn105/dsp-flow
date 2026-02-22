@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './SettingsDialog.css';
 
 /**
  * Диалог настроек - редактирование частоты дискретизации
  */
-function SettingsDialog({ isDarkTheme, onClose, sampleRate, onSampleRateChange }) {
+function SettingsDialog({ onClose, sampleRate, onSampleRateChange }) {
+    const { isDarkTheme } = useThemeContext();
     const [localSampleRate, setLocalSampleRate] = useState(sampleRate);
     const [error, setError] = useState('');
 
@@ -86,7 +88,6 @@ function SettingsDialog({ isDarkTheme, onClose, sampleRate, onSampleRateChange }
 }
 
 SettingsDialog.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     sampleRate: PropTypes.number.isRequired,
     onSampleRateChange: PropTypes.func.isRequired

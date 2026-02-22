@@ -2,9 +2,11 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import ValidationService from '../../../services/validationService';
 
-function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode }) {
+function SaveDialog({ onClose, schemeName, onSaveSuccess, mode }) {
+    const { isDarkTheme } = useThemeContext();
     const { saveScheme, reactFlowInstance } = useDSPEditor();
     const [formData, setFormData] = useState({
         name: mode === 'saveAs' ? '' : schemeName,
@@ -79,7 +81,7 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode }) {
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
                 />
-                {error && <div className="error-message">⚠️ {error}</div>}
+                {error && <div className="error-message" role="alert">⚠️ {error}</div>}
                 <div className="dialog-buttons">
                     <button type="submit">{mode === 'saveAs' ? 'Сохранить' : 'Обновить'}</button>
                     <button type="button" onClick={onClose}>Отмена</button>
@@ -90,7 +92,6 @@ function SaveDialog({ isDarkTheme, onClose, schemeName, onSaveSuccess, mode }) {
 }
 
 SaveDialog.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     schemeName: PropTypes.string.isRequired,
     onSaveSuccess: PropTypes.func.isRequired,

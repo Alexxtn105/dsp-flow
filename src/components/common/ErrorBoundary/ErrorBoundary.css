@@ -1,0 +1,17 @@
+.error-boundary-fallback {
+    padding: 16px;
+    text-align: center;
+    color: var(--text-secondary, #888);
+    font-size: 13px;
+}
+
+.error-boundary-reset-btn {
+    margin-top: 8px;
+    padding: 4px 12px;
+    border: 1px solid var(--border-primary, #ccc);
+    border-radius: 4px;
+    background: var(--bg-secondary, #f5f5f5);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-primary, #333);
+}

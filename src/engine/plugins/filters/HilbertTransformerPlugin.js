@@ -43,7 +43,8 @@ export default {
                 buffer,
                 pointer: 0,
                 N,
-                delay: M
+                delay: M,
+                _order: params.order ?? 64
             });
         },
 
@@ -51,10 +52,12 @@ export default {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize * 2);
 
-            if (!this.states.has(nodeId)) {
+            const currentOrder = params.order ?? 64;
+            let state = this.states.get(nodeId);
+            if (!state || state._order !== currentOrder) {
                 this.init(nodeId, params);
+                state = this.states.get(nodeId);
             }
-            const state = this.states.get(nodeId);
             const { coeffs, buffer, N, delay } = state;
             let { pointer } = state;
 

@@ -67,6 +67,14 @@
     height: 100%;
 }
 
+.legend-gradient-audition {
+    background: linear-gradient(to top, black, purple, red, orange, yellow, white);
+}
+
+.legend-gradient-grayscale {
+    background: linear-gradient(to top, black, white);
+}
+
 .legend-labels {
     position: absolute;
     left: -25px;

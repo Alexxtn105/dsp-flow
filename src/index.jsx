@@ -1,12 +1,24 @@
 import { createRoot } from 'react-dom/client';
 import initPlugins from './engine/initPlugins.js';
+import { ThemeProvider } from './contexts/ThemeContext';
 import App from './App';
 
 import './styles/index.css';
 
-initPlugins();
+try {
+    initPlugins();
+} catch (error) {
+    console.error('Ошибка инициализации плагинов:', error);
+    document.querySelector('#app').textContent =
+        'Ошибка инициализации приложения. Перезагрузите страницу.';
+    throw error;
+}
 
 const container = document.querySelector('#app');
 const root = createRoot(container);
 
-root.render(<App />);
+root.render(
+    <ThemeProvider>
+        <App />
+    </ThemeProvider>
+);

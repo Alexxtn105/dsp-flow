@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Footer.css';
 
 function Footer({
-    isDarkTheme,
     isRunning,
     nodesCount,
     // connectionsCount зарезервирован для будущего использования
@@ -16,6 +16,7 @@ function Footer({
     onStep,
     onStepSizeChange
 }) {
+    const { isDarkTheme } = useThemeContext();
     const formatProgress = (value) => {
         return Math.round(value * 100);
     };
@@ -110,7 +111,6 @@ function Footer({
 }
 
 Footer.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     isRunning: PropTypes.bool.isRequired,
     nodesCount: PropTypes.number.isRequired,
     connectionsCount: PropTypes.number.isRequired,

@@ -88,7 +88,14 @@ class WavFileService {
         const actualSize = endSample - startSample;
 
         if (actualSize <= 0) {
-            return null; // Достигнут конец файла
+            return new Float32Array(chunkSize);
+        }
+
+        // Всегда возвращаем буфер размером chunkSize (zero-padding в конце)
+        if (actualSize < chunkSize) {
+            const result = new Float32Array(chunkSize);
+            result.set(channelData.subarray(startSample, endSample));
+            return result;
         }
 
         return channelData.slice(startSample, endSample);

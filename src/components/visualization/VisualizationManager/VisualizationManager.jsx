@@ -5,16 +5,17 @@ import OscilloscopeView from '../OscilloscopeView';
 import SpectrumView from '../SpectrumView';
 import WaterfallView from '../WaterfallView';
 import { ErrorBoundary } from '../../common';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 
 /**
  * Менеджер окон визуализации
  * Управляет открытием/закрытием и обновлением данных в окнах
  */
 const VisualizationManager = forwardRef(function VisualizationManager({
-    isDarkTheme,
     sampleRate,
     nodes
 }, ref) {
+    const { isDarkTheme } = useThemeContext();
     const [openWindows, setOpenWindows] = useState(new Map());
     const [windowData, setWindowData] = useState(new Map());
 
@@ -164,7 +165,6 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                     key={windowId}
                     nodeId={windowId}
                     title={config.title}
-                    isDarkTheme={isDarkTheme}
                     onClose={closeWindow}
                     onResize={handleResize}
                     initialPosition={config.position}
@@ -176,23 +176,20 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                             <SpectrumView
                                 data={data}
                                 sampleRate={sampleRate}
-                                isDarkTheme={isDarkTheme}
-                                width={config.width}
+                                            width={config.width}
                                 height={config.height - 70}
                             />
                         ) : config.vizType === 'waterfall' ? (
                             <WaterfallView
                                 data={data}
                                 sampleRate={sampleRate}
-                                isDarkTheme={isDarkTheme}
-                                width={config.width}
+                                            width={config.width}
                                 height={config.height - 70}
                             />
                         ) : (
                             <OscilloscopeView
                                 data={data}
-                                isDarkTheme={isDarkTheme}
-                                width={config.width}
+                                            width={config.width}
                                 height={config.height - 70}
                             />
                         )}
@@ -208,7 +205,6 @@ const VisualizationManager = forwardRef(function VisualizationManager({
 });
 
 VisualizationManager.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     sampleRate: PropTypes.number.isRequired,
     nodes: PropTypes.array.isRequired
 };
