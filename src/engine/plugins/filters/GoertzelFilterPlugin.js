@@ -35,6 +35,7 @@ export default {
             const cosW = Math.cos(2 * Math.PI * k / N);
             const sinW = Math.sin(2 * Math.PI * k / N);
 
+
             for (let i = 0; i < input.length; i++) {
                 const s0 = input[i] + coeff * state.s1 - state.s2;
                 state.s2 = state.s1;

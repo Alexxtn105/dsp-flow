@@ -37,6 +37,8 @@ export default {
             }
             const state = this.states.get(nodeId);
 
+
+
             for (let i = 0; i < input.length; i++) {
                 state.buffer[state.bufferPos] = input[i];
                 state.bufferPos++;
