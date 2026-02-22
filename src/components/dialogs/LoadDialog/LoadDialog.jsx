@@ -4,7 +4,7 @@ import Dialog from '../../common/Dialog/Dialog';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import { formatDate } from '../../../utils/helpers';
 
-function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
+function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAlert }) {
     const { getSavedSchemes, loadScheme, deleteScheme, setLoadedSchemeData } = useDSPEditor();
     const [schemes, setSchemes] = useState([]);
 
@@ -18,11 +18,23 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
             // Устанавливаем загруженные данные в контекст
             setLoadedSchemeData(result.data);
             onLoadSuccess(schemeName);
+        } else if (!result.success) {
+            const message = result.error === 'VALIDATION_FAILED'
+                ? `Схема "${schemeName}" содержит ошибки:\n${result.errors.join('\n')}`
+                : result.message || 'Не удалось загрузить схему';
+            if (showAlert) {
+                showAlert(message, 'Ошибка загрузки');
+            }
         }
     };
 
     const handleDelete = async (schemeName) => {
-        if (confirm(`Удалить схему "${schemeName}"?`)) {
+        if (showConfirm) {
+            showConfirm(`Удалить схему "${schemeName}"?`, 'Удаление', async () => {
+                await deleteScheme(schemeName);
+                setSchemes(getSavedSchemes());
+            });
+        } else {
             await deleteScheme(schemeName);
             setSchemes(getSavedSchemes());
         }
@@ -62,7 +74,9 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess }) {
 LoadDialog.propTypes = {
     isDarkTheme: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onLoadSuccess: PropTypes.func.isRequired
+    onLoadSuccess: PropTypes.func.isRequired,
+    showConfirm: PropTypes.func,
+    showAlert: PropTypes.func
 };
 
 export default LoadDialog;

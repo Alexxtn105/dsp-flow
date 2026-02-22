@@ -17,10 +17,10 @@ export default {
 
         process(inputs, params, chunkSize, nodeId) {
             const output = new Float32Array(chunkSize);
-            const frequency = params.frequency || 1000;
-            const amplitude = params.amplitude !== undefined ? params.amplitude : 1.0;
-            const phaseOffset = (params.phase || 0) * (Math.PI / 180);
-            const sampleRate = params.sampleRate || 48000;
+            const frequency = params.frequency ?? 1000;
+            const amplitude = params.amplitude ?? 1.0;
+            const phaseOffset = (params.phase ?? 0) * (Math.PI / 180);
+            const sampleRate = params.sampleRate ?? 48000;
 
             if (!this.states.has(nodeId)) {
                 this.states.set(nodeId, { currentPhase: 0 });
