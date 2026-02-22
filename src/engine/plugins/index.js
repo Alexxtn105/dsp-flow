@@ -22,6 +22,8 @@ import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin.js';
 import SummerPlugin from './math/SummerPlugin.js';
 import MultiplierPlugin from './math/MultiplierPlugin.js';
 import IntegratorPlugin from './math/IntegratorPlugin.js';
+import RealPartPlugin from './math/RealPartPlugin.js';
+import ImagPartPlugin from './math/ImagPartPlugin.js';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
@@ -64,6 +66,8 @@ export default [
     IntegratorPlugin,
     SummerPlugin,
     MultiplierPlugin,
+    RealPartPlugin,
+    ImagPartPlugin,
 
     // Визуализация
     OscilloscopePlugin,
