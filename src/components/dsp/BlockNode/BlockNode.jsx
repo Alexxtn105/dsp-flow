@@ -20,6 +20,7 @@ function BlockNode({ data, selected }) {
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
+    const inputsCount = data.params?.numInputs || signalConfig.inputsCount || 1;
     const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
     const canVisualize = isVisualizationBlock(data.blockType);
@@ -50,16 +51,16 @@ function BlockNode({ data, selected }) {
     return (
         <div className={`block-node ${selected ? 'selected' : ''}`}>
             {hasInput && (
-                signalConfig.inputsCount && signalConfig.inputsCount > 1 ? (
+                inputsCount > 1 ? (
                     // Multiple inputs
-                    Array.from({ length: signalConfig.inputsCount }).map((_, i) => (
+                    Array.from({ length: inputsCount }).map((_, i) => (
                         <Handle
                             key={`input-${i}`}
                             type="target"
                             position={Position.Left}
                             id={`input-${i}`}
                             className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
-                            style={{ top: `${((i + 1) * 100) / (signalConfig.inputsCount + 1)}%` }}
+                            style={{ top: `${((i + 1) * 100) / (inputsCount + 1)}%` }}
                             data-signal-type={signalConfig.input}
                             title={`Вход ${i + 1}`}
                         />

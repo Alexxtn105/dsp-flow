@@ -4,7 +4,7 @@ export default {
     icon: 'close',
     description: 'Перемножитель',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real', inputsCount: 2 },
     defaultParams: {
         numInputs: 2,
         operation: 'multiply',
@@ -12,23 +12,35 @@ export default {
     },
     processor: {
         process(inputs, params, chunkSize) {
-            const input1 = inputs[0] || new Float32Array(chunkSize);
             const output = new Float32Array(chunkSize);
             const scale = params.scaleFactor ?? 1.0;
 
-            if (inputs.length < 2 || !inputs[1]) {
-                // Один вход — умножение на scaleFactor
+            if (inputs.length === 0 || !inputs[0]) {
+                return output;
+            }
+
+            // Начинаем с первого входа
+            const first = inputs[0];
+            for (let i = 0; i < chunkSize; i++) {
+                output[i] = i < first.length ? first[i] : 0;
+            }
+
+            // Перемножаем с каждым последующим входом
+            for (let idx = 1; idx < inputs.length; idx++) {
+                const inp = inputs[idx];
+                if (!inp) continue;
                 for (let i = 0; i < chunkSize; i++) {
-                    output[i] = (i < input1.length ? input1[i] : 0) * scale;
-                }
-            } else {
-                const input2 = inputs[1];
-                for (let i = 0; i < chunkSize; i++) {
-                    const v1 = i < input1.length ? input1[i] : 0;
-                    const v2 = i < input2.length ? input2[i] : 0;
-                    output[i] = v1 * v2 * scale;
+                    output[i] *= (i < inp.length ? inp[i] : 0);
                 }
             }
+
+            // Применяем масштабный коэффициент
+            if (scale !== 1.0) {
+                for (let i = 0; i < chunkSize; i++) {
+                    output[i] *= scale;
+                }
+            }
+
             return output;
         }
     }

@@ -90,12 +90,12 @@ describe('PluginRegistry', () => {
     it('getSignalConfig возвращает конфигурацию сигналов', () => {
         registry.register(makePlugin({ signals: { input: null, output: 'real' } }));
         const config = registry.getSignalConfig('Тестовый блок');
-        expect(config).toEqual({ input: null, output: 'real' });
+        expect(config).toEqual({ input: null, output: 'real', inputsCount: 1 });
     });
 
     it('getSignalConfig возвращает дефолт для незарегистрированного', () => {
         const config = registry.getSignalConfig('???');
-        expect(config).toEqual({ input: 'real', output: 'real' });
+        expect(config).toEqual({ input: 'real', output: 'real', inputsCount: 1 });
     });
 
     it('getDefaultParams возвращает параметры', () => {

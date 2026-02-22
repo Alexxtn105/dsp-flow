@@ -92,11 +92,12 @@ class PluginRegistry {
     getSignalConfig(type) {
         const plugin = this.#plugins.get(type);
         if (!plugin) {
-            return { input: 'real', output: 'real' };
+            return { input: 'real', output: 'real', inputsCount: 1 };
         }
         return {
             input: plugin.signals.input,
-            output: plugin.signals.output
+            output: plugin.signals.output,
+            inputsCount: plugin.signals.inputsCount || 1
         };
     }
 

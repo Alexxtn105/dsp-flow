@@ -93,22 +93,44 @@ function DSPEditor({
     const handleSaveParams = useCallback((nodeId, newParams) => {
         setNodes(nds => nds.map(node => {
             if (node.id === nodeId) {
-                return {
-                    ...node,
-                    data: {
-                        ...node.data,
-                        params: newParams
-                    }
+                const updatedData = {
+                    ...node.data,
+                    params: newParams
                 };
+
+                // Если изменился numInputs — обновляем signalConfig.inputsCount
+                if (newParams.numInputs !== undefined && node.data.signalConfig) {
+                    updatedData.signalConfig = {
+                        ...node.data.signalConfig,
+                        inputsCount: newParams.numInputs
+                    };
+                }
+
+                return { ...node, data: updatedData };
             }
             return node;
         }));
+
+        // Удаляем edges к хэндлам, которых больше нет
+        const newNumInputs = newParams.numInputs;
+        if (newNumInputs !== undefined) {
+            setEdges(eds => eds.filter(edge => {
+                if (edge.target !== nodeId) return true;
+                const handle = edge.targetHandle;
+                if (!handle) return true;
+                // Хэндлы имеют вид "input-0", "input-1", ...
+                const match = handle.match(/^input-(\d+)$/);
+                if (!match) return true; // "input" (одиночный) — оставляем
+                const idx = parseInt(match[1], 10);
+                return idx < newNumInputs;
+            }));
+        }
 
         // Помечаем схему как несохранённую
         if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
             onSchemeUpdate(currentScheme.name, false);
         }
-    }, [setNodes, currentScheme, onSchemeUpdate]);
+    }, [setNodes, setEdges, currentScheme, onSchemeUpdate]);
 
     // Обработчик обновления одного параметра (для быстрого переключения)
     const handleParamUpdate = useCallback((nodeId, paramName, paramValue) => {

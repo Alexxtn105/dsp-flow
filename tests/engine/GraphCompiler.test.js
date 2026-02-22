@@ -324,7 +324,7 @@ describe('GraphCompiler', () => {
             expect(sequence[0].blockType).toBe(SINE);
             expect(sequence[0].params).toEqual({ frequency: 440 });
             expect(sequence[0].inputs).toHaveLength(0);
-            expect(sequence[0].signalConfig).toEqual({ input: null, output: 'real' });
+            expect(sequence[0].signalConfig).toEqual({ input: null, output: 'real', inputsCount: 1 });
 
             // Фильтр — вход от генератора
             expect(sequence[1].nodeId).toBe('flt');
@@ -332,14 +332,14 @@ describe('GraphCompiler', () => {
             expect(sequence[1].params).toEqual({ cutoff: 1000 });
             expect(sequence[1].inputs).toHaveLength(1);
             expect(sequence[1].inputs[0].sourceNodeId).toBe('gen');
-            expect(sequence[1].signalConfig).toEqual({ input: 'real', output: 'real' });
+            expect(sequence[1].signalConfig).toEqual({ input: 'real', output: 'real', inputsCount: 1 });
 
             // Осциллограф — вход от фильтра
             expect(sequence[2].nodeId).toBe('osc');
             expect(sequence[2].blockType).toBe(OSC);
             expect(sequence[2].inputs).toHaveLength(1);
             expect(sequence[2].inputs[0].sourceNodeId).toBe('flt');
-            expect(sequence[2].signalConfig).toEqual({ input: 'real', output: null });
+            expect(sequence[2].signalConfig).toEqual({ input: 'real', output: null, inputsCount: 1 });
         });
 
         it('узел с двумя входами получает оба в inputs', () => {

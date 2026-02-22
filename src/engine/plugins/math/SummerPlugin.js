@@ -4,7 +4,7 @@ export default {
     icon: 'add',
     description: 'Сумматор',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real', inputsCount: 2 },
     defaultParams: {
         numInputs: 2,
         weights: [1.0, 1.0],

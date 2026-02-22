@@ -269,9 +269,15 @@ class DSPProcessor {
      * @returns {Float32Array} выходные данные
      */
     executeBlock(block) {
-        // Собираем входные данные
+        // Собираем входные данные, сортируя по targetHandle для правильного порядка
+        const sortedInputs = [...block.inputs].sort((a, b) => {
+            const aHandle = a.targetHandle || '';
+            const bHandle = b.targetHandle || '';
+            return aHandle.localeCompare(bHandle, undefined, { numeric: true });
+        });
+
         const inputs = [];
-        for (const input of block.inputs) {
+        for (const input of sortedInputs) {
             const sourceState = this.blockStates.get(input.sourceNodeId);
             if (sourceState?.output) {
                 inputs.push(sourceState.output);
