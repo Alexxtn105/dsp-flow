@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import './ErrorBoundary.css';
 
 class ErrorBoundary extends Component {
     constructor(props) {
@@ -22,25 +23,11 @@ class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div style={{
-                    padding: '16px',
-                    textAlign: 'center',
-                    color: 'var(--text-secondary, #888)',
-                    fontSize: '13px',
-                }}>
+                <div className="error-boundary-fallback">
                     <p>{this.props.fallbackMessage || 'Ошибка отображения'}</p>
                     <button
                         onClick={this.handleReset}
-                        style={{
-                            marginTop: '8px',
-                            padding: '4px 12px',
-                            border: '1px solid var(--border-primary, #ccc)',
-                            borderRadius: '4px',
-                            background: 'var(--bg-secondary, #f5f5f5)',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            color: 'var(--text-primary, #333)',
-                        }}
+                        className="error-boundary-reset-btn"
                     >
                         Повторить
                     </button>

@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import { formatDate } from '../../../utils/helpers';
 
-function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAlert }) {
+function LoadDialog({ onClose, onLoadSuccess, showConfirm, showAlert }) {
+    const { isDarkTheme } = useThemeContext();
     const { getSavedSchemes, loadScheme, deleteScheme, setLoadedSchemeData } = useDSPEditor();
     const [schemes, setSchemes] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +82,10 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAler
                                 >
                                     {isLoading ? 'Загрузка...' : 'Загрузить'}
                                 </button>
-                                <button onClick={() => handleDelete(scheme.name)}>Удалить</button>
+                                <button
+                                    onClick={() => handleDelete(scheme.name)}
+                                    aria-label={`Удалить схему ${scheme.name}`}
+                                >Удалить</button>
                             </div>
                         </div>
                     ))
@@ -94,7 +99,6 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAler
 }
 
 LoadDialog.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     onLoadSuccess: PropTypes.func.isRequired,
     showConfirm: PropTypes.func,

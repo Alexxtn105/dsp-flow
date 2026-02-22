@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import Icon from '../../common/Icons/Icon.jsx';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './ControlToolbar.css';
 
 function ControlToolbar({
-    isDarkTheme,
-    toggleTheme,
     onSave,
     onSaveAs,
     onLoad,
@@ -16,6 +15,8 @@ function ControlToolbar({
     isSaveAsEnabled,
     isRunning
 }) {
+    const { isDarkTheme, toggleTheme } = useThemeContext();
+
     return (
         <div className={`control-toolbar ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="control-toolbar-header">
@@ -131,8 +132,6 @@ function ControlToolbar({
 }
 
 ControlToolbar.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
-    toggleTheme: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
     onSaveAs: PropTypes.func.isRequired,
     onLoad: PropTypes.func.isRequired,

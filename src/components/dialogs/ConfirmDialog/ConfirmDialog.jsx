@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
+import { useThemeContext } from '../../../contexts/ThemeContext';
+import './ConfirmDialog.css';
 
 /**
  * Универсальный диалог подтверждения / информационного сообщения
  * mode='confirm' — OK + Отмена
  * mode='alert' — только OK
  */
-function ConfirmDialog({ isDarkTheme, message, title, onConfirm, onClose, mode = 'confirm' }) {
+function ConfirmDialog({ message, title, onConfirm, onClose, mode = 'confirm' }) {
+    const { isDarkTheme } = useThemeContext();
     return (
         <Dialog
             isOpen
@@ -14,7 +17,7 @@ function ConfirmDialog({ isDarkTheme, message, title, onConfirm, onClose, mode =
             title={title}
             className={isDarkTheme ? 'dark-theme' : ''}
         >
-            <p style={{ margin: '0 0 16px', whiteSpace: 'pre-line', fontSize: '14px', lineHeight: 1.5 }}>
+            <p className="confirm-dialog-message">
                 {message}
             </p>
             <div className="dialog-buttons">
@@ -32,7 +35,6 @@ function ConfirmDialog({ isDarkTheme, message, title, onConfirm, onClose, mode =
 }
 
 ConfirmDialog.propTypes = {
-    isDarkTheme: PropTypes.bool,
     message: PropTypes.string.isRequired,
     title: PropTypes.string,
     onConfirm: PropTypes.func,

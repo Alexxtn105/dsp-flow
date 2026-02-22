@@ -178,7 +178,27 @@ class PluginRegistry {
     clearAllStates() {
         for (const plugin of this.#plugins.values()) {
             if (typeof plugin.processor.clearStates === 'function') {
-                plugin.processor.clearStates();
+                try {
+                    plugin.processor.clearStates();
+                } catch {
+                    // Продолжаем очистку остальных плагинов
+                }
+            }
+        }
+    }
+
+    /**
+     * Удаляет состояния процессоров для узлов, которых нет в activeNodeIds
+     * @param {Set<string>} activeNodeIds - множество активных nodeId
+     */
+    clearStatesForRemovedNodes(activeNodeIds) {
+        for (const plugin of this.#plugins.values()) {
+            if (plugin.processor.states instanceof Map) {
+                for (const nodeId of plugin.processor.states.keys()) {
+                    if (!activeNodeIds.has(nodeId)) {
+                        plugin.processor.states.delete(nodeId);
+                    }
+                }
             }
         }
     }

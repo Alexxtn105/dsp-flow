@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './VisualizationWindow.css';
 
 /**
@@ -8,7 +9,6 @@ import './VisualizationWindow.css';
 function VisualizationWindow({
     nodeId,
     title,
-    isDarkTheme,
     onClose,
     onResize,
     children,
@@ -16,6 +16,7 @@ function VisualizationWindow({
     width = 400,
     height = 300
 }) {
+    const { isDarkTheme } = useThemeContext();
     const windowRef = useRef(null);
     const headerRef = useRef(null);
     const [position, setPosition] = useState(initialPosition || { x: 100, y: 100 });
@@ -107,7 +108,11 @@ function VisualizationWindow({
         >
             <div className="viz-window-header" ref={headerRef}>
                 <span className="viz-window-title">{title}</span>
-                <button className="viz-window-close" onClick={() => onClose(nodeId)}>
+                <button
+                    className="viz-window-close"
+                    onClick={() => onClose(nodeId)}
+                    aria-label="Закрыть окно визуализации"
+                >
                     ✕
                 </button>
             </div>
@@ -119,6 +124,9 @@ function VisualizationWindow({
             <div
                 className="viz-window-resize-handle"
                 onMouseDown={handleResizeMouseDown}
+                role="separator"
+                aria-label="Изменить размер окна"
+                tabIndex={0}
             />
         </div>
     );
@@ -127,7 +135,6 @@ function VisualizationWindow({
 VisualizationWindow.propTypes = {
     nodeId: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    isDarkTheme: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     onResize: PropTypes.func, // New prop
     children: PropTypes.node,

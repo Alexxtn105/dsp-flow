@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import Icon from '../../common/Icons/Icon.jsx';
 import registry from '../../../engine/PluginRegistry';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Toolbar.css';
 
-function Toolbar({ isDarkTheme }) {
+function Toolbar() {
+    const { isDarkTheme } = useThemeContext();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [collapsedGroups, setCollapsedGroups] = useState({});
     const [, setDraggingBlock] = useState(null);
@@ -153,10 +154,14 @@ function Toolbar({ isDarkTheme }) {
                             onDragStart={(e) => onDragStart(e, block.name)}
                             onDragEnd={onDragEnd}
                             title={`${block.name}: ${block.description}`}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Добавить блок ${block.name}`}
                         >
                             <Icon
                                 name={block.icon}
                                 size="medium"
+                                aria-hidden="true"
                             />
                         </div>
                     ))}
@@ -165,9 +170,5 @@ function Toolbar({ isDarkTheme }) {
         </div>
     );
 }
-
-Toolbar.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired
-};
 
 export default Toolbar;

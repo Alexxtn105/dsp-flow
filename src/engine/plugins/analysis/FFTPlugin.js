@@ -1,4 +1,5 @@
 import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
+import WindowFunctions from '../_shared/WindowFunctions.js';
 
 export default {
     type: 'БПФ',
@@ -9,7 +10,7 @@ export default {
     signals: { input: 'real', output: 'complex' },
     defaultParams: {
         fftSize: 8192,
-        windowType: 'hann',
+        windowType: 'hanning',
         normalize: true,
     },
     processor: {
@@ -22,7 +23,13 @@ export default {
                 : minSize;
             const real = new Float32Array(fftSize);
             const imag = new Float32Array(fftSize);
-            for (let i = 0; i < input.length; i++) real[i] = input[i];
+
+            // Применяем оконную функцию перед БПФ для снижения спектральной утечки
+            const windowFn = WindowFunctions[params.windowType] || WindowFunctions.hanning;
+            for (let i = 0; i < input.length; i++) {
+                real[i] = input[i] * windowFn(i, input.length);
+            }
+
             fft(real, imag);
             return computeMagnitudeDB(real, imag);
         }

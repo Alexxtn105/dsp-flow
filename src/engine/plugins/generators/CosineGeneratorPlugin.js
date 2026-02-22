@@ -31,8 +31,8 @@ export default {
             for (let i = 0; i < chunkSize; i++) {
                 output[i] = amplitude * Math.cos(state.currentPhase + phaseOffset);
                 state.currentPhase += phaseIncrement;
-                if (state.currentPhase > 2 * Math.PI) {
-                    state.currentPhase -= 2 * Math.PI;
+                if (state.currentPhase >= 2 * Math.PI) {
+                    state.currentPhase %= (2 * Math.PI);
                 }
             }
 

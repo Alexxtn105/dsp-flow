@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
 import registry from '../../../engine/PluginRegistry';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './BlockParamsDialog.css';
 
 /**
  * Диалог редактирования параметров блока
  */
-function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
+function BlockParamsDialog({ onClose, node, onSave }) {
+    const { isDarkTheme } = useThemeContext();
     // Debug: Ensure params are loaded correctly
 
     const [localParams, setLocalParams] = useState({});
@@ -244,7 +246,6 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
 }
 
 BlockParamsDialog.propTypes = {
-    isDarkTheme: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     node: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired

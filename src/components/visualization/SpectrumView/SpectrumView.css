@@ -32,3 +32,8 @@
 .dark-theme .spectrum-canvas {
     border-color: var(--border-secondary);
 }
+
+.viz-btn-text {
+    width: auto;
+    padding: 0 8px;
+}

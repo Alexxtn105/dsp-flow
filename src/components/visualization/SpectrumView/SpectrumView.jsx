@@ -1,11 +1,14 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { setupCanvasDPR, drawFrequencyGrid, drawCursorLabel, getMouseFrequency } from '../_shared/canvasUtils';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './SpectrumView.css';
 
 /**
  * Спектроанализатор - отображение амплитудного спектра
  */
-function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, height = 200 }) {
+function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
+    const { isDarkTheme } = useThemeContext();
     const canvasRef = useRef(null);
     const [accumulate, setAccumulate] = useState(false);
     const [accumulatedData, setAccumulatedData] = useState(null);
@@ -38,16 +41,7 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-
-        // Установка размера с учётом DPR
-        if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-        }
-        ctx.resetTransform();
-        ctx.scale(dpr, dpr);
+        const ctx = setupCanvasDPR(canvas, width, height);
 
         // Очистка
         ctx.fillStyle = isDarkTheme ? '#1f2937' : '#f9fafb';
@@ -77,43 +71,11 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
             ctx.fillText(`${db}`, 2, y);
         }
 
-        // Vertical Freq lines
-        const maxFreq = sampleRate / 2;
-        const pixelsPerHz = width / maxFreq;
-
-        let stepHz = 100;
-        if (pixelsPerHz * 100 < 40) stepHz = 500;
-        if (pixelsPerHz * 500 < 40) stepHz = 1000;
-        if (pixelsPerHz * 1000 < 40) stepHz = 5000;
-
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        const minorStepHz = stepHz / 5;
-
-        for (let f = 0; f <= maxFreq; f += minorStepHz) {
-            const isMajor = f % stepHz === 0;
-            const x = (f / maxFreq) * width;
-
-            ctx.beginPath();
-            ctx.moveTo(x, height);
-            ctx.lineTo(x, height - (isMajor ? 10 : 5));
-            ctx.stroke();
-
-            if (isMajor) {
-                let label = f < 1000 ? `${f}` : `${f / 1000}k`;
-                ctx.fillText(label, x, height - 12);
-
-                if (f > 0) {
-                    ctx.save();
-                    ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, height - 10);
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            }
-        }
+        // Vertical Freq lines (shared utility)
+        ctx.lineWidth = 0.5;
+        ctx.font = '10px sans-serif';
+        ctx.fillStyle = isDarkTheme ? '#9ca3af' : '#4b5563';
+        drawFrequencyGrid(ctx, width, height, sampleRate, isDarkTheme);
 
         // Drawing helper
         const drawLine = (pData, color) => {
@@ -167,19 +129,7 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
 
             // Label
             const label = `${Math.round(hoverFreq)}Hz : ${hoverDb.toFixed(1)}dB`;
-            const textW = ctx.measureText(label).width + 8;
-
-            let tx = cursorX + 5;
-            let ty = cursorY - 20;
-            if (tx + textW > width) tx = cursorX - textW - 5;
-            if (ty < 0) ty = cursorY + 10;
-
-            ctx.fillStyle = isDarkTheme ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.9)';
-            ctx.fillRect(tx, ty, textW, 16);
-            ctx.fillStyle = isDarkTheme ? '#fff' : '#000';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(label, tx + 4, ty + 8);
+            drawCursorLabel(ctx, label, cursorX, cursorY - 20, width, isDarkTheme);
         }
 
     }, [data, accumulatedData, accumulate, sampleRate, isDarkTheme, width, height, cursorX, cursorY, hoverFreq, hoverDb]);
@@ -198,8 +148,7 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
         setCursorY(y);
 
         // Calc freq and dB from coords
-        const maxFreq = sampleRate / 2;
-        const freq = (x / width) * maxFreq;
+        const freq = getMouseFrequency(x, width, sampleRate);
 
         const minDb = -100;
         const maxDb = 0;
@@ -220,8 +169,7 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
             <div className="viz-toolbar"> {/* Reuse styles for consistency */}
                 <div className="viz-toolbar-group">
                     <button
-                        className={`viz-btn ${accumulate ? 'active' : ''}`}
-                        style={{ width: 'auto', padding: '0 8px' }}
+                        className={`viz-btn viz-btn-text ${accumulate ? 'active' : ''}`}
                         onClick={() => setAccumulate(!accumulate)}
                         title="Накопление спектра (Max Hold)"
                     >
@@ -235,6 +183,8 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
                 className="spectrum-canvas"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
+                role="img"
+                aria-label="Спектроанализатор"
             />
         </div>
     );
@@ -243,7 +193,6 @@ function SpectrumView({ data, sampleRate = 48000, isDarkTheme, width = 380, heig
 SpectrumView.propTypes = {
     data: PropTypes.instanceOf(Float32Array),
     sampleRate: PropTypes.number,
-    isDarkTheme: PropTypes.bool.isRequired,
     width: PropTypes.number,
     height: PropTypes.number
 };

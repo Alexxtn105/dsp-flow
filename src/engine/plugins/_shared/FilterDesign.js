@@ -32,20 +32,21 @@ export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) 
     }
 
     // Normalize for unity gain
+    const NORM_EPSILON = 1e-10;
     if (type === 'highpass') {
         // Highpass: normalize at Nyquist (alternating sum)
         let sum = 0;
         for (let i = 0; i < order; i++) {
             sum += (i % 2 === 0 ? coeffs[i] : -coeffs[i]);
         }
-        if (sum !== 0) {
+        if (Math.abs(sum) > NORM_EPSILON) {
             for (let i = 0; i < order; i++) coeffs[i] /= sum;
         }
     } else {
         // Lowpass: normalize at DC
         let sum = 0;
         for (let i = 0; i < order; i++) sum += coeffs[i];
-        if (sum !== 0) {
+        if (Math.abs(sum) > NORM_EPSILON) {
             for (let i = 0; i < order; i++) coeffs[i] /= sum;
         }
     }

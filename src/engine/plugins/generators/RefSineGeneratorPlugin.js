@@ -36,8 +36,8 @@ export default {
                 output[i * 2] = amplitude * Math.sin(phase);
                 output[i * 2 + 1] = amplitude * Math.cos(phase);
                 state.currentPhase += phaseIncrement;
-                if (state.currentPhase > 2 * Math.PI) {
-                    state.currentPhase -= 2 * Math.PI;
+                if (state.currentPhase >= 2 * Math.PI) {
+                    state.currentPhase %= (2 * Math.PI);
                 }
             }
 

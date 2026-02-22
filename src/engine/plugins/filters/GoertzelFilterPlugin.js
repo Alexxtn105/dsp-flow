@@ -24,10 +24,10 @@ export default {
             const state = this.states.get(nodeId);
 
             const sampleRate = params.samplingRate ?? 48000;
-            const targetFreq = params.targetFrequency ?? 1000;
+            const targetFreq = Math.min(params.targetFrequency ?? 1000, sampleRate / 2);
             const N = params.N ?? 256;
 
-            const k = Math.round(N * targetFreq / sampleRate);
+            const k = Math.min(Math.max(0, Math.round(N * targetFreq / sampleRate)), N - 1);
             const coeff = 2 * Math.cos(2 * Math.PI * k / N);
 
             const output = new Float32Array(input.length);

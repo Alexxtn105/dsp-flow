@@ -4,10 +4,16 @@
 
 /**
  * In-place Cooley-Tukey FFT
+ * @param {Float32Array} real - действительная часть (длина должна быть степенью двойки)
+ * @param {Float32Array} imag - мнимая часть
  */
 export function fft(real, imag) {
     const n = real.length;
     if (n <= 1) return;
+
+    if ((n & (n - 1)) !== 0) {
+        throw new Error(`FFT: размер ${n} не является степенью двойки`);
+    }
 
     for (let i = 1, j = 0; i < n; i++) {
         let bit = n >> 1;
@@ -48,17 +54,16 @@ export function fft(real, imag) {
  */
 export function computeMagnitudeDB(real, imag) {
     const n = real.length;
-    const magnitude = new Float32Array(n / 2);
-    for (let i = 0; i < n / 2; i++) {
-        magnitude[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
-    }
+    const half = n / 2;
+    const magnitude = new Float32Array(half);
+    const MIN_DB = -120;
 
-    const N = n;
-
-    for (let i = 0; i < magnitude.length; i++) {
-        const scale = (i === 0) ? (1 / N) : (2 / N);
-        const mag = magnitude[i] * scale;
-        magnitude[i] = 20 * Math.log10(mag + 1e-10);
+    for (let i = 0; i < half; i++) {
+        const scale = (i === 0) ? (1 / n) : (2 / n);
+        const mag = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]) * scale;
+        magnitude[i] = mag > 0
+            ? Math.max(MIN_DB, 20 * Math.log10(mag))
+            : MIN_DB;
     }
     return magnitude;
 }

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useTheme } from './hooks/useTheme';
+import { useThemeContext } from './contexts/ThemeContext';
 import { DSPEditorProvider } from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
 import ControlToolbar from './components/layout/ControlToolbar/ControlToolbar.jsx';
@@ -14,7 +14,7 @@ import { GraphCompiler, DSPProcessor, WavFileService } from './engine';
 import './App.css';
 
 function App() {
-    const { isDarkTheme, toggleTheme } = useTheme();
+    const { isDarkTheme } = useThemeContext();
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const visualizationManagerRef = useRef(null);
 
@@ -293,12 +293,10 @@ function App() {
     return (
         <DSPEditorProvider reactFlowInstance={reactFlowInstance}>
             <div className={`app ${isDarkTheme ? 'dark-theme' : ''}`}>
-                <Header currentScheme={currentScheme} isDarkTheme={isDarkTheme} />
+                <Header currentScheme={currentScheme} />
 
                 <div className="app-content">
                     <ControlToolbar
-                        isDarkTheme={isDarkTheme}
-                        toggleTheme={toggleTheme}
                         onSave={handleSave}
                         onSaveAs={() => setShowSaveAsDialog(true)}
                         onLoad={() => setShowLoadDialog(true)}
@@ -312,7 +310,6 @@ function App() {
                     />
 
                     <DSPEditor
-                        isDarkTheme={isDarkTheme}
                         currentScheme={currentScheme}
                         onSchemeUpdate={handleSchemeUpdate}
                         onStatsUpdate={handleStatsUpdate}
@@ -323,7 +320,6 @@ function App() {
                 </div>
 
                 <Footer
-                    isDarkTheme={isDarkTheme}
                     isRunning={isRunning}
                     nodesCount={stats.nodesCount}
                     connectionsCount={stats.connectionsCount}
@@ -340,14 +336,12 @@ function App() {
 
                 <VisualizationManager
                     ref={visualizationManagerRef}
-                    isDarkTheme={isDarkTheme}
                     sampleRate={sampleRate}
                     nodes={nodes}
                 />
 
                 {showSaveDialog && (
                     <SaveDialog
-                        isDarkTheme={isDarkTheme}
                         onClose={() => setShowSaveDialog(false)}
                         schemeName={currentScheme.name}
                         onSaveSuccess={handleSaveSuccess}
@@ -357,7 +351,6 @@ function App() {
 
                 {showSaveAsDialog && (
                     <SaveDialog
-                        isDarkTheme={isDarkTheme}
                         onClose={() => setShowSaveAsDialog(false)}
                         schemeName={currentScheme.name}
                         onSaveSuccess={handleSaveSuccess}
@@ -367,7 +360,6 @@ function App() {
 
                 {showLoadDialog && (
                     <LoadDialog
-                        isDarkTheme={isDarkTheme}
                         onClose={() => setShowLoadDialog(false)}
                         onLoadSuccess={handleLoadSuccess}
                         showConfirm={showConfirm}
@@ -377,7 +369,6 @@ function App() {
 
                 {showSettingsDialog && (
                     <SettingsDialog
-                        isDarkTheme={isDarkTheme}
                         onClose={() => setShowSettingsDialog(false)}
                         sampleRate={sampleRate}
                         onSampleRateChange={handleSampleRateChange}
@@ -386,7 +377,6 @@ function App() {
 
                 {dialogState && (
                     <ConfirmDialog
-                        isDarkTheme={isDarkTheme}
                         message={dialogState.message}
                         title={dialogState.title}
                         mode={dialogState.mode}

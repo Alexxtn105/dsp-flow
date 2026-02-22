@@ -1,11 +1,14 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { setupCanvasDPR, drawFrequencyGrid, drawCursorLabel, getMouseFrequency } from '../_shared/canvasUtils';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './WaterfallView.css';
 
 /**
  * Водопад (WaterFall) - спектрограмма во времени
  */
-function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, height = 200 }) {
+function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) {
+    const { isDarkTheme } = useThemeContext();
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
     const [colorMap, setColorMap] = useState('audition');
@@ -68,18 +71,7 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         const tempCanvas = tempCanvasRef.current;
         if (!canvas || !tempCanvas) return;
 
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-
-        const targetWidth = Math.floor(width * dpr);
-        const targetHeight = Math.floor(height * dpr);
-
-        if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-            canvas.width = targetWidth;
-            canvas.height = targetHeight;
-        }
-        ctx.resetTransform();
-        ctx.scale(dpr, dpr);
+        const ctx = setupCanvasDPR(canvas, width, height);
 
         // Clear BG
         ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
@@ -92,43 +84,11 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)';
         ctx.fillStyle = isDarkTheme ? '#aaa' : '#555';
         ctx.font = '10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
 
-        const maxFreq = sampleRate / 2;
-        const pixelsPerHz = width / maxFreq;
-
-        let stepHz = 100;
-        if (pixelsPerHz * 100 < 40) stepHz = 500;
-        if (pixelsPerHz * 500 < 40) stepHz = 1000;
-        if (pixelsPerHz * 1000 < 40) stepHz = 5000;
-
-        const minorStepHz = stepHz / 5;
-
-        for (let f = 0; f <= maxFreq; f += minorStepHz) {
-            const isMajor = f % stepHz === 0;
-            const x = (f / maxFreq) * width;
-
-            ctx.beginPath();
-            ctx.moveTo(x, height);
-            ctx.lineTo(x, height - (isMajor ? 10 : 5));
-            ctx.stroke();
-
-            if (isMajor) {
-                let label = f < 1000 ? `${f}` : `${f / 1000}k`;
-                ctx.fillText(label, x, height - 22);
-
-                if (f > 0) {
-                    ctx.save();
-                    ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, height);
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            }
-        }
+        drawFrequencyGrid(ctx, width, height, sampleRate, isDarkTheme, {
+            textBaseline: 'top',
+            labelOffsetY: -22
+        });
 
         // Draw Cursor
         if (cursorX !== null) {
@@ -142,15 +102,7 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
             if (mouseFreq !== null) {
                 const label = `${Math.round(mouseFreq)} Hz`;
                 ctx.font = '10px sans-serif';
-                const labelWidth = ctx.measureText(label).width + 8;
-                let lx = cursorX + 5;
-                if (lx + labelWidth > width) lx = cursorX - labelWidth - 5;
-                ctx.fillStyle = isDarkTheme ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)';
-                ctx.fillRect(lx, 10, labelWidth, 16);
-                ctx.fillStyle = isDarkTheme ? '#fff' : '#000';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-                ctx.fillText(label, lx + 4, 12);
+                drawCursorLabel(ctx, label, cursorX, 10, width, isDarkTheme);
             }
         }
     }, [isDarkTheme, width, height, sampleRate, cursorX, mouseFreq]);
@@ -215,8 +167,7 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
         const x = e.clientX - rect.left;
         const clampedX = Math.max(0, Math.min(width, x));
         setCursorX(clampedX);
-        const freq = (clampedX / width) * (sampleRate / 2);
-        setMouseFreq(freq);
+        setMouseFreq(getMouseFrequency(clampedX, width, sampleRate));
     }, [width, sampleRate]);
 
     const handleMouseLeave = useCallback(() => {
@@ -262,15 +213,13 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
                     className="waterfall-canvas"
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
+                    role="img"
+                    aria-label="Спектрограмма (водопад)"
                 />
 
                 {showLegend && (
                     <div className="waterfall-legend-overlay">
-                        <div className="legend-gradient" style={{
-                            background: colorMap === 'audition'
-                                ? 'linear-gradient(to top, black, purple, red, orange, yellow, white)'
-                                : 'linear-gradient(to top, black, white)'
-                        }}></div>
+                        <div className={`legend-gradient legend-gradient-${colorMap}`}></div>
                         <div className="legend-labels">
                             <span>0dB</span>
                             <span>-50</span>
@@ -286,7 +235,6 @@ function WaterfallView({ data, sampleRate = 48000, isDarkTheme, width = 380, hei
 WaterfallView.propTypes = {
     data: PropTypes.instanceOf(Float32Array),
     sampleRate: PropTypes.number,
-    isDarkTheme: PropTypes.bool.isRequired,
     width: PropTypes.number,
     height: PropTypes.number
 };

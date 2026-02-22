@@ -1,11 +1,13 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useThemeContext } from '../../../contexts/ThemeContext';
 import './OscilloscopeView.css';
 
 /**
  * Осциллограф - отображение временной формы сигнала
  */
-function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
+function OscilloscopeView({ data, width = 380, height = 200 }) {
+    const { isDarkTheme } = useThemeContext();
     const canvasRef = useRef(null);
     const [visibleSamples, setVisibleSamples] = useState(1000); // Default visible count
 
@@ -108,20 +110,22 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
     return (
         <div className={`oscilloscope-view ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="viz-toolbar"> {/* Reuse styles */}
-                <span style={{ marginRight: 8, fontSize: 11 }}>Zoom:</span>
+                <span className="viz-toolbar-label">Zoom:</span>
                 <input
                     type="number"
                     value={visibleSamples}
                     onChange={(e) => setVisibleSamples(Math.max(10, parseInt(e.target.value) || 1000))}
-                    className="viz-select"
-                    style={{ width: 60 }}
+                    className="viz-select viz-zoom-input"
                     step="100"
+                    aria-label="Количество видимых отсчётов"
                 />
             </div>
             <canvas
                 ref={canvasRef}
                 style={{ width, height }}
                 className="oscilloscope-canvas"
+                role="img"
+                aria-label="Осциллограф"
             />
         </div>
     );
@@ -129,7 +133,6 @@ function OscilloscopeView({ data, isDarkTheme, width = 380, height = 200 }) {
 
 OscilloscopeView.propTypes = {
     data: PropTypes.instanceOf(Float32Array),
-    isDarkTheme: PropTypes.bool.isRequired,
     width: PropTypes.number,
     height: PropTypes.number
 };

@@ -57,6 +57,16 @@ class DSPProcessor {
         this.blockStates.clear();
         this.currentSample = 0;
 
+        // Удаляем состояния для узлов, которых нет в новом графе
+        const currentNodeIds = new Set(this.compiledGraph.map(b => b.nodeId));
+        for (const nodeId of this.blockStates.keys()) {
+            if (!currentNodeIds.has(nodeId)) {
+                this.blockStates.delete(nodeId);
+            }
+        }
+        // Очищаем состояния плагинов для удалённых узлов
+        registry.clearStatesForRemovedNodes(currentNodeIds);
+
         // Инициализируем состояния для каждого блока
         for (const block of this.compiledGraph) {
             this.blockStates.set(block.nodeId, {
@@ -67,9 +77,21 @@ class DSPProcessor {
             // Если у блока есть метод init, вызываем его для предварительного расчета (например, коэффициентов фильтра)
             const BlockProcessor = registry.getProcessor(block.blockType);
             if (BlockProcessor && typeof BlockProcessor.init === 'function') {
-                // Передаем params и sampleRate
-                const paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
-                BlockProcessor.init(block.nodeId, paramsWithSampleRate, this.sampleRate);
+                try {
+                    const paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
+                    BlockProcessor.init(block.nodeId, paramsWithSampleRate, this.sampleRate);
+                } catch (error) {
+                    return {
+                        success: false,
+                        errors: [{
+                            type: 'init_error',
+                            message: `Ошибка инициализации блока "${block.blockType}": ${error.message}`,
+                            nodeId: block.nodeId
+                        }],
+                        warnings: result.warnings || [],
+                        executionOrder: null
+                    };
+                }
             }
         }
 
@@ -108,7 +130,7 @@ class DSPProcessor {
         const intervalMs = (this.chunkSize / effectiveSpeed) * 1000;
 
         // Инициализируем AudioContext для воспроизведения (один на всё приложение)
-        if (!this.audioContext) {
+        if (!this.audioContext || this.audioContext.state === 'closed') {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
         if (this.audioContext.state === 'suspended') {
@@ -266,8 +288,7 @@ class DSPProcessor {
 
         // Для генераторов (Входной сигнал) - читаем из WAV
         if (block.blockType === 'Audio File' && this.isFileMode) {
-            return WavFileService.readChunk(this.currentSample, this.chunkSize) ||
-                new Float32Array(this.chunkSize);
+            return WavFileService.readChunk(this.currentSample, this.chunkSize);
         }
 
         // Передаем nodeId для блоков, которым нужно сохранять состояние (например, генераторы)
