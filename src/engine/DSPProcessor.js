@@ -87,10 +87,20 @@ class DSPProcessor {
             return;
         }
 
-        this.isRunning = true;
-
         // В режиме файла берём sample rate из файла, иначе используем установленный
         const sampleRate = this.isFileMode ? WavFileService.getSampleRate() : this.sampleRate;
+
+        if (!sampleRate || sampleRate <= 0) {
+            const error = new Error(`Некорректная частота дискретизации: ${sampleRate}`);
+            if (this.onError) {
+                this.onError(error);
+            } else {
+                console.error(error.message);
+            }
+            return;
+        }
+
+        this.isRunning = true;
 
         // Рассчитываем интервал обработки
         // По умолчанию обрабатываем в реальном времени
@@ -311,6 +321,7 @@ class DSPProcessor {
      */
     playAudioChunk(chunkData) {
         if (!this.audioContext) return;
+        if (!this.sampleRate || this.sampleRate <= 0) return;
 
         // Создаем буфер
         const buffer = this.audioContext.createBuffer(1, chunkData.length, this.sampleRate);

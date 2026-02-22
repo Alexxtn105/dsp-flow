@@ -50,6 +50,7 @@ function DSPEditor({
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const hasLoadedExternalScheme = useRef(false);
+    const processedSchemeRef = useRef(null);
 
     // Refs для callback-ов — стабильные ссылки, не вызывают ре-рендер всех узлов
     const callbacksRef = useRef({});
@@ -156,9 +157,10 @@ function DSPEditor({
         }
     }, [loadAutoSave, setNodes, setEdges]);
 
-    // Обработка загруженной схемы из контекста
+    // Обработка загруженной схемы из контекста (с защитой от двойного вызова в Strict Mode)
     useEffect(() => {
-        if (loadedSchemeData && loadedSchemeData.nodes) {
+        if (loadedSchemeData && loadedSchemeData.nodes && loadedSchemeData !== processedSchemeRef.current) {
+            processedSchemeRef.current = loadedSchemeData;
             clearAutoSave();
             setNodes(loadedSchemeData.nodes || []);
             setEdges(loadedSchemeData.edges || []);
@@ -166,6 +168,13 @@ function DSPEditor({
             setLoadedSchemeData(null);
         }
     }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData]);
+
+    // Сброс флага при создании новой схемы (граф очищен)
+    useEffect(() => {
+        if (nodes.length === 0 && edges.length === 0) {
+            hasLoadedExternalScheme.current = false;
+        }
+    }, [nodes.length, edges.length]);
 
     // Инъекция стабильных callback-ов в узлы при загрузке/добавлении
     // Не зависит от handleOpenParams и т.д. — используются стабильные обёртки через ref

@@ -249,6 +249,8 @@ export const getBlockSignalConfig = (blockType) => {
  * Проверить, совместимы ли типы сигналов для соединения
  */
 export const areSignalsCompatible = (sourceType, targetType) => {
+    // null означает генератор (без входа) или sink (без выхода) — всегда совместим
+    if (sourceType === null || targetType === null) return true;
     return sourceType === targetType;
 };
 

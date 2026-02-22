@@ -32,6 +32,9 @@ export default {
 
             const output = new Float32Array(input.length);
 
+            const cosW = Math.cos(2 * Math.PI * k / N);
+            const sinW = Math.sin(2 * Math.PI * k / N);
+
             for (let i = 0; i < input.length; i++) {
                 const s0 = input[i] + coeff * state.s1 - state.s2;
                 state.s2 = state.s1;
@@ -40,13 +43,18 @@ export default {
 
                 if (state.count >= N) {
                     // Вычисляем магнитуду по формуле Гёрцеля
-                    const real = state.s1 - state.s2 * Math.cos(2 * Math.PI * k / N);
-                    const imag = state.s2 * Math.sin(2 * Math.PI * k / N);
+                    const real = state.s1 - state.s2 * cosW;
+                    const imag = state.s2 * sinW;
                     state.magnitude = Math.sqrt(real * real + imag * imag);
                     // Сброс
                     state.s1 = 0;
                     state.s2 = 0;
                     state.count = 0;
+                } else if (state.magnitude === 0 && state.count > 0) {
+                    // До первого полного блока: вычисляем промежуточную магнитуду
+                    const real = state.s1 - state.s2 * cosW;
+                    const imag = state.s2 * sinW;
+                    state.magnitude = Math.sqrt(real * real + imag * imag);
                 }
 
                 output[i] = state.magnitude;

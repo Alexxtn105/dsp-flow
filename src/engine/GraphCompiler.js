@@ -36,6 +36,18 @@ class GraphCompiler {
             });
         }
 
+        // Шаг 2.5: Обнаружение несвязных компонентов
+        if (nodes.length > 1 && !sortResult.hasCycle) {
+            const components = this.findConnectedComponents(nodes, edges);
+            if (components.length > 1) {
+                warnings.push({
+                    type: 'disconnected_components',
+                    message: `Граф содержит ${components.length} несвязных компонента`,
+                    components
+                });
+            }
+        }
+
         // Если есть ошибки - возвращаем их
         if (errors.length > 0) {
             return {
@@ -155,6 +167,39 @@ class GraphCompiler {
             : [];
 
         return { order, hasCycle, cycleNodes };
+    }
+
+    /**
+     * Находит несвязные компоненты графа (без учёта направления рёбер)
+     */
+    findConnectedComponents(nodes, edges) {
+        const parent = new Map();
+        for (const node of nodes) parent.set(node.id, node.id);
+
+        const find = (x) => {
+            while (parent.get(x) !== x) {
+                parent.set(x, parent.get(parent.get(x)));
+                x = parent.get(x);
+            }
+            return x;
+        };
+        const union = (a, b) => {
+            const ra = find(a), rb = find(b);
+            if (ra !== rb) parent.set(ra, rb);
+        };
+
+        for (const edge of edges) {
+            union(edge.source, edge.target);
+        }
+
+        const groups = new Map();
+        for (const node of nodes) {
+            const root = find(node.id);
+            if (!groups.has(root)) groups.set(root, []);
+            groups.get(root).push(node.id);
+        }
+
+        return [...groups.values()];
     }
 
     /**
