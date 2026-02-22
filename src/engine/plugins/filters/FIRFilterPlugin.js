@@ -12,7 +12,7 @@ export function createFIRProcessor() {
 
         init(nodeId, params, sampleRate) {
             const order = params.order || 31;
-            const cutoff = params.cutoffFrequency || params.frequency || 1000;
+            const cutoff = params.cutoffFrequency || params.cutoff || params.frequency || 1000;
             const type = params.filterType || 'lowpass';
             const windowName = params.windowFunction || 'hamming';
             const designMethod = params.designMethod || 'window';

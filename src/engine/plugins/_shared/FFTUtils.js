@@ -22,7 +22,7 @@ export function fft(real, imag) {
     for (let len = 2; len <= n; len <<= 1) {
         const angle = (2 * Math.PI) / len;
         const wReal = Math.cos(angle);
-        const wImag = Math.sin(angle);
+        const wImag = -Math.sin(angle);
         for (let i = 0; i < n; i += len) {
             let curReal = 1;
             let curImag = 0;
