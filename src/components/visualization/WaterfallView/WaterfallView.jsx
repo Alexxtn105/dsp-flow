@@ -65,6 +65,8 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
         return `rgb(${r},${g},${b})`;
     }, []);
 
+    const drawSceneRef = useRef(null);
+
     // Scene drawing function - draws Buffer + Overlays to main canvas
     const drawScene = useCallback(() => {
         const canvas = canvasRef.current;
@@ -106,6 +108,8 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
             }
         }
     }, [isDarkTheme, width, height, sampleRate, cursorX, mouseFreq]);
+
+    drawSceneRef.current = drawScene;
 
     // 1. UPDATE BUFFER Only when new DATA arrives + call drawScene
     useEffect(() => {
@@ -153,8 +157,9 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
         }
 
         // Trigger scene drawing
-        drawScene();
-    }, [data, isNormalized, colorMap, getColor, drawScene]);
+        drawSceneRef.current();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, isNormalized, colorMap, getColor]);
 
     // Re-render on cursor changes when simulation is stopped
     useEffect(() => {
