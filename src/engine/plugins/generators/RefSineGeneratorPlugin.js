@@ -16,7 +16,8 @@ export default {
         clearStates() { this.states.clear(); },
 
         process(inputs, params, chunkSize, nodeId) {
-            const output = new Float32Array(chunkSize);
+            // Комплексный выход: interleaved [I0, Q0, I1, Q1, ...] размером chunkSize * 2
+            const output = new Float32Array(chunkSize * 2);
             const frequency = params.frequency ?? 1000;
             const amplitude = params.amplitude ?? 1.0;
             const phaseOffset = (params.phase ?? 0) * (Math.PI / 180);
@@ -30,7 +31,10 @@ export default {
             const phaseIncrement = (2 * Math.PI * frequency) / sampleRate;
 
             for (let i = 0; i < chunkSize; i++) {
-                output[i] = amplitude * Math.sin(state.currentPhase + phaseOffset);
+                const phase = state.currentPhase + phaseOffset;
+                // I = sin, Q = cos (аналитический сигнал)
+                output[i * 2] = amplitude * Math.sin(phase);
+                output[i * 2 + 1] = amplitude * Math.cos(phase);
                 state.currentPhase += phaseIncrement;
                 if (state.currentPhase > 2 * Math.PI) {
                     state.currentPhase -= 2 * Math.PI;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
@@ -14,6 +14,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
     const [localParams, setLocalParams] = useState({});
     const [wavFileName, setWavFileName] = useState('');
     const [error, setError] = useState(null);
+    const audioContextRef = useRef(null);
 
     // Инициализация параметров при открытии диалога
     const nodeId = node?.id;
@@ -28,6 +29,18 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nodeId]);
+
+    // Cleanup AudioContext при размонтировании
+    useEffect(() => {
+        return () => {
+            if (audioContextRef.current) {
+                try {
+                    audioContextRef.current.close();
+                } catch { /* already closed */ }
+                audioContextRef.current = null;
+            }
+        };
+    }, []);
 
     const blockType = node?.data?.blockType || 'Неизвестный блок';
     const isInputSignal = blockType === 'Audio File';
@@ -58,9 +71,15 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
         }
 
         try {
+            // Закрываем предыдущий AudioContext при повторном выборе файла
+            if (audioContextRef.current) {
+                try { audioContextRef.current.close(); } catch { /* ignore */ }
+            }
+
             // Читаем файл и получаем AudioBuffer для извлечения sample rate
             const arrayBuffer = await file.arrayBuffer();
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContextRef.current = audioContext;
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
             setWavFileName(file.name);
@@ -77,6 +96,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
             }));
 
             audioContext.close();
+            audioContextRef.current = null;
         } catch (error) {
             console.error('Ошибка чтения WAV файла:', error);
             setError('Не удалось прочитать WAV файл');

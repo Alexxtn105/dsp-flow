@@ -161,7 +161,13 @@ class DSPProcessor {
 
         // Закрываем AudioContext, чтобы не копить ресурсы
         if (this.audioContext) {
-            this.audioContext.close();
+            try {
+                if (this.audioContext.state !== 'closed') {
+                    this.audioContext.close();
+                }
+            } catch {
+                // AudioContext already closed — ignore
+            }
             this.audioContext = null;
         }
 

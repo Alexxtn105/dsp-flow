@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
@@ -7,23 +7,36 @@ import { formatDate } from '../../../utils/helpers';
 function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAlert }) {
     const { getSavedSchemes, loadScheme, deleteScheme, setLoadedSchemeData } = useDSPEditor();
     const [schemes, setSchemes] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const mountedRef = useRef(true);
 
     useEffect(() => {
         setSchemes(getSavedSchemes());
+        return () => { mountedRef.current = false; };
     }, [getSavedSchemes]);
 
     const handleLoad = async (schemeName) => {
-        const result = await loadScheme(schemeName);
-        if (result.success && result.data) {
-            // Устанавливаем загруженные данные в контекст
-            setLoadedSchemeData(result.data);
-            onLoadSuccess(schemeName);
-        } else if (!result.success) {
-            const message = result.error === 'VALIDATION_FAILED'
-                ? `Схема "${schemeName}" содержит ошибки:\n${result.errors.join('\n')}`
-                : result.message || 'Не удалось загрузить схему';
-            if (showAlert) {
-                showAlert(message, 'Ошибка загрузки');
+        if (isLoading) return;
+        setIsLoading(true);
+
+        try {
+            const result = await loadScheme(schemeName);
+            if (!mountedRef.current) return;
+
+            if (result.success && result.data) {
+                setLoadedSchemeData(result.data);
+                onLoadSuccess(schemeName);
+            } else if (!result.success) {
+                const message = result.error === 'VALIDATION_FAILED'
+                    ? `Схема "${schemeName}" содержит ошибки:\n${result.errors.join('\n')}`
+                    : result.message || 'Не удалось загрузить схему';
+                if (showAlert) {
+                    showAlert(message, 'Ошибка загрузки');
+                }
+            }
+        } finally {
+            if (mountedRef.current) {
+                setIsLoading(false);
             }
         }
     };
@@ -32,11 +45,15 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAler
         if (showConfirm) {
             showConfirm(`Удалить схему "${schemeName}"?`, 'Удаление', async () => {
                 await deleteScheme(schemeName);
-                setSchemes(getSavedSchemes());
+                if (mountedRef.current) {
+                    setSchemes(getSavedSchemes());
+                }
             });
         } else {
             await deleteScheme(schemeName);
-            setSchemes(getSavedSchemes());
+            if (mountedRef.current) {
+                setSchemes(getSavedSchemes());
+            }
         }
     };
 
@@ -57,7 +74,12 @@ function LoadDialog({ isDarkTheme, onClose, onLoadSuccess, showConfirm, showAler
                             {scheme.description && <div className="scheme-desc">{scheme.description}</div>}
                             <div className="scheme-date">{formatDate(scheme.timestamp)}</div>
                             <div className="scheme-actions">
-                                <button onClick={() => handleLoad(scheme.name)}>Загрузить</button>
+                                <button
+                                    onClick={() => handleLoad(scheme.name)}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Загрузка...' : 'Загрузить'}
+                                </button>
                                 <button onClick={() => handleDelete(scheme.name)}>Удалить</button>
                             </div>
                         </div>
