@@ -1,0 +1,34 @@
+.spectrum-view {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.spectrum-canvas {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+
+.spectrum-labels-y {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-secondary);
+}
+
+.spectrum-labels-x {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--text-secondary);
+}
+
+.dark-theme .spectrum-canvas {
+    border-color: var(--border-secondary);
+}

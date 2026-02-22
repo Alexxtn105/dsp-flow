@@ -1,0 +1,123 @@
+.block-params-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.param-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.param-section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.param-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.param-row .param-label {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.param-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+}
+
+.param-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* WAV file section */
+.wav-section {
+    background: var(--bg-tertiary);
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+
+.wav-file-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.wav-file-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 100%;
+    text-align: center;
+}
+
+.wav-file-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.wav-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-primary);
+}
+
+.wav-info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.wav-info-item span {
+    color: var(--text-secondary);
+}
+
+.wav-info-item strong {
+    color: var(--text-primary);
+}
+
+/* Dark theme */
+.dark-theme .param-input {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .wav-section {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.dark-theme .wav-info {
+    border-top-color: var(--border-secondary);
+}
