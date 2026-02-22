@@ -34,7 +34,7 @@ export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) 
     // Normalize for unity gain at DC
     let sum = 0;
     for (let i = 0; i < order; i++) sum += coeffs[i];
-    if (sum !== 0 && type === 'lowpass') {
+    if (sum !== 0) {
         for (let i = 0; i < order; i++) coeffs[i] /= sum;
     }
 

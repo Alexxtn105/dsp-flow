@@ -11,8 +11,48 @@ export default {
         N: 256,
     },
     processor: {
-        process(inputs, params, chunkSize) {
-            return inputs[0] || new Float32Array(chunkSize);
+        states: new Map(),
+        clearStates() { this.states.clear(); },
+
+        process(inputs, params, chunkSize, nodeId) {
+            const input = inputs[0];
+            if (!input) return new Float32Array(chunkSize);
+
+            if (!this.states.has(nodeId)) {
+                this.states.set(nodeId, { s1: 0, s2: 0, count: 0, magnitude: 0 });
+            }
+            const state = this.states.get(nodeId);
+
+            const sampleRate = params.samplingRate ?? 48000;
+            const targetFreq = params.targetFrequency ?? 1000;
+            const N = params.N ?? 256;
+
+            const k = Math.round(N * targetFreq / sampleRate);
+            const coeff = 2 * Math.cos(2 * Math.PI * k / N);
+
+            const output = new Float32Array(input.length);
+
+            for (let i = 0; i < input.length; i++) {
+                const s0 = input[i] + coeff * state.s1 - state.s2;
+                state.s2 = state.s1;
+                state.s1 = s0;
+                state.count++;
+
+                if (state.count >= N) {
+                    // Вычисляем магнитуду по формуле Гёрцеля
+                    const real = state.s1 - state.s2 * Math.cos(2 * Math.PI * k / N);
+                    const imag = state.s2 * Math.sin(2 * Math.PI * k / N);
+                    state.magnitude = Math.sqrt(real * real + imag * imag);
+                    // Сброс
+                    state.s1 = 0;
+                    state.s2 = 0;
+                    state.count = 0;
+                }
+
+                output[i] = state.magnitude;
+            }
+
+            return output;
         }
     }
 };

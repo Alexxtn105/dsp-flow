@@ -13,6 +13,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
 
     const [localParams, setLocalParams] = useState({});
     const [wavFileName, setWavFileName] = useState('');
+    const [error, setError] = useState(null);
 
     // Инициализация параметров при открытии диалога
     const nodeId = node?.id;
@@ -52,7 +53,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
 
         // Проверяем, что это WAV файл
         if (!file.name.toLowerCase().endsWith('.wav')) {
-            alert('Пожалуйста, выберите WAV файл');
+            setError('Пожалуйста, выберите WAV файл');
             return;
         }
 
@@ -78,7 +79,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
             audioContext.close();
         } catch (error) {
             console.error('Ошибка чтения WAV файла:', error);
-            alert('Не удалось прочитать WAV файл');
+            setError('Не удалось прочитать WAV файл');
         }
     };
 
@@ -199,6 +200,12 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
                                 </div>
                             );
                         })}
+                    </div>
+                )}
+
+                {error && (
+                    <div className="error-message" role="alert">
+                        {error}
                     </div>
                 )}
 

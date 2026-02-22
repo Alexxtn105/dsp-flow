@@ -353,6 +353,8 @@ function App() {
                         isDarkTheme={isDarkTheme}
                         onClose={() => setShowLoadDialog(false)}
                         onLoadSuccess={handleLoadSuccess}
+                        showConfirm={showConfirm}
+                        showAlert={showAlert}
                     />
                 )}
 
