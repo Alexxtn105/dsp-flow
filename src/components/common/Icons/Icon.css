@@ -1,0 +1,54 @@
+/* Базовые стили для Material Icons */
+.material-icons,
+.material-icons-outlined,
+.material-icons-round,
+.material-icons-sharp {
+    font-variation-settings: 'FILL' 1;
+    font-size: 24px;
+    user-select: none;
+}
+
+/* Размеры */
+.icon-small {
+    font-size: 18px !important;
+    width: 18px;
+    height: 18px;
+}
+
+.icon-medium {
+    font-size: 24px !important;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-large {
+    font-size: 32px !important;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-xlarge {
+    font-size: 40px !important;
+    width: 40px;
+    height: 40px;
+}
+
+/* Для outlined иконок */
+.material-icons-outlined {
+    font-variation-settings: 'FILL' 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .icon-medium {
+        font-size: 20px !important;
+        width: 20px;
+        height: 20px;
+    }
+
+    .icon-large {
+        font-size: 28px !important;
+        width: 28px;
+        height: 28px;
+    }
+}

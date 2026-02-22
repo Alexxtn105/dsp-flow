@@ -1,0 +1,489 @@
+.toolbar {
+    height: 100%;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-primary);
+    width: 280px;
+    transition: width var(--transition-normal);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.toolbar.collapsed {
+    width: 50px;
+}
+
+.toolbar-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 48px;
+    flex-shrink: 0;
+    transition: padding var(--transition-fast);
+}
+
+.toolbar-header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.toolbar.collapsed .toolbar-header-content {
+    justify-content: center;
+    width: 100%;
+}
+
+.toolbar-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.toolbar-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity var(--transition-fast);
+}
+
+.toolbar.collapsed .toolbar-title {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.toolbar-header h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.collapse-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+    transform: scale(1.1);
+}
+
+.toolbar.collapsed .collapse-btn {
+    margin: 0;
+    width: 32px;
+    height: 32px;
+}
+
+.toolbar-content {
+    padding: 16px 12px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.toolbar.collapsed .toolbar-content {
+    display: none;
+}
+
+.group-container {
+    margin-bottom: 16px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-normal);
+}
+
+.group-container:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.group-header {
+    padding: 12px;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-primary);
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.group-header:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ИЗМЕНЕНИЕ: Один блок на строку */
+.group-blocks {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.block-item {
+    background: var(--bg-secondary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all var(--transition-fast);
+    min-height: 60px;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    width: 100%;
+}
+
+.block-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.block-item:active {
+    cursor: grabbing;
+    transform: translateY(-1px);
+}
+
+.block-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.block-item:hover .block-icon {
+    background: var(--bg-secondary);
+    transform: scale(1.1);
+}
+
+.block-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.block-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.block-description {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Адаптивность для свернутого состояния */
+.toolbar.collapsed {
+    align-items: center;
+}
+
+.toolbar.collapsed .toolbar-header {
+    flex-direction: column;
+    padding: 12px 8px;
+    gap: 10px;
+    width: 100%;
+}
+
+.toolbar.collapsed .collapse-btn {
+    order: 2;
+}
+
+.toolbar.collapsed .toolbar-icon {
+    order: 1;
+    margin-bottom: 8px;
+}
+
+/* Скроллбар для содержимого тулбара */
+.toolbar-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.toolbar-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.toolbar-content::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 3px;
+}
+
+.toolbar-content::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
+}
+
+/* Анимация появления/скрытия */
+.toolbar-content {
+    animation: fadeIn var(--transition-normal) ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Подсказки для свернутого состояния */
+.toolbar.collapsed .block-item {
+    padding: 12px;
+    justify-content: center;
+    margin: 8px 0;
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+}
+
+.toolbar.collapsed .block-icon {
+    margin: 0;
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+}
+
+.toolbar.collapsed .block-info {
+    display: none;
+}
+
+.toolbar.collapsed .block-item:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+    pointer-events: none;
+    min-width: 120px;
+}
+
+/* Мобильная адаптивность */
+@media (max-width: 768px) {
+    .toolbar {
+        width: 250px;
+    }
+
+    .toolbar.collapsed {
+        width: 50px;
+    }
+
+    .toolbar-header {
+        padding: 10px;
+    }
+
+    .toolbar.collapsed .toolbar-header {
+        padding: 10px 6px;
+    }
+
+    .toolbar-icon {
+        font-size: 20px;
+    }
+
+    .toolbar.collapsed .toolbar-icon {
+        font-size: 18px;
+    }
+
+    /* ИЗМЕНЕНИЕ: Для мобильных тоже один блок на строку */
+    .group-blocks {
+        gap: 4px;
+    }
+
+    .block-item {
+        padding: 10px;
+        min-height: 56px;
+        gap: 10px;
+    }
+
+    .block-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .block-name {
+        font-size: 12px;
+    }
+
+    .block-description {
+        font-size: 10px;
+    }
+}
+
+/* Светлая тема */
+:root {
+    .toolbar {
+        background: #ffffff;
+        border-right-color: #e5e7eb;
+    }
+
+    .group-container {
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .group-container:hover {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .block-item:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .block-icon {
+        background: #f3f4f6;
+    }
+
+    .block-item:hover .block-icon {
+        background: #ffffff;
+    }
+}
+
+/* Темная тема */
+.dark-theme {
+    .toolbar {
+        background: #161b22;
+        border-right-color: #30363d;
+    }
+
+    .group-container {
+        background: #161b22;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .group-container:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .group-header:hover {
+        background: #21262d;
+    }
+
+    .block-item:hover {
+        background: #21262d;
+        border-color: #3c444d;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .block-icon {
+        background: #21262d;
+    }
+
+    .block-item:hover .block-icon {
+        background: #2d333b;
+    }
+}
+
+/* Анимация добавления блока */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    }
+}
+
+.block-item.dragging {
+    animation: pulse 1.5s infinite;
+    border-color: var(--accent-primary);
+}
+
+/* Состояние пустого тулбара */
+.toolbar-content:empty::before {
+    content: "Нет доступных блоков";
+    display: block;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* Улучшенная визуализация для drag & drop */
+.block-item.drag-over {
+    border: 2px dashed var(--accent-primary);
+    background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+}
+
+/* Фокус-состояние для доступности */
+.block-item:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-color: transparent;
+}
+
+.group-header:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: -2px;
+    border-radius: var(--radius-md);
+}
+
+/* ИЗМЕНЕНИЕ: Добавим визуальный разделитель между блоками для лучшей читаемости */
+.block-item + .block-item {
+    margin-top: 0;
+}
+
+/* ИЗМЕНЕНИЕ: Улучшенное отображение для длинных названий */
+.block-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
