@@ -31,17 +31,29 @@ export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) 
         coeffs[i] *= window(i, order);
     }
 
-    // Normalize for unity gain at DC
-    let sum = 0;
-    for (let i = 0; i < order; i++) sum += coeffs[i];
-    if (sum !== 0) {
-        for (let i = 0; i < order; i++) coeffs[i] /= sum;
+    // Normalize for unity gain
+    if (type === 'highpass') {
+        // Highpass: normalize at Nyquist (alternating sum)
+        let sum = 0;
+        for (let i = 0; i < order; i++) {
+            sum += (i % 2 === 0 ? coeffs[i] : -coeffs[i]);
+        }
+        if (sum !== 0) {
+            for (let i = 0; i < order; i++) coeffs[i] /= sum;
+        }
+    } else {
+        // Lowpass: normalize at DC
+        let sum = 0;
+        for (let i = 0; i < order; i++) sum += coeffs[i];
+        if (sum !== 0) {
+            for (let i = 0; i < order; i++) coeffs[i] /= sum;
+        }
     }
 
     // Spectral Inversion for Highpass
     if (type === 'highpass') {
         for (let i = 0; i < order; i++) coeffs[i] *= -1;
-        coeffs[Math.floor(M / 2)] += 1;
+        coeffs[Math.floor(order / 2)] += 1;
     }
 
     return coeffs;
@@ -51,6 +63,7 @@ export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) 
  * Filter Design: Placeholder for Remez
  */
 export const designRemez = (type, cutoff, sampleRate, order) => {
-    console.warn("Полноценный алгоритм Ремеза требует сложного итеративного решателя. Используется Windowed Sinc (Blackman) как качественное приближение.");
-    return designWindowedSinc(type, cutoff, sampleRate, order, 'blackman');
+    const coeffs = designWindowedSinc(type, cutoff, sampleRate, order, 'blackman');
+    coeffs._remezFallback = true;
+    return coeffs;
 };

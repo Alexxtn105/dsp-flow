@@ -50,7 +50,9 @@ export function createFIRProcessor() {
                 coeffs,
                 buffer,
                 pointer: 0,
-                order
+                order,
+                _cutoff: cutoff,
+                _order: order
             });
         },
 
@@ -59,11 +61,26 @@ export function createFIRProcessor() {
             if (!input) return new Float32Array(chunkSize);
 
             let state = this.states.get(nodeId);
+            const sampleRate = params.sampleRate || 48000;
 
             if (!state) {
-                const sampleRate = params.sampleRate || 48000;
                 this.init(nodeId, params, sampleRate);
                 state = this.states.get(nodeId);
+            } else {
+                // Проверяем, изменились ли параметры — пересчитываем коэффициенты
+                const currentCutoff = params.cutoffFrequency || params.cutoff || params.frequency || 1000;
+                const currentOrder = params.order || 31;
+                if (state._cutoff !== currentCutoff || state._order !== currentOrder) {
+                    const oldBuffer = state.buffer;
+                    const oldPointer = state.pointer;
+                    this.init(nodeId, params, sampleRate);
+                    state = this.states.get(nodeId);
+                    // Сохраняем буфер, если размер не изменился
+                    if (oldBuffer.length === state.buffer.length) {
+                        state.buffer.set(oldBuffer);
+                        state.pointer = oldPointer;
+                    }
+                }
             }
 
             const { coeffs, buffer, order } = state;

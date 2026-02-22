@@ -15,6 +15,7 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
     const [wavFileName, setWavFileName] = useState('');
     const [error, setError] = useState(null);
     const audioContextRef = useRef(null);
+    const mountedRef = useRef(true);
 
     // Инициализация параметров при открытии диалога
     const nodeId = node?.id;
@@ -32,7 +33,9 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
 
     // Cleanup AudioContext при размонтировании
     useEffect(() => {
+        mountedRef.current = true;
         return () => {
+            mountedRef.current = false;
             if (audioContextRef.current) {
                 try {
                     audioContextRef.current.close();
@@ -81,6 +84,8 @@ function BlockParamsDialog({ isDarkTheme, onClose, node, onSave }) {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             audioContextRef.current = audioContext;
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            if (!mountedRef.current) return;
 
             setWavFileName(file.name);
             setLocalParams(prev => ({

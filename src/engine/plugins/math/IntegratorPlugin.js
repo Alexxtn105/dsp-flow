@@ -35,8 +35,13 @@ export default {
                 state.accumulator += (input[i] + state.prevInput) * dt / 2;
                 state.prevInput = input[i];
 
-                if (resetOnOverflow && Math.abs(state.accumulator) > maxValue) {
-                    state.accumulator = 0;
+                if (Math.abs(state.accumulator) > maxValue) {
+                    if (resetOnOverflow) {
+                        state.accumulator = 0;
+                    } else {
+                        // Saturation: clamp to maxValue
+                        state.accumulator = Math.sign(state.accumulator) * maxValue;
+                    }
                 }
 
                 output[i] = state.accumulator;

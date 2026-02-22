@@ -202,14 +202,15 @@ function App() {
 
             DSPProcessor.onProgress = (progress) => {
                 lastProgressRef.current = progress;
-                if (!progressTimerRef.current) {
-                    progressTimerRef.current = setTimeout(() => {
-                        progressTimerRef.current = null;
-                        if (lastProgressRef.current) {
-                            setProcessingProgress(lastProgressRef.current);
-                        }
-                    }, 100);
+                if (progressTimerRef.current) {
+                    clearTimeout(progressTimerRef.current);
                 }
+                progressTimerRef.current = setTimeout(() => {
+                    progressTimerRef.current = null;
+                    if (lastProgressRef.current) {
+                        setProcessingProgress(lastProgressRef.current);
+                    }
+                }, 100);
             };
 
             DSPProcessor.onBlockOutput = (nodeId, output) => {

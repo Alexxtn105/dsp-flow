@@ -54,9 +54,9 @@ export function computeMagnitudeDB(real, imag) {
     }
 
     const N = n;
-    const scale = 2 / N;
 
     for (let i = 0; i < magnitude.length; i++) {
+        const scale = (i === 0) ? (1 / N) : (2 / N);
         const mag = magnitude[i] * scale;
         magnitude[i] = 20 * Math.log10(mag + 1e-10);
     }
