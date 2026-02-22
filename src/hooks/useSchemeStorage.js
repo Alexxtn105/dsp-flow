@@ -107,8 +107,11 @@ export const useSchemeStorage = () => {
             // Валидация загружаемой схемы
             const validation = ValidationService.validateSchemeData(scheme);
             if (!validation.isValid) {
-                console.warn('Invalid scheme data:', validation.errors);
-                // Продолжаем загрузку, но предупреждаем
+                return {
+                    success: false,
+                    error: 'VALIDATION_FAILED',
+                    errors: validation.errors
+                };
             }
 
             return {
