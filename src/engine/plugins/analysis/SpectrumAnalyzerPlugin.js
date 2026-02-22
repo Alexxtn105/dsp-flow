@@ -6,8 +6,8 @@ export default {
     id: 'spectrum-analyzer',
     icon: 'analytics',
     description: 'Спектральный анализ',
-    group: 'fft-blocks',
-    signals: { input: 'real', output: 'real' },
+    group: 'visualization',
+    signals: { input: 'real', output: null },
     defaultParams: {
         fftSize: 2048,
         windowFunction: 'blackman-harris',
