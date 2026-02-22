@@ -74,6 +74,10 @@ function App() {
     const [isManualMode, setIsManualMode] = useState(false);
     const [manualStepSize, setManualStepSize] = useState(1024);
 
+    // Debounce timer ref для onProgress
+    const progressTimerRef = useRef(null);
+    const lastProgressRef = useRef(null);
+
     const handleSchemeUpdate = useCallback((schemeName, isSaved = true) => {
         setCurrentScheme({
             name: schemeName,
@@ -197,7 +201,15 @@ function App() {
             DSPProcessor.initialize(currentNodes, edges);
 
             DSPProcessor.onProgress = (progress) => {
-                setProcessingProgress(progress);
+                lastProgressRef.current = progress;
+                if (!progressTimerRef.current) {
+                    progressTimerRef.current = setTimeout(() => {
+                        progressTimerRef.current = null;
+                        if (lastProgressRef.current) {
+                            setProcessingProgress(lastProgressRef.current);
+                        }
+                    }, 100);
+                }
             };
 
             DSPProcessor.onBlockOutput = (nodeId, output) => {
@@ -208,6 +220,7 @@ function App() {
 
             DSPProcessor.onComplete = () => {
                 setIsRunning(false);
+                setProcessingProgress({ currentSample: 0, totalSamples: 0, progress: 0 });
             };
 
             DSPProcessor.onError = (error) => {
@@ -270,6 +283,9 @@ function App() {
         return () => {
             DSPProcessor.stop();
             WavFileService.close();
+            if (progressTimerRef.current) {
+                clearTimeout(progressTimerRef.current);
+            }
         };
     }, []);
 

@@ -20,6 +20,7 @@ function Dialog({
 }) {
     const dialogRef = useRef(null);
     const previousFocusRef = useRef(null);
+    const rafIdRef = useRef(null);
     const titleId = useId();
 
     // Обработчик нажатия клавиш (Escape + focus trap)
@@ -76,7 +77,7 @@ function Dialog({
         document.addEventListener('keydown', handleKeyDown);
 
         // Автофокус на первый интерактивный элемент
-        requestAnimationFrame(() => {
+        rafIdRef.current = requestAnimationFrame(() => {
             if (dialogRef.current) {
                 const focusable = dialogRef.current.querySelectorAll(FOCUSABLE_SELECTOR);
                 if (focusable.length > 0) {
@@ -91,10 +92,18 @@ function Dialog({
             document.body.classList.remove('dialog-open');
             document.removeEventListener('keydown', handleKeyDown);
 
-            // Возвращаем фокус на предыдущий элемент
-            if (previousFocusRef.current && previousFocusRef.current.focus) {
-                previousFocusRef.current.focus();
+            // Отменяем requestAnimationFrame при cleanup
+            if (rafIdRef.current) {
+                cancelAnimationFrame(rafIdRef.current);
+                rafIdRef.current = null;
             }
+
+            // Возвращаем фокус на предыдущий элемент (безопасно)
+            const prevEl = previousFocusRef.current;
+            if (prevEl && typeof prevEl.focus === 'function' && document.contains(prevEl)) {
+                prevEl.focus();
+            }
+            previousFocusRef.current = null;
         };
     }, [isOpen, handleKeyDown]);
 

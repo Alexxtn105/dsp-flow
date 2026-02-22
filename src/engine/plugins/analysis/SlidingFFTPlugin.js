@@ -21,25 +21,21 @@ export default {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 
-            if (!this.states.has(nodeId)) {
-                const windowSize = params.windowSize ?? 1024;
-                this.states.set(nodeId, {
-                    buffer: new Float32Array(windowSize),
-                    bufferPos: 0,
-                    lastMagnitude: new Float32Array(windowSize / 2)
-                });
-            }
-            const state = this.states.get(nodeId);
-
             const windowSize = params.windowSize ?? 1024;
             const fftSize = params.fftSize ?? windowSize;
             const overlap = params.overlap ?? (windowSize >> 1);
             const hopSize = windowSize - overlap;
+            const halfSpectrum = fftSize >> 1;
             const windowFn = WindowFunctions.hanning;
 
-            // Выход: магнитуда половины спектра (fftSize / 2)
-            const halfSpectrum = fftSize >> 1;
-            const output = new Float32Array(halfSpectrum);
+            if (!this.states.has(nodeId)) {
+                this.states.set(nodeId, {
+                    buffer: new Float32Array(windowSize),
+                    bufferPos: 0,
+                    lastMagnitude: new Float32Array(halfSpectrum)
+                });
+            }
+            const state = this.states.get(nodeId);
 
             for (let i = 0; i < input.length; i++) {
                 state.buffer[state.bufferPos] = input[i];
@@ -69,9 +65,11 @@ export default {
                 }
             }
 
-            // Копируем последний вычисленный спектр
-            for (let j = 0; j < halfSpectrum && j < output.length; j++) {
-                output[j] = state.lastMagnitude[j] ?? 0;
+            // Возвращаем буфер размером chunkSize для совместимости с pipeline
+            const output = new Float32Array(chunkSize);
+            const copyLen = Math.min(halfSpectrum, chunkSize);
+            for (let j = 0; j < copyLen; j++) {
+                output[j] = state.lastMagnitude[j];
             }
 
             return output;

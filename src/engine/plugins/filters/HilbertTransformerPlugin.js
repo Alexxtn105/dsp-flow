@@ -74,8 +74,7 @@ export default {
                 }
 
                 // I-компонента: задержанный вход на delay = (N-1)/2 отсчётов
-                let delayedIdx = pointer - delay;
-                if (delayedIdx < 0) delayedIdx += N;
+                const delayedIdx = ((pointer - delay) % N + N) % N;
                 const iComp = buffer[delayedIdx];
 
                 output[i * 2] = iComp;
