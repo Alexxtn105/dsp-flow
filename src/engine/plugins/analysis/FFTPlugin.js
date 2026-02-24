@@ -10,7 +10,7 @@ export default {
     signals: { input: 'real', output: 'complex' },
     defaultParams: {
         fftSize: 8192,
-        windowType: 'hanning',
+        windowFunction: 'hanning',
         normalize: true,
     },
     processor: {
@@ -25,7 +25,7 @@ export default {
             const imag = new Float32Array(fftSize);
 
             // Применяем оконную функцию перед БПФ для снижения спектральной утечки
-            const windowFn = WindowFunctions[params.windowType] || WindowFunctions.hanning;
+            const windowFn = WindowFunctions[params.windowFunction] || WindowFunctions.hanning;
             for (let i = 0; i < input.length; i++) {
                 real[i] = input[i] * windowFn(i, input.length);
             }

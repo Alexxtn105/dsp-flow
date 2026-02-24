@@ -30,8 +30,8 @@ export default function initPlugins() {
     ]);
 
     registry.registerParamOptions('designMethod', [
-        { value: 'window', label: 'Windowed Sinc' },
-        { value: 'remez', label: 'Remez Exchange (не реализовано, используется Windowed Sinc)' }
+        { value: 'window', label: 'Оконный метод (Windowed Sinc)' },
+        { value: 'remez', label: 'Паркс-Макклеллан (Remez Exchange)' }
     ]);
 
     registry.registerParamOptions('filterType', [
@@ -59,6 +59,32 @@ export default function initPlugins() {
         { value: 'jet', label: 'Jet' },
         { value: 'hot', label: 'Hot' },
         { value: 'grayscale', label: 'Grayscale' }
+    ]);
+
+    registry.registerParamOptions('constellation', [
+        { value: 'BPSK', label: 'BPSK' },
+        { value: 'QPSK', label: 'QPSK' },
+        { value: '8PSK', label: '8PSK' },
+        { value: '16QAM', label: '16-QAM' },
+        { value: '64QAM', label: '64-QAM' }
+    ]);
+
+    registry.registerParamOptions('outputRange', [
+        { value: '±180°', label: '±180°' },
+        { value: '±π', label: '±π (радианы)' },
+        { value: '0-360°', label: '0–360°' },
+        { value: '0-2π', label: '0–2π (радианы)' }
+    ]);
+
+    registry.registerParamOptions('normalization', [
+        { value: 'none', label: 'Без нормализации' },
+        { value: 'average', label: 'Среднее (÷N)' },
+        { value: 'peak', label: 'По пиковому значению' }
+    ]);
+
+    registry.registerParamOptions('operation', [
+        { value: 'multiply', label: 'Умножение' },
+        { value: 'divide', label: 'Деление' }
     ]);
 
     // Регистрация всех плагинов

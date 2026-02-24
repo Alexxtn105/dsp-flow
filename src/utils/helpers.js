@@ -203,6 +203,42 @@ export const getBlockDescription = (blockType) => {
  * Форматировать имя параметра для отображения
  */
 export const formatParamName = (name) => {
+    // Точные соответствия для составных имён
+    const exactNames = {
+        'windowFunction': 'Оконная функция',
+        'designMethod': 'Метод расчёта',
+        'filterType': 'Тип фильтра',
+        'cutoffFrequency': 'Частота среза',
+        'lowCutoff': 'Низ. частота среза',
+        'highCutoff': 'Выс. частота среза',
+        'fftSize': 'Размер БПФ',
+        'outputRange': 'Диапазон выхода',
+        'normalization': 'Нормализация',
+        'scaleFactor': 'Масштаб. коэффициент',
+        'numInputs': 'Кол-во входов',
+        'integrationTime': 'Время интеграции',
+        'resetOnOverflow': 'Сброс при переполнении',
+        'maxValue': 'Макс. значение',
+        'referenceFrequency': 'Опорная частота',
+        'centerFrequency': 'Центральная частота',
+        'targetFrequency': 'Целевая частота',
+        'samplingRate': 'Частота дискретизации',
+        'symbolRate': 'Символьная скорость',
+        'eyeDiagram': 'Глазковая диаграмма',
+        'dBScale': 'Шкала дБ',
+        'timeWindow': 'Временное окно',
+        'phaseShift': 'Сдвиг фазы',
+        'colorMap': 'Цветовая карта',
+        'windowSize': 'Размер окна',
+        'sensitivity': 'Чувствительность',
+        'averaging': 'Усреднение',
+        'frequencyRange': 'Диапазон частот',
+        'constellation': 'Созвездие',
+        'operation': 'Операция',
+    };
+
+    if (exactNames[name]) return exactNames[name];
+
     return name
         .replace(/([A-Z])/g, ' $1')
         .replace(/^./, str => str.toUpperCase())

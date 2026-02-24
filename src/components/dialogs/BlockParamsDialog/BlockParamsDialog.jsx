@@ -57,6 +57,13 @@ function BlockParamsDialog({ onClose, node, onSave }) {
             parsedValue = parseFloat(value) || 0;
         } else if (type === 'boolean') {
             parsedValue = value === 'true' || value === true;
+        } else if (type === 'select-options') {
+            // Сохраняем исходный тип значения (число остаётся числом)
+            const originalValue = localParams[key];
+            if (typeof originalValue === 'number') {
+                parsedValue = parseFloat(value);
+                if (isNaN(parsedValue)) parsedValue = value;
+            }
         }
 
         setLocalParams(prev => ({
@@ -197,7 +204,7 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                                     {inputType === 'select-options' ? (
                                         <select
                                             value={value}
-                                            onChange={(e) => handleParamChange(key, e.target.value, 'text')}
+                                            onChange={(e) => handleParamChange(key, e.target.value, 'select-options')}
                                             className="param-input"
                                         >
                                             {paramOptions.map(opt => (
