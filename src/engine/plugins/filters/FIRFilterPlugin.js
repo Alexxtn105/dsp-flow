@@ -5,7 +5,7 @@ import { sinc, designWindowedSinc, designRemez, designRemezBandpass } from '../_
  * Фабрика FIR-процессора. Каждый вызов создаёт новый экземпляр
  * с собственным Map для состояний (states).
  */
-export function createFIRProcessor() {
+export function createFIRProcessor(fixedFilterType) {
     return {
         states: new Map(),
         clearStates() { this.states.clear(); },
@@ -13,7 +13,7 @@ export function createFIRProcessor() {
         init(nodeId, params, sampleRate) {
             const order = params.order || 31;
             const cutoff = params.cutoffFrequency || params.cutoff || params.frequency || 1000;
-            const type = params.filterType || 'lowpass';
+            const type = fixedFilterType || params.filterType || 'lowpass';
             const windowName = params.windowFunction || 'hamming';
             const designMethod = params.designMethod || 'window';
 
@@ -76,7 +76,7 @@ export function createFIRProcessor() {
                 // Проверяем, изменились ли параметры — пересчитываем коэффициенты
                 const currentCutoff = params.cutoffFrequency || params.cutoff || params.frequency || 1000;
                 const currentOrder = params.order || 31;
-                const currentFilterType = params.filterType || 'lowpass';
+                const currentFilterType = fixedFilterType || params.filterType || 'lowpass';
                 if (state._cutoff !== currentCutoff || state._order !== currentOrder || state._filterType !== currentFilterType) {
                     const oldBuffer = state.buffer;
                     const oldPointer = state.pointer;

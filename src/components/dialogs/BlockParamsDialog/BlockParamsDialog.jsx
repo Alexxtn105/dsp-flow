@@ -64,6 +64,12 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                 parsedValue = parseFloat(value);
                 if (isNaN(parsedValue)) parsedValue = value;
             }
+        } else if (type === 'array') {
+            // Парсим строку с разделителем-запятой в массив чисел
+            parsedValue = value.split(',').map(s => {
+                const num = parseFloat(s.trim());
+                return isNaN(num) ? 0 : num;
+            });
         }
 
         setLocalParams(prev => ({
@@ -126,6 +132,7 @@ function BlockParamsDialog({ onClose, node, onSave }) {
     const getInputType = (key, value) => {
         const paramOptions = registry.getParamOptions(key);
         if (paramOptions) return 'select-options';
+        if (Array.isArray(value)) return 'array';
         if (typeof value === 'number') return 'number';
         if (typeof value === 'boolean') return 'select';
         return 'text';
@@ -222,6 +229,14 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                                             <option value="true">Да</option>
                                             <option value="false">Нет</option>
                                         </select>
+                                    ) : inputType === 'array' ? (
+                                        <input
+                                            type="text"
+                                            value={Array.isArray(value) ? value.join(', ') : value}
+                                            onChange={(e) => handleParamChange(key, e.target.value, 'array')}
+                                            className="param-input"
+                                            placeholder="1.0, 1.0, ..."
+                                        />
                                     ) : (
                                         <input
                                             type={inputType}

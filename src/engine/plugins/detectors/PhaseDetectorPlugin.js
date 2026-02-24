@@ -23,7 +23,8 @@ export default {
             }
             const state = this.states.get(nodeId);
 
-            const outputInDegrees = (params.outputRange ?? '±180°').includes('°');
+            const range = params.outputRange ?? '±180°';
+            const sensitivity = params.sensitivity ?? 1.0;
             // Interleaved I/Q: input.length = chunkSize * 2, выход = chunkSize
             const numSamples = input.length >> 1;
             const output = new Float32Array(numSamples);
@@ -40,9 +41,25 @@ export default {
                 state.accumPhase += delta;
                 state.prevPhase = phase;
 
-                output[i] = outputInDegrees
-                    ? state.accumPhase * (180 / Math.PI)
-                    : state.accumPhase;
+                let value;
+                switch (range) {
+                    case '±180°':
+                        value = state.accumPhase * (180 / Math.PI);
+                        break;
+                    case '0-360°': {
+                        const deg = state.accumPhase * (180 / Math.PI);
+                        value = ((deg % 360) + 360) % 360;
+                        break;
+                    }
+                    case '0-2π':
+                        value = ((state.accumPhase % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                        break;
+                    default: // '±π'
+                        value = state.accumPhase;
+                        break;
+                }
+
+                output[i] = value * sensitivity;
             }
 
             return output;

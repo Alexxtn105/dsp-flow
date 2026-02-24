@@ -10,9 +10,8 @@ export default {
     defaultParams: {
         order: 64,
         cutoff: 1000,
-        filterType: 'highpass',
         windowFunction: 'hamming',
         designMethod: 'window',
     },
-    processor: createFIRProcessor()
+    processor: createFIRProcessor('highpass')
 };

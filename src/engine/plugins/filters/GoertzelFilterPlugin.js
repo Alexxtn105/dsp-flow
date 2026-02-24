@@ -7,7 +7,6 @@ export default {
     signals: { input: 'real', output: 'real' },
     defaultParams: {
         targetFrequency: 1000,
-        samplingRate: 48000,
         N: 256,
     },
     processor: {
@@ -23,7 +22,7 @@ export default {
             }
             const state = this.states.get(nodeId);
 
-            const sampleRate = params.samplingRate ?? 48000;
+            const sampleRate = params.sampleRate ?? 48000;
             const targetFreq = Math.min(params.targetFrequency ?? 1000, sampleRate / 2);
             const N = params.N ?? 256;
 

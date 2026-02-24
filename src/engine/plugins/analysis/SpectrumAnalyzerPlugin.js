@@ -11,7 +11,6 @@ export default {
     defaultParams: {
         fftSize: 2048,
         windowFunction: 'blackman-harris',
-        frequencyRange: 'full',
         dBScale: true,
         averaging: 5,
     },
@@ -26,11 +25,14 @@ export default {
             const fftSize = params.fftSize || 2048;
             const windowName = params.windowFunction || 'blackman-harris';
             const windowFunc = WindowFunctions[windowName] || WindowFunctions['blackman-harris'];
+            const useDbs = params.dBScale !== false;
+            const avgFrames = Math.max(1, params.averaging || 1);
 
             if (!this.states.has(nodeId)) {
                 this.states.set(nodeId, {
                     buffer: new Float32Array(fftSize),
-                    pointer: 0
+                    pointer: 0,
+                    avgSpectrum: null
                 });
             }
 
@@ -58,7 +60,35 @@ export default {
             real.set(processingBuffer);
 
             fft(real, imag);
-            return computeMagnitudeDB(real, imag);
+
+            const half = fftSize / 2;
+            const currentSpectrum = new Float32Array(half);
+
+            if (useDbs) {
+                const dbSpectrum = computeMagnitudeDB(real, imag);
+                currentSpectrum.set(dbSpectrum);
+            } else {
+                // Линейная магнитуда
+                for (let i = 0; i < half; i++) {
+                    const scale = (i === 0) ? (1 / fftSize) : (2 / fftSize);
+                    currentSpectrum[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]) * scale;
+                }
+            }
+
+            // Экспоненциальное усреднение
+            if (avgFrames > 1) {
+                const alpha = 1 / avgFrames;
+                if (!state.avgSpectrum || state.avgSpectrum.length !== half) {
+                    state.avgSpectrum = new Float32Array(currentSpectrum);
+                } else {
+                    for (let i = 0; i < half; i++) {
+                        state.avgSpectrum[i] += alpha * (currentSpectrum[i] - state.avgSpectrum[i]);
+                    }
+                }
+                return new Float32Array(state.avgSpectrum);
+            }
+
+            return currentSpectrum;
         }
     }
 };

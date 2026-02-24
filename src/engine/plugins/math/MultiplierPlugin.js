@@ -14,6 +14,7 @@ export default {
         process(inputs, params, chunkSize) {
             const output = new Float32Array(chunkSize);
             const scale = params.scaleFactor ?? 1.0;
+            const operation = params.operation || 'multiply';
 
             if (inputs.length === 0 || !inputs[0]) {
                 return output;
@@ -25,12 +26,19 @@ export default {
                 output[i] = i < first.length ? first[i] : 0;
             }
 
-            // Перемножаем с каждым последующим входом
+            // Применяем операцию с каждым последующим входом
             for (let idx = 1; idx < inputs.length; idx++) {
                 const inp = inputs[idx];
                 if (!inp) continue;
-                for (let i = 0; i < chunkSize; i++) {
-                    output[i] *= (i < inp.length ? inp[i] : 0);
+                if (operation === 'divide') {
+                    for (let i = 0; i < chunkSize; i++) {
+                        const divisor = i < inp.length ? inp[i] : 0;
+                        output[i] = divisor !== 0 ? output[i] / divisor : 0;
+                    }
+                } else {
+                    for (let i = 0; i < chunkSize; i++) {
+                        output[i] *= (i < inp.length ? inp[i] : 0);
+                    }
                 }
             }
 

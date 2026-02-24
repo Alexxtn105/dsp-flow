@@ -119,7 +119,7 @@ describe('GoertzelFilterPlugin', () => {
         for (let i = 0; i < input.length; i++) {
             input[i] = Math.sin(2 * Math.PI * targetFreq * i / sampleRate);
         }
-        const output = proc.process([input], { targetFrequency: targetFreq, samplingRate: sampleRate, N }, 512, 'g1');
+        const output = proc.process([input], { targetFrequency: targetFreq, sampleRate: sampleRate, N }, 512, 'g1');
         // После N отсчётов магнитуда должна быть значительной
         expect(output[N]).toBeGreaterThan(0);
     });
@@ -135,7 +135,7 @@ describe('GoertzelFilterPlugin', () => {
         for (let i = 0; i < input.length; i++) {
             input[i] = Math.sin(2 * Math.PI * 3000 * i / sampleRate);
         }
-        const params = { targetFrequency: targetFreq, samplingRate: sampleRate, N };
+        const params = { targetFrequency: targetFreq, sampleRate: sampleRate, N };
         const output = proc.process([input], params, 512, 'g2');
 
         // Генерируем синусоиду на ЦЕЛЕВОЙ частоте для сравнения
@@ -167,7 +167,7 @@ describe('GoertzelFilterPlugin', () => {
         for (let i = 0; i < input.length; i++) {
             input[i] = Math.sin(2 * Math.PI * targetFreq * i / sampleRate);
         }
-        const output = proc.process([input], { targetFrequency: targetFreq, samplingRate: sampleRate, N }, 128, 'g5');
+        const output = proc.process([input], { targetFrequency: targetFreq, sampleRate: sampleRate, N }, 128, 'g5');
         // Промежуточная магнитуда не нулевая (исправление бага 2.9)
         expect(output[127]).toBeGreaterThan(0);
     });

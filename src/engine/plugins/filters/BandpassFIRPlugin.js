@@ -11,9 +11,8 @@ export default {
         order: 64,
         lowCutoff: 1000,
         highCutoff: 3000,
-        filterType: 'bandpass',
         windowFunction: 'hamming',
         designMethod: 'window',
     },
-    processor: createFIRProcessor()
+    processor: createFIRProcessor('bandpass')
 };

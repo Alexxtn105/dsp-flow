@@ -12,6 +12,7 @@ export default {
         windowSize: 1024,
         overlap: 512,
         fftSize: 1024,
+        windowFunction: 'hanning',
     },
     processor: {
         states: new Map(),
@@ -26,7 +27,8 @@ export default {
             const overlap = Math.min(params.overlap ?? (windowSize >> 1), windowSize - 1);
             const hopSize = Math.max(1, windowSize - overlap);
             const halfSpectrum = fftSize >> 1;
-            const windowFn = WindowFunctions.hanning;
+            const windowName = params.windowFunction || 'hanning';
+            const windowFn = WindowFunctions[windowName] || WindowFunctions.hanning;
 
             if (!this.states.has(nodeId)) {
                 this.states.set(nodeId, {

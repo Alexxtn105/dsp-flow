@@ -24,6 +24,11 @@ export default {
             const state = this.states.get(nodeId);
 
             const sampleRate = params.sampleRate ?? 48000;
+            const centerFreq = params.centerFrequency ?? 1000;
+            const bandwidth = params.bandwidth ?? 100;
+            const sensitivity = params.sensitivity ?? 1.0;
+            const halfBw = bandwidth / 2;
+
             // Interleaved I/Q: input.length = chunkSize * 2, выход = chunkSize
             const numSamples = input.length >> 1;
             const output = new Float32Array(numSamples);
@@ -40,7 +45,17 @@ export default {
                 state.prevPhase = phase;
 
                 // Мгновенная частота = dPhase * sampleRate / (2 * pi)
-                output[i] = dPhase * sampleRate / (2 * Math.PI);
+                const instFreq = dPhase * sampleRate / (2 * Math.PI);
+
+                // Отклонение от центральной частоты
+                const deviation = instFreq - centerFreq;
+
+                // Обнуление если вне полосы пропускания
+                if (Math.abs(deviation) > halfBw) {
+                    output[i] = 0;
+                } else {
+                    output[i] = deviation * sensitivity;
+                }
             }
 
             return output;
