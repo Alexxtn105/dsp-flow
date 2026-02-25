@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import SummerPlugin from '../../src/engine/plugins/math/SummerPlugin.js';
 import MultiplierPlugin from '../../src/engine/plugins/math/MultiplierPlugin.js';
 import IntegratorPlugin from '../../src/engine/plugins/math/IntegratorPlugin.js';
+import RealPartPlugin from '../../src/engine/plugins/math/RealPartPlugin.js';
+import ImagPartPlugin from '../../src/engine/plugins/math/ImagPartPlugin.js';
 
 describe('SummerPlugin', () => {
     it('суммирует два входа', () => {
@@ -111,5 +113,59 @@ describe('IntegratorPlugin', () => {
         const out2 = proc.process([input], params, 100, 'int5');
         // Второй чанк продолжает интегрирование — начальное значение > 0
         expect(out2[0]).toBeGreaterThan(out1[0]);
+    });
+});
+
+describe('RealPartPlugin', () => {
+    it('извлекает действительную часть из interleaved I/Q', () => {
+        // Interleaved: [I0, Q0, I1, Q1, I2, Q2]
+        const input = new Float32Array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        const output = RealPartPlugin.processor.process([input], {}, 6);
+        expect(output.length).toBe(3); // input.length / 2
+        expect(output[0]).toBeCloseTo(1.0);
+        expect(output[1]).toBeCloseTo(3.0);
+        expect(output[2]).toBeCloseTo(5.0);
+    });
+
+    it('возвращает тишину при пустом входе', () => {
+        const output = RealPartPlugin.processor.process([], {}, 128);
+        expect(output.length).toBe(128);
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('обрабатывает единичный сэмпл', () => {
+        const input = new Float32Array([7.5, -3.2]);
+        const output = RealPartPlugin.processor.process([input], {}, 2);
+        expect(output.length).toBe(1);
+        expect(output[0]).toBeCloseTo(7.5);
+    });
+});
+
+describe('ImagPartPlugin', () => {
+    it('извлекает мнимую часть из interleaved I/Q', () => {
+        // Interleaved: [I0, Q0, I1, Q1, I2, Q2]
+        const input = new Float32Array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        const output = ImagPartPlugin.processor.process([input], {}, 6);
+        expect(output.length).toBe(3);
+        expect(output[0]).toBeCloseTo(2.0);
+        expect(output[1]).toBeCloseTo(4.0);
+        expect(output[2]).toBeCloseTo(6.0);
+    });
+
+    it('возвращает тишину при пустом входе', () => {
+        const output = ImagPartPlugin.processor.process([], {}, 128);
+        expect(output.length).toBe(128);
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('обрабатывает единичный сэмпл', () => {
+        const input = new Float32Array([7.5, -3.2]);
+        const output = ImagPartPlugin.processor.process([input], {}, 2);
+        expect(output.length).toBe(1);
+        expect(output[0]).toBeCloseTo(-3.2);
     });
 });

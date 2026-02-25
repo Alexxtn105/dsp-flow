@@ -221,15 +221,22 @@ class GraphCompiler {
             const node = nodeMap.get(nodeId);
             const inputEdges = edgeMap.get(nodeId) || [];
 
+            // Сортируем входы по targetHandle один раз при компиляции (H4)
+            const inputs = inputEdges.map(e => ({
+                sourceNodeId: e.source,
+                sourceHandle: e.sourceHandle,
+                targetHandle: e.targetHandle
+            })).sort((a, b) => {
+                const aHandle = a.targetHandle || '';
+                const bHandle = b.targetHandle || '';
+                return aHandle.localeCompare(bHandle, undefined, { numeric: true });
+            });
+
             return {
                 nodeId,
                 blockType: node.data.blockType,
                 params: node.data.params,
-                inputs: inputEdges.map(e => ({
-                    sourceNodeId: e.source,
-                    sourceHandle: e.sourceHandle,
-                    targetHandle: e.targetHandle
-                })),
+                inputs,
                 signalConfig: getBlockSignalConfig(node.data.blockType)
             };
         });

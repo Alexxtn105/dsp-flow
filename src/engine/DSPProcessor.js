@@ -229,9 +229,7 @@ class DSPProcessor {
                     initialized: true
                 });
                 if (output && this.onBlockOutput) {
-                    // Clone buffer for visualization to avoid mutation issues
-                    const outputCopy = new Float32Array(output);
-                    this.onBlockOutput(block.nodeId, outputCopy);
+                    this.onBlockOutput(block.nodeId, output);
                 }
 
                 // Если это Speaker и не замьючен - воспроизводим
@@ -269,15 +267,9 @@ class DSPProcessor {
      * @returns {Float32Array} выходные данные
      */
     executeBlock(block) {
-        // Собираем входные данные, сортируя по targetHandle для правильного порядка
-        const sortedInputs = [...block.inputs].sort((a, b) => {
-            const aHandle = a.targetHandle || '';
-            const bHandle = b.targetHandle || '';
-            return aHandle.localeCompare(bHandle, undefined, { numeric: true });
-        });
-
+        // Входы уже отсортированы при компиляции графа (GraphCompiler)
         const inputs = [];
-        for (const input of sortedInputs) {
+        for (const input of block.inputs) {
             const sourceState = this.blockStates.get(input.sourceNodeId);
             if (sourceState?.output) {
                 inputs.push(sourceState.output);

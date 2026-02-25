@@ -47,8 +47,10 @@ describe('FFTPlugin', () => {
         const input = new Float32Array(N).fill(0);
         input[0] = 1.0; // Импульс
         const output = FFTPlugin.processor.process([input], { fftSize: 1024 }, N);
-        // С fftSize=1024 выход должен быть 512 (половина)
-        expect(output.length).toBe(512);
+        // Выход фиксирован = chunkSize/2 для совместимости с пайплайном
+        expect(output.length).toBe(N / 2);
+        // При этом спектральные данные корректны (импульс → плоский спектр)
+        expect(output[0]).not.toBe(0);
     });
 });
 

@@ -7,7 +7,7 @@ export default {
     signals: { input: 'real', output: 'real' },
     defaultParams: {
         integrationTime: 1.0,
-        resetOnOverflow: true,
+        resetOnOverflow: false,
         maxValue: 1000,
     },
     processor: {

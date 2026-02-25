@@ -15,7 +15,8 @@ export default {
     },
     processor: {
         process(inputs, params, chunkSize) {
-            if (inputs.length === 0 || !inputs[0]) return new Float32Array(chunkSize / 2);
+            const halfChunk = chunkSize >> 1;
+            if (inputs.length === 0 || !inputs[0]) return new Float32Array(halfChunk);
             const input = inputs[0];
             const minSize = Math.pow(2, Math.ceil(Math.log2(input.length)));
             const fftSize = params.fftSize
@@ -31,7 +32,13 @@ export default {
             }
 
             fft(real, imag);
-            return computeMagnitudeDB(real, imag);
+            const magnitude = computeMagnitudeDB(real, imag);
+
+            // Выходной буфер фиксирован — chunkSize/2 бин для совместимости с пайплайном (C2)
+            if (magnitude.length === halfChunk) return magnitude;
+            const output = new Float32Array(halfChunk);
+            output.set(magnitude.subarray(0, Math.min(magnitude.length, halfChunk)));
+            return output;
         }
     }
 };

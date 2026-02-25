@@ -10,7 +10,9 @@ import LoadDialog from './components/dialogs/LoadDialog';
 import SettingsDialog from './components/dialogs/SettingsDialog';
 import ConfirmDialog from './components/dialogs/ConfirmDialog/ConfirmDialog.jsx';
 import { VisualizationManager } from './components/visualization';
-import { GraphCompiler, DSPProcessor, WavFileService } from './engine';
+import { useDialogManager } from './hooks/useDialogManager';
+import { useDSPSimulation } from './hooks/useDSPSimulation';
+import { DSPProcessor } from './engine';
 import './App.css';
 
 function App() {
@@ -24,27 +26,6 @@ function App() {
         isSaved: true
     });
 
-    // Состояния диалогов
-    const [showSaveDialog, setShowSaveDialog] = useState(false);
-    const [showSaveAsDialog, setShowSaveAsDialog] = useState(false);
-    const [showLoadDialog, setShowLoadDialog] = useState(false);
-    const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-
-    // Диалог подтверждения/сообщения (замена alert/confirm)
-    const [dialogState, setDialogState] = useState(null);
-
-    const showAlert = useCallback((message, title) => {
-        setDialogState({ mode: 'alert', message, title });
-    }, []);
-
-    const showConfirm = useCallback((message, title, onConfirm) => {
-        setDialogState({ mode: 'confirm', message, title, onConfirm });
-    }, []);
-
-    const closeDialog = useCallback(() => {
-        setDialogState(null);
-    }, []);
-
     // Частота дискретизации
     const [sampleRate, setSampleRate] = useState(48000);
 
@@ -54,35 +35,20 @@ function App() {
         connectionsCount: 0
     });
 
-    // Состояние симуляции
-    const [isRunning, setIsRunning] = useState(false);
+    // Диалоги
+    const dialogs = useDialogManager();
 
-    // Прогресс обработки
-    const [processingProgress, setProcessingProgress] = useState({
-        currentSample: 0,
-        totalSamples: 0,
-        progress: 0
+    // DSP-симуляция
+    const simulation = useDSPSimulation({
+        reactFlowInstance,
+        sampleRate,
+        setSampleRate,
+        showAlert: dialogs.showAlert,
+        visualizationManagerRef,
     });
 
-    // Ошибки компиляции
-    const [, setCompilationErrors] = useState([]);
-
-    // Nodes для визуализации
-    const [nodes, setNodes] = useState([]);
-
-    // Manual Mode State
-    const [isManualMode, setIsManualMode] = useState(false);
-    const [manualStepSize, setManualStepSize] = useState(1024);
-
-    // Debounce timer ref для onProgress
-    const progressTimerRef = useRef(null);
-    const lastProgressRef = useRef(null);
-
     const handleSchemeUpdate = useCallback((schemeName, isSaved = true) => {
-        setCurrentScheme({
-            name: schemeName,
-            isSaved
-        });
+        setCurrentScheme({ name: schemeName, isSaved });
     }, []);
 
     const handleStatsUpdate = useCallback((newStats) => {
@@ -90,9 +56,9 @@ function App() {
     }, []);
 
     const doCreateNewScheme = useCallback(() => {
-        if (isRunning) {
+        if (simulation.isRunning) {
             DSPProcessor.stop();
-            setIsRunning(false);
+            simulation.setIsRunning(false);
         }
 
         if (reactFlowInstance) {
@@ -101,18 +67,13 @@ function App() {
             reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1 });
         }
 
-        setCurrentScheme({
-            name: 'not_saved',
-            isSaved: true
-        });
-        setProcessingProgress({ currentSample: 0, totalSamples: 0, progress: 0 });
-        setCompilationErrors([]);
-        setNodes([]);
-    }, [reactFlowInstance, isRunning]);
+        setCurrentScheme({ name: 'not_saved', isSaved: true });
+        simulation.setNodes([]);
+    }, [reactFlowInstance, simulation]);
 
     const handleNewScheme = useCallback(() => {
         if (!currentScheme.isSaved) {
-            showConfirm(
+            dialogs.showConfirm(
                 'Текущая схема не сохранена. Создать новую схему?',
                 'Новая схема',
                 doCreateNewScheme
@@ -120,175 +81,44 @@ function App() {
             return;
         }
         doCreateNewScheme();
-    }, [currentScheme.isSaved, doCreateNewScheme, showConfirm]);
+    }, [currentScheme.isSaved, doCreateNewScheme, dialogs]);
 
     const handleSave = useCallback(() => {
         if (currentScheme.name === 'not_saved') {
-            setShowSaveAsDialog(true);
+            dialogs.setShowSaveAsDialog(true);
         } else {
-            setShowSaveDialog(true);
+            dialogs.setShowSaveDialog(true);
         }
-    }, [currentScheme.name]);
+    }, [currentScheme.name, dialogs]);
 
     const handleSaveSuccess = useCallback((schemeName) => {
         handleSchemeUpdate(schemeName, true);
-        setShowSaveDialog(false);
-        setShowSaveAsDialog(false);
-    }, [handleSchemeUpdate]);
+        dialogs.setShowSaveDialog(false);
+        dialogs.setShowSaveAsDialog(false);
+    }, [handleSchemeUpdate, dialogs]);
 
     const handleLoadSuccess = useCallback((schemeName) => {
         handleSchemeUpdate(schemeName, true);
-        setShowLoadDialog(false);
-    }, [handleSchemeUpdate]);
-
-    const handleToggleManualMode = useCallback((enabled) => {
-        setIsManualMode(enabled);
-        DSPProcessor.setManualMode(enabled);
-    }, []);
-
-    const handleStartSimulation = useCallback(() => {
-        if (!reactFlowInstance) return;
-
-        if (stats.nodesCount === 0) {
-            showAlert('Добавьте хотя бы один узел для запуска симуляции', 'Запуск');
-            return;
-        }
-
-        const currentNodes = reactFlowInstance.getNodes();
-        const edges = reactFlowInstance.getEdges();
-        setNodes(currentNodes);
-
-        const inputNode = currentNodes.find(n => n.data.blockType === 'Audio File');
-
-        const hasGenerators = currentNodes.some(n =>
-            ['Синусный генератор', 'Косинусный генератор', 'Референсный синусный генератор', 'Референсный косинусный генератор'].includes(n.data.blockType) ||
-            n.data.blockType === 'Audio File'
-        );
-
-        if (!hasGenerators) {
-            showAlert('Добавьте хотя бы один источник сигнала (Audio File или Генератор) для запуска', 'Запуск');
-            return;
-        }
-
-        const wavFile = inputNode?.data?.params?.wavFile;
-        if (inputNode && !wavFile) {
-            showAlert('Выберите WAV файл в блоке "Audio File"', 'Запуск');
-            return;
-        }
-
-        const compilationResult = GraphCompiler.compile(currentNodes, edges);
-
-        if (!compilationResult.success) {
-            setCompilationErrors(compilationResult.errors);
-            const errorMessages = compilationResult.errors.map(e => e.message).join('\n');
-            showAlert(`Ошибки компиляции:\n${errorMessages}`, 'Ошибка компиляции');
-            return;
-        }
-
-        setCompilationErrors([]);
-
-        const startProcessing = (fileSampleRate = null) => {
-            const rate = fileSampleRate || sampleRate;
-
-            if (fileSampleRate) {
-                setSampleRate(fileSampleRate);
-            }
-
-            DSPProcessor.setSampleRate(rate);
-            DSPProcessor.setFileMode(!!fileSampleRate);
-            DSPProcessor.setManualMode(isManualMode);
-
-            DSPProcessor.initialize(currentNodes, edges);
-
-            DSPProcessor.onProgress = (progress) => {
-                lastProgressRef.current = progress;
-                if (progressTimerRef.current) {
-                    clearTimeout(progressTimerRef.current);
-                }
-                progressTimerRef.current = setTimeout(() => {
-                    progressTimerRef.current = null;
-                    if (lastProgressRef.current) {
-                        setProcessingProgress(lastProgressRef.current);
-                    }
-                }, 100);
-            };
-
-            DSPProcessor.onBlockOutput = (nodeId, output) => {
-                if (visualizationManagerRef.current) {
-                    visualizationManagerRef.current.updateData(nodeId, output);
-                }
-            };
-
-            DSPProcessor.onComplete = () => {
-                setIsRunning(false);
-                setProcessingProgress({ currentSample: 0, totalSamples: 0, progress: 0 });
-            };
-
-            DSPProcessor.onError = (error) => {
-                setIsRunning(false);
-                showAlert(`Ошибка обработки: ${error.message}`, 'Ошибка');
-            };
-
-            DSPProcessor.start();
-            setIsRunning(true);
-        };
-
-        if (wavFile) {
-            WavFileService.loadFile(wavFile).then((fileInfo) => {
-                startProcessing(fileInfo.sampleRate);
-            }).catch(error => {
-                showAlert(`Ошибка загрузки WAV файла: ${error.message}`, 'Ошибка');
-            });
-        } else {
-            startProcessing(null);
-        }
-    }, [reactFlowInstance, stats.nodesCount, sampleRate, isManualMode, showAlert]);
-
-    const handleManualStep = useCallback(() => {
-        if (!isRunning) {
-            handleStartSimulation();
-        } else {
-            DSPProcessor.step(manualStepSize);
-        }
-    }, [isRunning, manualStepSize, handleStartSimulation]);
-
-    const handleStopSimulation = useCallback(() => {
-        DSPProcessor.stop();
-        setIsRunning(false);
-    }, []);
+        dialogs.setShowLoadDialog(false);
+    }, [handleSchemeUpdate, dialogs]);
 
     const handleSampleRateChange = useCallback((newRate) => {
         setSampleRate(newRate);
-        setCurrentScheme(prev => ({
-            ...prev,
-            isSaved: false
-        }));
+        setCurrentScheme(prev => ({ ...prev, isSaved: false }));
     }, []);
 
     const handleOpenVisualization = useCallback((nodeId) => {
         if (visualizationManagerRef.current && reactFlowInstance) {
             const currentNodes = reactFlowInstance.getNodes();
-            setNodes(currentNodes);
+            simulation.setNodes(currentNodes);
             visualizationManagerRef.current.openWindow(nodeId);
         }
-    }, [reactFlowInstance]);
+    }, [reactFlowInstance, simulation]);
 
     // Синхронизация nodes для VisualizationManager при изменении графа
-    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        if (reactFlowInstance) setNodes(reactFlowInstance.getNodes());
-    }, [stats.nodesCount, reactFlowInstance]);
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    useEffect(() => {
-        return () => {
-            DSPProcessor.stop();
-            WavFileService.close();
-            if (progressTimerRef.current) {
-                clearTimeout(progressTimerRef.current);
-            }
-        };
-    }, []);
+        if (reactFlowInstance) simulation.setNodes(reactFlowInstance.getNodes());
+    }, [stats.nodesCount, reactFlowInstance, simulation]);
 
     return (
         <DSPEditorProvider reactFlowInstance={reactFlowInstance}>
@@ -298,15 +128,15 @@ function App() {
                 <div className="app-content">
                     <ControlToolbar
                         onSave={handleSave}
-                        onSaveAs={() => setShowSaveAsDialog(true)}
-                        onLoad={() => setShowLoadDialog(true)}
+                        onSaveAs={() => dialogs.setShowSaveAsDialog(true)}
+                        onLoad={() => dialogs.setShowLoadDialog(true)}
                         onNewScheme={handleNewScheme}
-                        onSettings={() => setShowSettingsDialog(true)}
-                        onStart={handleStartSimulation}
-                        onStop={handleStopSimulation}
+                        onSettings={() => dialogs.setShowSettingsDialog(true)}
+                        onStart={simulation.handleStartSimulation}
+                        onStop={simulation.handleStopSimulation}
                         isSaveEnabled
                         isSaveAsEnabled
-                        isRunning={isRunning}
+                        isRunning={simulation.isRunning}
                     />
 
                     <DSPEditor
@@ -314,77 +144,77 @@ function App() {
                         onSchemeUpdate={handleSchemeUpdate}
                         onStatsUpdate={handleStatsUpdate}
                         onReactFlowInit={setReactFlowInstance}
-                        isRunning={isRunning}
+                        isRunning={simulation.isRunning}
                         onOpenVisualization={handleOpenVisualization}
                     />
                 </div>
 
                 <Footer
-                    isRunning={isRunning}
+                    isRunning={simulation.isRunning}
                     nodesCount={stats.nodesCount}
                     connectionsCount={stats.connectionsCount}
                     sampleRate={sampleRate}
-                    progress={processingProgress.progress}
-                    isManualMode={isManualMode}
-                    manualStepSize={manualStepSize}
-                    currentSample={processingProgress.currentSample}
-                    totalSamples={processingProgress.totalSamples}
-                    onToggleManual={handleToggleManualMode}
-                    onStep={handleManualStep}
-                    onStepSizeChange={setManualStepSize}
+                    progress={simulation.processingProgress.progress}
+                    isManualMode={simulation.isManualMode}
+                    manualStepSize={simulation.manualStepSize}
+                    currentSample={simulation.processingProgress.currentSample}
+                    totalSamples={simulation.processingProgress.totalSamples}
+                    onToggleManual={simulation.handleToggleManualMode}
+                    onStep={simulation.handleManualStep}
+                    onStepSizeChange={simulation.setManualStepSize}
                 />
 
                 <VisualizationManager
                     ref={visualizationManagerRef}
                     sampleRate={sampleRate}
-                    nodes={nodes}
+                    nodes={simulation.nodes}
                 />
 
-                {showSaveDialog && (
+                {dialogs.showSaveDialog && (
                     <SaveDialog
-                        onClose={() => setShowSaveDialog(false)}
+                        onClose={() => dialogs.setShowSaveDialog(false)}
                         schemeName={currentScheme.name}
                         onSaveSuccess={handleSaveSuccess}
                         mode="save"
                     />
                 )}
 
-                {showSaveAsDialog && (
+                {dialogs.showSaveAsDialog && (
                     <SaveDialog
-                        onClose={() => setShowSaveAsDialog(false)}
+                        onClose={() => dialogs.setShowSaveAsDialog(false)}
                         schemeName={currentScheme.name}
                         onSaveSuccess={handleSaveSuccess}
                         mode="saveAs"
                     />
                 )}
 
-                {showLoadDialog && (
+                {dialogs.showLoadDialog && (
                     <LoadDialog
-                        onClose={() => setShowLoadDialog(false)}
+                        onClose={() => dialogs.setShowLoadDialog(false)}
                         onLoadSuccess={handleLoadSuccess}
-                        showConfirm={showConfirm}
-                        showAlert={showAlert}
+                        showConfirm={dialogs.showConfirm}
+                        showAlert={dialogs.showAlert}
                     />
                 )}
 
-                {showSettingsDialog && (
+                {dialogs.showSettingsDialog && (
                     <SettingsDialog
-                        onClose={() => setShowSettingsDialog(false)}
+                        onClose={() => dialogs.setShowSettingsDialog(false)}
                         sampleRate={sampleRate}
                         onSampleRateChange={handleSampleRateChange}
                     />
                 )}
 
-                {dialogState && (
+                {dialogs.dialogState && (
                     <ConfirmDialog
-                        message={dialogState.message}
-                        title={dialogState.title}
-                        mode={dialogState.mode}
+                        message={dialogs.dialogState.message}
+                        title={dialogs.dialogState.title}
+                        mode={dialogs.dialogState.mode}
                         onConfirm={() => {
-                            if (dialogState.onConfirm) dialogState.onConfirm();
-                            closeDialog();
+                            if (dialogs.dialogState.onConfirm) dialogs.dialogState.onConfirm();
+                            dialogs.closeDialog();
                         }}
-                        onClose={closeDialog}
+                        onClose={dialogs.closeDialog}
                     />
                 )}
             </div>

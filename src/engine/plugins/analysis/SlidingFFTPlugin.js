@@ -34,7 +34,10 @@ export default {
                 this.states.set(nodeId, {
                     buffer: new Float32Array(windowSize),
                     bufferPos: 0,
-                    lastMagnitude: new Float32Array(halfSpectrum)
+                    lastMagnitude: new Float32Array(halfSpectrum),
+                    // Преаллоцированные буферы для FFT (H2)
+                    fftReal: new Float32Array(fftSize),
+                    fftImag: new Float32Array(fftSize),
                 });
             }
             const state = this.states.get(nodeId);
@@ -45,20 +48,20 @@ export default {
 
                 if (state.bufferPos >= windowSize) {
                     // Буфер заполнен — выполняем FFT
-                    const real = new Float32Array(fftSize);
-                    const imag = new Float32Array(fftSize);
+                    const { fftReal, fftImag } = state;
+                    fftReal.fill(0);
+                    fftImag.fill(0);
 
                     // Применяем оконную функцию
                     for (let j = 0; j < windowSize; j++) {
-                        real[j] = state.buffer[j] * windowFn(j, windowSize);
+                        fftReal[j] = state.buffer[j] * windowFn(j, windowSize);
                     }
-                    // Остальные нули (zero-padding если fftSize > windowSize)
 
-                    fft(real, imag);
+                    fft(fftReal, fftImag);
 
                     // Магнитуда половины спектра
                     for (let j = 0; j < halfSpectrum; j++) {
-                        state.lastMagnitude[j] = Math.sqrt(real[j] * real[j] + imag[j] * imag[j]);
+                        state.lastMagnitude[j] = Math.sqrt(fftReal[j] * fftReal[j] + fftImag[j] * fftImag[j]);
                     }
 
                     // Сдвигаем буфер на hopSize
