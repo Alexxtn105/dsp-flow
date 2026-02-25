@@ -2,8 +2,10 @@
 
 **Дата:** 2026-02-25
 **Ветка:** `development`
-**Тесты:** 152/152 passed
+**Тесты:** 173/173 passed
 **Версия:** 1.0.0
+
+> **Статус исправлений:** все CRITICAL (C1–C2) и HIGH (H1–H9) замечания исправлены в коммите `22c8122`.
 
 ---
 
@@ -427,10 +429,10 @@ Canvas-цвета не участвуют в дизайн-системе и не
 
 | Категория | Файлов | Тестов | Покрытие |
 |---|---|---|---|
-| Engine (DSPProcessor, GraphCompiler, PluginRegistry) | 3 | ~85 | Отличное |
-| Плагины (генераторы, фильтры, анализ, детекторы, мат.) | 7 | ~60 | Хорошее |
+| Engine (DSPProcessor, GraphCompiler, PluginRegistry, WavFileService) | 4 | ~100 | Отличное |
+| Плагины (генераторы, фильтры, анализ, детекторы, мат.) | 7 | ~66 | Хорошее |
 | Интеграционные | 1 | 6 | Минимальное |
-| **Итого** | **11** | **152** | **~25% файлов** |
+| **Итого** | **12** | **173** | **~30% файлов** |
 
 ### 9.2. Покрытие по модулям
 
@@ -449,8 +451,8 @@ Canvas-цвета не участвуют в дизайн-системе и не
 
 | Модуль | Тип | Строк кода | Критичность |
 |---|---|---|---|
-| RealPartPlugin, ImagPartPlugin | Плагины | ~40 | HIGH |
-| WavFileService | Движок | ~150 | HIGH |
+| ~~RealPartPlugin, ImagPartPlugin~~ | ~~Плагины~~ | ~~~40~~ | ✅ Покрыто |
+| ~~WavFileService~~ | ~~Движок~~ | ~~~150~~ | ✅ Покрыто |
 | storageService | Сервисы | ~217 | HIGH |
 | validationService | Сервисы | ~178 | MEDIUM |
 | useAutoSave | Хуки | ~173 | MEDIUM |
@@ -527,24 +529,24 @@ csstype@3.2.3            — TypeScript не используется
 
 ### CRITICAL (блокирующие / потеря данных)
 
-| # | Проблема | Файл | Раздел |
-|---|---|---|---|
-| C1 | Race condition при параллельных start() | DSPProcessor.js | 3.1 |
-| C2 | Размер выходного буфера FFT = chunkSize/2 | FFTPlugin.js | 3.2 |
+| # | Проблема | Файл | Раздел | Статус |
+|---|---|---|---|---|
+| C1 | Race condition при параллельных start() | DSPProcessor.js | 3.1 | ✅ Исправлено |
+| C2 | Размер выходного буфера FFT = chunkSize/2 | FFTPlugin.js | 3.2 | ✅ Исправлено |
 
 ### HIGH (серьёзные баги / утечки / производительность)
 
-| # | Проблема | Файл | Раздел |
-|---|---|---|---|
-| H1 | Утечка AudioContext при start/stop | DSPProcessor.js | 3.3 |
-| H2 | Аллокации Float32Array в SlidingFFT на каждое окно | SlidingFFTPlugin.js | 3.4 |
-| H3 | Копирование буфера на каждый чанк/блок | DSPProcessor.js | 3.5 |
-| H4 | localeCompare на каждом чанке | DSPProcessor.js | 3.6 |
-| H5 | Integrator: разрыв при reset-on-overflow | IntegratorPlugin.js | 5.2.1 |
-| H6 | App.jsx — God Object (395 строк, 13 useState) | App.jsx | 6.1.1 |
-| H7 | Нет тестов для RealPart/ImagPart, WavFileService | tests/ | 9.2 |
-| H8 | 5 лишних npm-зависимостей | package.json | 10.1 |
-| H9 | 2 уязвимости безопасности (ReDoS) | node_modules | 10.2 |
+| # | Проблема | Файл | Раздел | Статус |
+|---|---|---|---|---|
+| H1 | Утечка AudioContext при start/stop | DSPProcessor.js | 3.3 | ✅ Исправлено |
+| H2 | Аллокации Float32Array в SlidingFFT на каждое окно | SlidingFFTPlugin.js | 3.4 | ✅ Исправлено |
+| H3 | Копирование буфера на каждый чанк/блок | DSPProcessor.js | 3.5 | ✅ Исправлено |
+| H4 | localeCompare на каждом чанке | DSPProcessor.js | 3.6 | ✅ Исправлено |
+| H5 | Integrator: разрыв при reset-on-overflow | IntegratorPlugin.js | 5.2.1 | ✅ Исправлено |
+| H6 | App.jsx — God Object (395 строк, 13 useState) | App.jsx | 6.1.1 | ✅ Исправлено |
+| H7 | Нет тестов для RealPart/ImagPart, WavFileService | tests/ | 9.2 | ✅ Исправлено |
+| H8 | 5 лишних npm-зависимостей | package.json | 10.1 | ✅ Исправлено |
+| H9 | 2 уязвимости безопасности (ReDoS) | node_modules | 10.2 | ✅ Исправлено |
 
 ### MEDIUM (улучшения / рефакторинг)
 
@@ -578,20 +580,20 @@ csstype@3.2.3            — TypeScript не используется
 
 ## 12. Рекомендации
 
-### Немедленные действия (1–2 дня)
+### Немедленные действия (1–2 дня) — ✅ Выполнено
 
-1. **Исправить размер буфера FFTPlugin** (C2) — изменить контракт или документировать, что выход = chunkSize/2
-2. **Защитить start() от повторных вызовов** (C1) — добавить guard `if (this.isRunning) return`
-3. **Удалить лишние зависимости** (H8) — `npm prune`
-4. **Исправить уязвимости** (H9) — `npm audit fix`
-5. **Исправить IntegratorPlugin** (H5) — сатурация по умолчанию вместо сброса
+1. ~~**Исправить размер буфера FFTPlugin** (C2) — выход фиксирован на chunkSize/2~~
+2. ~~**Защитить start() от повторных вызовов** (C1) — guard `if (this.isRunning) return`~~
+3. ~~**Удалить лишние зависимости** (H8) — `npm prune`~~
+4. ~~**Исправить уязвимости** (H9) — `npm audit fix`~~
+5. ~~**Исправить IntegratorPlugin** (H5) — сатурация по умолчанию~~
 
-### Краткосрочные (1–2 недели)
+### Краткосрочные (1–2 недели) — ✅ Выполнено
 
-6. **Преаллокация буферов** (H2, H3) — пул Float32Array в DSPProcessor
-7. **Сортировка входов при компиляции** (H4) — перенести из executeBlock в GraphCompiler
-8. **Добавить тесты** (H7, M10) — RealPart, ImagPart, WavFileService, интеграционные
-9. **Рефакторинг App.jsx** (H6) — выделить кастомные хуки для диалогов и симуляции
+6. ~~**Преаллокация буферов** (H2, H3) — буферы в state SlidingFFT, убрано лишнее копирование~~
+7. ~~**Сортировка входов при компиляции** (H4) — перенесено в GraphCompiler~~
+8. ~~**Добавить тесты** (H7) — RealPart, ImagPart, WavFileService (+21 тест)~~
+9. ~~**Рефакторинг App.jsx** (H6) — выделены useDialogManager и useDSPSimulation~~
 10. **Добавить .prettierrc** (M11) — стандартизировать форматирование
 
 ### Среднесрочные (1–2 месяца)
