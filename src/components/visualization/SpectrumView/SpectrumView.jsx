@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { setupCanvasDPR, drawFrequencyGrid, drawCursorLabel, getMouseFrequency } from '../_shared/canvasUtils';
+import { setupCanvasDPR, drawFrequencyGrid, drawCursorLabel, getMouseFrequency, getCanvasColors, invalidateCanvasColors } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './SpectrumView.css';
 
@@ -19,7 +19,6 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
     const [hoverFreq, setHoverFreq] = useState(null);
     const [hoverDb, setHoverDb] = useState(null);
 
-    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (!accumulate) setAccumulatedData(null);
     }, [accumulate]);
@@ -35,7 +34,6 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
             return next;
         });
     }, [data, accumulate]);
-    /* eslint-enable react-hooks/set-state-in-effect */
 
     const drawSpectrum = useCallback(() => {
         const canvas = canvasRef.current;
@@ -43,8 +41,12 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
 
         const ctx = setupCanvasDPR(canvas, width, height);
 
+        // Получаем цвета из CSS-переменных
+        invalidateCanvasColors();
+        const colors = getCanvasColors(canvas.parentElement);
+
         // Очистка
-        ctx.fillStyle = isDarkTheme ? '#1f2937' : '#f9fafb';
+        ctx.fillStyle = colors.bg;
         ctx.fillRect(0, 0, width, height);
 
         // Grid parameters
@@ -53,12 +55,12 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
         const dbRange = maxDb - minDb;
 
         // Draw Grid
-        ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+        ctx.strokeStyle = colors.gridMajor;
         ctx.lineWidth = 0.5;
 
         // Horizontal dB lines (every 10dB)
         ctx.font = '10px sans-serif';
-        ctx.fillStyle = isDarkTheme ? '#9ca3af' : '#4b5563';
+        ctx.fillStyle = colors.textSecondary;
         ctx.textBaseline = 'middle';
 
         for (let db = maxDb; db >= minDb; db -= 10) {
@@ -74,8 +76,8 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
         // Vertical Freq lines (shared utility)
         ctx.lineWidth = 0.5;
         ctx.font = '10px sans-serif';
-        ctx.fillStyle = isDarkTheme ? '#9ca3af' : '#4b5563';
-        drawFrequencyGrid(ctx, width, height, sampleRate, isDarkTheme);
+        ctx.fillStyle = colors.textSecondary;
+        drawFrequencyGrid(ctx, width, height, sampleRate, colors);
 
         // Drawing helper
         const drawLine = (pData, color) => {
@@ -102,17 +104,17 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
 
         // Draw Accumulated
         if (accumulate && accumulatedData) {
-            drawLine(accumulatedData, '#ef4444'); // Red for max hold
+            drawLine(accumulatedData, colors.accent); // Red for max hold
         }
 
         // Draw Current
         if (data) {
-            drawLine(data, isDarkTheme ? '#60a5fa' : '#3b82f6');
+            drawLine(data, colors.signal);
         }
 
         // Crosshair
         if (cursorX !== null && cursorY !== null) {
-            ctx.strokeStyle = isDarkTheme ? '#ffffff' : '#000000';
+            ctx.strokeStyle = colors.crosshair;
             ctx.lineWidth = 1;
 
             // V-line
@@ -129,9 +131,10 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 200 }) {
 
             // Label
             const label = `${Math.round(hoverFreq)}Hz : ${hoverDb.toFixed(1)}dB`;
-            drawCursorLabel(ctx, label, cursorX, cursorY - 20, width, isDarkTheme);
+            drawCursorLabel(ctx, label, cursorX, cursorY - 20, width, colors);
         }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- isDarkTheme нужен для перерисовки при смене темы (CSS-переменные)
     }, [data, accumulatedData, accumulate, sampleRate, isDarkTheme, width, height, cursorX, cursorY, hoverFreq, hoverDb]);
 
     useEffect(() => {

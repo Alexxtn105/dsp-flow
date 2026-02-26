@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { setupCanvasDPR, drawFrequencyGrid, drawCursorLabel, getMouseFrequency } from '../_shared/canvasUtils';
+import { setupCanvasDPR, drawFrequencyGrid, drawCursorLabel, getMouseFrequency, getCanvasColors, invalidateCanvasColors } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './WaterfallView.css';
 
@@ -30,7 +30,12 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
             newCanvas.height = targetHeight;
             const newCtx = newCanvas.getContext('2d');
 
-            newCtx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+            // Используем цвет из CSS-переменных через элемент-контейнер
+            const container = canvasRef.current?.parentElement;
+            const waterfallBg = container
+                ? getComputedStyle(container).getPropertyValue('--canvas-waterfall-bg').trim()
+                : (isDarkTheme ? '#000000' : '#ffffff');
+            newCtx.fillStyle = waterfallBg || (isDarkTheme ? '#000000' : '#ffffff');
             newCtx.fillRect(0, 0, targetWidth, targetHeight);
 
             if (oldCanvas) {
@@ -75,8 +80,12 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
 
         const ctx = setupCanvasDPR(canvas, width, height);
 
+        // Получаем цвета из CSS-переменных
+        invalidateCanvasColors();
+        const colors = getCanvasColors(canvas.parentElement);
+
         // Clear BG
-        ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+        ctx.fillStyle = colors.waterfallBg;
         ctx.fillRect(0, 0, width, height);
 
         // Draw Buffer (Waterfall history)
@@ -84,17 +93,17 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
 
         // Draw Grid / Overlays
         ctx.strokeStyle = isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)';
-        ctx.fillStyle = isDarkTheme ? '#aaa' : '#555';
+        ctx.fillStyle = colors.overlayText;
         ctx.font = '10px sans-serif';
 
-        drawFrequencyGrid(ctx, width, height, sampleRate, isDarkTheme, {
+        drawFrequencyGrid(ctx, width, height, sampleRate, colors, {
             textBaseline: 'top',
             labelOffsetY: -22
         });
 
         // Draw Cursor
         if (cursorX !== null) {
-            ctx.strokeStyle = isDarkTheme ? '#ffffff' : '#000000';
+            ctx.strokeStyle = colors.crosshair;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(cursorX, 0);
@@ -104,7 +113,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 200 }) 
             if (mouseFreq !== null) {
                 const label = `${Math.round(mouseFreq)} Hz`;
                 ctx.font = '10px sans-serif';
-                drawCursorLabel(ctx, label, cursorX, 10, width, isDarkTheme);
+                drawCursorLabel(ctx, label, cursorX, 10, width, colors);
             }
         }
     }, [isDarkTheme, width, height, sampleRate, cursorX, mouseFreq]);

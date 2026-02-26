@@ -11,7 +11,6 @@ export default {
     defaultParams: {
         fftSize: 8192,
         windowFunction: 'hanning',
-        normalize: true,
     },
     processor: {
         process(inputs, params, chunkSize) {

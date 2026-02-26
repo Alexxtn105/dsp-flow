@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { getCanvasColors, invalidateCanvasColors } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './OscilloscopeView.css';
 
@@ -28,12 +29,16 @@ function OscilloscopeView({ data, width = 380, height = 200 }) {
         ctx.resetTransform();
         ctx.scale(dpr, dpr);
 
+        // Получаем цвета из CSS-переменных
+        invalidateCanvasColors();
+        const colors = getCanvasColors(canvas.parentElement);
+
         // Очистка
-        ctx.fillStyle = isDarkTheme ? '#1f2937' : '#f9fafb';
+        ctx.fillStyle = colors.bg;
         ctx.fillRect(0, 0, width, height);
 
         // Сетка
-        ctx.strokeStyle = isDarkTheme ? '#374151' : '#e5e7eb';
+        ctx.strokeStyle = colors.grid;
         ctx.lineWidth = 0.5;
 
         // H-lines
@@ -55,7 +60,7 @@ function OscilloscopeView({ data, width = 380, height = 200 }) {
         }
 
         // Center line
-        ctx.strokeStyle = isDarkTheme ? '#6b7280' : '#9ca3af';
+        ctx.strokeStyle = colors.axis;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, height / 2);
@@ -65,7 +70,7 @@ function OscilloscopeView({ data, width = 380, height = 200 }) {
         // Signal
         if (!data || data.length === 0) return;
 
-        ctx.strokeStyle = isDarkTheme ? '#60a5fa' : '#3b82f6';
+        ctx.strokeStyle = colors.signal;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
 
@@ -89,7 +94,7 @@ function OscilloscopeView({ data, width = 380, height = 200 }) {
         ctx.stroke();
 
         // Axis Labels
-        ctx.fillStyle = isDarkTheme ? '#9ca3af' : '#6b7280';
+        ctx.fillStyle = colors.text;
         ctx.font = '10px sans-serif';
 
         // Y-axis
@@ -101,6 +106,7 @@ function OscilloscopeView({ data, width = 380, height = 200 }) {
         ctx.textAlign = 'right';
         ctx.fillText(`${visibleSamples} samples`, width - 2, height - 2);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- isDarkTheme не используется напрямую, но нужен для перерисовки при смене темы (CSS-переменные)
     }, [data, isDarkTheme, width, height, visibleSamples]);
 
     useEffect(() => {

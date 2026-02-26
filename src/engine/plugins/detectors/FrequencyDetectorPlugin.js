@@ -36,12 +36,20 @@ export default {
             for (let i = 0; i < numSamples; i++) {
                 const I = input[i * 2];
                 const Q = input[i * 2 + 1];
+
+                // M5: Обработка нулевой магнитуды — фаза неопределена
+                const mag = Math.hypot(I, Q);
+                if (mag < 1e-10) {
+                    output[i] = 0;
+                    continue;
+                }
+
                 const phase = Math.atan2(Q, I);
 
-                // Разность фаз с unwrapping
+                // Разность фаз с unwrapping (M4: while вместо if для скачков > 2π)
                 let dPhase = phase - state.prevPhase;
-                if (dPhase > Math.PI) dPhase -= 2 * Math.PI;
-                if (dPhase < -Math.PI) dPhase += 2 * Math.PI;
+                while (dPhase > Math.PI) dPhase -= 2 * Math.PI;
+                while (dPhase < -Math.PI) dPhase += 2 * Math.PI;
                 state.prevPhase = phase;
 
                 // Мгновенная частота = dPhase * sampleRate / (2 * pi)

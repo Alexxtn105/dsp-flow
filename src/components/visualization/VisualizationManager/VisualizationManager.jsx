@@ -6,7 +6,6 @@ import SpectrumView from '../SpectrumView';
 import WaterfallView from '../WaterfallView';
 import ConstellationView from '../ConstellationView';
 import { ErrorBoundary } from '../../common';
-import { useThemeContext } from '../../../contexts/ThemeContext';
 
 /**
  * Менеджер окон визуализации
@@ -16,7 +15,6 @@ const VisualizationManager = forwardRef(function VisualizationManager({
     sampleRate,
     nodes
 }, ref) {
-    const { isDarkTheme } = useThemeContext();
     const [openWindows, setOpenWindows] = useState(new Map());
     const [windowData, setWindowData] = useState(new Map());
 
@@ -73,36 +71,33 @@ const VisualizationManager = forwardRef(function VisualizationManager({
     // Эффект для автоматического закрытия окон при удалении узлов
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
+        // Находим ID окон, чьи узлы были удалены
+        const removedIds = [];
+        for (const [windowId, config] of openWindows.entries()) {
+            const nodeExists = nodes.some(n => n.id === config.nodeId);
+            if (!nodeExists) {
+                removedIds.push(windowId);
+            }
+        }
+
+        if (removedIds.length === 0) return;
+
         setOpenWindows(prev => {
-            let changed = false;
             const next = new Map(prev);
-
-            for (const [windowId, config] of prev.entries()) {
-                const nodeExists = nodes.some(n => n.id === config.nodeId);
-                if (!nodeExists) {
-                    next.delete(windowId);
-                    changed = true;
-                }
+            for (const id of removedIds) {
+                next.delete(id);
             }
-
-            if (changed) {
-                // Также чистим данные
-                setWindowData(prevData => {
-                    const nextData = new Map(prevData);
-                    // Находим удаленные ключи
-                    // Note: windowId === nodeId in openWindow logic
-                    for (const [winId] of prev) {
-                        if (!next.has(winId)) {
-                            nextData.delete(winId);
-                        }
-                    }
-                    return nextData;
-                });
-                return next;
-            }
-            return prev;
+            return next;
         });
-    }, [nodes]);
+
+        setWindowData(prev => {
+            const next = new Map(prev);
+            for (const id of removedIds) {
+                next.delete(id);
+            }
+            return next;
+        });
+    }, [nodes, openWindows]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
     // Закрыть окно

@@ -10,6 +10,7 @@ import LoadDialog from './components/dialogs/LoadDialog';
 import SettingsDialog from './components/dialogs/SettingsDialog';
 import ConfirmDialog from './components/dialogs/ConfirmDialog/ConfirmDialog.jsx';
 import { VisualizationManager } from './components/visualization';
+import { ErrorBoundary } from './components/common';
 import { useDialogManager } from './hooks/useDialogManager';
 import { useDSPSimulation } from './hooks/useDSPSimulation';
 import { DSPProcessor } from './engine';
@@ -139,14 +140,16 @@ function App() {
                         isRunning={simulation.isRunning}
                     />
 
-                    <DSPEditor
-                        currentScheme={currentScheme}
-                        onSchemeUpdate={handleSchemeUpdate}
-                        onStatsUpdate={handleStatsUpdate}
-                        onReactFlowInit={setReactFlowInstance}
-                        isRunning={simulation.isRunning}
-                        onOpenVisualization={handleOpenVisualization}
-                    />
+                    <ErrorBoundary fallbackMessage="Ошибка редактора графа">
+                        <DSPEditor
+                            currentScheme={currentScheme}
+                            onSchemeUpdate={handleSchemeUpdate}
+                            onStatsUpdate={handleStatsUpdate}
+                            onReactFlowInit={setReactFlowInstance}
+                            isRunning={simulation.isRunning}
+                            onOpenVisualization={handleOpenVisualization}
+                        />
+                    </ErrorBoundary>
                 </div>
 
                 <Footer
@@ -170,53 +173,55 @@ function App() {
                     nodes={simulation.nodes}
                 />
 
-                {dialogs.showSaveDialog && (
-                    <SaveDialog
-                        onClose={() => dialogs.setShowSaveDialog(false)}
-                        schemeName={currentScheme.name}
-                        onSaveSuccess={handleSaveSuccess}
-                        mode="save"
-                    />
-                )}
+                <ErrorBoundary fallbackMessage="Ошибка диалогового окна">
+                    {dialogs.showSaveDialog && (
+                        <SaveDialog
+                            onClose={() => dialogs.setShowSaveDialog(false)}
+                            schemeName={currentScheme.name}
+                            onSaveSuccess={handleSaveSuccess}
+                            mode="save"
+                        />
+                    )}
 
-                {dialogs.showSaveAsDialog && (
-                    <SaveDialog
-                        onClose={() => dialogs.setShowSaveAsDialog(false)}
-                        schemeName={currentScheme.name}
-                        onSaveSuccess={handleSaveSuccess}
-                        mode="saveAs"
-                    />
-                )}
+                    {dialogs.showSaveAsDialog && (
+                        <SaveDialog
+                            onClose={() => dialogs.setShowSaveAsDialog(false)}
+                            schemeName={currentScheme.name}
+                            onSaveSuccess={handleSaveSuccess}
+                            mode="saveAs"
+                        />
+                    )}
 
-                {dialogs.showLoadDialog && (
-                    <LoadDialog
-                        onClose={() => dialogs.setShowLoadDialog(false)}
-                        onLoadSuccess={handleLoadSuccess}
-                        showConfirm={dialogs.showConfirm}
-                        showAlert={dialogs.showAlert}
-                    />
-                )}
+                    {dialogs.showLoadDialog && (
+                        <LoadDialog
+                            onClose={() => dialogs.setShowLoadDialog(false)}
+                            onLoadSuccess={handleLoadSuccess}
+                            showConfirm={dialogs.showConfirm}
+                            showAlert={dialogs.showAlert}
+                        />
+                    )}
 
-                {dialogs.showSettingsDialog && (
-                    <SettingsDialog
-                        onClose={() => dialogs.setShowSettingsDialog(false)}
-                        sampleRate={sampleRate}
-                        onSampleRateChange={handleSampleRateChange}
-                    />
-                )}
+                    {dialogs.showSettingsDialog && (
+                        <SettingsDialog
+                            onClose={() => dialogs.setShowSettingsDialog(false)}
+                            sampleRate={sampleRate}
+                            onSampleRateChange={handleSampleRateChange}
+                        />
+                    )}
 
-                {dialogs.dialogState && (
-                    <ConfirmDialog
-                        message={dialogs.dialogState.message}
-                        title={dialogs.dialogState.title}
-                        mode={dialogs.dialogState.mode}
-                        onConfirm={() => {
-                            if (dialogs.dialogState.onConfirm) dialogs.dialogState.onConfirm();
-                            dialogs.closeDialog();
-                        }}
-                        onClose={dialogs.closeDialog}
-                    />
-                )}
+                    {dialogs.dialogState && (
+                        <ConfirmDialog
+                            message={dialogs.dialogState.message}
+                            title={dialogs.dialogState.title}
+                            mode={dialogs.dialogState.mode}
+                            onConfirm={() => {
+                                if (dialogs.dialogState.onConfirm) dialogs.dialogState.onConfirm();
+                                dialogs.closeDialog();
+                            }}
+                            onClose={dialogs.closeDialog}
+                        />
+                    )}
+                </ErrorBoundary>
             </div>
         </DSPEditorProvider>
     );

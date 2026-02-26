@@ -9,33 +9,75 @@ import GraphCompiler from './GraphCompiler';
 import WavFileService from './WavFileService';
 import registry from './PluginRegistry';
 
+const ProcessorState = Object.freeze({
+    IDLE: 'IDLE',
+    RUNNING_REALTIME: 'RUNNING_REALTIME',
+    RUNNING_MANUAL: 'RUNNING_MANUAL',
+    RUNNING_FILE: 'RUNNING_FILE',
+});
+
 class DSPProcessor {
     constructor() {
-        this.isRunning = false;
+        this.state = ProcessorState.IDLE;
+        this._manualMode = false;
+        this._fileMode = false;
         this.currentSample = 0;
         this.chunkSize = 1024; // Размер обрабатываемого чанка
         this.processingInterval = null;
         this.compiledGraph = null;
         this.blockStates = new Map(); // Состояния блоков (выходные буферы)
+        this._nodeTypeMap = new Map(); // Отслеживание типов блоков для обнаружения смены типа (M1)
         this.onProgress = null;
         this.onBlockOutput = null;
         this.onComplete = null;
         this.onError = null;
         this.sampleRate = 48000;
-        this.isFileMode = false;
-        this.isManualMode = false;
 
         // Audio playback context
         this.audioContext = null;
         this.nextAudioStartTime = 0;
     }
 
+    /** Обратная совместимость: геттер/сеттер isRunning */
+    get isRunning() {
+        return this.state !== ProcessorState.IDLE;
+    }
+
+    set isRunning(value) {
+        if (!value) {
+            this.state = ProcessorState.IDLE;
+        } else if (this.state === ProcessorState.IDLE) {
+            // Определяем состояние на основе текущих конфигурационных флагов
+            if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
+            else if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
+            else this.state = ProcessorState.RUNNING_REALTIME;
+        }
+    }
+
+    /** Обратная совместимость: геттер/сеттер isManualMode */
+    get isManualMode() {
+        return this._manualMode;
+    }
+
+    set isManualMode(value) {
+        this._manualMode = !!value;
+    }
+
+    /** Обратная совместимость: геттер/сеттер isFileMode */
+    get isFileMode() {
+        return this._fileMode;
+    }
+
+    set isFileMode(value) {
+        this._fileMode = !!value;
+    }
+
     /**
      * Toggles manual mode
      */
     setManualMode(enabled) {
-        this.isManualMode = enabled;
-        if (enabled && this.isRunning) {
+        this._manualMode = !!enabled;
+        if (enabled && this.state === ProcessorState.RUNNING_REALTIME) {
             this.stop(); // Stop real-time interval if switching to manual
         }
     }
@@ -66,6 +108,26 @@ class DSPProcessor {
         }
         // Очищаем состояния плагинов для удалённых узлов
         registry.clearStatesForRemovedNodes(currentNodeIds);
+
+        // M1: Очищаем состояния при смене типа блока
+        for (const block of this.compiledGraph) {
+            const prevType = this._nodeTypeMap.get(block.nodeId);
+            if (prevType && prevType !== block.blockType) {
+                // Тип блока изменился — удаляем старое состояние процессора
+                const oldProcessor = registry.getProcessor(prevType);
+                if (oldProcessor && oldProcessor.states) {
+                    oldProcessor.states.delete(block.nodeId);
+                }
+                this.blockStates.delete(block.nodeId);
+            }
+            this._nodeTypeMap.set(block.nodeId, block.blockType);
+        }
+        // Удаляем из _nodeTypeMap узлы, которых больше нет
+        for (const nodeId of this._nodeTypeMap.keys()) {
+            if (!currentNodeIds.has(nodeId)) {
+                this._nodeTypeMap.delete(nodeId);
+            }
+        }
 
         // Инициализируем состояния для каждого блока
         for (const block of this.compiledGraph) {
@@ -102,7 +164,7 @@ class DSPProcessor {
      * Запускает обработку
      * @param {number} processingSpeed - скорость обработки (отсчётов в секунду)
      */
-    start(processingSpeed = null) {
+    async start(processingSpeed = null) {
         if (this.isRunning) return;
         if (!this.compiledGraph) {
             console.error('Граф не скомпилирован');
@@ -110,7 +172,7 @@ class DSPProcessor {
         }
 
         // В режиме файла берём sample rate из файла, иначе используем установленный
-        const sampleRate = this.isFileMode ? WavFileService.getSampleRate() : this.sampleRate;
+        const sampleRate = this._fileMode ? WavFileService.getSampleRate() : this.sampleRate;
 
         if (!sampleRate || sampleRate <= 0) {
             const error = new Error(`Некорректная частота дискретизации: ${sampleRate}`);
@@ -122,7 +184,10 @@ class DSPProcessor {
             return;
         }
 
-        this.isRunning = true;
+        // Определяем состояние на основе конфигурационных флагов
+        if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
+        else if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
+        else this.state = ProcessorState.RUNNING_REALTIME;
 
         // Рассчитываем интервал обработки
         // По умолчанию обрабатываем в реальном времени
@@ -134,13 +199,13 @@ class DSPProcessor {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
         if (this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+            await this.audioContext.resume();
         }
         // Переиспользуем контекст в WavFileService
         WavFileService.init(this.audioContext);
         this.nextAudioStartTime = this.audioContext.currentTime;
 
-        if (!this.isManualMode) {
+        if (this.state !== ProcessorState.RUNNING_MANUAL) {
             this.processingInterval = setInterval(() => {
                 this.processNextChunk();
             }, intervalMs);
@@ -158,7 +223,9 @@ class DSPProcessor {
         const originalChunkSize = this.chunkSize;
         this.chunkSize = numSamples;
 
-        this.isRunning = true;
+        if (this.state === ProcessorState.IDLE) {
+            this.state = ProcessorState.RUNNING_MANUAL;
+        }
         this.processNextChunk();
 
         // If it was stopped by processNextChunk (e.g. End of File), keep it false
@@ -172,7 +239,7 @@ class DSPProcessor {
      * Останавливает обработку (пауза)
      */
     stop() {
-        this.isRunning = false;
+        this.state = ProcessorState.IDLE;
         if (this.processingInterval) {
             clearInterval(this.processingInterval);
             this.processingInterval = null;
@@ -188,8 +255,11 @@ class DSPProcessor {
      */
     reset() {
         this.stop();
+        this._manualMode = false;
+        this._fileMode = false;
         this.currentSample = 0;
         this.blockStates.clear();
+        this._nodeTypeMap.clear();
 
         // Закрываем AudioContext, чтобы не копить ресурсы
         if (this.audioContext) {
@@ -212,7 +282,7 @@ class DSPProcessor {
      */
     processNextChunk() {
         // Проверяем, не достигнут ли конец файла (только в режиме файла)
-        if (this.isFileMode && WavFileService.isEndOfFile(this.currentSample)) {
+        if (this._fileMode && WavFileService.isEndOfFile(this.currentSample)) {
             this.stop();
             if (this.onComplete) {
                 this.onComplete();
@@ -243,7 +313,7 @@ class DSPProcessor {
 
             // Уведомляем о прогрессе
             if (this.onProgress) {
-                const totalSamples = this.isFileMode ? WavFileService.getTotalSamples() : 0;
+                const totalSamples = this._fileMode ? WavFileService.getTotalSamples() : 0;
                 const progress = totalSamples > 0 ? this.currentSample / totalSamples : 0;
 
                 this.onProgress({
@@ -285,7 +355,7 @@ class DSPProcessor {
         }
 
         // Для генераторов (Входной сигнал) - читаем из WAV
-        if (block.blockType === 'Audio File' && this.isFileMode) {
+        if (block.blockType === 'Audio File' && this._fileMode) {
             return WavFileService.readChunk(this.currentSample, this.chunkSize);
         }
 
@@ -308,7 +378,7 @@ class DSPProcessor {
      * Переход к определённой позиции
      */
     seekTo(sample) {
-        if (!this.isFileMode) return;
+        if (!this._fileMode) return;
         this.currentSample = Math.max(0, Math.min(sample, WavFileService.getTotalSamples()));
     }
 
@@ -316,7 +386,7 @@ class DSPProcessor {
      * Переход к определённому проценту
      */
     seekToPercent(percent) {
-        if (!this.isFileMode) return;
+        if (!this._fileMode) return;
         const sample = Math.floor(WavFileService.getTotalSamples() * percent);
         this.seekTo(sample);
     }
@@ -332,7 +402,7 @@ class DSPProcessor {
      * Устанавливает режим работы (файл или генератор)
      */
     setFileMode(isFile) {
-        this.isFileMode = isFile;
+        this._fileMode = !!isFile;
     }
 
     /**
@@ -365,4 +435,6 @@ class DSPProcessor {
     }
 }
 
-export default new DSPProcessor();
+const processor = new DSPProcessor();
+export { ProcessorState };
+export default processor;

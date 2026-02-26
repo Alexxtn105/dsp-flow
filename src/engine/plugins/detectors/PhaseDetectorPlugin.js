@@ -32,12 +32,21 @@ export default {
             for (let i = 0; i < numSamples; i++) {
                 const I = input[i * 2];
                 const Q = input[i * 2 + 1];
+
+                // M5: Обработка нулевой магнитуды — фаза неопределена
+                const mag = Math.hypot(I, Q);
+                if (mag < 1e-10) {
+                    // Выводим последнее накопленное значение
+                    output[i] = state.accumPhase;
+                    continue;
+                }
+
                 let phase = Math.atan2(Q, I);
 
-                // Phase unwrapping
+                // Phase unwrapping (M4: while вместо if для скачков > 2π)
                 let delta = phase - state.prevPhase;
-                if (delta > Math.PI) delta -= 2 * Math.PI;
-                if (delta < -Math.PI) delta += 2 * Math.PI;
+                while (delta > Math.PI) delta -= 2 * Math.PI;
+                while (delta < -Math.PI) delta += 2 * Math.PI;
                 state.accumPhase += delta;
                 state.prevPhase = phase;
 

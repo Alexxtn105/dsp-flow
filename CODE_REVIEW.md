@@ -1,11 +1,11 @@
 # Код-ревью: DSP Flow Editor
 
-**Дата:** 2026-02-25
+**Дата:** 2026-02-26
 **Ветка:** `development`
-**Тесты:** 173/173 passed
+**Тесты:** 177/177 passed
 **Версия:** 1.0.0
 
-> **Статус исправлений:** все CRITICAL (C1–C2) и HIGH (H1–H9) замечания исправлены в коммите `22c8122`.
+> **Статус исправлений:** все CRITICAL (C1–C2), HIGH (H1–H9) и MEDIUM (M1–M12) замечания исправлены.
 
 ---
 
@@ -307,9 +307,9 @@ I=sin, Q=cos вместо классического I=cos, Q=sin. Формир�
 
 | Параметр | Плагин | Статус |
 |---|---|---|
-| `normalize` | FFTPlugin | Объявлен в defaultParams, в процессоре не читается |
-| `integrationTime` | IntegratorPlugin | Объявлен, но нигде не используется |
-| `muted` | SpeakerPlugin | Объявлен, но не реализован в процессоре |
+| `normalize` | FFTPlugin | ~~Объявлен в defaultParams, в процессоре не читается~~ ✅ Удалён |
+| `integrationTime` | IntegratorPlugin | ~~Объявлен, но нигде не используется~~ ✅ Удалён |
+| `muted` | SpeakerPlugin | Используется в DSPProcessor.js (строка 312) — оставлен |
 
 ---
 
@@ -431,8 +431,8 @@ Canvas-цвета не участвуют в дизайн-системе и не
 |---|---|---|---|
 | Engine (DSPProcessor, GraphCompiler, PluginRegistry, WavFileService) | 4 | ~100 | Отличное |
 | Плагины (генераторы, фильтры, анализ, детекторы, мат.) | 7 | ~66 | Хорошее |
-| Интеграционные | 1 | 6 | Минимальное |
-| **Итого** | **12** | **173** | **~30% файлов** |
+| Интеграционные | 2 | 10 | Хорошее |
+| **Итого** | **13** | **177** | **~30% файлов** |
 
 ### 9.2. Покрытие по модулям
 
@@ -550,20 +550,20 @@ csstype@3.2.3            — TypeScript не используется
 
 ### MEDIUM (улучшения / рефакторинг)
 
-| # | Проблема | Файл | Раздел |
-|---|---|---|---|
-| M1 | Неполная очистка состояний при смене типа блока | DSPProcessor.js | 3.7 |
-| M2 | Boolean-флаги вместо enum состояний | DSPProcessor.js | 3.8 |
-| M3 | AudioContext.resume() — Promise не awaited | DSPProcessor.js | 3.9 |
-| M4 | Фазовое развёртывание обрабатывает скачки только ≤2π | FrequencyDetectorPlugin.js | 5.2.2 |
-| M5 | Нет обработки I=Q=0 в детекторах | FrequencyDetector, PhaseDetector | 5.2.3 |
-| M6 | nodeTypes/edgeTypes без useMemo | DSPEditor.jsx | 6.1.3 |
-| M7 | Множественные setState в одном useEffect | VisualizationManager.jsx | 6.1.4 |
-| M8 | ErrorBoundary не обёрнуты DSPEditor, диалоги | components/ | 6.2 |
-| M9 | Захардкоженные цвета в Canvas | SpectrumView, OscilloscopeView | 7.2.1 |
-| M10 | Отсутствуют интеграционные тесты тракта | tests/ | 9.3.3 |
-| M11 | Нет .prettierrc | корень проекта | 10.3 |
-| M12 | Неиспользуемые параметры (normalize, integrationTime, muted) | 3 плагина | 5.3 |
+| # | Проблема | Файл | Раздел | Статус |
+|---|---|---|---|---|
+| M1 | Неполная очистка состояний при смене типа блока | DSPProcessor.js | 3.7 | ✅ Исправлено |
+| M2 | Boolean-флаги вместо enum состояний | DSPProcessor.js | 3.8 | ✅ Исправлено |
+| M3 | AudioContext.resume() — Promise не awaited | DSPProcessor.js | 3.9 | ✅ Исправлено |
+| M4 | Фазовое развёртывание обрабатывает скачки только ≤2π | FrequencyDetectorPlugin.js | 5.2.2 | ✅ Исправлено |
+| M5 | Нет обработки I=Q=0 в детекторах | FrequencyDetector, PhaseDetector | 5.2.3 | ✅ Исправлено |
+| M6 | nodeTypes/edgeTypes без useMemo | DSPEditor.jsx | 6.1.3 | ✅ Исправлено (уже на уровне модуля) |
+| M7 | Множественные setState в одном useEffect | VisualizationManager.jsx | 6.1.4 | ✅ Исправлено |
+| M8 | ErrorBoundary не обёрнуты DSPEditor, диалоги | components/ | 6.2 | ✅ Исправлено |
+| M9 | Захардкоженные цвета в Canvas | SpectrumView, OscilloscopeView | 7.2.1 | ✅ Исправлено |
+| M10 | Отсутствуют интеграционные тесты тракта | tests/ | 9.3.3 | ✅ Исправлено |
+| M11 | Нет .prettierrc | корень проекта | 10.3 | ✅ Исправлено |
+| M12 | Неиспользуемые параметры (normalize, integrationTime, muted) | 3 плагина | 5.3 | ✅ Исправлено |
 
 ### LOW (мелочи / полировка)
 
@@ -594,15 +594,15 @@ csstype@3.2.3            — TypeScript не используется
 7. ~~**Сортировка входов при компиляции** (H4) — перенесено в GraphCompiler~~
 8. ~~**Добавить тесты** (H7) — RealPart, ImagPart, WavFileService (+21 тест)~~
 9. ~~**Рефакторинг App.jsx** (H6) — выделены useDialogManager и useDSPSimulation~~
-10. **Добавить .prettierrc** (M11) — стандартизировать форматирование
+10. ~~**Добавить .prettierrc** (M11) — стандартизировать форматирование~~
 
-### Среднесрочные (1–2 месяца)
+### Среднесрочные — ✅ Выполнено
 
-11. **Enum состояний DSPProcessor** (M2) — заменить boolean-флаги
-12. **ErrorBoundary на все секции** (M8)
-13. **Canvas-цвета через CSS-переменные** (M9) — чтение getComputedStyle
-14. **Удалить или реализовать неиспользуемые параметры** (M12)
-15. **Pre-commit hooks** (M11) — husky + lint-staged
+11. ~~**Enum состояний DSPProcessor** (M2) — ProcessorState enum, геттеры/сеттеры для обратной совместимости~~
+12. ~~**ErrorBoundary на все секции** (M8) — обёрнуты DSPEditor и блок диалогов~~
+13. ~~**Canvas-цвета через CSS-переменные** (M9) — getCanvasColors() + CSS custom properties~~
+14. ~~**Удалить неиспользуемые параметры** (M12) — normalize из FFTPlugin, integrationTime из IntegratorPlugin~~
+15. **Pre-commit hooks** — husky + lint-staged (не входило в текущий скоуп)
 
 ### Долгосрочные
 

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { getCanvasColors, invalidateCanvasColors } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './ConstellationView.css';
 
@@ -26,8 +27,12 @@ function ConstellationView({ data, width = 380, height = 200 }) {
         ctx.resetTransform();
         ctx.scale(dpr, dpr);
 
+        // Получаем цвета из CSS-переменных
+        invalidateCanvasColors();
+        const colors = getCanvasColors(canvas.parentElement);
+
         // Background
-        ctx.fillStyle = isDarkTheme ? '#1f2937' : '#f9fafb';
+        ctx.fillStyle = colors.bg;
         ctx.fillRect(0, 0, width, height);
 
         // Use square area centered in the available space
@@ -36,7 +41,7 @@ function ConstellationView({ data, width = 380, height = 200 }) {
         const offsetY = (height - side) / 2;
 
         // Grid
-        ctx.strokeStyle = isDarkTheme ? '#374151' : '#e5e7eb';
+        ctx.strokeStyle = colors.grid;
         ctx.lineWidth = 0.5;
 
         const gridCount = 8;
@@ -55,7 +60,7 @@ function ConstellationView({ data, width = 380, height = 200 }) {
         }
 
         // Axes through center
-        ctx.strokeStyle = isDarkTheme ? '#6b7280' : '#9ca3af';
+        ctx.strokeStyle = colors.axis;
         ctx.lineWidth = 1;
         const cx = offsetX + side / 2;
         const cy = offsetY + side / 2;
@@ -71,7 +76,7 @@ function ConstellationView({ data, width = 380, height = 200 }) {
         ctx.stroke();
 
         // Unit circle
-        ctx.strokeStyle = isDarkTheme ? '#4b5563' : '#d1d5db';
+        ctx.strokeStyle = colors.unitCircle;
         ctx.lineWidth = 0.8;
         ctx.setLineDash([4, 4]);
         ctx.beginPath();
@@ -85,7 +90,7 @@ function ConstellationView({ data, width = 380, height = 200 }) {
             const scale = side / 2 * 0.7; // same as unit circle
             const numPoints = Math.floor(data.length / 2);
 
-            ctx.fillStyle = isDarkTheme ? 'rgba(96, 165, 250, 0.6)' : 'rgba(59, 130, 246, 0.6)';
+            ctx.fillStyle = colors.signalAlpha;
 
             for (let i = 0; i < numPoints; i++) {
                 const I = data[i * 2];
@@ -100,12 +105,13 @@ function ConstellationView({ data, width = 380, height = 200 }) {
         }
 
         // Labels
-        ctx.fillStyle = isDarkTheme ? '#9ca3af' : '#6b7280';
+        ctx.fillStyle = colors.text;
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('I', offsetX + side - 8, cy - 4);
         ctx.fillText('Q', cx + 8, offsetY + 10);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- isDarkTheme нужен для перерисовки при смене темы (CSS-переменные)
     }, [data, isDarkTheme, width, height]);
 
     useEffect(() => {

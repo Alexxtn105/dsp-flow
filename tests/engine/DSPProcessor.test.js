@@ -50,8 +50,8 @@ describe('DSPProcessor', () => {
         DSPProcessor.sampleRate = 48000;
         DSPProcessor.chunkSize = 1024;
         DSPProcessor.compiledGraph = null;
-        DSPProcessor.isFileMode = false;
-        DSPProcessor.isManualMode = false;
+        DSPProcessor.setFileMode(false);
+        DSPProcessor.setManualMode(false);
     });
 
     // 1. initialize() с валидным графом (генератор -> осциллограф)
