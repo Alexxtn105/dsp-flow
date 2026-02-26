@@ -139,7 +139,7 @@ function App() {
                         isRunning={simulation.isRunning}
                     />
 
-                    <DSPEditor 
+                    <DSPEditor
                         currentScheme={currentScheme}
                         onSchemeUpdate={handleSchemeUpdate}
                         onStatsUpdate={handleStatsUpdate}
