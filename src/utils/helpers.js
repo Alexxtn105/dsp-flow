@@ -206,7 +206,6 @@ export const formatParamName = (name) => {
     // Точные соответствия для составных имён
     const exactNames = {
         'windowFunction': 'Оконная функция',
-        'designMethod': 'Метод расчёта',
         'filterType': 'Тип фильтра',
         'cutoffFrequency': 'Частота среза',
         'lowCutoff': 'Низ. частота среза',

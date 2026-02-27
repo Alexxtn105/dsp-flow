@@ -29,11 +29,6 @@ export default function initPlugins() {
         { value: 'flattop', label: 'Flat Top' }
     ]);
 
-    registry.registerParamOptions('designMethod', [
-        { value: 'window', label: 'Оконный метод (Windowed Sinc)' },
-        { value: 'remez', label: 'Паркс-Макклеллан (Remez Exchange)' }
-    ]);
-
     registry.registerParamOptions('filterType', [
         { value: 'lowpass', label: 'ФНЧ (Lowpass)' },
         { value: 'highpass', label: 'ФВЧ (Highpass)' },

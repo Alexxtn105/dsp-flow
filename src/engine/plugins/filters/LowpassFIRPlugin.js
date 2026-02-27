@@ -11,7 +11,6 @@ export default {
         order: 64,
         cutoff: 1000,
         windowFunction: 'hamming',
-        designMethod: 'window',
     },
     processor: createFIRProcessor('lowpass')
 };

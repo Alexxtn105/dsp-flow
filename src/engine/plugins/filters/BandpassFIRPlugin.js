@@ -12,7 +12,6 @@ export default {
         lowCutoff: 1000,
         highCutoff: 3000,
         windowFunction: 'hamming',
-        designMethod: 'window',
     },
     processor: createFIRProcessor('bandpass')
 };

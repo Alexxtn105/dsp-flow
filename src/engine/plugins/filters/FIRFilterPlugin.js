@@ -1,5 +1,5 @@
 import WindowFunctions from '../_shared/WindowFunctions.js';
-import { sinc, designWindowedSinc, designRemez, designRemezBandpass } from '../_shared/FilterDesign.js';
+import { sinc, designWindowedSinc } from '../_shared/FilterDesign.js';
 
 /**
  * Фабрика FIR-процессора. Каждый вызов создаёт новый экземпляр
@@ -15,7 +15,6 @@ export function createFIRProcessor(fixedFilterType) {
             const cutoff = params.cutoffFrequency || params.cutoff || params.frequency || 1000;
             const type = fixedFilterType || params.filterType || 'lowpass';
             const windowName = params.windowFunction || 'hamming';
-            const designMethod = params.designMethod || 'window';
 
             let coeffs;
 
@@ -23,30 +22,22 @@ export function createFIRProcessor(fixedFilterType) {
                 const lowCutoff = params.lowCutoff || cutoff * 0.8;
                 const highCutoff = params.highCutoff || cutoff * 1.2;
 
-                if (designMethod === 'remez') {
-                    coeffs = designRemezBandpass(lowCutoff, highCutoff, sampleRate, order);
-                } else {
-                    const M = order - 1;
-                    const fHigh = highCutoff / sampleRate;
-                    const fLow = lowCutoff / sampleRate;
-                    coeffs = new Float32Array(order);
-                    const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
+                const M = order - 1;
+                const fHigh = highCutoff / sampleRate;
+                const fLow = lowCutoff / sampleRate;
+                coeffs = new Float32Array(order);
+                const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
 
-                    for (let i = 0; i < order; i++) {
-                        if (i === M / 2) {
-                            coeffs[i] = 2 * (fHigh - fLow);
-                        } else {
-                            coeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - M / 2)) - 2 * fLow * sinc(2 * fLow * (i - M / 2));
-                        }
-                        coeffs[i] *= window(i, order);
+                for (let i = 0; i < order; i++) {
+                    if (i === M / 2) {
+                        coeffs[i] = 2 * (fHigh - fLow);
+                    } else {
+                        coeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - M / 2)) - 2 * fLow * sinc(2 * fLow * (i - M / 2));
                     }
+                    coeffs[i] *= window(i, order);
                 }
             } else {
-                if (designMethod === 'remez') {
-                    coeffs = designRemez(type, cutoff, sampleRate, order);
-                } else {
-                    coeffs = designWindowedSinc(type, cutoff, sampleRate, order, windowName);
-                }
+                coeffs = designWindowedSinc(type, cutoff, sampleRate, order, windowName);
             }
 
             const buffer = new Float32Array(order);
