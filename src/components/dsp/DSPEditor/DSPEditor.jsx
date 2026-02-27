@@ -188,29 +188,44 @@ function DSPEditor({
         onParamUpdate: (nodeId, paramName, paramValue) => callbacksRef.current.handleParamUpdate(nodeId, paramName, paramValue),
     });
 
+    // Вспомогательная функция: инъекция стабильных колбэков в массив нод
+    const injectCallbacks = useCallback((rawNodes) => {
+        const cbs = stableCallbacks.current;
+        return rawNodes.map(node => ({
+            ...node,
+            data: {
+                ...node.data,
+                nodeId: node.id,
+                onOpenParams: cbs.onOpenParams,
+                onOpenVisualization: cbs.onOpenVisualization,
+                onParamUpdate: cbs.onParamUpdate
+            }
+        }));
+    }, []);
+
     // Загрузка автосохранённой схемы при старте
     useEffect(() => {
         if (!hasLoadedExternalScheme.current) {
             const autoSaved = loadAutoSave();
             if (autoSaved) {
-                setNodes(autoSaved.nodes || []);
+                setNodes(injectCallbacks(autoSaved.nodes || []));
                 setEdges(autoSaved.edges || []);
                 hasLoadedExternalScheme.current = true;
             }
         }
-    }, [loadAutoSave, setNodes, setEdges]);
+    }, [loadAutoSave, setNodes, setEdges, injectCallbacks]);
 
     // Обработка загруженной схемы из контекста (с защитой от двойного вызова в Strict Mode)
     useEffect(() => {
         if (loadedSchemeData && loadedSchemeData.nodes && loadedSchemeData !== processedSchemeRef.current) {
             processedSchemeRef.current = loadedSchemeData;
             clearAutoSave();
-            setNodes(loadedSchemeData.nodes || []);
+            setNodes(injectCallbacks(loadedSchemeData.nodes || []));
             setEdges(loadedSchemeData.edges || []);
             hasLoadedExternalScheme.current = true;
             setLoadedSchemeData(null);
         }
-    }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData]);
+    }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData, injectCallbacks]);
 
     // Сброс флага при создании новой схемы (граф очищен)
     useEffect(() => {
