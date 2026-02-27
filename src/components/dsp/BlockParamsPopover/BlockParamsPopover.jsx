@@ -7,7 +7,7 @@ import { HIDDEN_PARAMS } from '../../../utils/constants';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './BlockParamsPopover.css';
 
-const POPOVER_WIDTH = 280;
+const POPOVER_WIDTH = 340;
 const POPOVER_GAP = 12;
 const VIEWPORT_PADDING = 8;
 
