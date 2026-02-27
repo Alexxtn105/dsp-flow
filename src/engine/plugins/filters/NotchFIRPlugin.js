@@ -3,7 +3,8 @@ import { sinc } from '../_shared/FilterDesign.js';
 
 /**
  * Создаёт процессор режекторного (band-reject) КИХ-фильтра.
- * Метод: проектирование полосового фильтра + спектральная инверсия.
+ * Метод: проектирование нормализованного полосового фильтра + спектральная инверсия.
+ * Порядок принудительно делается нечётным для целочисленной групповой задержки.
  */
 function createNotchProcessor() {
     return {
@@ -11,7 +12,10 @@ function createNotchProcessor() {
         clearStates() { this.states.clear(); },
 
         init(nodeId, params, sampleRate) {
-            const order = params.order || 64;
+            // Нечётный порядок обязателен для линейной фазы Type I
+            let order = params.order || 65;
+            if (order % 2 === 0) order += 1;
+
             const notchFreq = params.notchFrequency || 1000;
             const bandwidth = params.bandwidth || 200;
             const windowName = params.windowFunction || 'hamming';
@@ -19,34 +23,44 @@ function createNotchProcessor() {
             const lowCutoff = Math.max(1, notchFreq - bandwidth / 2);
             const highCutoff = Math.min(sampleRate / 2 - 1, notchFreq + bandwidth / 2);
 
-            // Проектируем полосовой фильтр
             const M = order - 1;
+            const center = M / 2; // целое число при нечётном order
             const fHigh = highCutoff / sampleRate;
             const fLow = lowCutoff / sampleRate;
             const bpCoeffs = new Float32Array(order);
             const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
 
+            // Проектируем полосовой фильтр (windowed sinc)
             for (let i = 0; i < order; i++) {
-                if (i === M / 2) {
+                if (i === center) {
                     bpCoeffs[i] = 2 * (fHigh - fLow);
                 } else {
-                    bpCoeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - M / 2)) - 2 * fLow * sinc(2 * fLow * (i - M / 2));
+                    bpCoeffs[i] = 2 * fHigh * sinc(2 * fHigh * (i - center))
+                               - 2 * fLow  * sinc(2 * fLow  * (i - center));
                 }
                 bpCoeffs[i] *= window(i, order);
             }
 
-            // Нормализация полосового фильтра по пиковому значению
-            let maxVal = 0;
+            // Нормализация: gain полосового фильтра на центральной частоте = 1.0
+            const fc = notchFreq / sampleRate;
+            let re = 0, im = 0;
             for (let i = 0; i < order; i++) {
-                maxVal = Math.max(maxVal, Math.abs(bpCoeffs[i]));
+                re += bpCoeffs[i] * Math.cos(2 * Math.PI * fc * i);
+                im -= bpCoeffs[i] * Math.sin(2 * Math.PI * fc * i);
+            }
+            const mag = Math.sqrt(re * re + im * im);
+            if (mag > 1e-10) {
+                for (let i = 0; i < order; i++) {
+                    bpCoeffs[i] /= mag;
+                }
             }
 
-            // Спектральная инверсия: notch = delta - bandpass
+            // Спектральная инверсия: notch = δ[n - center] - bandpass[n]
             const coeffs = new Float32Array(order);
             for (let i = 0; i < order; i++) {
                 coeffs[i] = -bpCoeffs[i];
             }
-            coeffs[Math.floor(M / 2)] += 1;
+            coeffs[center] += 1;
 
             const buffer = new Float32Array(order);
 
@@ -57,7 +71,7 @@ function createNotchProcessor() {
                 order,
                 _notchFreq: notchFreq,
                 _bandwidth: bandwidth,
-                _order: order
+                _order: params.order || 65
             });
         },
 
@@ -74,7 +88,7 @@ function createNotchProcessor() {
             } else {
                 const currentNotchFreq = params.notchFrequency || 1000;
                 const currentBandwidth = params.bandwidth || 200;
-                const currentOrder = params.order || 64;
+                const currentOrder = params.order || 65;
                 if (state._notchFreq !== currentNotchFreq || state._bandwidth !== currentBandwidth || state._order !== currentOrder) {
                     const oldBuffer = state.buffer;
                     const oldPointer = state.pointer;
@@ -126,7 +140,7 @@ export default {
     defaultParams: {
         notchFrequency: 1000,
         bandwidth: 200,
-        order: 64,
+        order: 65,
         windowFunction: 'hamming'
     },
     processor: createNotchProcessor()

@@ -7,12 +7,12 @@ describe('NotchFIRPlugin', () => {
     it('инициализация коэффициентов', () => {
         const proc = NotchFIRPlugin.processor;
         proc.clearStates();
-        proc.init('notch1', { notchFrequency: 1000, bandwidth: 200, order: 64, windowFunction: 'hamming' }, 48000);
+        proc.init('notch1', { notchFrequency: 1000, bandwidth: 200, order: 65, windowFunction: 'hamming' }, 48000);
         const state = proc.states.get('notch1');
         expect(state).toBeDefined();
         expect(state.coeffs).toBeInstanceOf(Float32Array);
-        expect(state.coeffs.length).toBe(64);
-        expect(state.order).toBe(64);
+        expect(state.coeffs.length).toBe(65);
+        expect(state.order).toBe(65);
     });
 
     it('DC сохраняется через режекторный фильтр', () => {
