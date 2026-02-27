@@ -6,7 +6,7 @@ import RefCosineGeneratorPlugin from './generators/RefCosineGeneratorPlugin.js';
 import AudioFilePlugin from './generators/AudioFilePlugin.js';
 
 // Фильтры
-import FIRFilterPlugin from './filters/FIRFilterPlugin.js';
+import NotchFIRPlugin from './filters/NotchFIRPlugin.js';
 import BandpassFIRPlugin from './filters/BandpassFIRPlugin.js';
 import HighpassFIRPlugin from './filters/HighpassFIRPlugin.js';
 import LowpassFIRPlugin from './filters/LowpassFIRPlugin.js';
@@ -39,7 +39,7 @@ import SpeakerPlugin from './output/SpeakerPlugin.js';
 
 export default [
     // Фильтры
-    FIRFilterPlugin,
+    NotchFIRPlugin,
     BandpassFIRPlugin,
     HighpassFIRPlugin,
     LowpassFIRPlugin,

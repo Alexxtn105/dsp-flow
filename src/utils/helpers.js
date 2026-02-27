@@ -235,6 +235,8 @@ export const formatParamName = (name) => {
         'frequencyRange': 'Диапазон частот',
         'constellation': 'Созвездие',
         'operation': 'Операция',
+        'notchFrequency': 'Частота режекции',
+        'bandwidth': 'Ширина полосы',
     };
 
     if (exactNames[name]) return exactNames[name];

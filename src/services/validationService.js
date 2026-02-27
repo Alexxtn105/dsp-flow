@@ -104,13 +104,16 @@ class ValidationService {
      */
     static validateBlockParams(blockType, params) {
         const validators = {
-            'КИХ-Фильтр': (p) => {
+            'Режекторный КИХ-фильтр': (p) => {
                 const errors = [];
                 if (!p.order || p.order < 1 || p.order > 1024) {
                     errors.push('Порядок фильтра должен быть от 1 до 1024');
                 }
-                if (!p.cutoff || p.cutoff <= 0) {
-                    errors.push('Частота среза должна быть положительной');
+                if (!p.notchFrequency || p.notchFrequency <= 0) {
+                    errors.push('Частота режекции должна быть положительной');
+                }
+                if (!p.bandwidth || p.bandwidth <= 0) {
+                    errors.push('Ширина полосы режекции должна быть положительной');
                 }
                 return errors;
             },

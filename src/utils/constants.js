@@ -13,7 +13,7 @@ export const SIGNAL_TYPES = {
 // Типы блоков DSP
 export const DSP_BLOCK_TYPES = {
     // Фильтры
-    FIR_FILTER: 'КИХ-Фильтр',
+    NOTCH_FIR: 'Режекторный КИХ-фильтр',
     BANDPASS_FIR: 'Полосовой КИХ-фильтр',
     HIGHPASS_FIR: 'ФВЧ КИХ-фильтр',
     LOWPASS_FIR: 'ФНЧ КИХ-фильтр',

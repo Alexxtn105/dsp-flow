@@ -24,7 +24,7 @@ describe('helpers.js — обратная совместимость', () => {
 
     it('getBlockIcon возвращает иконку', () => {
         expect(getBlockIcon('Синусный генератор')).toBe('waves');
-        expect(getBlockIcon('КИХ-Фильтр')).toBe('filter_alt');
+        expect(getBlockIcon('Режекторный КИХ-фильтр')).toBe('block');
     });
 
     it('getBlockDescription возвращает описание', () => {
@@ -39,7 +39,7 @@ describe('helpers.js — обратная совместимость', () => {
     it('isGeneratorBlock определяет генераторы', () => {
         expect(isGeneratorBlock('Синусный генератор')).toBe(true);
         expect(isGeneratorBlock('Audio File')).toBe(true);
-        expect(isGeneratorBlock('КИХ-Фильтр')).toBe(false);
+        expect(isGeneratorBlock('Режекторный КИХ-фильтр')).toBe(false);
         expect(isGeneratorBlock('Осциллограф')).toBe(false);
     });
 

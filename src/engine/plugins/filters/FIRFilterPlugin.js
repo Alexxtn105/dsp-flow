@@ -119,19 +119,3 @@ export function createFIRProcessor(fixedFilterType) {
     };
 }
 
-export default {
-    type: 'КИХ-Фильтр',
-    id: 'fir-filter',
-    icon: 'filter_alt',
-    description: 'КИХ-фильтр (FIR)',
-    group: 'filters',
-    signals: { input: 'real', output: 'real' },
-    defaultParams: {
-        filterType: 'lowpass',
-        cutoffFrequency: 1000,
-        order: 31,
-        windowFunction: 'hamming',
-        designMethod: 'remez'
-    },
-    processor: createFIRProcessor()
-};

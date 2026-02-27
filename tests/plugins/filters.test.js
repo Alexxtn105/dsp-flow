@@ -1,109 +1,112 @@
 import { describe, it, expect } from 'vitest';
-import FIRFilterPlugin from '../../src/engine/plugins/filters/FIRFilterPlugin.js';
-import { createFIRProcessor } from '../../src/engine/plugins/filters/FIRFilterPlugin.js';
+import NotchFIRPlugin from '../../src/engine/plugins/filters/NotchFIRPlugin.js';
 import GoertzelFilterPlugin from '../../src/engine/plugins/filters/GoertzelFilterPlugin.js';
 import HilbertTransformerPlugin from '../../src/engine/plugins/filters/HilbertTransformerPlugin.js';
 
-describe('FIRFilterPlugin', () => {
-    it('инициализация коэффициентов lowpass', () => {
-        const proc = createFIRProcessor();
-        proc.init('fir1', { filterType: 'lowpass', cutoffFrequency: 1000, order: 31, windowFunction: 'hamming' }, 48000);
-        const state = proc.states.get('fir1');
+describe('NotchFIRPlugin', () => {
+    it('инициализация коэффициентов', () => {
+        const proc = NotchFIRPlugin.processor;
+        proc.clearStates();
+        proc.init('notch1', { notchFrequency: 1000, bandwidth: 200, order: 64, windowFunction: 'hamming' }, 48000);
+        const state = proc.states.get('notch1');
         expect(state).toBeDefined();
         expect(state.coeffs).toBeInstanceOf(Float32Array);
-        expect(state.coeffs.length).toBe(31);
-        expect(state.order).toBe(31);
-    });
-
-    it('инициализация коэффициентов bandpass', () => {
-        const proc = createFIRProcessor();
-        proc.init('fir2', { filterType: 'bandpass', lowCutoff: 1000, highCutoff: 3000, order: 64 }, 48000);
-        const state = proc.states.get('fir2');
         expect(state.coeffs.length).toBe(64);
+        expect(state.order).toBe(64);
     });
 
-    it('lowpass фильтрация: DC сохраняется', () => {
-        const proc = createFIRProcessor();
-        const params = { filterType: 'lowpass', cutoffFrequency: 5000, order: 31, windowFunction: 'hamming', sampleRate: 48000 };
-        // DC input (постоянная)
+    it('DC сохраняется через режекторный фильтр', () => {
+        const proc = NotchFIRPlugin.processor;
+        proc.clearStates();
+        const params = { notchFrequency: 5000, bandwidth: 500, order: 64, windowFunction: 'hamming', sampleRate: 48000 };
         const dcInput = new Float32Array(1024).fill(1.0);
-        // Пропускаем несколько чанков для стабилизации
-        proc.process([dcInput], params, 1024, 'fir3');
-        proc.process([dcInput], params, 1024, 'fir3');
-        const output = proc.process([dcInput], params, 1024, 'fir3');
-        // После стабилизации DC-компонента должна быть близка к 1.0
+        proc.process([dcInput], params, 1024, 'notch_dc');
+        proc.process([dcInput], params, 1024, 'notch_dc');
+        const output = proc.process([dcInput], params, 1024, 'notch_dc');
         const dcValue = output[output.length - 1];
         expect(dcValue).toBeCloseTo(1.0, 1);
     });
 
+    it('подавляет синусоиду на частоте режекции', () => {
+        const proc = NotchFIRPlugin.processor;
+        proc.clearStates();
+        const sampleRate = 48000;
+        const notchFreq = 1000;
+        const params = { notchFrequency: notchFreq, bandwidth: 400, order: 128, windowFunction: 'hamming', sampleRate };
+
+        // Синусоида на частоте режекции
+        const input = new Float32Array(2048);
+        for (let i = 0; i < input.length; i++) {
+            input[i] = Math.sin(2 * Math.PI * notchFreq * i / sampleRate);
+        }
+
+        // Прогреваем
+        proc.process([input], params, 2048, 'notch_rej');
+        proc.process([input], params, 2048, 'notch_rej');
+        const output = proc.process([input], params, 2048, 'notch_rej');
+
+        // Энергия выхода должна быть значительно меньше энергии входа
+        let inputEnergy = 0, outputEnergy = 0;
+        for (let i = 1024; i < 2048; i++) {
+            inputEnergy += input[i] * input[i];
+            outputEnergy += output[i] * output[i];
+        }
+        expect(outputEnergy).toBeLessThan(inputEnergy * 0.3);
+    });
+
+    it('пропускает синусоиду вне полосы режекции', () => {
+        const proc = NotchFIRPlugin.processor;
+        proc.clearStates();
+        const sampleRate = 48000;
+        const notchFreq = 5000;
+        const passFreq = 500;
+        const params = { notchFrequency: notchFreq, bandwidth: 500, order: 64, windowFunction: 'hamming', sampleRate };
+
+        const input = new Float32Array(2048);
+        for (let i = 0; i < input.length; i++) {
+            input[i] = Math.sin(2 * Math.PI * passFreq * i / sampleRate);
+        }
+
+        proc.process([input], params, 2048, 'notch_pass');
+        proc.process([input], params, 2048, 'notch_pass');
+        const output = proc.process([input], params, 2048, 'notch_pass');
+
+        let inputEnergy = 0, outputEnergy = 0;
+        for (let i = 1024; i < 2048; i++) {
+            inputEnergy += input[i] * input[i];
+            outputEnergy += output[i] * output[i];
+        }
+        // Энергия выхода должна быть близка к входной
+        expect(outputEnergy).toBeGreaterThan(inputEnergy * 0.5);
+    });
+
     it('возвращает тишину при пустом входе', () => {
-        const proc = createFIRProcessor();
-        const output = proc.process([], {}, 512, 'fir4');
+        const proc = NotchFIRPlugin.processor;
+        proc.clearStates();
+        const output = proc.process([], {}, 512, 'notch_empty');
         expect(output.length).toBe(512);
         for (let i = 0; i < output.length; i++) {
             expect(output[i]).toBe(0);
         }
     });
 
-    it('каждый экземпляр createFIRProcessor имеет независимые состояния', () => {
-        const procA = createFIRProcessor();
-        const procB = createFIRProcessor();
-        procA.init('n1', { filterType: 'lowpass', cutoffFrequency: 1000, order: 31 }, 48000);
-        expect(procA.states.has('n1')).toBe(true);
-        expect(procB.states.has('n1')).toBe(false);
-    });
-
-    it('пересчитывает коэффициенты при изменении cutoff', () => {
-        const proc = createFIRProcessor();
-        const params1 = { filterType: 'lowpass', cutoffFrequency: 1000, order: 31, sampleRate: 48000 };
+    it('пересчитывает коэффициенты при изменении notchFrequency', () => {
+        const proc = NotchFIRPlugin.processor;
+        proc.clearStates();
         const input = new Float32Array(256).fill(1.0);
-        proc.process([input], params1, 256, 'fir_recomp');
-        const coeffs1 = new Float32Array(proc.states.get('fir_recomp').coeffs);
+        const params1 = { notchFrequency: 1000, bandwidth: 200, order: 64, sampleRate: 48000 };
+        proc.process([input], params1, 256, 'notch_recomp');
+        const coeffs1 = new Float32Array(proc.states.get('notch_recomp').coeffs);
 
-        const params2 = { ...params1, cutoffFrequency: 5000 };
-        proc.process([input], params2, 256, 'fir_recomp');
-        const coeffs2 = proc.states.get('fir_recomp').coeffs;
+        const params2 = { ...params1, notchFrequency: 5000 };
+        proc.process([input], params2, 256, 'notch_recomp');
+        const coeffs2 = proc.states.get('notch_recomp').coeffs;
 
-        // Коэффициенты должны различаться
         let different = false;
         for (let i = 0; i < coeffs1.length; i++) {
             if (Math.abs(coeffs1[i] - coeffs2[i]) > 1e-6) { different = true; break; }
         }
         expect(different).toBe(true);
-    });
-});
-
-describe('FIRFilterPlugin Remez', () => {
-    it('инициализация с designMethod: remez создаёт корректные коэффициенты', () => {
-        const proc = createFIRProcessor();
-        proc.init('fir_remez1', {
-            filterType: 'lowpass',
-            cutoffFrequency: 2000,
-            order: 31,
-            designMethod: 'remez'
-        }, 48000);
-        const state = proc.states.get('fir_remez1');
-        expect(state).toBeDefined();
-        expect(state.coeffs).toBeInstanceOf(Float32Array);
-        expect(state.coeffs.length).toBe(31);
-        expect(state.coeffs._remezFallback).toBeUndefined();
-    });
-
-    it('Remez lowpass: DC проходит через фильтр', () => {
-        const proc = createFIRProcessor();
-        const params = {
-            filterType: 'lowpass',
-            cutoffFrequency: 5000,
-            order: 31,
-            designMethod: 'remez',
-            sampleRate: 48000
-        };
-        const dcInput = new Float32Array(1024).fill(1.0);
-        proc.process([dcInput], params, 1024, 'fir_remez_dc');
-        proc.process([dcInput], params, 1024, 'fir_remez_dc');
-        const output = proc.process([dcInput], params, 1024, 'fir_remez_dc');
-        const dcValue = output[output.length - 1];
-        expect(dcValue).toBeCloseTo(1.0, 1);
     });
 });
 
