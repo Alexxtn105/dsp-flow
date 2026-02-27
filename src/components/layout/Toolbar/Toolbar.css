@@ -93,6 +93,73 @@
     height: 32px;
 }
 
+/* Поле поиска */
+.toolbar-search {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-primary);
+    flex-shrink: 0;
+}
+
+.toolbar-search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 0 8px;
+    transition: border-color var(--transition-fast);
+}
+
+.toolbar-search-input-wrapper:focus-within {
+    border-color: var(--accent-primary);
+}
+
+.toolbar-search-icon {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.toolbar-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 13px;
+    padding: 6px 0;
+    outline: none;
+    min-width: 0;
+}
+
+.toolbar-search input::placeholder {
+    color: var(--text-secondary);
+}
+
+.toolbar-search-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition: color var(--transition-fast);
+}
+
+.toolbar-search-clear:hover {
+    color: var(--text-primary);
+}
+
+.toolbar-no-results {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
 .toolbar-content {
     padding: 16px 12px;
     overflow-y: auto;
@@ -395,6 +462,15 @@
 
 /* Темная тема */
 .dark-theme {
+    .toolbar-search-input-wrapper {
+        background: #0d1117;
+        border-color: #30363d;
+    }
+
+    .toolbar-search-input-wrapper:focus-within {
+        border-color: var(--accent-primary);
+    }
+
     .toolbar {
         background: #161b22;
         border-right-color: #30363d;

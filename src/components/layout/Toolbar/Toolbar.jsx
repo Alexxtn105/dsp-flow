@@ -9,8 +9,22 @@ function Toolbar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [collapsedGroups, setCollapsedGroups] = useState({});
     const [, setDraggingBlock] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const groups = registry.getGroups();
+
+    const query = searchQuery.trim().toLowerCase();
+    const filteredGroups = query
+        ? groups
+            .map(group => ({
+                ...group,
+                blocks: group.blocks.filter(block =>
+                    block.name.toLowerCase().includes(query) ||
+                    (block.description && block.description.toLowerCase().includes(query))
+                )
+            }))
+            .filter(group => group.blocks.length > 0)
+        : groups;
 
     const onDragStart = (event, blockName) => {
         event.dataTransfer.setData('application/reactflow', blockName);
@@ -62,8 +76,36 @@ function Toolbar() {
             </div>
 
             {!isCollapsed && (
+                <div className="toolbar-search">
+                    <div className="toolbar-search-input-wrapper">
+                        <Icon name="search" size="small" className="toolbar-search-icon" aria-hidden="true" />
+                        <input
+                            type="text"
+                            placeholder="Поиск блоков..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            aria-label="Поиск блоков"
+                        />
+                        {searchQuery && (
+                            <button
+                                className="toolbar-search-clear"
+                                onClick={() => setSearchQuery('')}
+                                title="Очистить поиск"
+                                aria-label="Очистить поиск"
+                            >
+                                <Icon name="close" size="small" aria-hidden="true" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {!isCollapsed && (
                 <div className="toolbar-content">
-                    {groups.map((group) => (
+                    {filteredGroups.length === 0 && (
+                        <div className="toolbar-no-results">Ничего не найдено</div>
+                    )}
+                    {filteredGroups.map((group) => (
                         <div
                             key={group.id}
                             className="group-container"
