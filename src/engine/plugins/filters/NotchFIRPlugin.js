@@ -2,6 +2,22 @@ import WindowFunctions from '../_shared/WindowFunctions.js';
 import { sinc } from '../_shared/FilterDesign.js';
 
 /**
+ * Коэффициенты компенсации переходных полос для каждой оконной функции.
+ * Расширяют внутренний bandpass так, чтобы заданная ширина полосы
+ * соответствовала области глубокой режекции (≈ -20 дБ).
+ * compensation_per_side = factor * sampleRate / order
+ */
+const TRANSITION_COMPENSATION = {
+    rectangular: 0.25,
+    hamming: 0.90,
+    hanning: 1.00,
+    blackman: 1.15,
+    'blackman-harris': 1.35,
+    nuttall: 1.35,
+    flattop: 1.90
+};
+
+/**
  * Создаёт процессор режекторного (band-reject) КИХ-фильтра.
  * Метод: проектирование нормализованного полосового фильтра + спектральная инверсия.
  * Порядок принудительно делается нечётным для целочисленной групповой задержки.
@@ -20,8 +36,10 @@ function createNotchProcessor() {
             const bandwidth = params.bandwidth || 200;
             const windowName = params.windowFunction || 'hamming';
 
-            const lowCutoff = Math.max(1, notchFreq - bandwidth / 2);
-            const highCutoff = Math.min(sampleRate / 2 - 1, notchFreq + bandwidth / 2);
+            // Компенсация переходных полос окна: расширяем внутренний bandpass
+            const twComp = (TRANSITION_COMPENSATION[windowName] || 0.90) * sampleRate / order;
+            const lowCutoff = Math.max(1, notchFreq - bandwidth / 2 - twComp);
+            const highCutoff = Math.min(sampleRate / 2 - 1, notchFreq + bandwidth / 2 + twComp);
 
             const M = order - 1;
             const center = M / 2; // целое число при нечётном order
