@@ -10,7 +10,8 @@ function createRemezProcessor() {
         clearStates() { this.states.clear(); },
 
         init(nodeId, params, sampleRate) {
-            const order = params.order || 64;
+            let order = params.order || 101;
+            if (order % 2 === 0) order += 1; // нечётный для Type I линейной фазы
             const lowCutoff = params.lowCutoff || 1000;
             const highCutoff = params.highCutoff || 3000;
 
@@ -91,7 +92,7 @@ export default {
     group: 'filters',
     signals: { input: 'real', output: 'real' },
     defaultParams: {
-        order: 64,
+        order: 101,
         lowCutoff: 1000,
         highCutoff: 3000,
     },

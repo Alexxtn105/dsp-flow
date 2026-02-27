@@ -242,92 +242,62 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
             break;
         }
 
-        // Sort by descending |error| and pick top numExtrema,
-        // but maintain alternating sign (Remez condition)
-        newExtrema.sort((a, b) => Math.abs(error[b]) - Math.abs(error[a]));
-
-        // Select extrema maintaining alternating sign
-        const selected = [newExtrema[0]];
-        for (let i = 1; i < newExtrema.length && selected.length < numExtrema; i++) {
-            const candidate = newExtrema[i];
-            const lastIdx = selected[selected.length - 1];
-            // Check alternating sign
-            if (error[candidate] * error[lastIdx] < 0 || selected.length === 1) {
-                // Accept if sign alternates or we need more points
-                selected.push(candidate);
+        // Build alternating-sign sequence in frequency order
+        const alt = [newExtrema[0]];
+        for (let i = 1; i < newExtrema.length; i++) {
+            const ci = newExtrema[i];
+            const pi = alt[alt.length - 1];
+            if (error[ci] * error[pi] < 0) {
+                alt.push(ci);
+            } else if (Math.abs(error[ci]) > Math.abs(error[pi])) {
+                alt[alt.length - 1] = ci;
             }
         }
 
-        // If not enough with alternating sign, just take top ones
-        if (selected.length < numExtrema) {
-            const selectedSet = new Set(selected);
-            for (let i = 0; i < newExtrema.length && selected.length < numExtrema; i++) {
-                if (!selectedSet.has(newExtrema[i])) {
-                    selected.push(newExtrema[i]);
-                    selectedSet.add(newExtrema[i]);
-                }
+        // Trim to numExtrema from the end with smaller |error|
+        while (alt.length > numExtrema) {
+            if (Math.abs(error[alt[0]]) < Math.abs(error[alt[alt.length - 1]])) {
+                alt.shift();
+            } else {
+                alt.pop();
             }
         }
 
-        selected.sort((a, b) => a - b);
-        extremalIndices = selected.slice(0, numExtrema);
+        if (alt.length >= numExtrema) {
+            extremalIndices = alt.slice(0, numExtrema);
+        }
     }
 
     // Step 5: Extract filter coefficients via cosine expansion from A(f)
-    // A(f) is computed on the grid — use IDFT-like approach to get h[n]
-    // For Type I linear phase (odd numTaps): h[n] = a[0] + 2*sum(a[k]*cos(2*pi*k*f))
-    // Compute a[k] from A(f) using least-squares on the grid
     const coeffsA = new Float64Array(L + 1);
-
-    // Use the computed A on a uniform grid for IDFT
     const uniformN = Math.max(512, numTaps * 8);
     const uniformA = new Float64Array(uniformN);
 
-    // Interpolate A onto uniform grid [0, 0.5]
+    // Linear interpolation of A onto uniform grid [0, 0.5]
     for (let i = 0; i < uniformN; i++) {
         const f = 0.5 * i / (uniformN - 1);
-        // Find in which band this frequency falls
-        let inBand = false;
-        for (let b = 0; b < numBands; b++) {
-            if (f >= bands[b * 2] - 1e-10 && f <= bands[b * 2 + 1] + 1e-10) {
-                inBand = true;
-                break;
-            }
+        // Binary search for bracketing grid points
+        let lo = 0, hi = G - 1;
+        while (lo < hi - 1) {
+            const mid = (lo + hi) >> 1;
+            if (grid[mid] <= f) lo = mid;
+            else hi = mid;
         }
-        if (!inBand) {
-            // Transition band — interpolate from A grid
-            // Find nearest grid points
-            let bestIdx = 0;
-            let bestDist = Infinity;
-            for (let gi = 0; gi < G; gi++) {
-                const dist = Math.abs(grid[gi] - f);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestIdx = gi;
-                }
-            }
-            uniformA[i] = A[bestIdx];
+        if (Math.abs(grid[hi] - grid[lo]) < 1e-15) {
+            uniformA[i] = A[lo];
         } else {
-            // In-band: find nearest grid point
-            let bestIdx = 0;
-            let bestDist = Infinity;
-            for (let gi = 0; gi < G; gi++) {
-                const dist = Math.abs(grid[gi] - f);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestIdx = gi;
-                }
-            }
-            uniformA[i] = A[bestIdx];
+            const t = Math.max(0, Math.min(1, (f - grid[lo]) / (grid[hi] - grid[lo])));
+            uniformA[i] = A[lo] + t * (A[hi] - A[lo]);
         }
     }
 
     // IDFT: a[k] = (2/N) * sum(A[i] * cos(2*pi*k*f_i)) for k > 0, (1/N) for k=0
+    // f goes from 0 to 0.5, so ω = 2πf goes from 0 to π
     for (let k = 0; k <= L; k++) {
         let sum = 0;
         for (let i = 0; i < uniformN; i++) {
             const f = 0.5 * i / (uniformN - 1);
-            sum += uniformA[i] * Math.cos(2 * Math.PI * k * f * 2); // cos(2*pi*k*(f/0.5)*0.5) = cos(2*pi*k*f)
+            sum += uniformA[i] * Math.cos(2 * Math.PI * k * f);
         }
         if (k === 0) {
             coeffsA[k] = sum / uniformN;
@@ -372,11 +342,15 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
 
     const fLow = lowCutoff / sampleRate;
     const fHigh = highCutoff / sampleRate;
-    const transitionWidth = Math.min(3.0 / order, 0.1);
+
+    // Transition width: limit by available space below/above passband
+    const baseTW = Math.min(3.0 / order, 0.1);
+    const lowerTW = Math.min(baseTW, fLow * 0.7);
+    const upperTW = Math.min(baseTW, (0.5 - fHigh) * 0.15);
 
     // Three bands: stopband1, passband, stopband2
-    const f1Stop = Math.max(0.01, fLow - transitionWidth / 2);
-    const f2Start = Math.min(0.49, fHigh + transitionWidth / 2);
+    const f1Stop = Math.max(0.005, fLow - lowerTW);
+    const f2Start = Math.min(0.495, fHigh + upperTW);
     const bands = [0, f1Stop, fLow, fHigh, f2Start, 0.5];
     const desired = [0, 0, 1, 1, 0, 0];
     const weights = [1, 1, 1];
@@ -512,44 +486,51 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
 
         if (newExtrema.length < numExtrema) break;
 
-        newExtrema.sort((a, b) => Math.abs(error[b]) - Math.abs(error[a]));
-        const selected = [newExtrema[0]];
-        for (let i = 1; i < newExtrema.length && selected.length < numExtrema; i++) {
-            const candidate = newExtrema[i];
-            const lastIdx = selected[selected.length - 1];
-            if (error[candidate] * error[lastIdx] < 0 || selected.length === 1) {
-                selected.push(candidate);
+        // Build alternating-sign sequence in frequency order
+        const alt = [newExtrema[0]];
+        for (let i = 1; i < newExtrema.length; i++) {
+            const ci = newExtrema[i];
+            const pi = alt[alt.length - 1];
+            if (error[ci] * error[pi] < 0) {
+                alt.push(ci);
+            } else if (Math.abs(error[ci]) > Math.abs(error[pi])) {
+                alt[alt.length - 1] = ci;
             }
         }
-        if (selected.length < numExtrema) {
-            const selectedSet = new Set(selected);
-            for (let i = 0; i < newExtrema.length && selected.length < numExtrema; i++) {
-                if (!selectedSet.has(newExtrema[i])) {
-                    selected.push(newExtrema[i]);
-                    selectedSet.add(newExtrema[i]);
-                }
+
+        // Trim to numExtrema from the end with smaller |error|
+        while (alt.length > numExtrema) {
+            if (Math.abs(error[alt[0]]) < Math.abs(error[alt[alt.length - 1]])) {
+                alt.shift();
+            } else {
+                alt.pop();
             }
         }
-        selected.sort((a, b) => a - b);
-        extremalIndices = selected.slice(0, numExtrema);
+
+        if (alt.length >= numExtrema) {
+            extremalIndices = alt.slice(0, numExtrema);
+        }
     }
 
     // Extract coefficients via cosine expansion
     const uniformN = Math.max(512, numTaps * 8);
     const uniformA = new Float64Array(uniformN);
 
+    // Linear interpolation of A onto uniform grid [0, 0.5]
     for (let i = 0; i < uniformN; i++) {
         const f = 0.5 * i / (uniformN - 1);
-        let bestIdx = 0;
-        let bestDist = Infinity;
-        for (let gi = 0; gi < G; gi++) {
-            const dist = Math.abs(grid[gi] - f);
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIdx = gi;
-            }
+        let lo = 0, hi = G - 1;
+        while (lo < hi - 1) {
+            const mid = (lo + hi) >> 1;
+            if (grid[mid] <= f) lo = mid;
+            else hi = mid;
         }
-        uniformA[i] = A[bestIdx];
+        if (Math.abs(grid[hi] - grid[lo]) < 1e-15) {
+            uniformA[i] = A[lo];
+        } else {
+            const t = Math.max(0, Math.min(1, (f - grid[lo]) / (grid[hi] - grid[lo])));
+            uniformA[i] = A[lo] + t * (A[hi] - A[lo]);
+        }
     }
 
     const coeffsA = new Float64Array(L + 1);
@@ -557,7 +538,7 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
         let sum = 0;
         for (let i = 0; i < uniformN; i++) {
             const f = 0.5 * i / (uniformN - 1);
-            sum += uniformA[i] * Math.cos(2 * Math.PI * k * f * 2);
+            sum += uniformA[i] * Math.cos(2 * Math.PI * k * f);
         }
         coeffsA[k] = (k === 0) ? sum / uniformN : 2 * sum / uniformN;
     }
@@ -568,6 +549,19 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
     for (let k = 1; k <= L; k++) {
         coeffs[center - k] = coeffsA[k] / 2;
         coeffs[center + k] = coeffsA[k] / 2;
+    }
+
+    // Normalize: unity gain at passband center frequency
+    const NORM_EPSILON = 1e-10;
+    const fc = (lowCutoff + highCutoff) / 2 / sampleRate;
+    let re = 0, im = 0;
+    for (let i = 0; i < numTaps; i++) {
+        re += coeffs[i] * Math.cos(2 * Math.PI * fc * i);
+        im -= coeffs[i] * Math.sin(2 * Math.PI * fc * i);
+    }
+    const mag = Math.sqrt(re * re + im * im);
+    if (mag > NORM_EPSILON) {
+        for (let i = 0; i < numTaps; i++) coeffs[i] /= mag;
     }
 
     return coeffs;
