@@ -251,6 +251,22 @@ class DSPProcessor {
     }
 
     /**
+     * Перемотка в начало (сохраняет скомпилированный граф)
+     */
+    rewind() {
+        this.stop();
+        this.currentSample = 0;
+        if (this.audioContext) {
+            this.nextAudioStartTime = this.audioContext.currentTime;
+        }
+        registry.clearAllStates();
+        for (const [, state] of this.blockStates) {
+            state.output = null;
+            state.initialized = false;
+        }
+    }
+
+    /**
      * Сброс к началу
      */
     reset() {

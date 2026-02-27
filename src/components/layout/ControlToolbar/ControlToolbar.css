@@ -167,7 +167,15 @@
 }
 
 .stop-btn:hover:not(:disabled) {
-    color: var(--danger);
+    color: var(--warning);
+}
+
+.rewind-btn:hover:not(:disabled) {
+    color: var(--accent-primary);
+}
+
+.start-btn.paused {
+    color: var(--warning);
 }
 
 .settings-btn:hover:not(:disabled) {

@@ -57,9 +57,10 @@ function App() {
     }, []);
 
     const doCreateNewScheme = useCallback(() => {
-        if (simulation.isRunning) {
-            DSPProcessor.stop();
+        if (simulation.isRunning || simulation.isPaused) {
+            DSPProcessor.reset();
             simulation.setIsRunning(false);
+            simulation.setIsPaused(false);
         }
 
         if (reactFlowInstance) {
@@ -135,9 +136,11 @@ function App() {
                         onSettings={() => dialogs.setShowSettingsDialog(true)}
                         onStart={simulation.handleStartSimulation}
                         onStop={simulation.handleStopSimulation}
+                        onRewind={simulation.handleRewind}
                         isSaveEnabled
                         isSaveAsEnabled
                         isRunning={simulation.isRunning}
+                        isPaused={simulation.isPaused}
                     />
 
                     <ErrorBoundary fallbackMessage="Ошибка редактора графа">
@@ -154,6 +157,7 @@ function App() {
 
                 <Footer
                     isRunning={simulation.isRunning}
+                    isPaused={simulation.isPaused}
                     nodesCount={stats.nodesCount}
                     connectionsCount={stats.connectionsCount}
                     sampleRate={sampleRate}

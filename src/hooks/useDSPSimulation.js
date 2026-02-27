@@ -15,9 +15,11 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
     const [isManualMode, setIsManualMode] = useState(false);
     const [manualStepSize, setManualStepSize] = useState(1024);
     const [nodes, setNodes] = useState([]);
+    const [isPaused, setIsPaused] = useState(false);
 
     const progressTimerRef = useRef(null);
     const lastProgressRef = useRef(null);
+    const pendingStepRef = useRef(false);
 
     const handleToggleManualMode = useCallback((enabled) => {
         setIsManualMode(enabled);
@@ -63,6 +65,9 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
             return;
         }
 
+        const resuming = isPaused;
+        const savedSample = resuming ? DSPProcessor.currentSample : 0;
+
         const startProcessing = (fileSampleRate = null) => {
             const rate = fileSampleRate || sampleRate;
 
@@ -75,6 +80,10 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
             DSPProcessor.setManualMode(isManualMode);
 
             DSPProcessor.initialize(currentNodes, edges);
+
+            if (resuming) {
+                DSPProcessor.currentSample = savedSample;
+            }
 
             DSPProcessor.onProgress = (progress) => {
                 lastProgressRef.current = progress;
@@ -97,40 +106,65 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
 
             DSPProcessor.onComplete = () => {
                 setIsRunning(false);
-                setProcessingProgress({ currentSample: 0, totalSamples: 0, progress: 0 });
+                setIsPaused(false);
+                setProcessingProgress(prev => ({ currentSample: prev.totalSamples, totalSamples: prev.totalSamples, progress: 1 }));
             };
 
             DSPProcessor.onError = (error) => {
                 setIsRunning(false);
+                setIsPaused(false);
                 showAlert(`Ошибка обработки: ${error.message}`, 'Ошибка');
             };
 
             DSPProcessor.start();
             setIsRunning(true);
+            setIsPaused(false);
+
+            if (pendingStepRef.current) {
+                pendingStepRef.current = false;
+                DSPProcessor.step(manualStepSize);
+            }
         };
 
         if (wavFile) {
-            WavFileService.loadFile(wavFile).then((fileInfo) => {
-                startProcessing(fileInfo.sampleRate);
-            }).catch(error => {
-                showAlert(`Ошибка загрузки WAV файла: ${error.message}`, 'Ошибка');
-            });
+            if (resuming && WavFileService.audioBuffer) {
+                const fileSampleRate = WavFileService.getSampleRate();
+                startProcessing(fileSampleRate);
+            } else {
+                WavFileService.loadFile(wavFile).then((fileInfo) => {
+                    startProcessing(fileInfo.sampleRate);
+                }).catch(error => {
+                    showAlert(`Ошибка загрузки WAV файла: ${error.message}`, 'Ошибка');
+                });
+            }
         } else {
             startProcessing(null);
         }
-    }, [reactFlowInstance, sampleRate, isManualMode, showAlert, setSampleRate, visualizationManagerRef]);
+    }, [reactFlowInstance, sampleRate, isManualMode, isPaused, manualStepSize, showAlert, setSampleRate, visualizationManagerRef]);
 
     const handleManualStep = useCallback(() => {
-        if (!isRunning) {
+        if (!isRunning && !isPaused) {
+            pendingStepRef.current = true;
+            handleStartSimulation();
+        } else if (isPaused) {
+            pendingStepRef.current = true;
             handleStartSimulation();
         } else {
             DSPProcessor.step(manualStepSize);
         }
-    }, [isRunning, manualStepSize, handleStartSimulation]);
+    }, [isRunning, isPaused, manualStepSize, handleStartSimulation]);
 
     const handleStopSimulation = useCallback(() => {
         DSPProcessor.stop();
         setIsRunning(false);
+        setIsPaused(true);
+    }, []);
+
+    const handleRewind = useCallback(() => {
+        DSPProcessor.rewind();
+        setIsRunning(false);
+        setIsPaused(false);
+        setProcessingProgress(prev => ({ currentSample: 0, totalSamples: prev.totalSamples, progress: 0 }));
     }, []);
 
     // Cleanup при размонтировании
@@ -146,6 +180,7 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
 
     return {
         isRunning, setIsRunning,
+        isPaused, setIsPaused,
         processingProgress,
         isManualMode,
         manualStepSize, setManualStepSize,
@@ -154,5 +189,6 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         handleStartSimulation,
         handleStopSimulation,
         handleManualStep,
+        handleRewind,
     };
 }

@@ -4,6 +4,7 @@ import './Footer.css';
 
 function Footer({
     isRunning,
+    isPaused,
     nodesCount,
     // connectionsCount зарезервирован для будущего использования
     sampleRate,
@@ -27,7 +28,9 @@ function Footer({
                 <div className="footer-left">
                     <div className="status-group">
                         <span className="footer-status">
-                            Статус: {isRunning ? (isManualMode ? 'Пауза (Ручной режим)' : 'Выполнение...') : 'Готов'}
+                            Статус: {isRunning
+                                ? (isManualMode ? 'Ручной режим' : 'Выполнение...')
+                                : (isPaused ? 'Пауза' : 'Готов')}
                         </span>
                         {currentSample > 0 && (
                             <span className="sample-counter">
@@ -36,7 +39,7 @@ function Footer({
                             </span>
                         )}
                     </div>
-                    {isRunning && progress > 0 && !isManualMode && (
+                    {(isRunning || isPaused) && progress > 0 && !isManualMode && (
                         <div className="progress-container">
                             <div className="progress-bar">
                                 <div
@@ -112,6 +115,7 @@ function Footer({
 
 Footer.propTypes = {
     isRunning: PropTypes.bool.isRequired,
+    isPaused: PropTypes.bool,
     nodesCount: PropTypes.number.isRequired,
     connectionsCount: PropTypes.number.isRequired,
     sampleRate: PropTypes.number.isRequired,

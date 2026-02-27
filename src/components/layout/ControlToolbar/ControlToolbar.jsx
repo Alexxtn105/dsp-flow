@@ -11,9 +11,11 @@ function ControlToolbar({
     onSettings,
     onStart,
     onStop,
+    onRewind,
     isSaveEnabled,
     isSaveAsEnabled,
-    isRunning
+    isRunning,
+    isPaused
 }) {
     const { isDarkTheme, toggleTheme } = useThemeContext();
 
@@ -76,26 +78,37 @@ function ControlToolbar({
 
                     <div className="control-divider"></div>
 
-                    {/* Кнопка "Старт" */}
+                    {/* Кнопка "Старт" / "Продолжить" */}
                     <button
-                        className={`control-btn start-btn ${isRunning ? 'active' : ''}`}
+                        className={`control-btn start-btn ${isRunning ? 'active' : ''} ${isPaused ? 'paused' : ''}`}
                         onClick={onStart}
-                        title="Запустить симуляцию"
+                        title={isPaused ? "Продолжить симуляцию" : "Запустить симуляцию"}
                         disabled={isRunning}
                     >
                         <Icon name="play_arrow" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Старт</span>
+                        <span className="control-btn-tooltip">{isPaused ? 'Продолжить' : 'Старт'}</span>
                     </button>
 
-                    {/* Кнопка "Стоп" */}
+                    {/* Кнопка "Пауза" */}
                     <button
                         className="control-btn stop-btn"
                         onClick={onStop}
-                        title="Остановить симуляцию"
+                        title="Пауза"
                         disabled={!isRunning}
                     >
-                        <Icon name="stop" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Стоп</span>
+                        <Icon name="pause" size="large" className="control-btn-icon" />
+                        <span className="control-btn-tooltip">Пауза</span>
+                    </button>
+
+                    {/* Кнопка "В начало" */}
+                    <button
+                        className="control-btn rewind-btn"
+                        onClick={onRewind}
+                        title="Перемотать в начало"
+                        disabled={!isRunning && !isPaused}
+                    >
+                        <Icon name="skip_previous" size="large" className="control-btn-icon" />
+                        <span className="control-btn-tooltip">В начало</span>
                     </button>
 
                     <div className="control-divider"></div>
@@ -139,9 +152,11 @@ ControlToolbar.propTypes = {
     onSettings: PropTypes.func.isRequired,
     onStart: PropTypes.func.isRequired,
     onStop: PropTypes.func.isRequired,
+    onRewind: PropTypes.func.isRequired,
     isSaveEnabled: PropTypes.bool.isRequired,
     isSaveAsEnabled: PropTypes.bool.isRequired,
-    isRunning: PropTypes.bool.isRequired
+    isRunning: PropTypes.bool.isRequired,
+    isPaused: PropTypes.bool.isRequired
 };
 
 export default ControlToolbar;
