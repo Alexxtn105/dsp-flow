@@ -87,15 +87,15 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
 
             DSPProcessor.onProgress = (progress) => {
                 lastProgressRef.current = progress;
-                if (progressTimerRef.current) {
-                    clearTimeout(progressTimerRef.current);
+                // Throttle: первый вызов запускает таймер, остальные просто обновляют ref
+                if (!progressTimerRef.current) {
+                    progressTimerRef.current = setTimeout(() => {
+                        progressTimerRef.current = null;
+                        if (lastProgressRef.current) {
+                            setProcessingProgress(lastProgressRef.current);
+                        }
+                    }, 100);
                 }
-                progressTimerRef.current = setTimeout(() => {
-                    progressTimerRef.current = null;
-                    if (lastProgressRef.current) {
-                        setProcessingProgress(lastProgressRef.current);
-                    }
-                }, 100);
             };
 
             DSPProcessor.onBlockOutput = (nodeId, output) => {

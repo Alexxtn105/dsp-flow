@@ -48,8 +48,9 @@ class DSPProcessor {
             this.state = ProcessorState.IDLE;
         } else if (this.state === ProcessorState.IDLE) {
             // Определяем состояние на основе текущих конфигурационных флагов
-            if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
-            else if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
+            // Ручной режим имеет приоритет
+            if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
+            else if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
             else this.state = ProcessorState.RUNNING_REALTIME;
         }
     }
@@ -185,8 +186,9 @@ class DSPProcessor {
         }
 
         // Определяем состояние на основе конфигурационных флагов
-        if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
-        else if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
+        // Ручной режим имеет приоритет — даже в режиме файла не создаём интервал
+        if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
+        else if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
         else this.state = ProcessorState.RUNNING_REALTIME;
 
         // Рассчитываем интервал обработки
