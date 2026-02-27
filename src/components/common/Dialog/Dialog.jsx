@@ -19,12 +19,18 @@ function Dialog({
     closeOnOverlay = true
 }) {
     const dialogRef = useRef(null);
+    const overlayRef = useRef(null);
     const previousFocusRef = useRef(null);
     const rafIdRef = useRef(null);
     const titleId = useId();
 
     // Обработчик нажатия клавиш (Escape + focus trap)
+    // Навешивается на overlay, чтобы stopPropagation не пускал события к React Flow
     const handleKeyDown = useCallback((e) => {
+        // Останавливаем всплытие — React Flow слушает keydown на document
+        // и удаляет выделенные узлы по Backspace/Delete
+        e.stopPropagation();
+
         if (closeOnEscape && e.key === 'Escape') {
             onClose();
             return;
@@ -73,8 +79,12 @@ function Dialog({
         // Блокируем скролл body
         document.body.classList.add('dialog-open');
 
-        // Добавляем обработчик клавиатуры
-        document.addEventListener('keydown', handleKeyDown);
+        // Навешиваем обработчик клавиатуры на overlay (не на document!),
+        // чтобы stopPropagation предотвращал всплытие к document-обработчикам React Flow
+        const overlay = overlayRef.current;
+        if (overlay) {
+            overlay.addEventListener('keydown', handleKeyDown);
+        }
 
         // Автофокус на первый интерактивный элемент
         rafIdRef.current = requestAnimationFrame(() => {
@@ -90,7 +100,9 @@ function Dialog({
 
         return () => {
             document.body.classList.remove('dialog-open');
-            document.removeEventListener('keydown', handleKeyDown);
+            if (overlay) {
+                overlay.removeEventListener('keydown', handleKeyDown);
+            }
 
             // Отменяем requestAnimationFrame при cleanup
             if (rafIdRef.current) {
@@ -110,7 +122,7 @@ function Dialog({
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="dialog-overlay" onClick={handleOverlayClick}>
+        <div className="dialog-overlay" ref={overlayRef} onClick={handleOverlayClick}>
             <div
                 ref={dialogRef}
                 className={`dialog ${className}`}

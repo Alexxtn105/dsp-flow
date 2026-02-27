@@ -157,6 +157,59 @@
     text-overflow: ellipsis;
 }
 
+.param-value-editable {
+    cursor: pointer;
+    border-bottom: 1px dashed transparent;
+    transition: border-color var(--transition-fast);
+}
+
+.param-value-editable:hover {
+    border-bottom-color: var(--accent-primary);
+}
+
+.param-value-more {
+    cursor: pointer;
+    color: var(--accent-primary);
+}
+
+.block-param-more {
+    cursor: pointer;
+}
+
+.block-param-more:hover .param-value-more {
+    text-decoration: underline;
+}
+
+/* Inline editor inputs */
+.inline-edit-input,
+.inline-edit-select {
+    width: 65px;
+    font-size: 11px;
+    padding: 1px 3px;
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.inline-edit-select {
+    width: 75px;
+    padding: 0 2px;
+}
+
+/* Remove spinner from number input */
+.inline-edit-input[type="number"]::-webkit-inner-spin-button,
+.inline-edit-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.inline-edit-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 /* Стили для ручек (handles) */
 .block-handle {
     width: 10px !important;
@@ -198,6 +251,13 @@
 
 .dark-theme .block-param {
     border-bottom-color: var(--border-secondary);
+}
+
+.dark-theme .inline-edit-input,
+.dark-theme .inline-edit-select {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
 }
 
 /* Адаптивность */

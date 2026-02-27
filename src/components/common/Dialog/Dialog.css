@@ -29,7 +29,8 @@
 }
 
 .dialog input,
-.dialog textarea {
+.dialog textarea,
+.dialog select {
     width: 100%;
     padding: 10px;
     margin-bottom: 12px;
@@ -42,7 +43,8 @@
 }
 
 .dialog input:focus,
-.dialog textarea:focus {
+.dialog textarea:focus,
+.dialog select:focus {
     outline: none;
     border-color: var(--accent-primary);
 }
@@ -182,7 +184,8 @@
 }
 
 .dark-theme .dialog input,
-.dark-theme .dialog textarea {
+.dark-theme .dialog textarea,
+.dark-theme .dialog select {
     background: var(--bg-secondary);
     color: var(--text-primary);
     border-color: var(--border-secondary);

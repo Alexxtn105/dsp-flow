@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
 import registry from '../../../engine/PluginRegistry';
+import { HIDDEN_PARAMS } from '../../../utils/constants';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './BlockParamsDialog.css';
 
@@ -138,11 +139,8 @@ function BlockParamsDialog({ onClose, node, onSave }) {
         return 'text';
     };
 
-    // Параметры, которые не показываем в редакторе (служебные)
-    const hiddenParams = ['wavFile', 'signalConfig', 'nodeId', 'onOpenParams', 'onOpenVisualization'];
-
     const editableParams = Object.entries(localParams).filter(
-        ([key]) => !hiddenParams.includes(key)
+        ([key]) => !HIDDEN_PARAMS.includes(key)
     );
 
     return (

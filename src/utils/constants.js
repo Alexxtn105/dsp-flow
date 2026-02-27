@@ -56,6 +56,13 @@ export const STORAGE_CONFIG = {
     MAX_AUTO_SAVE_AGE_DAYS: 1
 };
 
+// Скрытые/служебные параметры (не показываются в inline-редакторе и диалоге)
+export const HIDDEN_PARAMS = [
+    'wavFile', 'signalConfig', 'nodeId', 'onOpenParams', 'onOpenVisualization',
+    'detectedSampleRate', 'duration', 'channels', 'totalSamples', 'wavFileName',
+    'sourceType', 'muted'
+];
+
 // Правила валидации
 export const VALIDATION_RULES = {
     SCHEME_NAME: {

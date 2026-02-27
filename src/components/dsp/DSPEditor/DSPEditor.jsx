@@ -132,29 +132,49 @@ function DSPEditor({
         }
     }, [setNodes, setEdges, currentScheme, onSchemeUpdate]);
 
-    // Обработчик обновления одного параметра (для быстрого переключения)
+    // Обработчик обновления одного параметра (для быстрого переключения и inline-редактирования)
     const handleParamUpdate = useCallback((nodeId, paramName, paramValue) => {
         setNodes(nds => nds.map(node => {
             if (node.id === nodeId) {
-                return {
-                    ...node,
-                    data: {
-                        ...node.data,
-                        params: {
-                            ...node.data.params,
-                            [paramName]: paramValue
-                        }
+                const updatedData = {
+                    ...node.data,
+                    params: {
+                        ...node.data.params,
+                        [paramName]: paramValue
                     }
                 };
+
+                // Если изменился numInputs — обновляем signalConfig.inputsCount
+                if (paramName === 'numInputs' && node.data.signalConfig) {
+                    updatedData.signalConfig = {
+                        ...node.data.signalConfig,
+                        inputsCount: paramValue
+                    };
+                }
+
+                return { ...node, data: updatedData };
             }
             return node;
         }));
+
+        // Удаляем edges к хэндлам, которых больше нет
+        if (paramName === 'numInputs') {
+            setEdges(eds => eds.filter(edge => {
+                if (edge.target !== nodeId) return true;
+                const handle = edge.targetHandle;
+                if (!handle) return true;
+                const match = handle.match(/^input-(\d+)$/);
+                if (!match) return true;
+                const idx = parseInt(match[1], 10);
+                return idx < paramValue;
+            }));
+        }
 
         // Помечаем схему как несохранённую
         if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
             onSchemeUpdate(currentScheme.name, false);
         }
-    }, [setNodes, currentScheme, onSchemeUpdate]);
+    }, [setNodes, setEdges, currentScheme, onSchemeUpdate]);
 
     // Обновляем refs через effect (без ре-рендеров узлов)
     useEffect(() => {

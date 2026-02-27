@@ -1,7 +1,9 @@
-import { memo } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Handle, Position } from '@xyflow/react';
 import Icon from '../../common/Icons/Icon.jsx';
+import registry from '../../../engine/PluginRegistry';
+import { HIDDEN_PARAMS } from '../../../utils/constants';
 
 import {
     getBlockIcon,
@@ -16,6 +18,19 @@ import {
 } from '../../../utils/helpers';
 import './BlockNode.css';
 
+const MAX_VISIBLE_PARAMS = 3;
+
+/**
+ * Определяет тип inline-редактора для параметра
+ */
+function getParamType(key, value) {
+    const options = registry.getParamOptions(key);
+    if (options) return { type: 'select', options };
+    if (typeof value === 'boolean') return { type: 'boolean' };
+    if (typeof value === 'number') return { type: 'number' };
+    return { type: 'text' };
+}
+
 function BlockNode({ data, selected }) {
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
@@ -26,6 +41,82 @@ function BlockNode({ data, selected }) {
     const canVisualize = isVisualizationBlock(data.blockType);
     const isAudioFile = data.blockType === 'Audio File';
     const isMuted = data.params?.muted || false;
+
+    // Inline editing state
+    const [editingParam, setEditingParam] = useState(null);
+    const [editValue, setEditValue] = useState('');
+    const inputRef = useRef(null);
+
+    // Autofocus on editor when editing starts
+    useEffect(() => {
+        if (editingParam && inputRef.current) {
+            inputRef.current.focus();
+            if (inputRef.current.select) {
+                inputRef.current.select();
+            }
+        }
+    }, [editingParam]);
+
+    // Filter editable params: exclude hidden and array params
+    const editableParams = data.params
+        ? Object.entries(data.params).filter(
+            ([key, value]) => !HIDDEN_PARAMS.includes(key) && !Array.isArray(value)
+        )
+        : [];
+
+    const visibleParams = editableParams.slice(0, MAX_VISIBLE_PARAMS);
+    const hiddenCount = editableParams.length - visibleParams.length;
+
+    const enterEditMode = (e, key, value) => {
+        e.stopPropagation();
+        setEditingParam(key);
+        setEditValue(typeof value === 'boolean' ? String(value) : String(value));
+    };
+
+    const commitEdit = (key, rawValue) => {
+        if (!data.onParamUpdate) return;
+        const currentValue = data.params[key];
+        const paramType = getParamType(key, currentValue);
+        let parsed;
+
+        if (paramType.type === 'number') {
+            parsed = parseFloat(rawValue);
+            if (isNaN(parsed)) parsed = currentValue;
+        } else if (paramType.type === 'boolean') {
+            parsed = rawValue === 'true';
+        } else if (paramType.type === 'select') {
+            // Preserve original type (number stays number)
+            if (typeof currentValue === 'number') {
+                parsed = parseFloat(rawValue);
+                if (isNaN(parsed)) parsed = rawValue;
+            } else {
+                parsed = rawValue;
+            }
+        } else {
+            parsed = rawValue;
+        }
+
+        data.onParamUpdate(data.nodeId, key, parsed);
+        setEditingParam(null);
+    };
+
+    const cancelEdit = () => {
+        setEditingParam(null);
+    };
+
+    const handleKeyDown = (e, key) => {
+        // Stop propagation to prevent React Flow from handling keys (Backspace deletes nodes!)
+        e.stopPropagation();
+        if (e.key === 'Enter') {
+            commitEdit(key, editValue);
+        } else if (e.key === 'Escape') {
+            cancelEdit();
+        }
+    };
+
+    const stopPropagation = (e) => {
+        e.stopPropagation();
+    };
 
     const handleToggleMute = (e) => {
         e.stopPropagation();
@@ -46,6 +137,82 @@ function BlockNode({ data, selected }) {
         if (data.onOpenVisualization) {
             data.onOpenVisualization(data.nodeId);
         }
+    };
+
+    const renderParamValue = (key, value) => {
+        if (editingParam === key) {
+            const paramType = getParamType(key, value);
+
+            if (paramType.type === 'select') {
+                return (
+                    <select
+                        ref={inputRef}
+                        className="inline-edit-select nopan nodrag"
+                        value={editValue}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            commitEdit(key, e.target.value);
+                        }}
+                        onBlur={() => cancelEdit()}
+                        onKeyDown={(e) => handleKeyDown(e, key)}
+                        onMouseDown={stopPropagation}
+                    >
+                        {paramType.options.map(opt => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </option>
+                        ))}
+                    </select>
+                );
+            }
+
+            if (paramType.type === 'boolean') {
+                return (
+                    <select
+                        ref={inputRef}
+                        className="inline-edit-select nopan nodrag"
+                        value={editValue}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            commitEdit(key, e.target.value);
+                        }}
+                        onBlur={() => cancelEdit()}
+                        onKeyDown={(e) => handleKeyDown(e, key)}
+                        onMouseDown={stopPropagation}
+                    >
+                        <option value="true">Да</option>
+                        <option value="false">Нет</option>
+                    </select>
+                );
+            }
+
+            return (
+                <input
+                    ref={inputRef}
+                    type={paramType.type}
+                    className="inline-edit-input nopan nodrag"
+                    value={editValue}
+                    onChange={(e) => {
+                        e.stopPropagation();
+                        setEditValue(e.target.value);
+                    }}
+                    onBlur={() => commitEdit(key, editValue)}
+                    onKeyDown={(e) => handleKeyDown(e, key)}
+                    onMouseDown={stopPropagation}
+                    step={paramType.type === 'number' ? 'any' : undefined}
+                />
+            );
+        }
+
+        return (
+            <span
+                className="param-value param-value-editable"
+                onDoubleClick={(e) => enterEditMode(e, key, value)}
+                title="Двойной клик для редактирования"
+            >
+                {formatParamValue(value)}
+            </span>
+        );
     };
 
     return (
@@ -122,26 +289,24 @@ function BlockNode({ data, selected }) {
                 </div>
             </div>
 
-            {
-                data.params && Object.keys(data.params).length > 0 && (
-                    <div className="block-params">
-                        {Object.entries(data.params).slice(0, 3).map(([key, value]) => (
-                            <div key={key} className="block-param">
-                                <span className="param-label">{formatParamName(key)}:</span>
-                                <span className="param-value">{formatParamValue(value)}</span>
-                            </div>
-                        ))}
-                        {Object.keys(data.params).length > 3 && (
-                            <div className="block-param">
-                                <span className="param-label">...</span>
-                                <span className="param-value">
-                                    еще {Object.keys(data.params).length - 3}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                )
-            }
+            {editableParams.length > 0 && (
+                <div className="block-params">
+                    {visibleParams.map(([key, value]) => (
+                        <div key={key} className="block-param">
+                            <span className="param-label">{formatParamName(key)}:</span>
+                            {renderParamValue(key, value)}
+                        </div>
+                    ))}
+                    {hiddenCount > 0 && (
+                        <div className="block-param block-param-more" onClick={handleOpenParams}>
+                            <span className="param-label">...</span>
+                            <span className="param-value param-value-more">
+                                ещё {hiddenCount}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {
                 hasOutput && (
@@ -155,7 +320,7 @@ function BlockNode({ data, selected }) {
                     />
                 )
             }
-        </div >
+        </div>
     );
 }
 
