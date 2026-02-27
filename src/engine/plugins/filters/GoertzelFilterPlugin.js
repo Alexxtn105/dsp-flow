@@ -41,19 +41,19 @@ export default {
                 state.count++;
 
                 if (state.count >= N) {
-                    // Вычисляем магнитуду по формуле Гёрцеля
+                    // Вычисляем магнитуду по формуле Гёрцеля, нормализуем на N/2
                     const real = state.s1 - state.s2 * cosW;
                     const imag = state.s2 * sinW;
-                    state.magnitude = Math.sqrt(real * real + imag * imag);
+                    state.magnitude = Math.sqrt(real * real + imag * imag) / (N / 2);
                     // Сброс
                     state.s1 = 0;
                     state.s2 = 0;
                     state.count = 0;
                 } else if (state.magnitude === 0 && state.count > 0) {
-                    // До первого полного блока: вычисляем промежуточную магнитуду
+                    // До первого полного блока: промежуточная магнитуда (нормализуем на count/2)
                     const real = state.s1 - state.s2 * cosW;
                     const imag = state.s2 * sinW;
-                    state.magnitude = Math.sqrt(real * real + imag * imag);
+                    state.magnitude = Math.sqrt(real * real + imag * imag) / (state.count / 2);
                 }
 
                 output[i] = state.magnitude;
