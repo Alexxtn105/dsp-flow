@@ -10,7 +10,11 @@ export default {
     },
     processor: {
         process(inputs, params, chunkSize) {
-            return inputs[0] || new Float32Array(chunkSize);
+            const output = inputs[0] || new Float32Array(chunkSize);
+            if (params.muted) {
+                return new Float32Array(chunkSize);
+            }
+            return output;
         }
     }
 };

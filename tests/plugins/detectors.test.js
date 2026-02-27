@@ -77,9 +77,9 @@ describe('FrequencyDetectorPlugin', () => {
         const output = proc.process([input], { sampleRate, centerFrequency, bandwidth: 200 }, chunkSize, 'fd1');
         expect(output).toBeInstanceOf(Float32Array);
         expect(output.length).toBe(chunkSize);
-        // Отклонение от центральной частоты должно быть ~0
+        // Отклонение от центральной частоты должно быть ~0 (допуск ±5 Гц)
         const avgDeviation = output.slice(1, chunkSize).reduce((a, b) => a + b, 0) / (chunkSize - 1);
-        expect(avgDeviation).toBeCloseTo(0, -1);
+        expect(Math.abs(avgDeviation)).toBeLessThan(5);
     });
 
     it('определяет разные частоты — отклонение', () => {
@@ -96,9 +96,10 @@ describe('FrequencyDetectorPlugin', () => {
             input[i * 2 + 1] = Math.sin(phase);
         }
         const output = proc.process([input], { sampleRate, centerFrequency, bandwidth: 200 }, chunkSize, 'fd2');
-        // Отклонение от центральной частоты ~+50 Гц
+        // Отклонение от центральной частоты ~+50 Гц (допуск ±5 Гц)
         const avgDeviation = output.slice(1).reduce((a, b) => a + b, 0) / (chunkSize - 1);
-        expect(avgDeviation).toBeCloseTo(50, -1);
+        expect(avgDeviation).toBeGreaterThan(45);
+        expect(avgDeviation).toBeLessThan(55);
     });
 
     it('обнуляет выход вне полосы пропускания', () => {
@@ -148,8 +149,8 @@ describe('FrequencyDetectorPlugin', () => {
             input2[i * 2 + 1] = Math.sin(phase);
         }
         const out2 = proc.process([input2], { sampleRate, centerFrequency, bandwidth: 200 }, chunkSize, 'fd4');
-        // Отклонение от центральной частоты должно быть ~0
+        // Отклонение от центральной частоты должно быть ~0 (допуск ±5 Гц)
         const avgDeviation = out2.reduce((a, b) => a + b, 0) / chunkSize;
-        expect(avgDeviation).toBeCloseTo(0, -1);
+        expect(Math.abs(avgDeviation)).toBeLessThan(5);
     });
 });

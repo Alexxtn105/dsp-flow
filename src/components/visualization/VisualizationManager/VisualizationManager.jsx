@@ -36,20 +36,18 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             vizType = 'constellation';
         }
 
-        // Позиционирование окна (ближе к правому краю)
-        const existingCount = openWindows.size;
-        const defaultWidth = 400;
-        const screenWidth = window.innerWidth;
-
-        // Отступ справа 20px, смещение для каждого следующего окна
-        const startX = screenWidth - defaultWidth - 50;
-
-        const position = {
-            x: Math.max(50, startX - (existingCount * 30)), // Сдвигаем влево каждое новое, чтобы было видно
-            y: 100 + existingCount * 30
-        };
-
         setOpenWindows(prev => {
+            // Позиционирование окна (ближе к правому краю)
+            const existingCount = prev.size;
+            const defaultWidth = 400;
+            const screenWidth = window.innerWidth;
+            const startX = screenWidth - defaultWidth - 50;
+
+            const position = {
+                x: Math.max(50, startX - (existingCount * 30)),
+                y: 100 + existingCount * 30
+            };
+
             const next = new Map(prev);
             next.set(windowId, {
                 nodeId,
@@ -61,28 +59,23 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             });
             return next;
         });
-    }, [nodes, openWindows.size]);
+    }, [nodes]);
 
-    // Закрываем окна удалённых блоков
-    // This useState call was incorrectly placed and not used to declare state.
-    // The comment indicates it was meant for a side effect, which should be useEffect.
-    // The actual side effect logic is correctly implemented in the useEffect below.
-
-    // Эффект для автоматического закрытия окон при удалении узлов
+    // Эффект для автоматического закрытия окон при удалении узлов (N15)
+    // Используем functional update для чтения prev, не включая openWindows в deps
+    const nodeIds = nodes.map(n => n.id).join(',');
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        // Находим ID окон, чьи узлы были удалены
-        const removedIds = [];
-        for (const [windowId, config] of openWindows.entries()) {
-            const nodeExists = nodes.some(n => n.id === config.nodeId);
-            if (!nodeExists) {
-                removedIds.push(windowId);
-            }
-        }
-
-        if (removedIds.length === 0) return;
-
         setOpenWindows(prev => {
+            const removedIds = [];
+            for (const [windowId, config] of prev.entries()) {
+                const nodeExists = nodes.some(n => n.id === config.nodeId);
+                if (!nodeExists) {
+                    removedIds.push(windowId);
+                }
+            }
+            if (removedIds.length === 0) return prev;
+
             const next = new Map(prev);
             for (const id of removedIds) {
                 next.delete(id);
@@ -91,13 +84,22 @@ const VisualizationManager = forwardRef(function VisualizationManager({
         });
 
         setWindowData(prev => {
+            const removedIds = [];
+            for (const windowId of prev.keys()) {
+                const nodeExists = nodes.some(n => n.id === windowId);
+                if (!nodeExists) {
+                    removedIds.push(windowId);
+                }
+            }
+            if (removedIds.length === 0) return prev;
+
             const next = new Map(prev);
             for (const id of removedIds) {
                 next.delete(id);
             }
             return next;
         });
-    }, [nodes, openWindows]);
+    }, [nodeIds]); // eslint-disable-line react-hooks/exhaustive-deps
     /* eslint-enable react-hooks/set-state-in-effect */
 
     // Закрыть окно

@@ -17,10 +17,7 @@ export function ThemeProvider({ children }) {
     );
 }
 
-/**
- * Хук для доступа к теме из любого компонента без prop drilling.
- * @returns {{ isDarkTheme: boolean, theme: string, toggleTheme: () => void, setTheme: (theme: string) => void }}
- */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useThemeContext() {
     const ctx = useContext(ThemeContext);
     if (!ctx) {

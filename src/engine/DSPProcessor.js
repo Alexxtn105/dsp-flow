@@ -261,6 +261,10 @@ class DSPProcessor {
         this.blockStates.clear();
         this._nodeTypeMap.clear();
 
+        // Сбрасываем WavFileService ДО закрытия AudioContext,
+        // чтобы он не хранил ссылку на закрытый контекст (N2)
+        WavFileService.reset();
+
         // Закрываем AudioContext, чтобы не копить ресурсы
         if (this.audioContext) {
             try {
@@ -302,9 +306,16 @@ class DSPProcessor {
                     this.onBlockOutput(block.nodeId, output);
                 }
 
-                // Если это Speaker и не замьючен - воспроизводим
-                if (block.blockType === 'Динамик' && !block.params.muted && output && this.audioContext) {
-                    this.playAudioChunk(output);
+                // Если это Speaker — воспроизводим (muted обрабатывается в SpeakerPlugin.process)
+                if (block.blockType === 'Динамик' && output && this.audioContext) {
+                    // Проверяем, что выход не тишина (muted плагин вернёт нули)
+                    let hasSignal = false;
+                    for (let i = 0; i < output.length; i++) {
+                        if (output[i] !== 0) { hasSignal = true; break; }
+                    }
+                    if (hasSignal) {
+                        this.playAudioChunk(output);
+                    }
                 }
             }
 

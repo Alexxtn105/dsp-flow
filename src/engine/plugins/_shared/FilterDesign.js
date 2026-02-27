@@ -23,7 +23,7 @@ export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) 
     const window = WindowFunctions[windowName] || WindowFunctions.rectangular;
 
     for (let i = 0; i < order; i++) {
-        if (i === M / 2) {
+        if (i === Math.floor(M / 2)) {
             coeffs[i] = 2 * fc;
         } else {
             coeffs[i] = 2 * fc * sinc(2 * fc * (i - M / 2));

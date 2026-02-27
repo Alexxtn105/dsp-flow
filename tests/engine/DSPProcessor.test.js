@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import initPlugins from '../../src/engine/initPlugins.js';
 import DSPProcessor from '../../src/engine/DSPProcessor.js';
 

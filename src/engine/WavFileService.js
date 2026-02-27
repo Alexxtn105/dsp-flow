@@ -19,10 +19,10 @@ class WavFileService {
      * @param {AudioContext} [externalContext] - внешний AudioContext для переиспользования
      */
     init(externalContext) {
-        if (externalContext) {
+        if (externalContext && externalContext.state !== 'closed') {
             this.audioContext = externalContext;
             this._ownsContext = false;
-        } else if (!this.audioContext) {
+        } else if (!this.audioContext || this.audioContext.state === 'closed') {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this._ownsContext = true;
         }
@@ -98,7 +98,7 @@ class WavFileService {
             return result;
         }
 
-        return channelData.slice(startSample, endSample);
+        return channelData.subarray(startSample, endSample);
     }
 
     /**
