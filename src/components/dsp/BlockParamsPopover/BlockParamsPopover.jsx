@@ -1,26 +1,64 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import Dialog from '../../common/Dialog/Dialog.jsx';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
 import registry from '../../../engine/PluginRegistry';
 import { HIDDEN_PARAMS } from '../../../utils/constants';
 import { useThemeContext } from '../../../contexts/ThemeContext';
-import './BlockParamsDialog.css';
+import './BlockParamsPopover.css';
+
+const POPOVER_WIDTH = 280;
+const POPOVER_GAP = 12;
+const VIEWPORT_PADDING = 8;
+
+function computePosition(nodeRect) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let x, y;
+
+    // Try right
+    if (nodeRect.right + POPOVER_GAP + POPOVER_WIDTH + VIEWPORT_PADDING <= vw) {
+        x = nodeRect.right + POPOVER_GAP;
+    }
+    // Try left
+    else if (nodeRect.left - POPOVER_GAP - POPOVER_WIDTH - VIEWPORT_PADDING >= 0) {
+        x = nodeRect.left - POPOVER_GAP - POPOVER_WIDTH;
+    }
+    // Fallback: align to right edge of viewport
+    else {
+        x = Math.max(VIEWPORT_PADDING, vw - POPOVER_WIDTH - VIEWPORT_PADDING);
+    }
+
+    // Vertical: align top of popover with top of node, clamped to viewport
+    y = Math.max(VIEWPORT_PADDING, Math.min(nodeRect.top, vh - 400 - VIEWPORT_PADDING));
+
+    return { x, y };
+}
 
 /**
- * Диалог редактирования параметров блока
+ * Поповер редактирования параметров блока
  */
-function BlockParamsDialog({ onClose, node, onSave }) {
+function BlockParamsPopover({ onClose, node, onSave }) {
     const { isDarkTheme } = useThemeContext();
-    // Debug: Ensure params are loaded correctly
 
     const [localParams, setLocalParams] = useState({});
     const [wavFileName, setWavFileName] = useState('');
     const [error, setError] = useState(null);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
     const audioContextRef = useRef(null);
     const mountedRef = useRef(true);
+    const popoverRef = useRef(null);
 
-    // Инициализация параметров при открытии диалога
+    // Вычислить позицию на основе DOM-элемента блока
+    const updatePosition = useCallback(() => {
+        const el = document.querySelector(`[data-id="${node.id}"]`);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        setPosition(computePosition(rect));
+    }, [node.id]);
+
+    // Инициализация параметров при открытии
     const nodeId = node?.id;
     useEffect(() => {
         if (!node?.data) return;
@@ -34,19 +72,60 @@ function BlockParamsDialog({ onClose, node, onSave }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nodeId]);
 
+    // Позиционирование + репозиционирование при pan/zoom/resize
+    useEffect(() => {
+        updatePosition();
+
+        const handleResize = () => updatePosition();
+        window.addEventListener('resize', handleResize);
+
+        // MutationObserver на viewport для отслеживания pan/zoom
+        const viewport = document.querySelector('.react-flow__viewport');
+        let observer;
+        if (viewport) {
+            observer = new MutationObserver(() => updatePosition());
+            observer.observe(viewport, { attributes: true, attributeFilter: ['style'] });
+        }
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (observer) observer.disconnect();
+        };
+    }, [updatePosition]);
+
     // Cleanup AudioContext при размонтировании
     useEffect(() => {
         mountedRef.current = true;
         return () => {
             mountedRef.current = false;
             if (audioContextRef.current) {
-                try {
-                    audioContextRef.current.close();
-                } catch { /* already closed */ }
+                try { audioContextRef.current.close(); } catch { /* already closed */ }
                 audioContextRef.current = null;
             }
         };
     }, []);
+
+    // Click-outside закрытие
+    useEffect(() => {
+        const handleMouseDown = (e) => {
+            if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+                onClose();
+            }
+        };
+        document.addEventListener('mousedown', handleMouseDown);
+        return () => document.removeEventListener('mousedown', handleMouseDown);
+    }, [onClose]);
+
+    // Escape закрытие
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
 
     const blockType = node?.data?.blockType || 'Неизвестный блок';
     const isInputSignal = blockType === 'Audio File';
@@ -59,14 +138,12 @@ function BlockParamsDialog({ onClose, node, onSave }) {
         } else if (type === 'boolean') {
             parsedValue = value === 'true' || value === true;
         } else if (type === 'select-options') {
-            // Сохраняем исходный тип значения (число остаётся числом)
             const originalValue = localParams[key];
             if (typeof originalValue === 'number') {
                 parsedValue = parseFloat(value);
                 if (isNaN(parsedValue)) parsedValue = value;
             }
         } else if (type === 'array') {
-            // Парсим строку с разделителем-запятой в массив чисел
             parsedValue = value.split(',').map(s => {
                 const num = parseFloat(s.trim());
                 return isNaN(num) ? 0 : num;
@@ -83,19 +160,16 @@ function BlockParamsDialog({ onClose, node, onSave }) {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Проверяем, что это WAV файл
         if (!file.name.toLowerCase().endsWith('.wav')) {
             setError('Пожалуйста, выберите WAV файл');
             return;
         }
 
         try {
-            // Закрываем предыдущий AudioContext при повторном выборе файла
             if (audioContextRef.current) {
                 try { audioContextRef.current.close(); } catch { /* ignore */ }
             }
 
-            // Читаем файл и получаем AudioBuffer для извлечения sample rate
             const arrayBuffer = await file.arrayBuffer();
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             audioContextRef.current = audioContext;
@@ -109,7 +183,6 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                 wavFile: file,
                 wavFileName: file.name,
                 sourceType: 'file',
-                // Автоматически извлекаем sample rate из файла
                 detectedSampleRate: audioBuffer.sampleRate,
                 duration: audioBuffer.duration,
                 channels: audioBuffer.numberOfChannels,
@@ -118,8 +191,8 @@ function BlockParamsDialog({ onClose, node, onSave }) {
 
             audioContext.close();
             audioContextRef.current = null;
-        } catch (error) {
-            console.error('Ошибка чтения WAV файла:', error);
+        } catch (err) {
+            console.error('Ошибка чтения WAV файла:', err);
             setError('Не удалось прочитать WAV файл');
         }
     };
@@ -128,6 +201,11 @@ function BlockParamsDialog({ onClose, node, onSave }) {
         e.preventDefault();
         onSave(node.id, localParams);
         onClose();
+    };
+
+    // Изоляция клавиатуры — предотвращаем Backspace/Delete удаление блоков React Flow
+    const handlePopoverKeyDown = (e) => {
+        e.stopPropagation();
     };
 
     const getInputType = (key, value) => {
@@ -143,15 +221,20 @@ function BlockParamsDialog({ onClose, node, onSave }) {
         ([key]) => !HIDDEN_PARAMS.includes(key)
     );
 
-    return (
-        <Dialog
-            isOpen={true}
-            onClose={onClose}
-            title={`Настройки: ${getBlockDescription(blockType)}`}
-            className={isDarkTheme ? 'dark-theme' : ''}
+    return createPortal(
+        <div
+            ref={popoverRef}
+            className={`block-params-popover ${isDarkTheme ? 'dark-theme' : ''}`}
+            style={{ left: position.x, top: position.y }}
+            onKeyDown={handlePopoverKeyDown}
         >
-            <form onSubmit={handleSubmit} className="block-params-form">
-                {/* Специальный UI для входного сигнала - выбор WAV файла */}
+            <div className="popover-header">
+                <span className="popover-title">{getBlockDescription(blockType)}</span>
+                <button className="popover-close-btn" onClick={onClose} type="button">&times;</button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="popover-body">
+                {/* WAV-секция для Audio File */}
                 {isInputSignal && (
                     <div className="param-section wav-section">
                         <label className="param-section-label">Источник сигнала</label>
@@ -160,10 +243,10 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                                 type="file"
                                 accept=".wav"
                                 onChange={handleFileSelect}
-                                id="wav-file-input"
+                                id="wav-file-input-popover"
                                 className="hidden-file-input"
                             />
-                            <label htmlFor="wav-file-input" className="wav-file-btn">
+                            <label htmlFor="wav-file-input-popover" className="wav-file-btn">
                                 {wavFileName || 'Выбрать WAV файл'}
                             </label>
                         </div>
@@ -195,7 +278,6 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                     <div className="param-section">
                         <label className="param-section-label">Параметры</label>
                         {editableParams.map(([key, value]) => {
-                            // Пропускаем служебные поля WAV
                             if (['detectedSampleRate', 'duration', 'channels', 'totalSamples', 'wavFileName', 'sourceType'].includes(key)) {
                                 return null;
                             }
@@ -256,19 +338,20 @@ function BlockParamsDialog({ onClose, node, onSave }) {
                     </div>
                 )}
 
-                <div className="dialog-buttons">
-                    <button type="submit">Применить</button>
-                    <button type="button" onClick={onClose}>Отмена</button>
+                <div className="popover-actions">
+                    <button type="submit" className="popover-btn popover-btn-primary">Применить</button>
+                    <button type="button" className="popover-btn popover-btn-secondary" onClick={onClose}>Отмена</button>
                 </div>
             </form>
-        </Dialog>
+        </div>,
+        document.body
     );
 }
 
-BlockParamsDialog.propTypes = {
+BlockParamsPopover.propTypes = {
     onClose: PropTypes.func.isRequired,
     node: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired
 };
 
-export default BlockParamsDialog;
+export default BlockParamsPopover;

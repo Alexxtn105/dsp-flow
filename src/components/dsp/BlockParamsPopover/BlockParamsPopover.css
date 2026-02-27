@@ -1,0 +1,292 @@
+/* Поповер редактирования параметров блока */
+.block-params-popover {
+    position: fixed;
+    width: 280px;
+    max-height: 400px;
+    z-index: 100;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    animation: popoverAppear 0.15s ease-out;
+}
+
+@keyframes popoverAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Header */
+.popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-primary);
+    flex-shrink: 0;
+}
+
+.popover-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.popover-close-btn {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+
+.popover-close-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* Body (scrollable form) */
+.popover-body {
+    padding: 10px 12px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Thin scrollbar */
+.popover-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.popover-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.popover-body::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 2px;
+}
+
+.popover-body::-webkit-scrollbar-thumb:hover {
+    background: var(--border-secondary);
+}
+
+/* Param sections */
+.block-params-popover .param-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.block-params-popover .param-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.block-params-popover .param-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.block-params-popover .param-row .param-label {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.block-params-popover .param-input {
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+}
+
+.block-params-popover .param-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* WAV section */
+.block-params-popover .wav-section {
+    background: var(--bg-tertiary);
+    padding: 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+
+.block-params-popover .wav-file-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.block-params-popover .hidden-file-input {
+    display: none;
+}
+
+.block-params-popover .wav-file-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 100%;
+    text-align: center;
+}
+
+.block-params-popover .wav-file-btn:hover {
+    background: var(--accent-hover);
+}
+
+.block-params-popover .wav-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-primary);
+}
+
+.block-params-popover .wav-info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+}
+
+.block-params-popover .wav-info-item span {
+    color: var(--text-secondary);
+}
+
+.block-params-popover .wav-info-item strong {
+    color: var(--text-primary);
+}
+
+/* Error */
+.block-params-popover .error-message {
+    color: var(--danger);
+    font-size: 12px;
+    padding: 6px 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+/* Actions */
+.popover-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-primary);
+    flex-shrink: 0;
+}
+
+.popover-btn {
+    flex: 1;
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.popover-btn-primary {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.popover-btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.popover-btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+}
+
+.popover-btn-secondary:hover {
+    background: var(--bg-primary);
+    border-color: var(--border-secondary);
+}
+
+/* Dark theme */
+.block-params-popover.dark-theme {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .popover-header {
+    border-bottom-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .popover-close-btn:hover {
+    background: var(--bg-tertiary);
+}
+
+.block-params-popover.dark-theme .param-input {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .wav-section {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .wav-info {
+    border-top-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .popover-actions {
+    border-top-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .popover-btn-secondary {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+}
+
+.block-params-popover.dark-theme .popover-btn-secondary:hover {
+    background: var(--bg-primary);
+}
+
+.block-params-popover.dark-theme .popover-body::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+}

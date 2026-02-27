@@ -15,7 +15,7 @@ import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 
-import BlockParamsDialog from '../../dialogs/BlockParamsDialog';
+import BlockParamsPopover from '../BlockParamsPopover';
 import { useAutoSave } from '../../../hooks/index.js';
 import {
     generateNodeId,
@@ -433,9 +433,9 @@ function DSPEditor({
 
             </div>
 
-            {/* Диалог редактирования параметров блока */}
+            {/* Поповер редактирования параметров блока */}
             {paramsDialogNode && (
-                <BlockParamsDialog
+                <BlockParamsPopover
                     onClose={() => setParamsDialogNode(null)}
                     node={paramsDialogNode}
                     onSave={handleSaveParams}
