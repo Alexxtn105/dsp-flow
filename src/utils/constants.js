@@ -20,6 +20,7 @@ export const DSP_BLOCK_TYPES = {
     HILBERT_TRANSFORMER: 'Преобразователь Гильберта',
     GOERTZEL_FILTER: 'Фильтр Герцеля',
     REMEZ_FILTER: 'Фильтр Ремеза',
+    DELAY_LINE: 'Линия задержки',
 
     // Генераторы
     CONSTANT: 'Константа',

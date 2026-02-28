@@ -14,6 +14,7 @@ import LowpassFIRPlugin from './filters/LowpassFIRPlugin.js';
 import HilbertTransformerPlugin from './filters/HilbertTransformerPlugin.js';
 import GoertzelFilterPlugin from './filters/GoertzelFilterPlugin.js';
 import RemezFilterPlugin from './filters/RemezFilterPlugin.js';
+import DelayLinePlugin from './filters/DelayLinePlugin.js';
 
 // Анализ
 import FFTPlugin from './analysis/FFTPlugin.js';
@@ -57,6 +58,7 @@ export default [
     HilbertTransformerPlugin,
     GoertzelFilterPlugin,
     RemezFilterPlugin,
+    DelayLinePlugin,
 
     // Генераторы
     AudioFilePlugin,

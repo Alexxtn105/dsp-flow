@@ -129,6 +129,18 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Линия задержки — сигнал со стрелкой сдвига вправо
+    'dsp-delay': (
+        <>
+            <path d="M3 12 C5 6, 7 6, 9 12 C11 18, 13 18, 15 12"
+                  strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+            <path d="M9 12 C11 6, 13 6, 15 12 C17 18, 19 18, 21 12"
+                  strokeWidth="2" strokeLinecap="round" />
+            <path d="M14 4 L18 4 L16 2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <path d="M14 4 L18 4 L16 6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
     /* ===================== ANALYSIS ===================== */
 
     // БПФ — спектральные столбцы разной высоты
