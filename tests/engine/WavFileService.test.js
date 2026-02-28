@@ -28,28 +28,6 @@ window.AudioContext = class MockAudioContext {
     get destination() { return {}; }
 };
 
-/**
- * Создаёт минимальный WAV-заголовок (44 байта) с указанной частотой дискретизации
- */
-function buildWavHeader(sampleRate) {
-    const buf = new ArrayBuffer(44);
-    const view = new DataView(buf);
-    view.setUint32(0, 0x52494646, false);  // "RIFF"
-    view.setUint32(4, 36, true);            // file size - 8
-    view.setUint32(8, 0x57415645, false);  // "WAVE"
-    view.setUint32(12, 0x666D7420, false); // "fmt "
-    view.setUint32(16, 16, true);           // fmt chunk size
-    view.setUint16(20, 1, true);            // PCM
-    view.setUint16(22, 1, true);            // mono
-    view.setUint32(24, sampleRate, true);   // sample rate
-    view.setUint32(28, sampleRate * 2, true); // byte rate
-    view.setUint16(32, 2, true);            // block align
-    view.setUint16(34, 16, true);           // bits per sample
-    view.setUint32(36, 0x64617461, false); // "data"
-    view.setUint32(40, 0, true);            // data size
-    return buf;
-}
-
 describe('WavFileService', () => {
     beforeEach(() => {
         WavFileService.close();
@@ -76,29 +54,8 @@ describe('WavFileService', () => {
         });
     });
 
-    describe('parseWavSampleRate()', () => {
-        it('извлекает sample rate из валидного WAV-заголовка', () => {
-            expect(WavFileService.parseWavSampleRate(buildWavHeader(44100))).toBe(44100);
-            expect(WavFileService.parseWavSampleRate(buildWavHeader(8000))).toBe(8000);
-            expect(WavFileService.parseWavSampleRate(buildWavHeader(48000))).toBe(48000);
-            expect(WavFileService.parseWavSampleRate(buildWavHeader(96000))).toBe(96000);
-        });
-
-        it('возвращает null для невалидного буфера', () => {
-            expect(WavFileService.parseWavSampleRate(new ArrayBuffer(10))).toBeNull();
-            expect(WavFileService.parseWavSampleRate(new ArrayBuffer(100))).toBeNull();
-        });
-
-        it('возвращает null для буфера без RIFF-заголовка', () => {
-            const buf = new ArrayBuffer(44);
-            const view = new DataView(buf);
-            view.setUint32(0, 0x00000000, false);
-            expect(WavFileService.parseWavSampleRate(buf)).toBeNull();
-        });
-    });
-
     describe('loadFile()', () => {
-        it('загружает файл и возвращает метаданные (fallback без WAV-заголовка)', async () => {
+        it('загружает файл и возвращает метаданные', async () => {
             const mockFile = {
                 name: 'test.wav',
                 arrayBuffer: () => Promise.resolve(new ArrayBuffer(100))
@@ -111,19 +68,6 @@ describe('WavFileService', () => {
             expect(info.numberOfChannels).toBe(2);
             expect(info.length).toBe(88200);
             expect(info.fileName).toBe('test.wav');
-        });
-
-        it('использует sample rate из WAV-заголовка', async () => {
-            const mockFile = {
-                name: 'test_8k.wav',
-                arrayBuffer: () => Promise.resolve(buildWavHeader(8000))
-            };
-
-            const info = await WavFileService.loadFile(mockFile);
-
-            expect(info.sampleRate).toBe(8000);
-            expect(WavFileService.originalSampleRate).toBe(8000);
-            expect(WavFileService.getSampleRate()).toBe(8000);
         });
     });
 
@@ -221,7 +165,7 @@ describe('WavFileService', () => {
     });
 
     describe('reset()', () => {
-        it('очищает audioBuffer, file и originalSampleRate', async () => {
+        it('очищает audioBuffer и file', async () => {
             const mockFile = {
                 name: 'test.wav',
                 arrayBuffer: () => Promise.resolve(new ArrayBuffer(100))
@@ -232,7 +176,6 @@ describe('WavFileService', () => {
 
             expect(WavFileService.audioBuffer).toBeNull();
             expect(WavFileService.file).toBeNull();
-            expect(WavFileService.originalSampleRate).toBeNull();
             expect(WavFileService.getTotalSamples()).toBe(0);
         });
     });

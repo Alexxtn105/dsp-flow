@@ -5,7 +5,6 @@ import { getBlockDescription, formatParamName, getDefaultParams } from '../../..
 import registry from '../../../engine/PluginRegistry';
 import { HIDDEN_PARAMS } from '../../../utils/constants';
 import { useThemeContext } from '../../../contexts/ThemeContext';
-import WavFileService from '../../../engine/WavFileService';
 import './BlockParamsPopover.css';
 
 const POPOVER_WIDTH = 340;
@@ -172,16 +171,11 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
             }
 
             const arrayBuffer = await file.arrayBuffer();
-            const headerSampleRate = WavFileService.parseWavSampleRate(arrayBuffer);
-
-            const ctxOptions = headerSampleRate ? { sampleRate: headerSampleRate } : {};
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)(ctxOptions);
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             audioContextRef.current = audioContext;
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
             if (!mountedRef.current) return;
-
-            const fileSampleRate = headerSampleRate || audioBuffer.sampleRate;
 
             setWavFileName(file.name);
             setLocalParams(prev => ({
@@ -189,14 +183,14 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                 wavFile: file,
                 wavFileName: file.name,
                 sourceType: 'file',
-                detectedSampleRate: fileSampleRate,
+                detectedSampleRate: audioBuffer.sampleRate,
                 duration: audioBuffer.duration,
                 channels: audioBuffer.numberOfChannels,
                 totalSamples: audioBuffer.length
             }));
 
-            if (onSampleRateChange && fileSampleRate) {
-                onSampleRateChange(fileSampleRate);
+            if (onSampleRateChange && audioBuffer.sampleRate) {
+                onSampleRateChange(audioBuffer.sampleRate);
             }
 
             audioContext.close();
