@@ -13,7 +13,8 @@ import { ErrorBoundary } from '../../common';
  */
 const VisualizationManager = forwardRef(function VisualizationManager({
     sampleRate,
-    nodes
+    nodes,
+    onUpdateNodeParams
 }, ref) {
     const [openWindows, setOpenWindows] = useState(new Map());
     const [windowData, setWindowData] = useState(new Map());
@@ -145,6 +146,14 @@ const VisualizationManager = forwardRef(function VisualizationManager({
         });
     }, []);
 
+    // Изменить fftSize блока
+    const handleFftSizeChange = useCallback((nodeId, newFftSize) => {
+        if (!onUpdateNodeParams) return;
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        onUpdateNodeParams(nodeId, { ...node.data.params, fftSize: newFftSize });
+    }, [nodes, onUpdateNodeParams]);
+
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
         openWindow,
@@ -159,6 +168,8 @@ const VisualizationManager = forwardRef(function VisualizationManager({
 
         openWindows.forEach((config, windowId) => {
             const data = windowData.get(windowId);
+            const node = nodes.find(n => n.id === config.nodeId);
+            const nodeFftSize = node?.data?.params?.fftSize;
 
             windows.push(
                 <VisualizationWindow
@@ -176,27 +187,31 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                             <SpectrumView
                                 data={data}
                                 sampleRate={sampleRate}
-                                            width={config.width}
+                                width={config.width}
                                 height={config.height - 70}
+                                fftSize={nodeFftSize}
+                                onFftSizeChange={onUpdateNodeParams ? (size) => handleFftSizeChange(config.nodeId, size) : undefined}
                             />
                         ) : config.vizType === 'waterfall' ? (
                             <WaterfallView
                                 data={data}
                                 sampleRate={sampleRate}
-                                            width={config.width}
+                                width={config.width}
                                 height={config.height - 70}
+                                fftSize={nodeFftSize}
+                                onFftSizeChange={onUpdateNodeParams ? (size) => handleFftSizeChange(config.nodeId, size) : undefined}
                             />
                         ) : config.vizType === 'constellation' ? (
                             <ConstellationView
                                 data={data}
-                                            width={config.width}
+                                width={config.width}
                                 height={config.height - 70}
                             />
                         ) : (
                             <OscilloscopeView
                                 data={data}
                                 sampleRate={sampleRate}
-                                            width={config.width}
+                                width={config.width}
                                 height={config.height - 70}
                             />
                         )}
@@ -213,7 +228,8 @@ const VisualizationManager = forwardRef(function VisualizationManager({
 
 VisualizationManager.propTypes = {
     sampleRate: PropTypes.number.isRequired,
-    nodes: PropTypes.array.isRequired
+    nodes: PropTypes.array.isRequired,
+    onUpdateNodeParams: PropTypes.func
 };
 
 export default VisualizationManager;

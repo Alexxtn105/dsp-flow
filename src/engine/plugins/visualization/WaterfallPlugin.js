@@ -34,6 +34,13 @@ export default {
             }
 
             const state = this.states.get(nodeId);
+
+            // Пересоздаём буфер при изменении fftSize
+            if (state.buffer.length !== fftSize) {
+                state.buffer = new Float32Array(fftSize);
+                state.pointer = 0;
+            }
+
             const { buffer } = state;
             let { pointer } = state;
 

@@ -157,6 +157,25 @@
     -moz-appearance: textfield;
 }
 
+/* Select (FFT size) */
+.sa-select {
+    height: 22px;
+    padding: 0 4px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    background: var(--panel-input-bg);
+    color: var(--panel-text-3);
+    font-size: 10px;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 120ms ease;
+}
+
+.sa-select:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+}
+
 /* ---- Canvas ---- */
 .sa-canvas {
     display: block;

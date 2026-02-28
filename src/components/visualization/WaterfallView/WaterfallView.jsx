@@ -21,15 +21,18 @@ const AXIS_LEFT = 44;
 const AXIS_BOTTOM = 28;
 const LEGEND_W = 18;
 const LEGEND_PAD = 6;
+const MIN_VISIBLE_RANGE = 500;
+const ZOOM_FACTOR = 0.8;
+const FFT_SIZES = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
 
 function formatFreq(freq) {
     if (freq >= 1000) return `${(freq / 1000).toFixed(freq % 1000 === 0 ? 0 : 1)}k`;
     return `${Math.round(freq)}`;
 }
 
-function calcFreqGridStep(plotWidth, maxFreq) {
+function calcFreqGridStep(plotWidth, visibleRange) {
     const targetSteps = Math.max(4, Math.floor(plotWidth / 80));
-    const rawStep = maxFreq / targetSteps;
+    const rawStep = visibleRange / targetSteps;
     const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
     const r = rawStep / mag;
     if (r <= 1.5) return mag;
@@ -60,7 +63,6 @@ function getGrayscaleColor(normalized) {
 }
 
 function getInfernoColor(normalized) {
-    // Simplified inferno-like palette
     let r, g, b;
     if (normalized < 0.25) {
         const t = normalized / 0.25;
@@ -87,15 +89,16 @@ const COLOR_MAPS = {
 /**
  * Водопад (спектрограмма) — профессиональный вид в стиле Adobe Audition
  */
-function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) {
+function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, fftSize, onFftSizeChange }) {
     const { isDarkTheme } = useThemeContext();
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
     const [colorMap, setColorMap] = useState('audition');
     const [isNormalized, setIsNormalized] = useState(false);
 
-    // Zoom
-    const [maxFreq, setMaxFreq] = useState(sampleRate / 2);
+    // Frequency pan/zoom
+    const [startFreq, setStartFreq] = useState(0);
+    const [visibleRange, setVisibleRange] = useState(sampleRate / 2);
     const [minDb, setMinDb] = useState(-100);
     const maxDb = 0;
 
@@ -110,9 +113,21 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
     const plotH = height - AXIS_BOTTOM;
     const legendX = plotLeft + plotW + LEGEND_PAD;
 
+    const endFreq = Math.min(startFreq + visibleRange, nyquist);
+    const actualRange = endFreq - startFreq;
+
+    // Clamp helper
+    const clampFreqView = useCallback((newStart, newRange) => {
+        const r = Math.max(MIN_VISIBLE_RANGE, Math.min(newRange, nyquist));
+        const s = Math.max(0, Math.min(newStart, nyquist - r));
+        setStartFreq(s);
+        setVisibleRange(r);
+    }, [nyquist]);
+
     useEffect(() => {
-        setMaxFreq(prev => Math.min(prev, sampleRate / 2));
-    }, [sampleRate]);
+        setVisibleRange(prev => Math.min(prev, nyquist));
+        setStartFreq(prev => Math.max(0, Math.min(prev, nyquist - MIN_VISIBLE_RANGE)));
+    }, [nyquist]);
 
     // Temp buffer resize
     useEffect(() => {
@@ -159,11 +174,13 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, plotLeft, 0, plotW, plotH);
 
         // --- Frequency grid overlay ---
-        const freqStep = calcFreqGridStep(plotW, maxFreq);
+        const freqStep = calcFreqGridStep(plotW, actualRange);
+        const gridStart = Math.ceil(startFreq / freqStep) * freqStep;
         ctx.save();
         ctx.globalAlpha = 0.4;
-        for (let f = freqStep; f <= maxFreq; f += freqStep) {
-            const x = plotLeft + (f / maxFreq) * plotW;
+        for (let f = gridStart; f <= endFreq; f += freqStep) {
+            if (f <= startFreq) continue;
+            const x = plotLeft + ((f - startFreq) / actualRange) * plotW;
             ctx.strokeStyle = c.gridMajor;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
@@ -191,8 +208,8 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
 
-        for (let f = 0; f <= maxFreq; f += freqStep) {
-            const x = plotLeft + (f / maxFreq) * plotW;
+        for (let f = gridStart; f <= endFreq; f += freqStep) {
+            const x = plotLeft + ((f - startFreq) / actualRange) * plotW;
             ctx.fillText(formatFreq(f), x, plotH + 4);
             ctx.strokeStyle = c.axisLine;
             ctx.beginPath();
@@ -206,7 +223,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         ctx.fillStyle = c.axisTextBright;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText('Hz', plotLeft + plotW - 2, plotH + 14);
+        ctx.fillText('Гц', plotLeft + plotW - 2, plotH + 14);
 
         // Y-axis title (time arrow)
         ctx.save();
@@ -286,7 +303,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
             ctx.setLineDash([]);
 
             if (hoverFreq !== null) {
-                const label = `${Math.round(hoverFreq)} Hz`;
+                const label = `${Math.round(hoverFreq)} Гц`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 12;
                 const boxH = 20;
@@ -313,9 +330,9 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
             ctx.restore();
         }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sampleRate и isDarkTheme нужны для перерисовки
-    }, [width, height, sampleRate, maxFreq, minDb, plotLeft, plotW, plotH, legendX,
-        colorMap, isNormalized, getColor, cursorX, cursorY, hoverFreq, isDarkTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [width, height, sampleRate, startFreq, visibleRange, minDb, plotLeft, plotW, plotH, legendX,
+        colorMap, isNormalized, getColor, cursorX, cursorY, hoverFreq, isDarkTheme, actualRange, endFreq]);
 
     drawSceneRef.current = drawScene;
 
@@ -337,17 +354,19 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         tempCtx.drawImage(tempCanvas, 0, 0, tw, tempCanvas.height, 0, shiftY, tw, tempCanvas.height);
         tempCtx.globalCompositeOperation = 'source-over';
 
-        // Draw new line
+        // Draw new line — only bins in visible frequency range
         const numBins = data.length;
         const binFreqStep = nyquist / numBins;
-        const maxBinIndex = Math.min(numBins - 1, Math.floor(maxFreq / binFreqStep));
-        const pixelsPerBin = tw / (maxBinIndex + 1);
+        const minBinIndex = Math.max(0, Math.floor(startFreq / binFreqStep));
+        const maxBinIndex = Math.min(numBins - 1, Math.ceil(endFreq / binFreqStep));
+        const visibleBinCount = maxBinIndex - minBinIndex + 1;
+        const pixelsPerBin = tw / visibleBinCount;
 
         let localMin = minDb;
         let localMax = maxDb;
         if (isNormalized) {
             localMin = Infinity; localMax = -Infinity;
-            for (let i = 0; i <= maxBinIndex; i++) {
+            for (let i = minBinIndex; i <= maxBinIndex; i++) {
                 if (data[i] < localMin) localMin = data[i];
                 if (data[i] > localMax) localMax = data[i];
             }
@@ -355,14 +374,14 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         }
         const range = localMax - localMin;
 
-        for (let i = 0; i <= maxBinIndex; i++) {
+        for (let i = minBinIndex; i <= maxBinIndex; i++) {
             const db = data[i];
             let normalized;
             if (isNormalized) normalized = (db - localMin) / range;
             else normalized = (db - minDb) / (maxDb - minDb);
             normalized = Math.max(0, Math.min(1, normalized));
 
-            const x = Math.floor(i * pixelsPerBin);
+            const x = Math.floor((i - minBinIndex) * pixelsPerBin);
             const w = Math.ceil(pixelsPerBin);
             tempCtx.fillStyle = getColor(normalized, colorMap);
             tempCtx.fillRect(x, 0, w, shiftY);
@@ -370,7 +389,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
 
         drawSceneRef.current();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data, isNormalized, colorMap, getColor, maxFreq, minDb]);
+    }, [data, isNormalized, colorMap, getColor, startFreq, visibleRange, minDb]);
 
     // Re-render on overlay changes
     useEffect(() => {
@@ -385,23 +404,50 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         setCursorX(x);
         setCursorY(y);
         const fx = (x - plotLeft) / plotW;
-        setHoverFreq(Math.max(0, fx * maxFreq));
-    }, [plotLeft, plotW, maxFreq]);
+        setHoverFreq(Math.max(0, startFreq + fx * actualRange));
+    }, [plotLeft, plotW, startFreq, actualRange]);
 
     const handleMouseLeave = useCallback(() => {
         setCursorX(null);
         setCursorY(null);
     }, []);
 
-    const handleFreqSlider = useCallback((e) => {
-        const pct = parseInt(e.target.value) / 100;
-        setMaxFreq(Math.max(500, Math.round(pct * nyquist / 100) * 100));
-    }, [nyquist]);
+    // Wheel zoom centered on cursor
+    const handleWheel = useCallback((e) => {
+        e.preventDefault();
+        if (!canvasRef.current) return;
 
-    const handleFreqInput = useCallback((e) => {
-        const val = parseInt(e.target.value);
-        if (!isNaN(val) && val >= 100 && val <= nyquist) setMaxFreq(val);
-    }, [nyquist]);
+        const rect = canvasRef.current.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const fx = (mouseX - plotLeft) / plotW;
+        const freqAtCursor = startFreq + fx * actualRange;
+
+        const zoomIn = e.deltaY > 0;
+        const factor = zoomIn ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
+        const newRange = Math.max(MIN_VISIBLE_RANGE, Math.min(actualRange * factor, nyquist));
+
+        const newStart = freqAtCursor - fx * newRange;
+        clampFreqView(newStart, newRange);
+    }, [plotLeft, plotW, startFreq, actualRange, nyquist, clampFreqView]);
+
+    // Attach wheel handler with passive: false
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        canvas.addEventListener('wheel', handleWheel, { passive: false });
+        return () => canvas.removeEventListener('wheel', handleWheel);
+    }, [handleWheel]);
+
+    const handleZoomSlider = useCallback((e) => {
+        const pct = parseInt(e.target.value) / 100;
+        const newRange = Math.max(MIN_VISIBLE_RANGE, pct * nyquist);
+        clampFreqView(startFreq, newRange);
+    }, [nyquist, startFreq, clampFreqView]);
+
+    const handlePanSlider = useCallback((e) => {
+        const newStart = parseInt(e.target.value);
+        clampFreqView(newStart, visibleRange);
+    }, [visibleRange, clampFreqView]);
 
     const handleDbSlider = useCallback((e) => {
         setMinDb(parseInt(e.target.value));
@@ -412,7 +458,8 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
         if (!isNaN(val) && val >= -160 && val < 0) setMinDb(val);
     }, []);
 
-    const freqSliderValue = Math.round((maxFreq / nyquist) * 100);
+    const zoomSliderValue = Math.round((visibleRange / nyquist) * 100);
+    const maxPan = Math.max(0, nyquist - visibleRange);
 
     return (
         <div className={`waterfall-view audition-theme ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -437,31 +484,57 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260 }) 
                     </button>
                 </div>
 
+                {fftSize !== undefined && onFftSizeChange && (
+                    <>
+                        <div className="wf-toolbar-divider" />
+                        <div className="wf-toolbar-section">
+                            <span className="wf-label">FFT</span>
+                            <select
+                                className="wf-select"
+                                value={fftSize}
+                                onChange={(e) => onFftSizeChange(parseInt(e.target.value))}
+                                title="Размер FFT"
+                            >
+                                {FFT_SIZES.map(size => (
+                                    <option key={size} value={size}>{size}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                )}
+
                 <div className="wf-toolbar-divider" />
 
+                {/* Zoom */}
                 <div className="wf-toolbar-section">
-                    <span className="wf-label">Частота</span>
+                    <span className="wf-label">Масштаб</span>
                     <input
                         type="range"
                         className="wf-slider"
                         min="2"
                         max="100"
-                        value={freqSliderValue}
-                        onChange={handleFreqSlider}
-                        title="Масштаб по частоте"
+                        value={zoomSliderValue}
+                        onChange={handleZoomSlider}
+                        title="Масштаб по частоте (или колесико мыши)"
                     />
-                    <input
-                        type="number"
-                        className="wf-input"
-                        value={maxFreq}
-                        onChange={handleFreqInput}
-                        min="100"
-                        max={nyquist}
-                        step="100"
-                        title="Макс. частота (Гц)"
-                    />
-                    <span className="wf-unit">Гц</span>
                 </div>
+
+                {/* Pan */}
+                {visibleRange < nyquist && (
+                    <div className="wf-toolbar-section">
+                        <span className="wf-label">Сдвиг</span>
+                        <input
+                            type="range"
+                            className="wf-slider"
+                            min="0"
+                            max={maxPan}
+                            step={Math.max(1, Math.round(maxPan / 200))}
+                            value={Math.round(startFreq)}
+                            onChange={handlePanSlider}
+                            title="Прокрутка по частоте"
+                        />
+                    </div>
+                )}
 
                 <div className="wf-toolbar-divider" />
 
@@ -507,7 +580,9 @@ WaterfallView.propTypes = {
     data: PropTypes.instanceOf(Float32Array),
     sampleRate: PropTypes.number,
     width: PropTypes.number,
-    height: PropTypes.number
+    height: PropTypes.number,
+    fftSize: PropTypes.number,
+    onFftSizeChange: PropTypes.func,
 };
 
 export default WaterfallView;

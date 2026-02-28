@@ -109,6 +109,18 @@ function App() {
         setCurrentScheme(prev => ({ ...prev, isSaved: false }));
     }, []);
 
+    // Обновление параметров блока из окна визуализации (напр. fftSize)
+    const handleUpdateNodeParams = useCallback((nodeId, newParams) => {
+        if (!reactFlowInstance) return;
+        reactFlowInstance.setNodes(nds => nds.map(node => {
+            if (node.id === nodeId) {
+                return { ...node, data: { ...node.data, params: newParams } };
+            }
+            return node;
+        }));
+        setCurrentScheme(prev => ({ ...prev, isSaved: false }));
+    }, [reactFlowInstance]);
+
     const handleOpenVisualization = useCallback((nodeId) => {
         if (visualizationManagerRef.current && reactFlowInstance) {
             const currentNodes = reactFlowInstance.getNodes();
@@ -176,6 +188,7 @@ function App() {
                     ref={visualizationManagerRef}
                     sampleRate={sampleRate}
                     nodes={simulation.nodes}
+                    onUpdateNodeParams={handleUpdateNodeParams}
                 />
 
                 <ErrorBoundary fallbackMessage="Ошибка диалогового окна">

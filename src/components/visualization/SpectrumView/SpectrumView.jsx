@@ -25,15 +25,18 @@ const AUDITION_COLORS = {
 
 const AXIS_LEFT = 44;
 const AXIS_BOTTOM = 28;
+const MIN_VISIBLE_RANGE = 500;
+const ZOOM_FACTOR = 0.8;
+const FFT_SIZES = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
 
 function formatFreq(freq) {
     if (freq >= 1000) return `${(freq / 1000).toFixed(freq % 1000 === 0 ? 0 : 1)}k`;
     return `${Math.round(freq)}`;
 }
 
-function calcFreqGridStep(plotWidth, maxFreq) {
+function calcFreqGridStep(plotWidth, visibleRange) {
     const targetSteps = Math.max(4, Math.floor(plotWidth / 80));
-    const rawStep = maxFreq / targetSteps;
+    const rawStep = visibleRange / targetSteps;
     const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
     const residual = rawStep / magnitude;
     let niceStep;
@@ -56,14 +59,15 @@ function calcDbGridStep(plotHeight, dbRange) {
 /**
  * Спектроанализатор — профессиональный вид в стиле Adobe Audition
  */
-function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
+function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fftSize, onFftSizeChange }) {
     const { isDarkTheme } = useThemeContext();
     const canvasRef = useRef(null);
     const [accumulate, setAccumulate] = useState(false);
     const [accumulatedData, setAccumulatedData] = useState(null);
 
-    // Zoom state
-    const [maxFreq, setMaxFreq] = useState(sampleRate / 2);
+    // Frequency pan/zoom state
+    const [startFreq, setStartFreq] = useState(0);
+    const [visibleRange, setVisibleRange] = useState(sampleRate / 2);
     const [minDb, setMinDb] = useState(-100);
     const maxDb = 0;
 
@@ -92,15 +96,28 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         });
     }, [data, accumulate]);
 
-    // Clamp maxFreq when sampleRate changes
+    const nyquist = sampleRate / 2;
+
+    // Clamp when sampleRate changes
     useEffect(() => {
-        setMaxFreq(prev => Math.min(prev, sampleRate / 2));
-    }, [sampleRate]);
+        setVisibleRange(prev => Math.min(prev, nyquist));
+        setStartFreq(prev => Math.max(0, Math.min(prev, nyquist - MIN_VISIBLE_RANGE)));
+    }, [nyquist]);
+
+    const endFreq = Math.min(startFreq + visibleRange, nyquist);
+    const actualRange = endFreq - startFreq;
 
     const plotWidth = width - AXIS_LEFT;
     const plotHeight = height - AXIS_BOTTOM;
     const dbRange = maxDb - minDb;
-    const nyquist = sampleRate / 2;
+
+    // Clamp helper
+    const clampFreqView = useCallback((newStart, newRange) => {
+        const r = Math.max(MIN_VISIBLE_RANGE, Math.min(newRange, nyquist));
+        const s = Math.max(0, Math.min(newStart, nyquist - r));
+        setStartFreq(s);
+        setVisibleRange(r);
+    }, [nyquist]);
 
     const drawSpectrum = useCallback(() => {
         const canvas = canvasRef.current;
@@ -144,9 +161,10 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         }
 
         // Vertical frequency grid
-        const freqStep = calcFreqGridStep(pw, maxFreq);
-        for (let f = 0; f <= maxFreq; f += freqStep) {
-            const x = px + (f / maxFreq) * pw;
+        const freqStep = calcFreqGridStep(pw, actualRange);
+        const gridStart = Math.ceil(startFreq / freqStep) * freqStep;
+        for (let f = gridStart; f <= endFreq; f += freqStep) {
+            const x = px + ((f - startFreq) / actualRange) * pw;
             const isMajor = f % (freqStep * 2) === 0 || f === 0;
 
             ctx.strokeStyle = isMajor ? c.gridMajor : c.gridMinor;
@@ -165,7 +183,8 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
 
             const binCount = pData.length;
             const binFreqStep = nyquist / binCount;
-            const maxBinIndex = Math.min(binCount - 1, Math.floor(maxFreq / binFreqStep));
+            const minBinIndex = Math.max(0, Math.floor(startFreq / binFreqStep));
+            const maxBinIndex = Math.min(binCount - 1, Math.ceil(endFreq / binFreqStep));
 
             // Build path
             ctx.save();
@@ -174,24 +193,26 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
             ctx.clip();
 
             ctx.beginPath();
-            let firstX;
-            for (let i = 0; i <= maxBinIndex; i++) {
+            let firstX, started = false;
+            for (let i = minBinIndex; i <= maxBinIndex; i++) {
                 const freq = i * binFreqStep;
-                const x = px + (freq / maxFreq) * pw;
+                const x = px + ((freq - startFreq) / actualRange) * pw;
                 const db = Math.max(minDb, Math.min(maxDb, pData[i]));
                 const y = py + ph - ((db - minDb) / dbRange) * ph;
 
-                if (i === 0) {
+                if (!started) {
                     ctx.moveTo(x, y);
                     firstX = x;
+                    started = true;
                 } else {
                     ctx.lineTo(x, y);
                 }
             }
 
             // Gradient fill
-            if (fillColor) {
-                const lastX = px + (maxBinIndex * binFreqStep / maxFreq) * pw;
+            if (fillColor && started) {
+                const lastFreq = maxBinIndex * binFreqStep;
+                const lastX = px + ((lastFreq - startFreq) / actualRange) * pw;
                 ctx.lineTo(lastX, py + ph);
                 ctx.lineTo(firstX, py + ph);
                 ctx.closePath();
@@ -204,12 +225,12 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
 
                 // Redraw the line on top
                 ctx.beginPath();
-                for (let i = 0; i <= maxBinIndex; i++) {
+                for (let i = minBinIndex; i <= maxBinIndex; i++) {
                     const freq = i * binFreqStep;
-                    const x = px + (freq / maxFreq) * pw;
+                    const x = px + ((freq - startFreq) / actualRange) * pw;
                     const db = Math.max(minDb, Math.min(maxDb, pData[i]));
                     const y = py + ph - ((db - minDb) / dbRange) * ph;
-                    if (i === 0) ctx.moveTo(x, y);
+                    if (i === minBinIndex) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
             }
@@ -233,10 +254,11 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         // --- Peak marker ---
         if (showPeak && data && data.length > 0) {
             const binFreqStep = nyquist / data.length;
-            const maxBinIndex = Math.min(data.length - 1, Math.floor(maxFreq / binFreqStep));
-            let peakIdx = 0;
+            const minBinPeak = Math.max(1, Math.floor(startFreq / binFreqStep));
+            const maxBinPeak = Math.min(data.length - 1, Math.ceil(endFreq / binFreqStep));
+            let peakIdx = minBinPeak;
             let peakVal = -Infinity;
-            for (let i = 1; i <= maxBinIndex; i++) {
+            for (let i = minBinPeak; i <= maxBinPeak; i++) {
                 if (data[i] > peakVal) {
                     peakVal = data[i];
                     peakIdx = i;
@@ -244,7 +266,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
             }
             if (peakVal > minDb) {
                 const peakFreq = peakIdx * binFreqStep;
-                const peakX = px + (peakFreq / maxFreq) * pw;
+                const peakX = px + ((peakFreq - startFreq) / actualRange) * pw;
                 const peakY = py + ph - ((peakVal - minDb) / dbRange) * ph;
 
                 ctx.save();
@@ -261,12 +283,12 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
                 ctx.closePath();
                 ctx.fill();
 
-                // Peak label
+                // Peak label — частота в Гц
                 ctx.font = '9px "Segoe UI", sans-serif';
                 ctx.fillStyle = c.peakMarker;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
-                const peakLabel = `${formatFreq(peakFreq)}Hz ${peakVal.toFixed(1)}dB`;
+                const peakLabel = `${Math.round(peakFreq)} Гц  ${peakVal.toFixed(1)} дБ`;
                 ctx.fillText(peakLabel, peakX, peakY - 13);
 
                 ctx.restore();
@@ -311,8 +333,8 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         ctx.textBaseline = 'top';
         ctx.fillStyle = c.axisText;
 
-        for (let f = 0; f <= maxFreq; f += freqStep) {
-            const x = px + (f / maxFreq) * pw;
+        for (let f = gridStart; f <= endFreq; f += freqStep) {
+            const x = px + ((f - startFreq) / actualRange) * pw;
             ctx.fillText(formatFreq(f), x, py + ph + 4);
 
             // Tick mark
@@ -333,13 +355,13 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         ctx.rotate(-Math.PI / 2);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('dB', 0, 0);
+        ctx.fillText('дБ', 0, 0);
         ctx.restore();
 
         // X-axis title
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText('Hz', px + pw - 2, py + ph + 14);
+        ctx.fillText('Гц', px + pw - 2, py + ph + 14);
 
         // --- Crosshair & cursor ---
         if (cursorX !== null && cursorY !== null &&
@@ -366,7 +388,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
 
             // Cursor label
             if (hoverFreq !== null && hoverDb !== null) {
-                const label = `${Math.round(hoverFreq)} Hz  ${hoverDb.toFixed(1)} dB`;
+                const label = `${Math.round(hoverFreq)} Гц  ${hoverDb.toFixed(1)} дБ`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 12;
                 const boxH = 20;
@@ -397,7 +419,8 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, accumulatedData, accumulate, sampleRate, isDarkTheme, width, height,
-        cursorX, cursorY, hoverFreq, hoverDb, maxFreq, minDb, showPeak, plotWidth, plotHeight, dbRange, nyquist]);
+        cursorX, cursorY, hoverFreq, hoverDb, startFreq, visibleRange, minDb, showPeak,
+        plotWidth, plotHeight, dbRange, nyquist, actualRange, endFreq]);
 
     useEffect(() => {
         drawSpectrum();
@@ -416,27 +439,52 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         const fx = (x - AXIS_LEFT) / plotWidth;
         const fy = 1 - (y / plotHeight);
 
-        setHoverFreq(Math.max(0, fx * maxFreq));
+        setHoverFreq(Math.max(0, startFreq + fx * actualRange));
         setHoverDb(minDb + fy * dbRange);
-    }, [plotWidth, plotHeight, maxFreq, minDb, dbRange]);
+    }, [plotWidth, plotHeight, startFreq, actualRange, minDb, dbRange]);
 
     const handleMouseLeave = useCallback(() => {
         setCursorX(null);
         setCursorY(null);
     }, []);
 
-    const handleFreqSlider = useCallback((e) => {
-        const pct = parseInt(e.target.value) / 100;
-        const newMax = Math.max(500, Math.round(pct * nyquist / 100) * 100);
-        setMaxFreq(newMax);
-    }, [nyquist]);
+    // Wheel zoom centered on cursor position
+    const handleWheel = useCallback((e) => {
+        e.preventDefault();
+        if (!canvasRef.current) return;
 
-    const handleFreqInput = useCallback((e) => {
-        const val = parseInt(e.target.value);
-        if (!isNaN(val) && val >= 100 && val <= nyquist) {
-            setMaxFreq(val);
-        }
-    }, [nyquist]);
+        const rect = canvasRef.current.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const fx = (mouseX - AXIS_LEFT) / plotWidth;
+        const freqAtCursor = startFreq + fx * actualRange;
+
+        const zoomIn = e.deltaY > 0;
+        const factor = zoomIn ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
+        const newRange = Math.max(MIN_VISIBLE_RANGE, Math.min(actualRange * factor, nyquist));
+
+        // Keep frequency under cursor at the same pixel position
+        const newStart = freqAtCursor - fx * newRange;
+        clampFreqView(newStart, newRange);
+    }, [plotWidth, startFreq, actualRange, nyquist, clampFreqView]);
+
+    // Attach wheel handler with passive: false
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        canvas.addEventListener('wheel', handleWheel, { passive: false });
+        return () => canvas.removeEventListener('wheel', handleWheel);
+    }, [handleWheel]);
+
+    const handleZoomSlider = useCallback((e) => {
+        const pct = parseInt(e.target.value) / 100;
+        const newRange = Math.max(MIN_VISIBLE_RANGE, pct * nyquist);
+        clampFreqView(startFreq, newRange);
+    }, [nyquist, startFreq, clampFreqView]);
+
+    const handlePanSlider = useCallback((e) => {
+        const newStart = parseInt(e.target.value);
+        clampFreqView(newStart, visibleRange);
+    }, [visibleRange, clampFreqView]);
 
     const handleDbSlider = useCallback((e) => {
         setMinDb(parseInt(e.target.value));
@@ -449,7 +497,8 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
         }
     }, []);
 
-    const freqSliderValue = Math.round((maxFreq / nyquist) * 100);
+    const zoomSliderValue = Math.round((visibleRange / nyquist) * 100);
+    const maxPan = Math.max(0, nyquist - visibleRange);
 
     return (
         <div className={`spectrum-view audition-theme ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -472,32 +521,57 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260 }) {
                     </button>
                 </div>
 
+                {fftSize !== undefined && onFftSizeChange && (
+                    <>
+                        <div className="sa-toolbar-divider" />
+                        <div className="sa-toolbar-section">
+                            <span className="sa-label">FFT</span>
+                            <select
+                                className="sa-select"
+                                value={fftSize}
+                                onChange={(e) => onFftSizeChange(parseInt(e.target.value))}
+                                title="Размер FFT"
+                            >
+                                {FFT_SIZES.map(size => (
+                                    <option key={size} value={size}>{size}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                )}
+
                 <div className="sa-toolbar-divider" />
 
-                {/* Horizontal zoom */}
+                {/* Zoom */}
                 <div className="sa-toolbar-section">
-                    <span className="sa-label">Частота</span>
+                    <span className="sa-label">Масштаб</span>
                     <input
                         type="range"
                         className="sa-slider"
                         min="2"
                         max="100"
-                        value={freqSliderValue}
-                        onChange={handleFreqSlider}
-                        title="Масштаб по частоте"
+                        value={zoomSliderValue}
+                        onChange={handleZoomSlider}
+                        title="Масштаб по частоте (или колесико мыши)"
                     />
-                    <input
-                        type="number"
-                        className="sa-input"
-                        value={maxFreq}
-                        onChange={handleFreqInput}
-                        min="100"
-                        max={nyquist}
-                        step="100"
-                        title="Макс. частота (Гц)"
-                    />
-                    <span className="sa-unit">Гц</span>
                 </div>
+
+                {/* Pan */}
+                {visibleRange < nyquist && (
+                    <div className="sa-toolbar-section">
+                        <span className="sa-label">Сдвиг</span>
+                        <input
+                            type="range"
+                            className="sa-slider"
+                            min="0"
+                            max={maxPan}
+                            step={Math.max(1, Math.round(maxPan / 200))}
+                            value={Math.round(startFreq)}
+                            onChange={handlePanSlider}
+                            title="Прокрутка по частоте"
+                        />
+                    </div>
+                )}
 
                 <div className="sa-toolbar-divider" />
 
@@ -545,7 +619,9 @@ SpectrumView.propTypes = {
     data: PropTypes.instanceOf(Float32Array),
     sampleRate: PropTypes.number,
     width: PropTypes.number,
-    height: PropTypes.number
+    height: PropTypes.number,
+    fftSize: PropTypes.number,
+    onFftSizeChange: PropTypes.func,
 };
 
 export default SpectrumView;
