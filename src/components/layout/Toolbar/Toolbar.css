@@ -146,6 +146,50 @@
     font-size: 11px;
 }
 
+/* ---- Group Actions (Collapse/Expand All) ---- */
+.tb-group-actions {
+    display: flex;
+    gap: 4px;
+    padding: 4px 8px 2px;
+    flex-shrink: 0;
+}
+
+.tb-group-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.02);
+    color: #5a6a7e;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: 600;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    transition: all 120ms ease;
+}
+
+.tb-group-action-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #99a8bf;
+}
+
+.tb-group-action-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.tb-group-action-btn .material-icons,
+.tb-group-action-btn .material-icons-outlined {
+    font-size: 14px;
+}
+
 /* ---- Content ---- */
 .tb-content {
     padding: 4px 6px;

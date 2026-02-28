@@ -27,6 +27,19 @@ function Toolbar() {
         : groups;
 
     const totalBlocks = groups.reduce((sum, g) => sum + g.blocks.length, 0);
+    const allGroupIds = groups.map(g => g.id);
+    const allCollapsed = allGroupIds.length > 0 && allGroupIds.every(id => collapsedGroups[id]);
+    const allExpanded = allGroupIds.length > 0 && allGroupIds.every(id => !collapsedGroups[id]);
+
+    const collapseAll = () => {
+        const collapsed = {};
+        allGroupIds.forEach(id => { collapsed[id] = true; });
+        setCollapsedGroups(collapsed);
+    };
+
+    const expandAll = () => {
+        setCollapsedGroups({});
+    };
 
     const onDragStart = (event, blockName) => {
         event.dataTransfer.setData('application/reactflow', blockName);
@@ -93,6 +106,32 @@ function Toolbar() {
                             <Icon name="close" size="small" aria-hidden="true" />
                         </button>
                     )}
+                </div>
+            )}
+
+            {/* Collapse/Expand All */}
+            {!isCollapsed && filteredGroups.length > 1 && (
+                <div className="tb-group-actions">
+                    <button
+                        className={`tb-group-action-btn ${allExpanded ? 'active' : ''}`}
+                        onClick={expandAll}
+                        disabled={allExpanded}
+                        title="Развернуть все группы"
+                        aria-label="Развернуть все группы"
+                    >
+                        <Icon name="unfold_more" size="small" aria-hidden="true" />
+                        <span>Развернуть</span>
+                    </button>
+                    <button
+                        className={`tb-group-action-btn ${allCollapsed ? 'active' : ''}`}
+                        onClick={collapseAll}
+                        disabled={allCollapsed}
+                        title="Свернуть все группы"
+                        aria-label="Свернуть все группы"
+                    >
+                        <Icon name="unfold_less" size="small" aria-hidden="true" />
+                        <span>Свернуть</span>
+                    </button>
                 </div>
             )}
 
