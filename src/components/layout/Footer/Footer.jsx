@@ -29,7 +29,10 @@ function Footer({
     onToggleManual,
     onStep,
     onStepSizeChange,
-    onSeek
+    onSeek,
+    onStart,
+    onStop,
+    onRewind
 }) {
     const { isDarkTheme } = useThemeContext();
 
@@ -109,6 +112,36 @@ function Footer({
                             {formatTime(totalSamples, sampleRate)}
                         </span>
                     )}
+                </div>
+            </div>
+
+            {/* Transport controls */}
+            <div className="ft-transport">
+                <div className="ft-transport-group">
+                    <button
+                        className="ft-tr-btn ft-tr-rewind"
+                        onClick={onRewind}
+                        title="В начало"
+                        disabled={!isRunning && !isPaused}
+                    >
+                        <span className="material-icons">skip_previous</span>
+                    </button>
+                    <button
+                        className={`ft-tr-btn ft-tr-play ${isRunning ? 'active' : ''} ${isPaused ? 'paused' : ''}`}
+                        onClick={onStart}
+                        title={isPaused ? 'Продолжить' : 'Старт'}
+                        disabled={isRunning}
+                    >
+                        <span className="material-icons">play_arrow</span>
+                    </button>
+                    <button
+                        className="ft-tr-btn ft-tr-stop"
+                        onClick={onStop}
+                        title="Стоп"
+                        disabled={!isRunning}
+                    >
+                        <span className="material-icons">stop</span>
+                    </button>
                 </div>
             </div>
 
@@ -200,7 +233,10 @@ Footer.propTypes = {
     onToggleManual: PropTypes.func,
     onStep: PropTypes.func,
     onStepSizeChange: PropTypes.func,
-    onSeek: PropTypes.func
+    onSeek: PropTypes.func,
+    onStart: PropTypes.func.isRequired,
+    onStop: PropTypes.func.isRequired,
+    onRewind: PropTypes.func.isRequired
 };
 
 Footer.defaultProps = {

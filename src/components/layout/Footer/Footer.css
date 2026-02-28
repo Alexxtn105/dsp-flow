@@ -70,6 +70,132 @@
     color: var(--panel-text-2);
 }
 
+/* ---- Transport controls (Audition-style) ---- */
+.ft-transport {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 12px 4px;
+}
+
+.ft-transport-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--panel-subtle-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 3px 4px;
+}
+
+/* Transport button base */
+.ft-tr-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--panel-text-4);
+    cursor: pointer;
+    transition: all 100ms ease;
+    padding: 0;
+}
+
+.ft-tr-btn .material-icons {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.ft-tr-btn:hover:not(:disabled) {
+    background: var(--panel-hover-bg);
+    color: var(--panel-text-2);
+}
+
+.ft-tr-btn:active:not(:disabled) {
+    background: var(--panel-active-bg);
+    transform: scale(0.95);
+}
+
+.ft-tr-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+/* Play button — larger, accent */
+.ft-tr-play {
+    width: 38px;
+    height: 30px;
+    margin: 0 2px;
+}
+
+.ft-tr-play .material-icons {
+    font-size: 24px;
+}
+
+.ft-tr-play:hover:not(:disabled) {
+    color: var(--panel-accent);
+    background: rgba(0, 229, 160, 0.1);
+}
+
+.ft-tr-play.active {
+    color: var(--panel-accent);
+    background: rgba(0, 229, 160, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(0, 229, 160, 0.25);
+}
+
+.ft-tr-play.active .material-icons {
+    filter: drop-shadow(0 0 4px rgba(0, 229, 160, 0.4));
+}
+
+.ft-tr-play.paused {
+    color: var(--panel-accent-orange);
+    background: rgba(255, 140, 0, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 140, 0, 0.2);
+}
+
+/* Stop button */
+.ft-tr-stop:hover:not(:disabled) {
+    color: var(--panel-accent-orange);
+    background: rgba(255, 140, 0, 0.08);
+}
+
+/* Rewind button */
+.ft-tr-rewind:hover:not(:disabled) {
+    color: var(--panel-accent-cyan);
+    background: rgba(0, 200, 255, 0.08);
+}
+
+/* Transport tooltips */
+.ft-tr-btn:hover:not(:disabled)::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-tooltip-bg);
+    border: 1px solid var(--panel-tooltip-border);
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    color: #e6edf3;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    pointer-events: none;
+    animation: ft-tr-tip 100ms ease-out forwards;
+}
+
+@keyframes ft-tr-tip {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 /* ---- Status bar ---- */
 .ft-bar {
     display: flex;

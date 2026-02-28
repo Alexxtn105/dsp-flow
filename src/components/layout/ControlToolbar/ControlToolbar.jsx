@@ -9,13 +9,9 @@ function ControlToolbar({
     onLoad,
     onNewScheme,
     onSettings,
-    onStart,
-    onStop,
-    onRewind,
     isSaveEnabled,
     isSaveAsEnabled,
-    isRunning,
-    isPaused
+    isRunning
 }) {
     const { isDarkTheme, toggleTheme } = useThemeContext();
 
@@ -58,36 +54,6 @@ function ControlToolbar({
 
                 <div className="ct-sep" />
 
-                {/* Transport group */}
-                <div className="ct-group">
-                    <button
-                        className={`ct-btn ct-btn-play ${isRunning ? 'active' : ''} ${isPaused ? 'paused' : ''}`}
-                        onClick={onStart}
-                        title={isPaused ? 'Продолжить' : 'Старт'}
-                        disabled={isRunning}
-                    >
-                        <Icon name="play_arrow" size="large" className="ct-icon" />
-                    </button>
-                    <button
-                        className="ct-btn ct-btn-pause"
-                        onClick={onStop}
-                        title="Пауза"
-                        disabled={!isRunning}
-                    >
-                        <Icon name="pause" size="large" className="ct-icon" />
-                    </button>
-                    <button
-                        className="ct-btn ct-btn-rewind"
-                        onClick={onRewind}
-                        title="В начало"
-                        disabled={!isRunning && !isPaused}
-                    >
-                        <Icon name="skip_previous" size="large" className="ct-icon" />
-                    </button>
-                </div>
-
-                <div className="ct-sep" />
-
                 {/* Settings group */}
                 <div className="ct-group">
                     <button
@@ -120,13 +86,9 @@ ControlToolbar.propTypes = {
     onLoad: PropTypes.func.isRequired,
     onNewScheme: PropTypes.func.isRequired,
     onSettings: PropTypes.func.isRequired,
-    onStart: PropTypes.func.isRequired,
-    onStop: PropTypes.func.isRequired,
-    onRewind: PropTypes.func.isRequired,
     isSaveEnabled: PropTypes.bool.isRequired,
     isSaveAsEnabled: PropTypes.bool.isRequired,
-    isRunning: PropTypes.bool.isRequired,
-    isPaused: PropTypes.bool.isRequired
+    isRunning: PropTypes.bool.isRequired
 };
 
 export default ControlToolbar;

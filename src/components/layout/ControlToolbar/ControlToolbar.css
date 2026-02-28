@@ -122,25 +122,6 @@
 /* File: load */
 .ct-btn-load:hover:not(:disabled) { color: var(--panel-accent-orange); }
 
-/* Transport: play */
-.ct-btn-play:hover:not(:disabled) { color: var(--panel-accent); }
-
-.ct-btn-play.active {
-    color: var(--panel-accent);
-    background: rgba(0, 229, 160, 0.1);
-}
-
-.ct-btn-play.paused {
-    color: var(--panel-accent-orange);
-    background: rgba(255, 140, 0, 0.08);
-}
-
-/* Transport: pause */
-.ct-btn-pause:hover:not(:disabled) { color: var(--panel-accent-orange); }
-
-/* Transport: rewind */
-.ct-btn-rewind:hover:not(:disabled) { color: var(--panel-accent-cyan); }
-
 /* Settings */
 .ct-btn-settings:hover:not(:disabled) { color: var(--panel-text-2); }
 

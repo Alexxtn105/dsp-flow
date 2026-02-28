@@ -134,13 +134,9 @@ function App() {
                         onLoad={() => dialogs.setShowLoadDialog(true)}
                         onNewScheme={handleNewScheme}
                         onSettings={() => dialogs.setShowSettingsDialog(true)}
-                        onStart={simulation.handleStartSimulation}
-                        onStop={simulation.handleStopSimulation}
-                        onRewind={simulation.handleRewind}
                         isSaveEnabled
                         isSaveAsEnabled
                         isRunning={simulation.isRunning}
-                        isPaused={simulation.isPaused}
                     />
 
                     <ErrorBoundary fallbackMessage="Ошибка редактора графа">
@@ -170,6 +166,9 @@ function App() {
                     onStep={simulation.handleManualStep}
                     onStepSizeChange={simulation.setManualStepSize}
                     onSeek={simulation.handleSeek}
+                    onStart={simulation.handleStartSimulation}
+                    onStop={simulation.handleStopSimulation}
+                    onRewind={simulation.handleRewind}
                 />
 
                 <VisualizationManager
