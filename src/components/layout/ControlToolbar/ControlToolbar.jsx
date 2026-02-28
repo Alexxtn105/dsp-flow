@@ -20,123 +20,93 @@ function ControlToolbar({
     const { isDarkTheme, toggleTheme } = useThemeContext();
 
     return (
-        <div className={`control-toolbar ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <div className="control-toolbar-header">
-                <Icon
-                    name="settings"
-                    size="large"
-                    className="control-toolbar-icon"
-                    title="Панель управления"
-                />
-            </div>
-
-            <div className="control-toolbar-content">
-                <div className="control-buttons">
-                    {/* Кнопка "Новая схема" */}
+        <div className={`ct ${isDarkTheme ? 'dark-theme' : ''}`}>
+            <div className="ct-content">
+                {/* File group */}
+                <div className="ct-group">
                     <button
-                        className="control-btn new-btn"
+                        className="ct-btn ct-btn-new"
                         onClick={onNewScheme}
-                        title="Создать новую схему"
+                        title="Новая схема"
                     >
-                        <Icon name="add" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Новая схема</span>
+                        <Icon name="add" size="large" className="ct-icon" />
                     </button>
-
-                    <div className="control-divider"></div>
-
-                    {/* Кнопка "Сохранить" */}
                     <button
-                        className="control-btn save-btn"
+                        className="ct-btn ct-btn-save"
                         onClick={onSave}
-                        title={isRunning ? "Остановите симуляцию для сохранения" : "Сохранить текущую схему"}
+                        title={isRunning ? 'Остановите для сохранения' : 'Сохранить'}
                         disabled={!isSaveEnabled || isRunning}
                     >
-                        <Icon name="save" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Сохранить</span>
+                        <Icon name="save" size="large" className="ct-icon" />
                     </button>
-
-                    {/* Кнопка "Сохранить как" */}
                     <button
-                        className="control-btn save-as-btn"
+                        className="ct-btn ct-btn-saveas"
                         onClick={onSaveAs}
-                        title={isRunning ? "Остановите симуляцию для сохранения" : "Сохранить под новым именем"}
+                        title={isRunning ? 'Остановите для сохранения' : 'Сохранить как'}
                         disabled={!isSaveAsEnabled || isRunning}
                     >
-                        <Icon name="save_as" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Сохранить как</span>
+                        <Icon name="save_as" size="large" className="ct-icon" />
                     </button>
-
-                    {/* Кнопка "Загрузить" */}
                     <button
-                        className="control-btn load-btn"
+                        className="ct-btn ct-btn-load"
                         onClick={onLoad}
-                        title="Загрузить сохраненную схему"
+                        title="Загрузить схему"
                     >
-                        <Icon name="folder_open" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Загрузить</span>
+                        <Icon name="folder_open" size="large" className="ct-icon" />
                     </button>
+                </div>
 
-                    <div className="control-divider"></div>
+                <div className="ct-sep" />
 
-                    {/* Кнопка "Старт" / "Продолжить" */}
+                {/* Transport group */}
+                <div className="ct-group">
                     <button
-                        className={`control-btn start-btn ${isRunning ? 'active' : ''} ${isPaused ? 'paused' : ''}`}
+                        className={`ct-btn ct-btn-play ${isRunning ? 'active' : ''} ${isPaused ? 'paused' : ''}`}
                         onClick={onStart}
-                        title={isPaused ? "Продолжить симуляцию" : "Запустить симуляцию"}
+                        title={isPaused ? 'Продолжить' : 'Старт'}
                         disabled={isRunning}
                     >
-                        <Icon name="play_arrow" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">{isPaused ? 'Продолжить' : 'Старт'}</span>
+                        <Icon name="play_arrow" size="large" className="ct-icon" />
                     </button>
-
-                    {/* Кнопка "Пауза" */}
                     <button
-                        className="control-btn stop-btn"
+                        className="ct-btn ct-btn-pause"
                         onClick={onStop}
                         title="Пауза"
                         disabled={!isRunning}
                     >
-                        <Icon name="pause" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Пауза</span>
+                        <Icon name="pause" size="large" className="ct-icon" />
                     </button>
-
-                    {/* Кнопка "В начало" */}
                     <button
-                        className="control-btn rewind-btn"
+                        className="ct-btn ct-btn-rewind"
                         onClick={onRewind}
-                        title="Перемотать в начало"
+                        title="В начало"
                         disabled={!isRunning && !isPaused}
                     >
-                        <Icon name="skip_previous" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">В начало</span>
+                        <Icon name="skip_previous" size="large" className="ct-icon" />
                     </button>
+                </div>
 
-                    <div className="control-divider"></div>
+                <div className="ct-sep" />
 
-                    {/* Кнопка "Настройки" */}
+                {/* Settings group */}
+                <div className="ct-group">
                     <button
-                        className="control-btn settings-btn"
+                        className="ct-btn ct-btn-settings"
                         onClick={onSettings}
                         title="Настройки схемы"
                     >
-                        <Icon name="tune" size="large" className="control-btn-icon" />
-                        <span className="control-btn-tooltip">Настройки</span>
+                        <Icon name="tune" size="large" className="ct-icon" />
                     </button>
-
-                    {/* Кнопка переключения темы */}
                     <button
-                        className="control-btn theme-btn"
+                        className="ct-btn ct-btn-theme"
                         onClick={toggleTheme}
-                        title={isDarkTheme ? "Переключить на светлую тему" : "Переключить на темную тему"}
+                        title={isDarkTheme ? 'Светлая тема' : 'Тёмная тема'}
                     >
                         <Icon
                             name={isDarkTheme ? 'light_mode' : 'dark_mode'}
                             size="large"
-                            className="control-btn-icon"
+                            className="ct-icon"
                         />
-                        <span className="control-btn-tooltip">
-                            {isDarkTheme ? 'Светлая тема' : 'Темная тема'}
-                        </span>
                     </button>
                 </div>
             </div>

@@ -1,253 +1,184 @@
-.control-toolbar {
+/* ===== Control Toolbar — Audition Style ===== */
+
+.ct {
     height: 100%;
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border-primary);
-    width: 50px;
+    width: 46px;
+    background: #12122a;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
     z-index: 11;
     display: flex;
     flex-direction: column;
-    transition: background var(--transition-fast);
     flex-shrink: 0;
+    user-select: none;
 }
 
-.control-toolbar-header {
-    padding: 12px;
-    border-bottom: 1px solid var(--border-primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 48px;
-    flex-shrink: 0;
-}
-
-/*.control-toolbar-icon {*/
-/*    font-size: 24px;*/
-/*    flex-shrink: 0;*/
-/*}*/
-
-.control-toolbar-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-}
-
-.control-toolbar-content {
-    padding: 10px 0;
+.ct-content {
+    padding: 8px 0;
     overflow-y: auto;
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 4px;
 }
 
-.control-buttons {
+/* Button groups */
+.ct-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    width: 100%;
     align-items: center;
+    gap: 2px;
+    width: 100%;
 }
 
-.control-btn {
+/* Separator */
+.ct-sep {
+    width: 24px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 4px 0;
+    flex-shrink: 0;
+}
+
+/* ---- Buttons ---- */
+.ct-btn {
+    position: relative;
     background: transparent;
     border: none;
-    color: var(--text-primary);
+    color: #5a6a7e;
     cursor: pointer;
-    font-size: 14px;
-    padding: 8px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all var(--transition-fast);
-    min-height: 40px;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-md);
-    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    transition: all 120ms ease;
 }
 
-.control-btn:hover:not(:disabled) {
-    background: var(--bg-tertiary);
-    transform: scale(1.1);
+.ct-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: #99a8bf;
 }
 
-.control-btn:hover:not(:disabled)::after {
-    content: attr(title);
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 8px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
-    padding: 6px 10px;
-    font-size: 12px;
-    color: var(--text-primary);
-    white-space: nowrap;
-    box-shadow: var(--shadow-md);
-    z-index: 1000;
-    pointer-events: none;
-    opacity: 0;
-    animation: fadeInTooltip 0.2s ease-out forwards;
+.ct-btn:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
 }
 
-@keyframes fadeInTooltip {
-    from {
-        opacity: 0;
-        transform: translateY(-50%) translateX(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(-50%) translateX(0);
-    }
-}
-
-.control-btn:disabled {
-    opacity: 0.4;
+.ct-btn:disabled {
+    opacity: 0.25;
     cursor: not-allowed;
 }
 
-.control-btn:disabled:hover {
-    background: transparent;
-    transform: none;
-}
-
-/*.control-btn-icon {*/
-/*    font-size: 24px;*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
-
-.control-btn-icon {
+/* Icon styling */
+.ct-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
 }
 
-.control-btn-tooltip {
-    display: none;
+/* ---- Tooltips ---- */
+.ct-btn:hover:not(:disabled)::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    color: #99a8bf;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    pointer-events: none;
+    animation: ct-tip 120ms ease-out forwards;
 }
 
-/* Специфичные стили для кнопок */
-.save-btn:hover:not(:disabled) {
-    color: var(--success);
+@keyframes ct-tip {
+    from { opacity: 0; transform: translateY(-50%) translateX(-4px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
-.save-as-btn:hover:not(:disabled) {
-    color: var(--accent-primary);
+/* ---- Button-specific colors ---- */
+
+/* File: new */
+.ct-btn-new:hover:not(:disabled) { color: #00c8ff; }
+
+/* File: save */
+.ct-btn-save:hover:not(:disabled) { color: #00e5a0; }
+
+/* File: save as */
+.ct-btn-saveas:hover:not(:disabled) { color: #00c8ff; }
+
+/* File: load */
+.ct-btn-load:hover:not(:disabled) { color: #ff8c00; }
+
+/* Transport: play */
+.ct-btn-play:hover:not(:disabled) { color: #00e5a0; }
+
+.ct-btn-play.active {
+    color: #00e5a0;
+    background: rgba(0, 229, 160, 0.1);
 }
 
-.load-btn:hover:not(:disabled) {
-    color: var(--warning);
+.ct-btn-play.paused {
+    color: #ff8c00;
+    background: rgba(255, 140, 0, 0.08);
 }
 
-.theme-btn:hover:not(:disabled) {
-    color: var(--text-secondary);
+/* Transport: pause */
+.ct-btn-pause:hover:not(:disabled) { color: #ff8c00; }
+
+/* Transport: rewind */
+.ct-btn-rewind:hover:not(:disabled) { color: #00c8ff; }
+
+/* Settings */
+.ct-btn-settings:hover:not(:disabled) { color: #99a8bf; }
+
+/* Theme */
+.ct-btn-theme:hover:not(:disabled) { color: #ffd700; }
+
+/* ---- Scrollbar ---- */
+.ct-content::-webkit-scrollbar {
+    width: 3px;
 }
 
-/* Новые кнопки */
-.new-btn:hover:not(:disabled) {
-    color: var(--accent-primary);
-}
-
-.start-btn:hover:not(:disabled) {
-    color: var(--success);
-}
-
-.start-btn.active {
-    color: var(--success);
-    background: color-mix(in srgb, var(--success) 15%, transparent);
-}
-
-.stop-btn:hover:not(:disabled) {
-    color: var(--warning);
-}
-
-.rewind-btn:hover:not(:disabled) {
-    color: var(--accent-primary);
-}
-
-.start-btn.paused {
-    color: var(--warning);
-}
-
-.settings-btn:hover:not(:disabled) {
-    color: var(--accent-secondary);
-}
-
-/* Разделитель между группами кнопок */
-.control-divider {
-    width: 30px;
-    height: 1px;
-    background: var(--border-primary);
-    margin: 4px 0;
-}
-
-/*!* Темная тема *!*/
-/*.dark-theme .control-toolbar {*/
-/*    background: var(--bg-tertiary);*/
-/*    border-right-color: var(--border-secondary);*/
-/*}*/
-
-/*.dark-theme .control-toolbar-header {*/
-/*    border-bottom-color: var(--border-secondary);*/
-/*}*/
-
-/*.dark-theme .control-btn:hover:not(:disabled) {*/
-/*    background: var(--bg-secondary);*/
-/*}*/
-
-/*.dark-theme .control-btn:hover:not(:disabled)::after {*/
-/*    background: var(--bg-tertiary);*/
-/*    border-color: var(--border-secondary);*/
-/*}*/
-
-/* Мобильная адаптивность */
-@media (max-width: 768px) {
-    .control-toolbar {
-        width: 40px;
-    }
-
-    .control-toolbar-header {
-        padding: 10px;
-    }
-
-    .control-toolbar-icon {
-        font-size: 20px;
-    }
-
-    .control-btn {
-        width: 36px;
-        height: 36px;
-        padding: 6px;
-    }
-
-    .control-btn-icon {
-        font-size: 20px;
-    }
-}
-
-/* Скроллбар для кнопок, если их будет много */
-.control-toolbar-content::-webkit-scrollbar {
-    width: 4px;
-}
-
-.control-toolbar-content::-webkit-scrollbar-track {
+.ct-content::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.control-toolbar-content::-webkit-scrollbar-thumb {
-    background: var(--border-primary);
+.ct-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 2px;
 }
 
-.control-toolbar-content::-webkit-scrollbar-thumb:hover {
-    background: var(--border-secondary);
+.ct-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .ct {
+        width: 38px;
+    }
+
+    .ct-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .ct-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+    }
 }
