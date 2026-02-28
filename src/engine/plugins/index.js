@@ -26,10 +26,19 @@ import MultiplierPlugin from './math/MultiplierPlugin.js';
 import IntegratorPlugin from './math/IntegratorPlugin.js';
 import RealPartPlugin from './math/RealPartPlugin.js';
 import ImagPartPlugin from './math/ImagPartPlugin.js';
+import ComplexMultiplierPlugin from './math/ComplexMultiplierPlugin.js';
+import ComplexSummerPlugin from './math/ComplexSummerPlugin.js';
+import ComplexSquarePlugin from './math/ComplexSquarePlugin.js';
+import ComplexSqrtPlugin from './math/ComplexSqrtPlugin.js';
+import ComplexPhasePlugin from './math/ComplexPhasePlugin.js';
+import ComplexMagnitudePlugin from './math/ComplexMagnitudePlugin.js';
+import RealSquarePlugin from './math/RealSquarePlugin.js';
+import RealPower4Plugin from './math/RealPower4Plugin.js';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
 import FrequencyDetectorPlugin from './detectors/FrequencyDetectorPlugin.js';
+import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin.js';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin.js';
@@ -65,6 +74,7 @@ export default [
     // Детекторы
     PhaseDetectorPlugin,
     FrequencyDetectorPlugin,
+    AmplitudeDetectorPlugin,
 
     // Математические
     IntegratorPlugin,
@@ -72,6 +82,14 @@ export default [
     MultiplierPlugin,
     RealPartPlugin,
     ImagPartPlugin,
+    ComplexMultiplierPlugin,
+    ComplexSummerPlugin,
+    ComplexSquarePlugin,
+    ComplexSqrtPlugin,
+    ComplexPhasePlugin,
+    ComplexMagnitudePlugin,
+    RealSquarePlugin,
+    RealPower4Plugin,
 
     // Визуализация
     OscilloscopePlugin,

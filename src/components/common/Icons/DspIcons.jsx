@@ -187,6 +187,16 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Амплитудный детектор — огибающая поверх сигнала
+    'dsp-amp-detect': (
+        <>
+            <path d="M3 12 C5 6, 7 6, 9 12 C11 18, 13 18, 15 12 C17 6, 19 6, 21 12"
+                  strokeWidth="1.2" strokeLinecap="round" opacity="0.3" />
+            <path d="M3 8 C7 8, 9 6, 12 6 C15 6, 17 8, 21 8"
+                  strokeWidth="2" strokeLinecap="round" />
+        </>
+    ),
+
     /* ===================== MATH ===================== */
 
     // Сумматор — символ Σ (сигма)
@@ -230,6 +240,58 @@ const DSP_ICONS = {
                   fontFamily="'Times New Roman',Georgia,serif"
                   fill="currentColor" stroke="none">Im</text>
             <line x1="2" y1="21" x2="22" y2="21" strokeWidth="1.5" opacity="0.3" />
+        </>
+    ),
+
+    // Возведение в квадрат — x²
+    'dsp-square': (
+        <>
+            <text x="3" y="18" fontSize="16" fontWeight="700" fontStyle="italic"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">x</text>
+            <text x="14" y="11" fontSize="11" fontWeight="800"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">2</text>
+        </>
+    ),
+
+    // Извлечение корня — √x
+    'dsp-sqrt': (
+        <>
+            <path d="M2 14 L6 14 L9 20 L15 4 L22 4"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Фаза — φ (arg)
+    'dsp-phase': (
+        <>
+            <circle cx="12" cy="12" r="6" strokeWidth="1.8" fill="none" />
+            <line x1="12" y1="3" x2="12" y2="21" strokeWidth="2" />
+            <text x="17" y="9" fontSize="8" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">φ</text>
+        </>
+    ),
+
+    // Амплитуда — |z|
+    'dsp-magnitude': (
+        <>
+            <text x="2" y="18" fontSize="16" fontWeight="800"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">|z|</text>
+        </>
+    ),
+
+    // Возведение в 4-ю степень — x⁴
+    'dsp-power4': (
+        <>
+            <text x="3" y="18" fontSize="16" fontWeight="700" fontStyle="italic"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">x</text>
+            <text x="14" y="11" fontSize="11" fontWeight="800"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">4</text>
         </>
     ),
 

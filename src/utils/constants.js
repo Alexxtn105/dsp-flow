@@ -37,11 +37,20 @@ export const DSP_BLOCK_TYPES = {
     // Детекторы
     PHASE_DETECTOR: 'Фазовый детектор',
     FREQUENCY_DETECTOR: 'Частотный детектор',
+    AMPLITUDE_DETECTOR: 'Амплитудный детектор',
 
     // Математические
     INTEGRATOR: 'Интегратор',
     SUMMER: 'Сумматор',
     MULTIPLIER: 'Перемножитель',
+    COMPLEX_MULTIPLIER: 'Комплексный перемножитель',
+    COMPLEX_SUMMER: 'Комплексный сумматор',
+    COMPLEX_SQUARE: 'Комплексный квадрат',
+    COMPLEX_SQRT: 'Комплексный корень',
+    COMPLEX_PHASE: 'Фаза (комплексная)',
+    COMPLEX_MAGNITUDE: 'Амплитуда (комплексная)',
+    REAL_SQUARE: 'Квадрат (действ.)',
+    REAL_POWER4: 'Степень 4 (действ.)',
 
     // Визуализация
     OSCILLOSCOPE: 'Осциллограф',
