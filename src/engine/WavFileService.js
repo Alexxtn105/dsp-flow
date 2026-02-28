@@ -12,6 +12,42 @@ class WavFileService {
         this.audioContext = null;
         this.audioBuffer = null;
         this.file = null;
+        this.originalSampleRate = null;
+    }
+
+    /**
+     * Парсит sample rate из WAV-заголовка (fmt-чанк, bytes 24-27)
+     * @param {ArrayBuffer} arrayBuffer
+     * @returns {number|null} оригинальная частота дискретизации или null
+     */
+    parseWavSampleRate(arrayBuffer) {
+        try {
+            const view = new DataView(arrayBuffer);
+            if (view.byteLength < 44) return null;
+            // "RIFF"
+            if (view.getUint32(0, false) !== 0x52494646) return null;
+            // "WAVE"
+            if (view.getUint32(8, false) !== 0x57415645) return null;
+
+            // Ищем fmt-чанк
+            let offset = 12;
+            while (offset + 8 <= view.byteLength) {
+                const chunkId = view.getUint32(offset, false);
+                const chunkSize = view.getUint32(offset + 4, true);
+                // "fmt " = 0x666D7420
+                if (chunkId === 0x666D7420) {
+                    if (offset + 12 + 4 <= view.byteLength) {
+                        return view.getUint32(offset + 12, true);
+                    }
+                    return null;
+                }
+                offset += 8 + chunkSize;
+                if (chunkSize % 2 !== 0) offset++;
+            }
+            return null;
+        } catch {
+            return null;
+        }
     }
 
     /**
@@ -35,14 +71,29 @@ class WavFileService {
      * @returns {Promise<Object>} метаданные файла
      */
     async loadFile(file) {
-        this.init();
         this.file = file;
 
         const arrayBuffer = await file.arrayBuffer();
+        const headerSampleRate = this.parseWavSampleRate(arrayBuffer);
+        this.originalSampleRate = headerSampleRate;
+
+        // Закрываем старый контекст чтобы создать с правильной частотой
+        if (this.audioContext && this._ownsContext) {
+            try { this.audioContext.close(); } catch { /* ignore */ }
+            this.audioContext = null;
+        }
+
+        // Создаём AudioContext с оригинальной частотой файла — без ресемплинга
+        if (!this.audioContext || this.audioContext.state === 'closed') {
+            const opts = headerSampleRate ? { sampleRate: headerSampleRate } : {};
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)(opts);
+            this._ownsContext = true;
+        }
+
         this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
 
         return {
-            sampleRate: this.audioBuffer.sampleRate,
+            sampleRate: headerSampleRate || this.audioBuffer.sampleRate,
             duration: this.audioBuffer.duration,
             numberOfChannels: this.audioBuffer.numberOfChannels,
             length: this.audioBuffer.length,
@@ -54,7 +105,7 @@ class WavFileService {
      * Возвращает sample rate текущего файла
      */
     getSampleRate() {
-        return this.audioBuffer?.sampleRate || 48000;
+        return this.originalSampleRate || this.audioBuffer?.sampleRate || 48000;
     }
 
     /**
@@ -132,6 +183,7 @@ class WavFileService {
     reset() {
         this.audioBuffer = null;
         this.file = null;
+        this.originalSampleRate = null;
     }
 
     /**
