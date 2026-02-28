@@ -26,12 +26,12 @@ function Toolbar() {
             .filter(group => group.blocks.length > 0)
         : groups;
 
+    const totalBlocks = groups.reduce((sum, g) => sum + g.blocks.length, 0);
+
     const onDragStart = (event, blockName) => {
         event.dataTransfer.setData('application/reactflow', blockName);
         event.dataTransfer.effectAllowed = 'move';
         setDraggingBlock(blockName);
-
-        // Добавляем визуальную обратную связь
         event.currentTarget.classList.add('dragging');
     };
 
@@ -49,69 +49,63 @@ function Toolbar() {
     };
 
     return (
-        <div className={`toolbar ${isCollapsed ? 'collapsed' : ''} ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <div className="toolbar-header">
+        <div className={`tb ${isCollapsed ? 'tb-collapsed' : ''} ${isDarkTheme ? 'dark-theme' : ''}`}>
+            {/* Header */}
+            <div className="tb-header">
                 {!isCollapsed && (
-                    <div className="toolbar-header-content">
-                        <Icon
-                            name="tune"
-                            size="large"
-                            className="toolbar-icon"
-                            title="Библиотека блоков DSP"
-                        />
-                        <h2 className="toolbar-title">Библиотека блоков</h2>
+                    <div className="tb-header-info">
+                        <span className="tb-header-title">Блоки</span>
+                        <span className="tb-header-count">{totalBlocks}</span>
                     </div>
                 )}
                 <button
-                    className="collapse-btn"
+                    className="tb-collapse-btn"
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    title={isCollapsed ? "Развернуть панель" : "Свернуть панель"}
-                    aria-label={isCollapsed ? "Развернуть панель" : "Свернуть панель"}
+                    title={isCollapsed ? 'Развернуть' : 'Свернуть'}
+                    aria-label={isCollapsed ? 'Развернуть панель' : 'Свернуть панель'}
                 >
                     <Icon
                         name={isCollapsed ? 'chevron_right' : 'chevron_left'}
-                        size="medium"
+                        size="small"
                     />
                 </button>
             </div>
 
+            {/* Search */}
             {!isCollapsed && (
-                <div className="toolbar-search">
-                    <div className="toolbar-search-input-wrapper">
-                        <Icon name="search" size="small" className="toolbar-search-icon" aria-hidden="true" />
-                        <input
-                            type="text"
-                            placeholder="Поиск блоков..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            aria-label="Поиск блоков"
-                        />
-                        {searchQuery && (
-                            <button
-                                className="toolbar-search-clear"
-                                onClick={() => setSearchQuery('')}
-                                title="Очистить поиск"
-                                aria-label="Очистить поиск"
-                            >
-                                <Icon name="close" size="small" aria-hidden="true" />
-                            </button>
-                        )}
-                    </div>
+                <div className="tb-search">
+                    <Icon name="search" size="small" className="tb-search-icon" aria-hidden="true" />
+                    <input
+                        type="text"
+                        placeholder="Поиск..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="tb-search-input"
+                        aria-label="Поиск блоков"
+                    />
+                    {searchQuery && (
+                        <button
+                            className="tb-search-clear"
+                            onClick={() => setSearchQuery('')}
+                            title="Очистить"
+                            aria-label="Очистить поиск"
+                        >
+                            <Icon name="close" size="small" aria-hidden="true" />
+                        </button>
+                    )}
                 </div>
             )}
 
+            {/* Content */}
             {!isCollapsed && (
-                <div className="toolbar-content">
+                <div className="tb-content">
                     {filteredGroups.length === 0 && (
-                        <div className="toolbar-no-results">Ничего не найдено</div>
+                        <div className="tb-empty">Ничего не найдено</div>
                     )}
                     {filteredGroups.map((group) => (
-                        <div
-                            key={group.id}
-                            className="group-container"
-                        >
+                        <div key={group.id} className="tb-group">
                             <div
-                                className="group-header"
+                                className="tb-group-header"
                                 onClick={() => toggleGroup(group.id)}
                                 role="button"
                                 tabIndex={0}
@@ -124,24 +118,26 @@ function Toolbar() {
                                 aria-expanded={!collapsedGroups[group.id]}
                                 aria-controls={`group-${group.id}`}
                             >
-                                <span>{group.name}</span>
+                                <span className="tb-group-name">{group.name}</span>
+                                <span className="tb-group-badge">{group.blocks.length}</span>
                                 <Icon
                                     name={collapsedGroups[group.id] ? 'expand_more' : 'expand_less'}
                                     size="small"
+                                    className="tb-group-chevron"
                                     aria-hidden="true"
                                 />
                             </div>
                             {!collapsedGroups[group.id] && (
                                 <div
-                                    className="group-blocks"
+                                    className="tb-group-blocks"
                                     id={`group-${group.id}`}
                                     role="region"
-                                    aria-label={`Блоки категории ${group.name}`}
+                                    aria-label={`Блоки: ${group.name}`}
                                 >
                                     {group.blocks.map((block) => (
                                         <div
                                             key={block.id}
-                                            className="block-item"
+                                            className="tb-block"
                                             draggable
                                             onDragStart={(e) => onDragStart(e, block.name)}
                                             onDragEnd={onDragEnd}
@@ -149,32 +145,14 @@ function Toolbar() {
                                             role="button"
                                             tabIndex={0}
                                             aria-label={`Добавить блок ${block.name}. ${block.description}`}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    e.preventDefault();
-                                                    // Создаем событие drag для клавиатурного использования
-                                                    const event = new Event('dragstart');
-                                                    Object.defineProperty(event, 'dataTransfer', {
-                                                        value: {
-                                                            setData: () => {},
-                                                            effectAllowed: 'move'
-                                                        }
-                                                    });
-                                                    e.target.dispatchEvent(event);
-                                                }
-                                            }}
                                         >
-                                            <div className="block-icon">
-                                                <Icon
-                                                    name={block.icon}
-                                                    size="medium"
-                                                    aria-hidden="true"
-                                                />
+                                            <div className="tb-block-icon">
+                                                <Icon name={block.icon} size="medium" aria-hidden="true" />
                                             </div>
-                                            <div className="block-info">
-                                                <div className="block-name">{block.name}</div>
+                                            <div className="tb-block-info">
+                                                <span className="tb-block-name">{block.name}</span>
                                                 {block.description && (
-                                                    <div className="block-description">{block.description}</div>
+                                                    <span className="tb-block-desc">{block.description}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -186,12 +164,13 @@ function Toolbar() {
                 </div>
             )}
 
-            {isCollapsed && !collapsedGroups && (
-                <div className="toolbar-content">
+            {/* Collapsed: icon-only blocks */}
+            {isCollapsed && (
+                <div className="tb-content tb-content-icons">
                     {groups.flatMap(group => group.blocks).map((block) => (
                         <div
                             key={block.id}
-                            className="block-item"
+                            className="tb-block-mini"
                             draggable
                             onDragStart={(e) => onDragStart(e, block.name)}
                             onDragEnd={onDragEnd}
@@ -200,11 +179,7 @@ function Toolbar() {
                             tabIndex={0}
                             aria-label={`Добавить блок ${block.name}`}
                         >
-                            <Icon
-                                name={block.icon}
-                                size="medium"
-                                aria-hidden="true"
-                            />
+                            <Icon name={block.icon} size="medium" aria-hidden="true" />
                         </div>
                     ))}
                 </div>
