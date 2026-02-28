@@ -1,7 +1,7 @@
 export default {
     type: 'Перемножитель',
     id: 'multiplier',
-    icon: 'close',
+    icon: 'dsp-multiply',
     description: 'Перемножитель',
     group: 'math-blocks',
     signals: { input: 'real', output: 'real', inputsCount: 2 },

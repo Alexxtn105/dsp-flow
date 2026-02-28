@@ -4,7 +4,7 @@ import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
 export default {
     type: 'Спектроанализатор',
     id: 'spectrum-analyzer',
-    icon: 'analytics',
+    icon: 'dsp-spectrum',
     description: 'Спектральный анализ',
     group: 'visualization',
     signals: { input: 'real', output: null },

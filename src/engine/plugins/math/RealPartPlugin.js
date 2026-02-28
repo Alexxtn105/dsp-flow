@@ -1,7 +1,7 @@
 export default {
     type: 'Re (действ. часть)',
     id: 'real-part',
-    icon: 'functions',
+    icon: 'dsp-real',
     description: 'Извлечение действительной части комплексного сигнала',
     group: 'math-blocks',
     signals: { input: 'complex', output: 'real' },

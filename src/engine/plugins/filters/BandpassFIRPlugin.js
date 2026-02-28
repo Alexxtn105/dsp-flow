@@ -3,7 +3,7 @@ import { createFIRProcessor } from './FIRFilterPlugin.js';
 export default {
     type: 'Полосовой КИХ-фильтр',
     id: 'bandpass-fir-filter',
-    icon: 'tune',
+    icon: 'dsp-bandpass',
     description: 'Полосовой КИХ-фильтр',
     group: 'filters',
     signals: { input: 'real', output: 'real' },

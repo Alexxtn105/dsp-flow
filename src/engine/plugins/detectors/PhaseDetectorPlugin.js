@@ -1,7 +1,7 @@
 export default {
     type: 'Фазовый детектор',
     id: 'phase-detector',
-    icon: 'speed',
+    icon: 'dsp-phase-detect',
     description: 'Фазовый детектор',
     group: 'detectors',
     signals: { input: 'complex', output: 'real' },

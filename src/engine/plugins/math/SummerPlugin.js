@@ -1,7 +1,7 @@
 export default {
     type: 'Сумматор',
     id: 'summer',
-    icon: 'add',
+    icon: 'dsp-sum',
     description: 'Сумматор',
     group: 'math-blocks',
     signals: { input: 'real', output: 'real', inputsCount: 2 },

@@ -87,7 +87,7 @@ function createRemezProcessor() {
 export default {
     type: 'Фильтр Ремеза',
     id: 'remez-filter',
-    icon: 'equalizer',
+    icon: 'dsp-remez',
     description: 'Полосовой КИХ-фильтр (алгоритм Паркс-Макклеллана / Ремеза)',
     group: 'filters',
     signals: { input: 'real', output: 'real' },

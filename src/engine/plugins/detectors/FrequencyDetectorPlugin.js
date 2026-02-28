@@ -1,7 +1,7 @@
 export default {
     type: 'Частотный детектор',
     id: 'frequency-detector',
-    icon: 'timeline',
+    icon: 'dsp-freq-detect',
     description: 'Частотный детектор',
     group: 'detectors',
     signals: { input: 'complex', output: 'real' },

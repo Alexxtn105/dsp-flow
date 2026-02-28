@@ -1,7 +1,7 @@
 export default {
     type: 'Осциллограф',
     id: 'oscilloscope',
-    icon: 'show_chart',
+    icon: 'dsp-oscilloscope',
     description: 'Визуализация сигнала',
     group: 'visualization',
     signals: { input: 'real', output: null },

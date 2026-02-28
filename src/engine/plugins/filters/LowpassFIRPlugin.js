@@ -3,7 +3,7 @@ import { createFIRProcessor } from './FIRFilterPlugin.js';
 export default {
     type: 'ФНЧ КИХ-фильтр',
     id: 'lowpass-fir-filter',
-    icon: 'trending_down',
+    icon: 'dsp-lowpass',
     description: 'ФНЧ КИХ-фильтр',
     group: 'filters',
     signals: { input: 'real', output: 'real' },

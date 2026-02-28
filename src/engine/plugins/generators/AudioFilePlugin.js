@@ -1,7 +1,7 @@
 export default {
     type: 'Audio File',
     id: 'audio-file',
-    icon: 'audio_file',
+    icon: 'dsp-audio-file',
     description: 'Источник аудиофайла',
     group: 'generators',
     signals: { input: null, output: 'real' },

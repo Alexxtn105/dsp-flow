@@ -1,7 +1,7 @@
 export default {
     type: 'Референсный косинусный генератор',
     id: 'ref-cosine-generator',
-    icon: 'graphic_eq',
+    icon: 'dsp-ref-cosine',
     description: 'Управляемый референсный косинусный генератор',
     group: 'generators',
     signals: { input: null, output: 'complex' },

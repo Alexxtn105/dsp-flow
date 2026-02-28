@@ -3,7 +3,7 @@ import { createFIRProcessor } from './FIRFilterPlugin.js';
 export default {
     type: 'ФВЧ КИХ-фильтр',
     id: 'highpass-fir-filter',
-    icon: 'trending_up',
+    icon: 'dsp-highpass',
     description: 'ФВЧ КИХ-фильтр',
     group: 'filters',
     signals: { input: 'real', output: 'real' },

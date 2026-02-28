@@ -8,7 +8,22 @@
     user-select: none;
 }
 
-/* Размеры */
+/* Для outlined иконок */
+.material-icons-outlined {
+    font-variation-settings: 'FILL' 0;
+}
+
+/* ---- DSP SVG иконки ---- */
+.dsp-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+/* ---- Размеры (общие для Material и DSP) ---- */
 .icon-small {
     font-size: 18px !important;
     width: 18px;
@@ -33,12 +48,7 @@
     height: 40px;
 }
 
-/* Для outlined иконок */
-.material-icons-outlined {
-    font-variation-settings: 'FILL' 0;
-}
-
-/* Адаптивность */
+/* ---- Адаптивность ---- */
 @media (max-width: 768px) {
     .icon-medium {
         font-size: 20px !important;

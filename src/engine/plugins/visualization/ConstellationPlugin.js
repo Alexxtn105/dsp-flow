@@ -1,7 +1,7 @@
 export default {
     type: 'Фазовое созвездие',
     id: 'constellation',
-    icon: 'star',
+    icon: 'dsp-constellation',
     description: 'Фазовое созвездие',
     group: 'visualization',
     signals: { input: 'complex', output: null },

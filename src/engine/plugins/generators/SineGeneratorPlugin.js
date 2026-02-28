@@ -1,7 +1,7 @@
 export default {
     type: 'Синусный генератор',
     id: 'sine-generator',
-    icon: 'waves',
+    icon: 'dsp-sine',
     description: 'Синусный генератор',
     group: 'generators',
     signals: { input: null, output: 'real' },

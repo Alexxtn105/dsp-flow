@@ -4,7 +4,7 @@ import WindowFunctions from '../_shared/WindowFunctions.js';
 export default {
     type: 'БПФ',
     id: 'fft',
-    icon: 'multiline_chart',
+    icon: 'dsp-fft',
     description: 'БПФ (размер кратен степени двойки)',
     group: 'fft-blocks',
     signals: { input: 'real', output: 'complex' },

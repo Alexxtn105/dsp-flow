@@ -4,7 +4,7 @@ import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
 export default {
     type: 'Водопад',
     id: 'waterfall',
-    icon: 'waterfall_chart',
+    icon: 'dsp-waterfall',
     description: 'Спектрограмма (Водопад)',
     group: 'visualization',
     signals: { input: 'real', output: null },

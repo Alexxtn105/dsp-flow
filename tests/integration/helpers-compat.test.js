@@ -23,8 +23,8 @@ describe('helpers.js — обратная совместимость', () => {
     });
 
     it('getBlockIcon возвращает иконку', () => {
-        expect(getBlockIcon('Синусный генератор')).toBe('waves');
-        expect(getBlockIcon('Режекторный КИХ-фильтр')).toBe('block');
+        expect(getBlockIcon('Синусный генератор')).toBe('dsp-sine');
+        expect(getBlockIcon('Режекторный КИХ-фильтр')).toBe('dsp-notch');
     });
 
     it('getBlockDescription возвращает описание', () => {

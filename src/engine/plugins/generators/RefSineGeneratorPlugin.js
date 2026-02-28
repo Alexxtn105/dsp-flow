@@ -1,7 +1,7 @@
 export default {
     type: 'Референсный синусный генератор',
     id: 'ref-sine-generator',
-    icon: 'waves',
+    icon: 'dsp-ref-sine',
     description: 'Управляемый референсный синусный генератор',
     group: 'generators',
     signals: { input: null, output: 'complex' },

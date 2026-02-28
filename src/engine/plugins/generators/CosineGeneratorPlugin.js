@@ -1,7 +1,7 @@
 export default {
     type: 'Косинусный генератор',
     id: 'cosine-generator',
-    icon: 'graphic_eq',
+    icon: 'dsp-cosine',
     description: 'Косинусный генератор',
     group: 'generators',
     signals: { input: null, output: 'real' },

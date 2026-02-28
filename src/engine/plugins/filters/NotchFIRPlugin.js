@@ -151,7 +151,7 @@ function createNotchProcessor() {
 export default {
     type: 'Режекторный КИХ-фильтр',
     id: 'notch-fir-filter',
-    icon: 'block',
+    icon: 'dsp-notch',
     description: 'Режекторный (notch) КИХ-фильтр',
     group: 'filters',
     signals: { input: 'real', output: 'real' },

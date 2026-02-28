@@ -1,10 +1,39 @@
 import PropTypes from 'prop-types';
+import DSP_ICONS from './DspIcons.jsx';
 import './Icon.css';
 
+const SIZE_PX = { small: 18, medium: 24, large: 32, xlarge: 40 };
+
 /**
- * Централизованный компонент для работы с Material Icons
+ * Централизованный компонент иконок.
+ * Поддерживает кастомные DSP SVG-иконки (dsp-*) и Material Icons.
  */
 function Icon({ name, variant = 'filled', size = 'medium', className = '', ...props }) {
+
+    /* ---------- Custom DSP SVG icon ---------- */
+    const dspContent = DSP_ICONS[name];
+    if (dspContent) {
+        const px = SIZE_PX[size] || SIZE_PX.medium;
+        return (
+            <svg
+                viewBox="0 0 24 24"
+                width={px}
+                height={px}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`dsp-icon icon-${size} ${className}`}
+                aria-hidden="true"
+                {...props}
+            >
+                {dspContent}
+            </svg>
+        );
+    }
+
+    /* ---------- Material Icon (fallback) ---------- */
     const getVariantClass = () => {
         switch(variant) {
             case 'outlined': return 'material-icons-outlined';
@@ -14,18 +43,9 @@ function Icon({ name, variant = 'filled', size = 'medium', className = '', ...pr
         }
     };
 
-    const getSizeClass = () => {
-        switch(size) {
-            case 'small': return 'icon-small';
-            case 'large': return 'icon-large';
-            case 'xlarge': return 'icon-xlarge';
-            default: return 'icon-medium';
-        }
-    };
-
     return (
         <span
-            className={`${getVariantClass()} ${getSizeClass()} ${className}`}
+            className={`${getVariantClass()} icon-${size} ${className}`}
             {...props}
         >
             {name}

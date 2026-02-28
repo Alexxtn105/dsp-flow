@@ -1,7 +1,7 @@
 export default {
     type: 'Динамик',
     id: 'speaker',
-    icon: 'volume_up',
+    icon: 'dsp-speaker',
     description: 'Аудио выход',
     group: 'output',
     signals: { input: 'real', output: null },

@@ -1,7 +1,7 @@
 export default {
     type: 'Im (мнимая часть)',
     id: 'imag-part',
-    icon: 'functions',
+    icon: 'dsp-imag',
     description: 'Извлечение мнимой части комплексного сигнала',
     group: 'math-blocks',
     signals: { input: 'complex', output: 'real' },

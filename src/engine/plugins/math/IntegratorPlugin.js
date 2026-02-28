@@ -1,7 +1,7 @@
 export default {
     type: 'Интегратор',
     id: 'integrator',
-    icon: 'functions',
+    icon: 'dsp-integrate',
     description: 'Интегратор',
     group: 'math-blocks',
     signals: { input: 'real', output: 'real' },

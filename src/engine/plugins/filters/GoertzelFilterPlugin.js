@@ -1,7 +1,7 @@
 export default {
     type: 'Фильтр Герцеля',
     id: 'goertzel-filter',
-    icon: 'psychology',
+    icon: 'dsp-goertzel',
     description: 'Фильтр Герцеля',
     group: 'filters',
     signals: { input: 'real', output: 'real' },

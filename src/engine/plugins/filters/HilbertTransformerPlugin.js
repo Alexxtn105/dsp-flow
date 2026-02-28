@@ -3,7 +3,7 @@ import WindowFunctions from '../_shared/WindowFunctions.js';
 export default {
     type: 'Преобразователь Гильберта',
     id: 'hilbert-transformer',
-    icon: 'transform',
+    icon: 'dsp-hilbert',
     description: 'Преобразователь Гильберта',
     group: 'filters',
     signals: { input: 'real', output: 'complex' },

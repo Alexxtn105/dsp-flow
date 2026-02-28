@@ -4,7 +4,7 @@ import WindowFunctions from '../_shared/WindowFunctions.js';
 export default {
     type: 'Скользящее БПФ',
     id: 'sliding-fft',
-    icon: 'show_chart',
+    icon: 'dsp-sliding-fft',
     description: 'Скользящее БПФ',
     group: 'fft-blocks',
     signals: { input: 'real', output: 'complex' },
