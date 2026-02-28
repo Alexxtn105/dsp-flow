@@ -1,116 +1,191 @@
-.waterf.viz-window-content {
-    flex: 1;
-    overflow: hidden;
+/* ===== Waterfall View — Audition Style ===== */
+
+.waterfall-view.audition-theme {
     position: relative;
-    background-color: #000;
     display: flex;
     flex-direction: column;
-}
-
-.waterfall-view {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-
-
-.waterfall-container {
-    flex: 1;
-    position: relative;
-    background: #000;
-    overflow: hidden;
-}
-
-.waterfall-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.waterfall-labels-x {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 5px;
-    font-size: 10px;
-    color: #6b7280;
-    font-family: monospace;
-    background-color: rgba(255, 255, 255, 0.5);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-}
-
-.waterfall-view.dark-theme .waterfall-labels-x {
-    color: #9ca3af;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.waterfall-legend-overlay {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 20px;
-    height: 100px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 2px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-}
-
-.legend-gradient {
-    flex: 1;
-    height: 100%;
-}
-
-.legend-gradient-audition {
-    background: linear-gradient(to top, black, purple, red, orange, yellow, white);
-}
-
-.legend-gradient-grayscale {
-    background: linear-gradient(to top, black, white);
-}
-
-.legend-labels {
-    position: absolute;
-    left: -25px;
-    top: 0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    font-size: 9px;
-    color: white;
-    text-shadow: 0 1px 2px black;
-    text-align: right;
-    width: 20px;
-}
-
-.waterfall-select {
-    padding: 2px 6px;
-    font-size: 11px;
+    background: #1a1a2e;
     border-radius: 4px;
-    border: 1px solid #d1d5db;
-    background-color: rgba(255, 255, 255, 0.8);
-    color: #374151;
-    cursor: pointer;
+    overflow: hidden;
+}
+
+/* ---- Toolbar ---- */
+.wf-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: #12122a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    min-height: 30px;
+}
+
+.wf-toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.wf-toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+/* Select */
+.wf-select {
+    height: 22px;
+    padding: 0 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #8899aa;
+    font-size: 10px;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
     outline: none;
+    cursor: pointer;
 }
 
-.waterfall-view.dark-theme .waterfall-select {
-    border-color: #4b5563;
-    background-color: rgba(31, 41, 55, 0.8);
-    color: #e5e7eb;
+.wf-select:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
-.waterfall-select:hover {
-    background-color: #ffffff;
+.wf-select option {
+    background: #1a1a2e;
+    color: #8899aa;
 }
 
-.waterfall-view.dark-theme .waterfall-select:hover {
-    background-color: #374151;
+/* Buttons */
+.wf-btn {
+    height: 22px;
+    padding: 0 7px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #7a8599;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 120ms ease;
+    user-select: none;
+}
+
+.wf-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #a0b0c8;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wf-btn.active {
+    background: rgba(0, 229, 160, 0.15);
+    color: #00e5a0;
+    border-color: rgba(0, 229, 160, 0.3);
+}
+
+/* Labels */
+.wf-label {
+    font-size: 10px;
+    color: #5a6a7e;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.wf-unit {
+    font-size: 9px;
+    color: #4a5a6e;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    user-select: none;
+}
+
+/* Sliders */
+.wf-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 56px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.wf-slider-short {
+    width: 44px;
+}
+
+.wf-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    background: #3a4a60;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 120ms ease;
+}
+
+.wf-slider::-webkit-slider-thumb:hover {
+    background: #4a5a70;
+}
+
+.wf-slider::-moz-range-thumb {
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    background: #3a4a60;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+.wf-slider::-moz-range-track {
+    background: rgba(255, 255, 255, 0.08);
+    height: 4px;
+    border-radius: 2px;
+}
+
+/* Numeric inputs */
+.wf-input {
+    width: 52px;
+    height: 20px;
+    padding: 0 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #8899aa;
+    font-size: 10px;
+    font-family: 'Segoe UI Mono', 'SF Mono', 'Consolas', monospace;
+    text-align: right;
+    outline: none;
+    transition: border-color 120ms ease;
+}
+
+.wf-input:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+    color: #aabbcc;
+}
+
+.wf-input-narrow {
+    width: 40px;
+}
+
+.wf-input::-webkit-inner-spin-button,
+.wf-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.wf-input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* ---- Canvas ---- */
+.wf-canvas {
+    display: block;
+    cursor: crosshair;
 }
