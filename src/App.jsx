@@ -147,6 +147,7 @@ function App() {
                             onReactFlowInit={setReactFlowInstance}
                             isRunning={simulation.isRunning}
                             onOpenVisualization={handleOpenVisualization}
+                            onSampleRateChange={handleSampleRateChange}
                         />
                     </ErrorBoundary>
                 </div>

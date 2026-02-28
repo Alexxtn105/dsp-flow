@@ -43,7 +43,8 @@ function DSPEditor({
     onStatsUpdate,
     onReactFlowInit,
     isRunning,
-    onOpenVisualization
+    onOpenVisualization,
+    onSampleRateChange
 }) {
     const { isDarkTheme } = useThemeContext();
     const reactFlowWrapper = useRef(null);
@@ -454,6 +455,7 @@ function DSPEditor({
                     onClose={() => setParamsDialogNode(null)}
                     node={paramsDialogNode}
                     onSave={handleSaveParams}
+                    onSampleRateChange={onSampleRateChange}
                 />
             )}
         </div>
@@ -466,7 +468,8 @@ DSPEditor.propTypes = {
     onStatsUpdate: PropTypes.func.isRequired,
     onReactFlowInit: PropTypes.func,
     isRunning: PropTypes.bool.isRequired,
-    onOpenVisualization: PropTypes.func
+    onOpenVisualization: PropTypes.func,
+    onSampleRateChange: PropTypes.func
 };
 
 export default DSPEditor;

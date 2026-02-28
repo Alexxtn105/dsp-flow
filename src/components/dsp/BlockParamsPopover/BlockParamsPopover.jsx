@@ -39,7 +39,7 @@ function computePosition(nodeRect) {
 /**
  * Поповер редактирования параметров блока
  */
-function BlockParamsPopover({ onClose, node, onSave }) {
+function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
     const { isDarkTheme } = useThemeContext();
 
     const [localParams, setLocalParams] = useState({});
@@ -188,6 +188,10 @@ function BlockParamsPopover({ onClose, node, onSave }) {
                 channels: audioBuffer.numberOfChannels,
                 totalSamples: audioBuffer.length
             }));
+
+            if (onSampleRateChange && audioBuffer.sampleRate) {
+                onSampleRateChange(audioBuffer.sampleRate);
+            }
 
             audioContext.close();
             audioContextRef.current = null;
@@ -351,7 +355,8 @@ function BlockParamsPopover({ onClose, node, onSave }) {
 BlockParamsPopover.propTypes = {
     onClose: PropTypes.func.isRequired,
     node: PropTypes.object.isRequired,
-    onSave: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired,
+    onSampleRateChange: PropTypes.func
 };
 
 export default BlockParamsPopover;

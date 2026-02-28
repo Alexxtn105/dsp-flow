@@ -40,7 +40,6 @@ function BlockNode({ data, selected }) {
     const description = getBlockDescription(data.blockType);
     const canVisualize = isVisualizationBlock(data.blockType);
     const isAudioFile = data.blockType === 'Audio File';
-    const isMuted = data.params?.muted || false;
 
     // Inline editing state
     const [editingParam, setEditingParam] = useState(null);
@@ -116,13 +115,6 @@ function BlockNode({ data, selected }) {
 
     const stopPropagation = (e) => {
         e.stopPropagation();
-    };
-
-    const handleToggleMute = (e) => {
-        e.stopPropagation();
-        if (data.onParamUpdate) {
-            data.onParamUpdate(data.nodeId, 'muted', !isMuted);
-        }
     };
 
     const handleOpenParams = (e) => {
@@ -263,15 +255,6 @@ function BlockNode({ data, selected }) {
                         <Icon name="visibility" size="small" />
                     </button>
                 )}
-                {isAudioFile && (
-                    <button
-                        className="block-action-btn mute-btn"
-                        onClick={handleToggleMute}
-                        title={isMuted ? "Включить звук" : "Выключить звук"}
-                    >
-                        <Icon name={isMuted ? "volume_off" : "volume_up"} size="small" />
-                    </button>
-                )}
             </div>
 
             <div className="block-header">
@@ -289,7 +272,28 @@ function BlockNode({ data, selected }) {
                 </div>
             </div>
 
-            {editableParams.length > 0 && (
+            {isAudioFile ? (
+                <div className="audio-file-info">
+                    {data.params?.wavFileName ? (
+                        <>
+                            <div className="audio-file-name" title={data.params.wavFileName}>
+                                <Icon name="audio_file" size="small" />
+                                <span>{data.params.wavFileName}</span>
+                            </div>
+                            <div className="audio-file-meta">
+                                {data.params.detectedSampleRate && (
+                                    <span>{(data.params.detectedSampleRate / 1000).toFixed(1)} kHz</span>
+                                )}
+                                {data.params.duration != null && (
+                                    <span>{data.params.duration.toFixed(1)}s</span>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="audio-file-empty">WAV не выбран</div>
+                    )}
+                </div>
+            ) : editableParams.length > 0 ? (
                 <div className="block-params">
                     {visibleParams.map(([key, value]) => (
                         <div key={key} className="block-param">
@@ -306,7 +310,7 @@ function BlockNode({ data, selected }) {
                         </div>
                     )}
                 </div>
-            )}
+            ) : null}
 
             {
                 hasOutput && (

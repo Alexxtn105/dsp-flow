@@ -7,7 +7,6 @@ export default {
     signals: { input: null, output: 'real' },
     defaultParams: {
         wavFile: null,
-        muted: false,
     },
     processor: {
         process(inputs, params, chunkSize) {

@@ -210,6 +210,43 @@
     -moz-appearance: textfield;
 }
 
+/* Audio File info */
+.audio-file-info {
+    margin-top: 6px;
+    padding: 4px 0;
+}
+
+.audio-file-name {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-primary);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.audio-file-name span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audio-file-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 3px;
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.audio-file-empty {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-style: italic;
+    opacity: 0.7;
+}
+
 /* Стили для ручек (handles) */
 .block-handle {
     width: 10px !important;
