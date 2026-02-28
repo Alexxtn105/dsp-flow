@@ -52,7 +52,9 @@ function Footer({
     const rafRef = useRef(null);
 
     // Update target when prop changes
-    targetRef.current = progress || 0;
+    useEffect(() => {
+        targetRef.current = progress || 0;
+    }, [progress]);
 
     // Smooth animation loop via requestAnimationFrame
     useEffect(() => {
