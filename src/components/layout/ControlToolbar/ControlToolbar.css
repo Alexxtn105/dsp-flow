@@ -1,10 +1,10 @@
-/* ===== Control Toolbar — Audition Style ===== */
+/* ===== Control Toolbar — Themed ===== */
 
 .ct {
     height: 100%;
     width: 46px;
-    background: #12122a;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--panel-bg);
+    border-right: 1px solid var(--panel-border);
     z-index: 11;
     display: flex;
     flex-direction: column;
@@ -35,7 +35,7 @@
 .ct-sep {
     width: 24px;
     height: 1px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--panel-border);
     margin: 4px 0;
     flex-shrink: 0;
 }
@@ -45,7 +45,7 @@
     position: relative;
     background: transparent;
     border: none;
-    color: #5a6a7e;
+    color: var(--panel-text-4);
     cursor: pointer;
     padding: 0;
     display: flex;
@@ -58,12 +58,12 @@
 }
 
 .ct-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.05);
-    color: #99a8bf;
+    background: var(--panel-hover-bg);
+    color: var(--panel-text-2);
 }
 
 .ct-btn:active:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel-active-bg);
 }
 
 .ct-btn:disabled {
@@ -88,16 +88,16 @@
     left: calc(100% + 6px);
     top: 50%;
     transform: translateY(-50%);
-    background: #1a1a2e;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--panel-tooltip-bg);
+    border: 1px solid var(--panel-tooltip-border);
     border-radius: 3px;
     padding: 4px 8px;
     font-size: 10px;
     font-weight: 500;
     font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
-    color: #99a8bf;
+    color: #e6edf3;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     pointer-events: none;
     animation: ct-tip 120ms ease-out forwards;
@@ -111,41 +111,41 @@
 /* ---- Button-specific colors ---- */
 
 /* File: new */
-.ct-btn-new:hover:not(:disabled) { color: #00c8ff; }
+.ct-btn-new:hover:not(:disabled) { color: var(--panel-accent-cyan); }
 
 /* File: save */
-.ct-btn-save:hover:not(:disabled) { color: #00e5a0; }
+.ct-btn-save:hover:not(:disabled) { color: var(--panel-accent); }
 
 /* File: save as */
-.ct-btn-saveas:hover:not(:disabled) { color: #00c8ff; }
+.ct-btn-saveas:hover:not(:disabled) { color: var(--panel-accent-cyan); }
 
 /* File: load */
-.ct-btn-load:hover:not(:disabled) { color: #ff8c00; }
+.ct-btn-load:hover:not(:disabled) { color: var(--panel-accent-orange); }
 
 /* Transport: play */
-.ct-btn-play:hover:not(:disabled) { color: #00e5a0; }
+.ct-btn-play:hover:not(:disabled) { color: var(--panel-accent); }
 
 .ct-btn-play.active {
-    color: #00e5a0;
+    color: var(--panel-accent);
     background: rgba(0, 229, 160, 0.1);
 }
 
 .ct-btn-play.paused {
-    color: #ff8c00;
+    color: var(--panel-accent-orange);
     background: rgba(255, 140, 0, 0.08);
 }
 
 /* Transport: pause */
-.ct-btn-pause:hover:not(:disabled) { color: #ff8c00; }
+.ct-btn-pause:hover:not(:disabled) { color: var(--panel-accent-orange); }
 
 /* Transport: rewind */
-.ct-btn-rewind:hover:not(:disabled) { color: #00c8ff; }
+.ct-btn-rewind:hover:not(:disabled) { color: var(--panel-accent-cyan); }
 
 /* Settings */
-.ct-btn-settings:hover:not(:disabled) { color: #99a8bf; }
+.ct-btn-settings:hover:not(:disabled) { color: var(--panel-text-2); }
 
 /* Theme */
-.ct-btn-theme:hover:not(:disabled) { color: #ffd700; }
+.ct-btn-theme:hover:not(:disabled) { color: var(--panel-accent-gold); }
 
 /* ---- Scrollbar ---- */
 .ct-content::-webkit-scrollbar {
@@ -157,12 +157,12 @@
 }
 
 .ct-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel-scrollbar);
     border-radius: 2px;
 }
 
 .ct-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--panel-scrollbar-hover);
 }
 
 /* ---- Responsive ---- */

@@ -59,6 +59,38 @@
   --toolbar-icon-bg: #f3f4f6;
   --toolbar-icon-hover-bg: #ffffff;
 
+  /* Panel chrome (header, footer, toolbars) */
+  --panel-bg: #e4e6eb;
+  --panel-bg-alt: #eaecf0;
+  --panel-border: rgba(0, 0, 0, 0.1);
+  --panel-border-hover: rgba(0, 0, 0, 0.16);
+  --panel-hover-bg: rgba(0, 0, 0, 0.05);
+  --panel-active-bg: rgba(0, 0, 0, 0.08);
+  --panel-subtle-bg: rgba(0, 0, 0, 0.04);
+  --panel-input-bg: rgba(255, 255, 255, 0.6);
+  --panel-tooltip-bg: #303040;
+  --panel-tooltip-border: rgba(255, 255, 255, 0.12);
+  --panel-dropdown-bg: #ffffff;
+  --panel-dropdown-border: rgba(0, 0, 0, 0.12);
+  --panel-scrollbar: rgba(0, 0, 0, 0.12);
+  --panel-scrollbar-hover: rgba(0, 0, 0, 0.2);
+  --panel-text-1: #1a1a2e;
+  --panel-text-2: #374151;
+  --panel-text-3: #4b5563;
+  --panel-text-4: #6b7280;
+  --panel-text-5: #9ca3af;
+  --panel-text-6: #b4bcc8;
+  --panel-accent: #059669;
+  --panel-accent-cyan: #0284c7;
+  --panel-accent-orange: #d97706;
+  --panel-accent-gold: #b45309;
+  --panel-slider: rgba(0, 0, 0, 0.08);
+  --panel-slider-thumb: #9ca3af;
+  --panel-slider-thumb-hover: #6b7280;
+  --panel-slider-thumb-border: rgba(0, 0, 0, 0.15);
+  --signal-real: #3b82f6;
+  --signal-complex: #8b5cf6;
+
   /* Canvas-визуализации */
   --canvas-bg: #f9fafb;
   --canvas-grid: #e5e7eb;
@@ -158,6 +190,38 @@
   --toolbar-item-hover-border: #3c444d;
   --toolbar-icon-bg: #21262d;
   --toolbar-icon-hover-bg: #2d333b;
+
+  /* Panel chrome */
+  --panel-bg: #12122a;
+  --panel-bg-alt: #161b26;
+  --panel-border: rgba(255, 255, 255, 0.06);
+  --panel-border-hover: rgba(255, 255, 255, 0.12);
+  --panel-hover-bg: rgba(255, 255, 255, 0.06);
+  --panel-active-bg: rgba(255, 255, 255, 0.08);
+  --panel-subtle-bg: rgba(255, 255, 255, 0.03);
+  --panel-input-bg: rgba(0, 0, 0, 0.3);
+  --panel-tooltip-bg: #1a1a2e;
+  --panel-tooltip-border: rgba(255, 255, 255, 0.1);
+  --panel-dropdown-bg: #1a1a2e;
+  --panel-dropdown-border: rgba(255, 255, 255, 0.08);
+  --panel-scrollbar: rgba(255, 255, 255, 0.06);
+  --panel-scrollbar-hover: rgba(255, 255, 255, 0.15);
+  --panel-text-1: #e6edf3;
+  --panel-text-2: #c8d6e5;
+  --panel-text-3: #8b949e;
+  --panel-text-4: #7a8599;
+  --panel-text-5: #5a6a7e;
+  --panel-text-6: #4a5a6e;
+  --panel-accent: #00e5a0;
+  --panel-accent-cyan: #00c8ff;
+  --panel-accent-orange: #ff8c00;
+  --panel-accent-gold: #ffd700;
+  --panel-slider: rgba(255, 255, 255, 0.08);
+  --panel-slider-thumb: #3a4a60;
+  --panel-slider-thumb-hover: #4a5a70;
+  --panel-slider-thumb-border: rgba(255, 255, 255, 0.15);
+  --signal-real: #60a5fa;
+  --signal-complex: #a78bfa;
 
   /* Canvas-визуализации */
   --canvas-bg: #1f2937;

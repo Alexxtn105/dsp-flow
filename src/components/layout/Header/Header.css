@@ -1,4 +1,4 @@
-/* ===== Header — Audition Style ===== */
+/* ===== Header — Themed ===== */
 
 .hdr {
     display: flex;
@@ -6,8 +6,8 @@
     justify-content: space-between;
     height: 40px;
     padding: 0 12px;
-    background: #12122a;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--panel-border);
     flex-shrink: 0;
     z-index: 20;
     gap: 16px;
@@ -26,14 +26,14 @@
     font-size: 14px;
     font-weight: 800;
     font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
-    color: #00e5a0;
+    color: var(--panel-accent);
     letter-spacing: 1.5px;
 }
 
 .hdr-title {
     font-size: 12px;
     font-weight: 500;
-    color: #5a6a7e;
+    color: var(--panel-text-4);
     letter-spacing: 0.3px;
 }
 
@@ -49,8 +49,8 @@
     align-items: center;
     gap: 6px;
     padding: 3px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--panel-subtle-bg);
+    border: 1px solid var(--panel-border);
     border-radius: 3px;
     max-width: 320px;
 }
@@ -59,12 +59,12 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #3a4a5e;
+    background: var(--panel-text-6);
     flex-shrink: 0;
 }
 
 .hdr-scheme-unsaved .hdr-scheme-dot {
-    background: #ff8c00;
+    background: var(--panel-accent-orange);
     box-shadow: 0 0 4px rgba(255, 140, 0, 0.5);
 }
 
@@ -72,7 +72,7 @@
     font-size: 11px;
     font-weight: 600;
     font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
-    color: #99a8bf;
+    color: var(--panel-text-2);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -81,7 +81,7 @@
 .hdr-scheme-badge {
     font-size: 9px;
     font-weight: 600;
-    color: #ff8c00;
+    color: var(--panel-accent-orange);
     padding: 1px 5px;
     background: rgba(255, 140, 0, 0.1);
     border: 1px solid rgba(255, 140, 0, 0.2);
@@ -104,10 +104,10 @@
     gap: 4px;
     height: 26px;
     padding: 0 8px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--panel-border);
     border-radius: 3px;
-    background: rgba(255, 255, 255, 0.03);
-    color: #5a6a7e;
+    background: var(--panel-subtle-bg);
+    color: var(--panel-text-4);
     font-size: 10px;
     font-weight: 500;
     font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
@@ -116,14 +116,14 @@
 }
 
 .hdr-legend-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: #8899aa;
-    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--panel-hover-bg);
+    color: var(--panel-text-3);
+    border-color: var(--panel-border-hover);
 }
 
 .hdr-legend-btn.active {
     background: rgba(0, 229, 160, 0.08);
-    color: #00e5a0;
+    color: var(--panel-accent);
     border-color: rgba(0, 229, 160, 0.2);
 }
 
@@ -138,10 +138,10 @@
     right: 0;
     margin-top: 4px;
     padding: 8px 12px;
-    background: #1a1a2e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--panel-dropdown-bg);
+    border: 1px solid var(--panel-dropdown-border);
     border-radius: 4px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     z-index: 100;
     display: flex;
     flex-direction: column;
@@ -168,7 +168,7 @@
     font-size: 10px;
     font-weight: 600;
     font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
-    color: #7a8599;
+    color: var(--panel-text-3);
     letter-spacing: 0.5px;
 }
 

@@ -1,10 +1,10 @@
-/* ===== Oscilloscope — Audition Style ===== */
+/* ===== Oscilloscope — Themed ===== */
 
 .oscilloscope-view.audition-theme {
     position: relative;
     display: flex;
     flex-direction: column;
-    background: #1a1a2e;
+    background: var(--panel-bg-alt);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -15,8 +15,8 @@
     align-items: center;
     gap: 6px;
     padding: 3px 8px;
-    background: #12122a;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--panel-border);
     flex-shrink: 0;
     min-height: 30px;
 }
@@ -30,14 +30,14 @@
 .osc-toolbar-divider {
     width: 1px;
     height: 18px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel-active-bg);
     flex-shrink: 0;
 }
 
 /* Labels */
 .osc-label {
     font-size: 10px;
-    color: #5a6a7e;
+    color: var(--panel-text-4);
     font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
     white-space: nowrap;
     user-select: none;
@@ -49,7 +49,7 @@
     appearance: none;
     width: 64px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel-slider);
     border-radius: 2px;
     outline: none;
     cursor: pointer;
@@ -61,27 +61,27 @@
     width: 10px;
     height: 14px;
     border-radius: 2px;
-    background: #3a4a60;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--panel-slider-thumb);
+    border: 1px solid var(--panel-slider-thumb-border);
     cursor: pointer;
     transition: background 120ms ease;
 }
 
 .osc-slider::-webkit-slider-thumb:hover {
-    background: #4a5a70;
+    background: var(--panel-slider-thumb-hover);
 }
 
 .osc-slider::-moz-range-thumb {
     width: 10px;
     height: 14px;
     border-radius: 2px;
-    background: #3a4a60;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--panel-slider-thumb);
+    border: 1px solid var(--panel-slider-thumb-border);
     cursor: pointer;
 }
 
 .osc-slider::-moz-range-track {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel-slider);
     height: 4px;
     border-radius: 2px;
 }
@@ -91,10 +91,10 @@
     width: 56px;
     height: 20px;
     padding: 0 4px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--panel-border);
     border-radius: 3px;
-    background: rgba(0, 0, 0, 0.3);
-    color: #8899aa;
+    background: var(--panel-input-bg);
+    color: var(--panel-text-3);
     font-size: 10px;
     font-family: 'Segoe UI Mono', 'SF Mono', 'Consolas', monospace;
     text-align: right;
@@ -104,7 +104,7 @@
 
 .osc-input:focus {
     border-color: rgba(0, 229, 160, 0.4);
-    color: #aabbcc;
+    color: var(--panel-text-2);
 }
 
 .osc-input-narrow {

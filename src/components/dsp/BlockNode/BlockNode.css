@@ -348,15 +348,15 @@
 }
 
 .signal-type-badge.signal-real {
-    color: #3b82f6;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: var(--signal-real);
+    background: color-mix(in srgb, var(--signal-real) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--signal-real) 30%, transparent);
 }
 
 .signal-type-badge.signal-complex {
-    color: #8b5cf6;
-    background: rgba(139, 92, 246, 0.1);
-    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: var(--signal-complex);
+    background: color-mix(in srgb, var(--signal-complex) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--signal-complex) 30%, transparent);
 }
 
 /* Стили для handles разных типов */
@@ -370,34 +370,15 @@
 }
 
 .block-handle.signal-real {
-    background: #3b82f6 !important;
+    background: var(--signal-real) !important;
     border-color: var(--bg-secondary) !important;
 }
 
-/*.block-handle.signal-complex {*/
-/*    background: #8b5cf6 !important;*/
-/*    border-color: var(--bg-secondary) !important;*/
-/*    position: relative;*/
-/*}*/
-
 .block-handle.signal-complex {
-    background: #8b5cf6 !important;
+    background: var(--signal-complex) !important;
     border-color: var(--bg-secondary) !important;
     box-sizing: border-box;
 }
-
-/* Двойной круг для комплексного сигнала */
-/*.block-handle.signal-complex::after {*/
-/*    content: '';*/
-/*    position: absolute;*/
-/*    top: -4px;*/
-/*    left: -4px;*/
-/*    right: -4px;*/
-/*    bottom: -4px;*/
-/*    border: 2px solid #8b5cf6;*/
-/*    border-radius: 50%;*/
-/*    opacity: 0.5;*/
-/*}*/
 
 .block-handle.signal-complex::after {
     content: '';
@@ -406,37 +387,11 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 16px;
-    /* больше, чем основной круг */
     height: 16px;
-    border: 2px solid #8b5cf6;
+    border: 2px solid var(--signal-complex);
     border-radius: 50%;
     opacity: 0.5;
     box-sizing: border-box;
-}
-
-/* Темная тема */
-.dark-theme .signal-type-badge.signal-real {
-    color: #60a5fa;
-    background: rgba(59, 130, 246, 0.2);
-    border-color: rgba(59, 130, 246, 0.4);
-}
-
-.dark-theme .signal-type-badge.signal-complex {
-    color: #a78bfa;
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
-}
-
-.dark-theme .block-handle.signal-real {
-    background: #60a5fa !important;
-}
-
-.dark-theme .block-handle.signal-complex {
-    background: #a78bfa !important;
-}
-
-.dark-theme .block-handle.signal-complex::after {
-    border-color: #a78bfa;
 }
 
 /* Адаптивность */
