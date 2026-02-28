@@ -1,33 +1,127 @@
-.oscilloscope-view {
+/* ===== Oscilloscope — Audition Style ===== */
+
+.oscilloscope-view.audition-theme {
     position: relative;
     display: flex;
     flex-direction: column;
+    background: #1a1a2e;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
-.oscilloscope-canvas {
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-primary);
-}
-
-.oscilloscope-labels {
+/* ---- Toolbar ---- */
+.osc-toolbar {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    padding-left: 6px;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: #12122a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    min-height: 30px;
+}
+
+.osc-toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.osc-toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+/* Labels */
+.osc-label {
     font-size: 10px;
-    color: var(--text-secondary);
+    color: #5a6a7e;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    white-space: nowrap;
+    user-select: none;
 }
 
-.dark-theme .oscilloscope-canvas {
-    border-color: var(--border-secondary);
+/* Sliders */
+.osc-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 64px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
 }
 
-.viz-toolbar-label {
-    margin-right: 8px;
-    font-size: 11px;
+.osc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    background: #3a4a60;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 120ms ease;
 }
 
-.viz-zoom-input {
-    width: 60px;
+.osc-slider::-webkit-slider-thumb:hover {
+    background: #4a5a70;
+}
+
+.osc-slider::-moz-range-thumb {
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    background: #3a4a60;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+.osc-slider::-moz-range-track {
+    background: rgba(255, 255, 255, 0.08);
+    height: 4px;
+    border-radius: 2px;
+}
+
+/* Numeric inputs */
+.osc-input {
+    width: 56px;
+    height: 20px;
+    padding: 0 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #8899aa;
+    font-size: 10px;
+    font-family: 'Segoe UI Mono', 'SF Mono', 'Consolas', monospace;
+    text-align: right;
+    outline: none;
+    transition: border-color 120ms ease;
+}
+
+.osc-input:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+    color: #aabbcc;
+}
+
+.osc-input-narrow {
+    width: 42px;
+}
+
+.osc-input::-webkit-inner-spin-button,
+.osc-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.osc-input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* ---- Canvas ---- */
+.osc-canvas {
+    display: block;
+    cursor: crosshair;
 }

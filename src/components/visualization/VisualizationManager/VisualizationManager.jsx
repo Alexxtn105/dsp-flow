@@ -195,6 +195,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                         ) : (
                             <OscilloscopeView
                                 data={data}
+                                sampleRate={sampleRate}
                                             width={config.width}
                                 height={config.height - 70}
                             />
