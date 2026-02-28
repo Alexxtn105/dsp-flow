@@ -236,6 +236,7 @@ export const formatParamName = (name) => {
         'operation': 'Операция',
         'notchFrequency': 'Частота режекции',
         'bandwidth': 'Ширина полосы',
+        'value': 'Значение',
     };
 
     if (exactNames[name]) return exactNames[name];

@@ -38,6 +38,16 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Константа — горизонтальная линия (постоянное значение)
+    'dsp-constant': (
+        <>
+            <path d="M3 12 L21 12" strokeWidth="2.5" strokeLinecap="round" />
+            <text x="7" y="9" fontSize="8" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">const</text>
+        </>
+    ),
+
     // Аудиофайл — документ с формой волны внутри
     'dsp-audio-file': (
         <>

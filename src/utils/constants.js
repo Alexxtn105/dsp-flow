@@ -22,6 +22,7 @@ export const DSP_BLOCK_TYPES = {
     REMEZ_FILTER: 'Фильтр Ремеза',
 
     // Генераторы
+    CONSTANT: 'Константа',
     AUDIO_FILE: 'Audio File',
     SINE_GENERATOR: 'Синусный генератор',
     COSINE_GENERATOR: 'Косинусный генератор',

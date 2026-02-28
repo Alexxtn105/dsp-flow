@@ -4,6 +4,7 @@ import CosineGeneratorPlugin from './generators/CosineGeneratorPlugin.js';
 import RefSineGeneratorPlugin from './generators/RefSineGeneratorPlugin.js';
 import RefCosineGeneratorPlugin from './generators/RefCosineGeneratorPlugin.js';
 import AudioFilePlugin from './generators/AudioFilePlugin.js';
+import ConstantPlugin from './generators/ConstantPlugin.js';
 
 // Фильтры
 import NotchFIRPlugin from './filters/NotchFIRPlugin.js';
@@ -50,6 +51,7 @@ export default [
 
     // Генераторы
     AudioFilePlugin,
+    ConstantPlugin,
     SineGeneratorPlugin,
     CosineGeneratorPlugin,
     RefSineGeneratorPlugin,
