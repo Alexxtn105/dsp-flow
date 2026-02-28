@@ -255,6 +255,31 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Формирователь комплексного — Re+jIm (два входа → один комплексный выход)
+    'dsp-complex-compose': (
+        <>
+            <text x="1" y="12" fontSize="10" fontWeight="700" fontStyle="italic"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">Re</text>
+            <text x="1" y="22" fontSize="10" fontWeight="700" fontStyle="italic"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">Im</text>
+            <path d="M15 6 L19 12 L15 18" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Комплексное сопряжение — z*
+    'dsp-conjugate': (
+        <>
+            <text x="3" y="18" fontSize="16" fontWeight="800" fontStyle="italic"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">z</text>
+            <text x="14" y="10" fontSize="12" fontWeight="800"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">*</text>
+        </>
+    ),
+
     // Возведение в квадрат — x²
     'dsp-square': (
         <>

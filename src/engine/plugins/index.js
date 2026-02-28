@@ -33,6 +33,8 @@ import ComplexSquarePlugin from './math/ComplexSquarePlugin.js';
 import ComplexSqrtPlugin from './math/ComplexSqrtPlugin.js';
 import ComplexPhasePlugin from './math/ComplexPhasePlugin.js';
 import ComplexMagnitudePlugin from './math/ComplexMagnitudePlugin.js';
+import ComplexComposerPlugin from './math/ComplexComposerPlugin.js';
+import ComplexConjugatePlugin from './math/ComplexConjugatePlugin.js';
 import RealSquarePlugin from './math/RealSquarePlugin.js';
 import RealPower4Plugin from './math/RealPower4Plugin.js';
 
@@ -90,6 +92,8 @@ export default [
     ComplexSqrtPlugin,
     ComplexPhasePlugin,
     ComplexMagnitudePlugin,
+    ComplexComposerPlugin,
+    ComplexConjugatePlugin,
     RealSquarePlugin,
     RealPower4Plugin,
 

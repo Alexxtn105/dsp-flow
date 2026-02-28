@@ -4,6 +4,8 @@ import MultiplierPlugin from '../../src/engine/plugins/math/MultiplierPlugin.js'
 import IntegratorPlugin from '../../src/engine/plugins/math/IntegratorPlugin.js';
 import RealPartPlugin from '../../src/engine/plugins/math/RealPartPlugin.js';
 import ImagPartPlugin from '../../src/engine/plugins/math/ImagPartPlugin.js';
+import ComplexComposerPlugin from '../../src/engine/plugins/math/ComplexComposerPlugin.js';
+import ComplexConjugatePlugin from '../../src/engine/plugins/math/ComplexConjugatePlugin.js';
 
 describe('SummerPlugin', () => {
     it('суммирует два входа', () => {
@@ -167,5 +169,101 @@ describe('ImagPartPlugin', () => {
         const output = ImagPartPlugin.processor.process([input], {}, 2);
         expect(output.length).toBe(1);
         expect(output[0]).toBeCloseTo(-3.2);
+    });
+});
+
+describe('ComplexComposerPlugin', () => {
+    it('формирует комплексный сигнал из двух действительных', () => {
+        const re = new Float32Array([1.0, 2.0, 3.0]);
+        const im = new Float32Array([4.0, 5.0, 6.0]);
+        const output = ComplexComposerPlugin.processor.process([re, im], {}, 3);
+        // Interleaved: [Re0, Im0, Re1, Im1, Re2, Im2]
+        expect(output.length).toBe(6);
+        expect(output[0]).toBeCloseTo(1.0);
+        expect(output[1]).toBeCloseTo(4.0);
+        expect(output[2]).toBeCloseTo(2.0);
+        expect(output[3]).toBeCloseTo(5.0);
+        expect(output[4]).toBeCloseTo(3.0);
+        expect(output[5]).toBeCloseTo(6.0);
+    });
+
+    it('работает только с действительной частью (мнимая = 0)', () => {
+        const re = new Float32Array([1.0, 2.0]);
+        const output = ComplexComposerPlugin.processor.process([re, null], {}, 2);
+        expect(output.length).toBe(4);
+        expect(output[0]).toBeCloseTo(1.0);
+        expect(output[1]).toBeCloseTo(0.0);
+        expect(output[2]).toBeCloseTo(2.0);
+        expect(output[3]).toBeCloseTo(0.0);
+    });
+
+    it('работает только с мнимой частью (действительная = 0)', () => {
+        const im = new Float32Array([3.0, 4.0]);
+        const output = ComplexComposerPlugin.processor.process([null, im], {}, 2);
+        expect(output.length).toBe(4);
+        expect(output[0]).toBeCloseTo(0.0);
+        expect(output[1]).toBeCloseTo(3.0);
+        expect(output[2]).toBeCloseTo(0.0);
+        expect(output[3]).toBeCloseTo(4.0);
+    });
+
+    it('возвращает тишину при пустых входах', () => {
+        const output = ComplexComposerPlugin.processor.process([null, null], {}, 128);
+        expect(output.length).toBe(256);
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('обратная операция к RealPart + ImagPart', () => {
+        const re = new Float32Array([1.0, -2.0, 3.5]);
+        const im = new Float32Array([0.5, 1.0, -0.7]);
+        const complex = ComplexComposerPlugin.processor.process([re, im], {}, 3);
+        const extractedRe = RealPartPlugin.processor.process([complex], {}, 6);
+        const extractedIm = ImagPartPlugin.processor.process([complex], {}, 6);
+        for (let i = 0; i < 3; i++) {
+            expect(extractedRe[i]).toBeCloseTo(re[i]);
+            expect(extractedIm[i]).toBeCloseTo(im[i]);
+        }
+    });
+});
+
+describe('ComplexConjugatePlugin', () => {
+    it('инвертирует мнимую часть комплексного сигнала', () => {
+        // Interleaved: [Re0, Im0, Re1, Im1, Re2, Im2]
+        const input = new Float32Array([1.0, 2.0, 3.0, -4.0, 5.0, 0.0]);
+        const output = ComplexConjugatePlugin.processor.process([input], {}, 6);
+        expect(output.length).toBe(6);
+        expect(output[0]).toBeCloseTo(1.0);   // Re0 без изменений
+        expect(output[1]).toBeCloseTo(-2.0);  // Im0 инвертирована
+        expect(output[2]).toBeCloseTo(3.0);   // Re1
+        expect(output[3]).toBeCloseTo(4.0);   // Im1 инвертирована
+        expect(output[4]).toBeCloseTo(5.0);   // Re2
+        expect(output[5]).toBeCloseTo(0.0);   // Im2 = -0 ≈ 0
+    });
+
+    it('двойное сопряжение возвращает исходный сигнал', () => {
+        const input = new Float32Array([1.0, 2.0, -3.0, 4.5]);
+        const conjugate = ComplexConjugatePlugin.processor.process([input], {}, 4);
+        const doubleConj = ComplexConjugatePlugin.processor.process([conjugate], {}, 4);
+        for (let i = 0; i < input.length; i++) {
+            expect(doubleConj[i]).toBeCloseTo(input[i]);
+        }
+    });
+
+    it('возвращает тишину при пустом входе', () => {
+        const output = ComplexConjugatePlugin.processor.process([], {}, 128);
+        expect(output.length).toBe(256);
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('обрабатывает единичный комплексный сэмпл', () => {
+        const input = new Float32Array([7.5, -3.2]);
+        const output = ComplexConjugatePlugin.processor.process([input], {}, 2);
+        expect(output.length).toBe(2);
+        expect(output[0]).toBeCloseTo(7.5);
+        expect(output[1]).toBeCloseTo(3.2);
     });
 });

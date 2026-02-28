@@ -50,6 +50,8 @@ export const DSP_BLOCK_TYPES = {
     COMPLEX_SQRT: 'Комплексный корень',
     COMPLEX_PHASE: 'Фаза (комплексная)',
     COMPLEX_MAGNITUDE: 'Амплитуда (комплексная)',
+    COMPLEX_COMPOSER: 'Формирователь комплексного',
+    COMPLEX_CONJUGATE: 'Комплексное сопряжение',
     REAL_SQUARE: 'Квадрат (действ.)',
     REAL_POWER4: 'Степень 4 (действ.)',
 
