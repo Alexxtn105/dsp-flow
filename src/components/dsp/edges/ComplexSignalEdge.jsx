@@ -1,4 +1,6 @@
-import { BaseEdge, getBezierPath } from '@xyflow/react';
+import { getBezierPath } from '@xyflow/react';
+
+const OFFSET = 2.5;
 
 function ComplexSignalEdge({ id, sourceX, sourceY, targetX, targetY, data }) {
     const [edgePath] = getBezierPath({
@@ -10,32 +12,42 @@ function ComplexSignalEdge({ id, sourceX, sourceY, targetX, targetY, data }) {
         targetPosition: 'left',
     });
 
+    const isRunning = data?.isRunning;
+    const animation = isRunning ? 'dashdraw 0.5s linear infinite' : 'none';
+
     return (
         <>
-            {/* Две пунктирные линии для эффекта двойной линии */}
-            <BaseEdge
-                id={`${id}-1`}
-                path={edgePath}
-                style={{
-                    stroke: '#8b5cf6',
-                    strokeWidth: 4,
-                    strokeDasharray: '5,5',
-                    opacity: 0.5,
-                    fill: 'none',
-                    animation: data?.isRunning ? 'dashdraw 0.5s linear infinite' : 'none'
-                }}
+            {/* Невидимая широкая область для клика */}
+            <path
+                className="react-flow__edge-interaction"
+                d={edgePath}
+                fill="none"
+                stroke="transparent"
+                strokeWidth={20}
             />
-            <BaseEdge
-                id={`${id}-2`}
-                path={edgePath}
-                style={{
-                    stroke: '#8b5cf6',
-                    strokeWidth: 2,
-                    strokeDasharray: '5,5',
-                    fill: 'none',
-                    animation: data?.isRunning ? 'dashdraw 0.5s linear infinite' : 'none'
-                }}
-            />
+            {/* Верхняя пунктирная линия */}
+            <g transform={`translate(0, -${OFFSET})`}>
+                <path
+                    id={id}
+                    className="react-flow__edge-path"
+                    d={edgePath}
+                    fill="none"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    style={{ stroke: 'var(--signal-complex)', animation }}
+                />
+            </g>
+            {/* Нижняя пунктирная линия */}
+            <g transform={`translate(0, ${OFFSET})`}>
+                <path
+                    className="react-flow__edge-path"
+                    d={edgePath}
+                    fill="none"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    style={{ stroke: 'var(--signal-complex)', animation }}
+                />
+            </g>
         </>
     );
 }
