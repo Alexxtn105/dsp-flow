@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
 import registry from '../../../engine/PluginRegistry';
 import { HIDDEN_PARAMS } from '../../../utils/constants';
+import FileStorageService from '../../../services/fileStorageService';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './BlockParamsPopover.css';
 
@@ -67,7 +68,9 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
         const currentParams = node.data.params || {};
         setLocalParams({ ...defaultParams, ...currentParams });
         if (currentParams.wavFile) {
-            setWavFileName(currentParams.wavFile.name || 'Файл выбран');
+            setWavFileName(currentParams.wavFile.name || currentParams.wavFileName || 'Файл выбран');
+        } else if (currentParams.wavFileName) {
+            setWavFileName(currentParams.wavFileName);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nodeId]);
@@ -203,6 +206,12 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Сохраняем аудиофайл в IndexedDB для восстановления при загрузке схемы
+        if (localParams.wavFile instanceof File) {
+            FileStorageService.saveFile(node.id, localParams.wavFile);
+        }
+
         onSave(node.id, localParams);
         onClose();
     };

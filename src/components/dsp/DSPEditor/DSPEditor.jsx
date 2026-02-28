@@ -25,8 +25,59 @@ import {
 } from '../../../utils/helpers';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import { useThemeContext } from '../../../contexts/ThemeContext';
+import FileStorageService from '../../../services/fileStorageService';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
+
+/**
+ * Восстановить аудиофайлы из IndexedDB для узлов AudioFile.
+ * Если файл не найден — очистить метаданные.
+ */
+async function restoreAudioFiles(nodes) {
+    const hasAudioFiles = nodes.some(
+        n => n.data.blockType === 'Audio File' && n.data.params?.wavFileName
+    );
+    if (!hasAudioFiles) return nodes;
+
+    return Promise.all(nodes.map(async (node) => {
+        if (node.data.blockType !== 'Audio File' || !node.data.params?.wavFileName) {
+            return node;
+        }
+
+        try {
+            const file = await FileStorageService.getFile(node.id);
+            if (file) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        params: { ...node.data.params, wavFile: file }
+                    }
+                };
+            }
+        } catch (err) {
+            console.warn('Не удалось восстановить аудиофайл для узла', node.id, err);
+        }
+
+        // Файл не найден — очищаем метаданные
+        return {
+            ...node,
+            data: {
+                ...node.data,
+                params: {
+                    ...node.data.params,
+                    wavFile: null,
+                    wavFileName: null,
+                    sourceType: null,
+                    detectedSampleRate: null,
+                    duration: null,
+                    channels: null,
+                    totalSamples: null
+                }
+            }
+        };
+    }));
+}
 
 const nodeTypes = {
     block: BlockNode,
@@ -206,26 +257,36 @@ function DSPEditor({
 
     // Загрузка автосохранённой схемы при старте
     useEffect(() => {
-        if (!hasLoadedExternalScheme.current) {
-            const autoSaved = loadAutoSave();
-            if (autoSaved) {
-                setNodes(injectCallbacks(autoSaved.nodes || []));
-                setEdges(autoSaved.edges || []);
-                hasLoadedExternalScheme.current = true;
+        const loadAuto = async () => {
+            if (!hasLoadedExternalScheme.current) {
+                const autoSaved = loadAutoSave();
+                if (autoSaved) {
+                    const nodesWithCallbacks = injectCallbacks(autoSaved.nodes || []);
+                    const restoredNodes = await restoreAudioFiles(nodesWithCallbacks);
+                    setNodes(restoredNodes);
+                    setEdges(autoSaved.edges || []);
+                    hasLoadedExternalScheme.current = true;
+                }
             }
-        }
+        };
+        loadAuto();
     }, [loadAutoSave, setNodes, setEdges, injectCallbacks]);
 
     // Обработка загруженной схемы из контекста (с защитой от двойного вызова в Strict Mode)
     useEffect(() => {
-        if (loadedSchemeData && loadedSchemeData.nodes && loadedSchemeData !== processedSchemeRef.current) {
-            processedSchemeRef.current = loadedSchemeData;
-            clearAutoSave();
-            setNodes(injectCallbacks(loadedSchemeData.nodes || []));
-            setEdges(loadedSchemeData.edges || []);
-            hasLoadedExternalScheme.current = true;
-            setLoadedSchemeData(null);
-        }
+        const loadScheme = async () => {
+            if (loadedSchemeData && loadedSchemeData.nodes && loadedSchemeData !== processedSchemeRef.current) {
+                processedSchemeRef.current = loadedSchemeData;
+                clearAutoSave();
+                const nodesWithCallbacks = injectCallbacks(loadedSchemeData.nodes || []);
+                const restoredNodes = await restoreAudioFiles(nodesWithCallbacks);
+                setNodes(restoredNodes);
+                setEdges(loadedSchemeData.edges || []);
+                hasLoadedExternalScheme.current = true;
+                setLoadedSchemeData(null);
+            }
+        };
+        loadScheme();
     }, [loadedSchemeData, setNodes, setEdges, clearAutoSave, setLoadedSchemeData, injectCallbacks]);
 
     // Сброс флага при создании новой схемы (граф очищен)
