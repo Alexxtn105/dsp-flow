@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Footer.css';
@@ -28,7 +28,8 @@ function Footer({
     totalSamples,
     onToggleManual,
     onStep,
-    onStepSizeChange
+    onStepSizeChange,
+    onSeek
 }) {
     const { isDarkTheme } = useThemeContext();
 
@@ -42,24 +43,58 @@ function Footer({
         ? (isManualMode ? 'status-manual' : 'status-run')
         : (isPaused ? 'status-pause' : 'status-ready');
 
-    const handleTimelineClick = useCallback(() => {
-        // Reserved for seek functionality
+    // Refs for smooth RAF-driven animation
+    const trackRef = useRef(null);
+    const fillRef = useRef(null);
+    const headRef = useRef(null);
+    const targetRef = useRef(0);
+    const displayRef = useRef(0);
+    const rafRef = useRef(null);
+
+    // Update target when prop changes
+    targetRef.current = progress || 0;
+
+    // Smooth animation loop via requestAnimationFrame
+    useEffect(() => {
+        const animate = () => {
+            const target = targetRef.current;
+            const current = displayRef.current;
+            const diff = target - current;
+
+            if (Math.abs(diff) < 0.00005) {
+                displayRef.current = target;
+            } else {
+                displayRef.current += diff * 0.25;
+            }
+
+            const p = displayRef.current * 100;
+            if (fillRef.current) fillRef.current.style.width = `${p}%`;
+            if (headRef.current) headRef.current.style.left = `${p}%`;
+
+            rafRef.current = requestAnimationFrame(animate);
+        };
+        rafRef.current = requestAnimationFrame(animate);
+        return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
     }, []);
+
+    const handleTimelineClick = useCallback((e) => {
+        if (!trackRef.current || !onSeek || totalSamples <= 0) return;
+        const rect = trackRef.current.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        // Immediately jump visually
+        displayRef.current = percent;
+        targetRef.current = percent;
+        onSeek(percent);
+    }, [totalSamples, onSeek]);
 
     return (
         <footer className={`ft ${isDarkTheme ? 'dark-theme' : ''}`}>
             {/* Timeline */}
             <div className="ft-timeline" onClick={handleTimelineClick}>
-                <div className="ft-timeline-track">
-                    <div
-                        className="ft-timeline-fill"
-                        style={{ width: `${pct}%` }}
-                    />
+                <div className="ft-timeline-track" ref={trackRef}>
+                    <div className="ft-timeline-fill" ref={fillRef} />
                     {totalSamples > 0 && (
-                        <div
-                            className="ft-timeline-head"
-                            style={{ left: `${pct}%` }}
-                        />
+                        <div className="ft-timeline-head" ref={headRef} />
                     )}
                 </div>
                 {/* Time markers */}
@@ -162,7 +197,8 @@ Footer.propTypes = {
     totalSamples: PropTypes.number,
     onToggleManual: PropTypes.func,
     onStep: PropTypes.func,
-    onStepSizeChange: PropTypes.func
+    onStepSizeChange: PropTypes.func,
+    onSeek: PropTypes.func
 };
 
 Footer.defaultProps = {

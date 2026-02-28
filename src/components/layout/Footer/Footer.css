@@ -29,27 +29,26 @@
     height: 100%;
     background: linear-gradient(90deg, #00e5a0, #00c8ff);
     border-radius: 1px;
-    transition: width 0.12s linear;
     position: relative;
+    will-change: width;
 }
 
 .ft-timeline-head {
     position: absolute;
     top: 50%;
-    width: 14px;
-    height: 14px;
+    width: 2px;
+    height: 18px;
     background: #00e5a0;
-    border: 2px solid #1a1a2e;
-    border-radius: 50%;
+    border-radius: 1px;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 6px rgba(0, 229, 160, 0.5);
+    box-shadow: 0 0 6px rgba(0, 229, 160, 0.45);
     z-index: 2;
-    transition: left 0.12s linear;
+    will-change: left;
 }
 
 .ft-timeline-head:hover {
     box-shadow: 0 0 10px rgba(0, 229, 160, 0.7);
-    transform: translate(-50%, -50%) scale(1.2);
+    width: 3px;
 }
 
 .ft-timeline-markers {

@@ -87,14 +87,13 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
 
             DSPProcessor.onProgress = (progress) => {
                 lastProgressRef.current = progress;
-                // Throttle: первый вызов запускает таймер, остальные просто обновляют ref
                 if (!progressTimerRef.current) {
-                    progressTimerRef.current = setTimeout(() => {
+                    progressTimerRef.current = requestAnimationFrame(() => {
                         progressTimerRef.current = null;
                         if (lastProgressRef.current) {
                             setProcessingProgress(lastProgressRef.current);
                         }
-                    }, 100);
+                    });
                 }
             };
 
@@ -167,13 +166,20 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         setProcessingProgress(prev => ({ currentSample: 0, totalSamples: prev.totalSamples, progress: 0 }));
     }, []);
 
+    const handleSeek = useCallback((percent) => {
+        DSPProcessor.seekToPercent(percent);
+        const total = WavFileService.getTotalSamples();
+        const sample = Math.floor(total * percent);
+        setProcessingProgress({ currentSample: sample, totalSamples: total, progress: percent });
+    }, []);
+
     // Cleanup при размонтировании
     useEffect(() => {
         return () => {
             DSPProcessor.stop();
             WavFileService.close();
             if (progressTimerRef.current) {
-                clearTimeout(progressTimerRef.current);
+                cancelAnimationFrame(progressTimerRef.current);
             }
         };
     }, []);
@@ -190,5 +196,6 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         handleStopSimulation,
         handleManualStep,
         handleRewind,
+        handleSeek,
     };
 }

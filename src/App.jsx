@@ -169,6 +169,7 @@ function App() {
                     onToggleManual={simulation.handleToggleManualMode}
                     onStep={simulation.handleManualStep}
                     onStepSizeChange={simulation.setManualStepSize}
+                    onSeek={simulation.handleSeek}
                 />
 
                 <VisualizationManager

@@ -409,6 +409,9 @@ class DSPProcessor {
     seekTo(sample) {
         if (!this._fileMode) return;
         this.currentSample = Math.max(0, Math.min(sample, WavFileService.getTotalSamples()));
+        if (this.audioContext) {
+            this.nextAudioStartTime = this.audioContext.currentTime;
+        }
     }
 
     /**
