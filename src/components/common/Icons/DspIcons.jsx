@@ -198,6 +198,18 @@ const DSP_ICONS = {
         </>
     ),
 
+    // ФАПЧ — петля обратной связи с φ
+    'dsp-pll': (
+        <>
+            <path d="M4 12 C4 7, 8 4, 12 4 C16 4, 20 7, 20 12 C20 17, 16 20, 12 20 C8 20, 4 17, 4 12"
+                  strokeWidth="1.5" fill="none" strokeDasharray="2 1.5" />
+            <polygon points="7,7 10,5 9,8.5" fill="currentColor" stroke="none" />
+            <text x="12" y="14" fontSize="8" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">PLL</text>
+        </>
+    ),
+
     /* ===================== MATH ===================== */
 
     // Сумматор — символ Σ (сигма)

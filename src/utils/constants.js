@@ -54,6 +54,8 @@ export const DSP_BLOCK_TYPES = {
     REAL_POWER4: 'Степень 4 (действ.)',
     ATAN2: 'Арктангенс',
 
+    PLL: 'ФАПЧ',
+
     // Визуализация
     OSCILLOSCOPE: 'Осциллограф',
     CONSTELLATION: 'Фазовое созвездие',

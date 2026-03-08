@@ -41,6 +41,7 @@ import Atan2Plugin from './math/Atan2Plugin.js';
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
 import FrequencyDetectorPlugin from './detectors/FrequencyDetectorPlugin.js';
 import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin.js';
+import PLLPlugin from './detectors/PLLPlugin.js';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin.js';
@@ -79,6 +80,7 @@ export default [
     PhaseDetectorPlugin,
     FrequencyDetectorPlugin,
     AmplitudeDetectorPlugin,
+    PLLPlugin,
 
     // Математические
     IntegratorPlugin,
