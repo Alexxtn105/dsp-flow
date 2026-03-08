@@ -163,8 +163,11 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
         const file = e.target.files[0];
         if (!file) return;
 
-        const ext = file.name.toLowerCase();
-        if (!ext.endsWith('.wav') && !ext.endsWith('.mp3')) {
+        const name = file.name.toLowerCase();
+        const validExtensions = name.endsWith('.wav') || name.endsWith('.mp3');
+        const validMime = file.type === 'audio/wav' || file.type === 'audio/x-wav' ||
+                          file.type === 'audio/mpeg' || file.type === 'audio/mp3';
+        if (!validExtensions && !validMime) {
             setError('Пожалуйста, выберите WAV или MP3 файл');
             return;
         }

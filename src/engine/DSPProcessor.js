@@ -132,17 +132,18 @@ class DSPProcessor {
 
         // Инициализируем состояния для каждого блока
         for (const block of this.compiledGraph) {
+            const cachedParams = { ...block.params, sampleRate: this.sampleRate };
             this.blockStates.set(block.nodeId, {
                 output: null,
-                initialized: false
+                initialized: false,
+                cachedParams
             });
 
             // Если у блока есть метод init, вызываем его для предварительного расчета (например, коэффициентов фильтра)
             const BlockProcessor = registry.getProcessor(block.blockType);
             if (BlockProcessor && typeof BlockProcessor.init === 'function') {
                 try {
-                    const paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
-                    BlockProcessor.init(block.nodeId, paramsWithSampleRate, this.sampleRate);
+                    BlockProcessor.init(block.nodeId, cachedParams, this.sampleRate);
                 } catch (error) {
                     return {
                         success: false,
@@ -316,10 +317,16 @@ class DSPProcessor {
             // Обрабатываем каждый блок в порядке топологической сортировки
             for (const block of this.compiledGraph) {
                 const output = this.executeBlock(block);
-                this.blockStates.set(block.nodeId, {
-                    output,
-                    initialized: true
-                });
+                const blockState = this.blockStates.get(block.nodeId);
+                blockState.output = output;
+                blockState.initialized = true;
+
+                // NaN/Infinity guard: обнуляем «плохие» значения, чтобы они не распространялись по графу
+                if (output instanceof Float32Array) {
+                    for (let i = 0; i < output.length; i++) {
+                        if (!isFinite(output[i])) output[i] = 0;
+                    }
+                }
                 if (output && this.onBlockOutput) {
                     // Для множественных выходов передаём primary (первый) для совместимости
                     const primaryOutput = output?.outputs ? output.outputs[0] : output;
@@ -415,9 +422,13 @@ class DSPProcessor {
             return WavFileService.readChunk(this.currentSample, this.chunkSize);
         }
 
-        // Передаем nodeId для блоков, которым нужно сохранять состояние (например, генераторы)
-        // Добавляем sampleRate в params
-        const paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
+        // Используем кешированные params (с sampleRate), обновляем при изменении параметров блока
+        const blockState = this.blockStates.get(block.nodeId);
+        let paramsWithSampleRate = blockState?.cachedParams;
+        if (!paramsWithSampleRate || paramsWithSampleRate.sampleRate !== this.sampleRate) {
+            paramsWithSampleRate = { ...block.params, sampleRate: this.sampleRate };
+            if (blockState) blockState.cachedParams = paramsWithSampleRate;
+        }
 
         // Выполняем блок
         return BlockProcessor.process(inputs, paramsWithSampleRate, this.chunkSize, block.nodeId);

@@ -1,4 +1,4 @@
-import { useState, useCallback, useImperativeHandle, forwardRef, useEffect } from 'react';
+import { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import VisualizationWindow from '../VisualizationWindow';
 import OscilloscopeView from '../OscilloscopeView';
@@ -72,7 +72,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
 
     // Эффект для автоматического закрытия окон при удалении узлов (N15)
     // Используем functional update для чтения prev, не включая openWindows в deps
-    const nodeIds = nodes.map(n => n.id).join(',');
+    const nodeIds = useMemo(() => nodes.map(n => n.id).join(','), [nodes]);
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         setOpenWindows(prev => {

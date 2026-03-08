@@ -2,15 +2,7 @@
 
 Источник: `CODE_REVIEW.md` в корне репозитория.
 
-## Открытые дефекты (5)
-
-### Средний приоритет
-| # | Дефект | Файл | Суть |
-|---|--------|------|------|
-| 9 | Нет NaN/Infinity guard | Сигнальный тракт | Плохое значение распространяется по всему графу |
-| 10 | WAV — только проверка расширения | BlockParamsPopover.jsx | Нет MIME-type проверки |
-| 11 | VisualizationManager пересчёты | VisualizationManager | `nodeIds` не мемоизирован, пересоздаётся каждый рендер |
-| 12 | Spread params на hot path | DSPProcessor.js:144,420 | `{ ...block.params, sampleRate }` на каждый чанк, нужно кешировать |
+## Открытые дефекты (3)
 
 ### Низкий приоритет
 | # | Дефект | Файл | Суть |
@@ -19,7 +11,7 @@
 | 17 | Hardcoded цвета | RealSignalEdge, Header | `#3b82f6` вместо CSS-переменных |
 | 18 | Goertzel Math.round | GoertzelFilterPlugin.js:29 | Math.round может дать bin за пределами спектра |
 
-## Исправленные дефекты (12)
+## Исправленные дефекты (16)
 
 | # | Дефект | Статус |
 |---|--------|--------|
@@ -31,6 +23,10 @@
 | 6 | sampleRate без валидации | Исправлено — `setSampleRate()` проверяет `rate > 0`, `start()` валидирует sampleRate |
 | 7 | Дублирование phase unwrapping | Исправлено — вынесено в `_shared/SignalUtils.js: unwrapPhaseDelta()` |
 | 8 | NotchFIR buffer resize | Исправлено — проверка размеров при пересоздании |
+| 9 | NaN/Infinity guard | Исправлено — `isFinite()` guard на выходе каждого блока в processNextChunk() |
+| 10 | WAV MIME-type проверка | Исправлено — проверка и расширения, и MIME-типа (audio/wav, audio/mpeg) |
+| 11 | VisualizationManager nodeIds | Исправлено — обёрнуто в `useMemo()` |
+| 12 | Spread params на hot path | Исправлено — cachedParams при initialize(), переиспользуется в executeBlock() |
 | 13 | Multiplier деление на ноль | По дизайну — возврат 0 |
 | 16 | Мёртвый CSS | Всё ещё присутствует (закомментирован) |
 | 19 | FFTUtils dB underflow | Исправлено — проверка `mag > 0`, MIN_DB = -120 |
