@@ -97,6 +97,41 @@ registry.registerGroup({ id: 'detectors', name: 'Детекторы', collapsed:
         { value: 'absolute', label: 'Абсолютная частота (Гц)' }
     ]);
 
+    registry.registerParamOptions('modulationType', [
+        { value: 'AM', label: 'АМ (амплитудная)' },
+        { value: 'FM', label: 'ЧМ (частотная)' },
+        { value: 'PM', label: 'ФМ (фазовая)' }
+    ]);
+
+    registry.registerParamOptions('filterDesign', [
+        { value: 'butterworth', label: 'Баттерворт (Butterworth)' },
+        { value: 'chebyshev1', label: 'Чебышев I (Chebyshev I)' }
+    ]);
+
+    registry.registerParamOptions('iirFilterType', [
+        { value: 'lowpass', label: 'ФНЧ (Lowpass)' },
+        { value: 'highpass', label: 'ФВЧ (Highpass)' }
+    ]);
+
+    registry.registerParamOptions('gainMode', [
+        { value: 'linear', label: 'Линейный' },
+        { value: 'dB', label: 'Децибелы (дБ)' }
+    ]);
+
+    registry.registerParamOptions('logFunction', [
+        { value: 'ln', label: 'ln (натуральный)' },
+        { value: 'log10', label: 'log₁₀ (десятичный)' },
+        { value: 'dB', label: 'дБ (20·log₁₀|x|)' },
+        { value: 'exp', label: 'exp (eˣ)' },
+        { value: 'pow10', label: '10ˣ' }
+    ]);
+
+    registry.registerParamOptions('pskConstellation', [
+        { value: 'BPSK', label: 'BPSK' },
+        { value: 'QPSK', label: 'QPSK' },
+        { value: '8PSK', label: '8PSK' }
+    ]);
+
     // Регистрация всех плагинов
     registry.registerAll(allPlugins);
 

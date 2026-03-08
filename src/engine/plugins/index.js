@@ -6,6 +6,8 @@ import RefCosineGeneratorPlugin from './generators/RefCosineGeneratorPlugin.js';
 import AudioFilePlugin from './generators/AudioFilePlugin.js';
 import ConstantPlugin from './generators/ConstantPlugin.js';
 import NoiseGeneratorPlugin from './generators/NoiseGeneratorPlugin.js';
+import AMFMPMModulatorPlugin from './generators/AMFMPMModulatorPlugin.js';
+import PSKModulatorPlugin from './generators/PSKModulatorPlugin.js';
 
 // Фильтры
 import NotchFIRPlugin from './filters/NotchFIRPlugin.js';
@@ -17,6 +19,8 @@ import GoertzelFilterPlugin from './filters/GoertzelFilterPlugin.js';
 import RemezFilterPlugin from './filters/RemezFilterPlugin.js';
 import DelayLinePlugin from './filters/DelayLinePlugin.js';
 import DecimatorInterpolatorPlugin from './filters/DecimatorInterpolatorPlugin.js';
+import IIRFilterPlugin from './filters/IIRFilterPlugin.js';
+import CICFilterPlugin from './filters/CICFilterPlugin.js';
 
 // Анализ
 import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin.js';
@@ -40,6 +44,11 @@ import RealPower4Plugin from './math/RealPower4Plugin.js';
 import Atan2Plugin from './math/Atan2Plugin.js';
 import AGCPlugin from './math/AGCPlugin.js';
 import AbsoluteValuePlugin from './math/AbsoluteValuePlugin.js';
+import MixerPlugin from './math/MixerPlugin.js';
+import ThresholdPlugin from './math/ThresholdPlugin.js';
+import GainPlugin from './math/GainPlugin.js';
+import LogExpPlugin from './math/LogExpPlugin.js';
+import CorrelatorPlugin from './analysis/CorrelatorPlugin.js';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
@@ -47,6 +56,8 @@ import FrequencyDetectorPlugin from './detectors/FrequencyDetectorPlugin.js';
 import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin.js';
 import PLLPlugin from './detectors/PLLPlugin.js';
 import FrequencyDiscriminatorPlugin from './detectors/FrequencyDiscriminatorPlugin.js';
+import AMFMPMDemodulatorPlugin from './detectors/AMFMPMDemodulatorPlugin.js';
+import TimingRecoveryPlugin from './detectors/TimingRecoveryPlugin.js';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin.js';
@@ -70,6 +81,8 @@ export default [
     RemezFilterPlugin,
     DelayLinePlugin,
     DecimatorInterpolatorPlugin,
+    IIRFilterPlugin,
+    CICFilterPlugin,
 
     // Генераторы
     AudioFilePlugin,
@@ -79,6 +92,8 @@ export default [
     RefSineGeneratorPlugin,
     RefCosineGeneratorPlugin,
     NoiseGeneratorPlugin,
+    AMFMPMModulatorPlugin,
+    PSKModulatorPlugin,
 
     // Анализ
     SpectrumAnalyzerPlugin,
@@ -89,6 +104,8 @@ export default [
     AmplitudeDetectorPlugin,
     PLLPlugin,
     FrequencyDiscriminatorPlugin,
+    AMFMPMDemodulatorPlugin,
+    TimingRecoveryPlugin,
 
     // Математические
     IntegratorPlugin,
@@ -109,6 +126,11 @@ export default [
     Atan2Plugin,
     AGCPlugin,
     AbsoluteValuePlugin,
+    MixerPlugin,
+    ThresholdPlugin,
+    GainPlugin,
+    LogExpPlugin,
+    CorrelatorPlugin,
 
     // Визуализация
     OscilloscopePlugin,

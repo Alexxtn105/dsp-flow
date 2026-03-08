@@ -22,6 +22,8 @@ export const DSP_BLOCK_TYPES = {
     REMEZ_FILTER: 'Фильтр Ремеза',
     DELAY_LINE: 'Линия задержки',
     DECIMATOR_INTERPOLATOR: 'Децимация/Интерполяция',
+    IIR_FILTER: 'БИХ-фильтр',
+    CIC_FILTER: 'CIC-фильтр',
 
     // Генераторы
     CONSTANT: 'Константа',
@@ -31,12 +33,16 @@ export const DSP_BLOCK_TYPES = {
     REF_SINE_GEN: 'Референсный синусный генератор',
     REF_COSINE_GEN: 'Референсный косинусный генератор',
     NOISE_GENERATOR: 'Генератор шума',
+    AMFMPM_MODULATOR: 'АМ/ЧМ/ФМ модулятор',
+    PSK_MODULATOR: 'PSK модулятор',
 
     // Детекторы
     PHASE_DETECTOR: 'Фазовый детектор',
     FREQUENCY_DETECTOR: 'Частотный детектор',
     AMPLITUDE_DETECTOR: 'Амплитудный детектор',
     FREQUENCY_DISCRIMINATOR: 'Частотный дискриминатор',
+    AMFMPM_DEMODULATOR: 'АМ/ЧМ/ФМ демодулятор',
+    TIMING_RECOVERY: 'Символьная синхронизация',
 
     // Математические
     INTEGRATOR: 'Интегратор',
@@ -55,6 +61,11 @@ export const DSP_BLOCK_TYPES = {
     ATAN2: 'Арктангенс',
     AGC: 'АРУ',
     ABSOLUTE_VALUE: 'Абсолютное значение',
+    MIXER: 'Смеситель',
+    THRESHOLD: 'Компаратор',
+    GAIN: 'Усилитель',
+    LOG_EXP: 'Логарифм/Экспонента',
+    CORRELATOR: 'Коррелятор',
 
     PLL: 'ФАПЧ',
 

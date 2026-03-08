@@ -391,6 +391,122 @@ const DSP_ICONS = {
               fill="currentColor" stroke="none">|x|</text>
     ),
 
+    // Смеситель / Frequency Shift — круг с × и стрелкой сдвига частоты
+    'dsp-mixer': (
+        <>
+            <circle cx="12" cy="12" r="8" strokeWidth="1.5" fill="none" />
+            <line x1="8" y1="8" x2="16" y2="16" strokeWidth="1.8" strokeLinecap="round" />
+            <line x1="16" y1="8" x2="8" y2="16" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M18 5 L22 5 L20 3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <path d="M18 5 L22 5 L20 7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Порог / Компаратор — ступенчатая функция
+    'dsp-threshold': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 16 L10 16 L10 7 L21 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <line x1="2" y1="12" x2="22" y2="12" strokeWidth="1" strokeDasharray="2 2" opacity="0.3" />
+        </>
+    ),
+
+    // Усилитель (Gain) — треугольник
+    'dsp-gain': (
+        <polygon points="4,6 4,18 20,12" strokeWidth="1.8" strokeLinejoin="round" fill="none" />
+    ),
+
+    // Логарифм — ln(x)
+    'dsp-log': (
+        <>
+            <path d="M3 20 C5 18, 7 14, 9 10 C11 6, 13 4, 16 3 L21 2"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <line x1="3" y1="20" x2="21" y2="20" strokeWidth="1" opacity="0.3" />
+            <line x1="3" y1="3" x2="3" y2="20" strokeWidth="1" opacity="0.3" />
+        </>
+    ),
+
+    // Коррелятор — Rxy с треугольным пиком
+    'dsp-correlator': (
+        <>
+            <line x1="2" y1="18" x2="22" y2="18" strokeWidth="1" opacity="0.3" />
+            <path d="M3 17 L8 16 L12 5 L16 16 L21 17"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <text x="14" y="14" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">Rxy</text>
+        </>
+    ),
+
+    // IIR-фильтр — АЧХ с полюсами (∞)
+    'dsp-iir': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 7 L10 7 C12 7, 13 9, 14 12 C15 16, 16 19, 18 19 L21 19"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <text x="14" y="8" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">IIR</text>
+        </>
+    ),
+
+    // CIC-фильтр — ступенчатый sinc
+    'dsp-cic': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 19 L5 18 L7 14 L9 8 L11 4 L12 4 L13 8 L15 14 L17 18 L19 19 L21 19"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <text x="7" y="17" fontSize="6" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">CIC</text>
+        </>
+    ),
+
+    // АМ/ЧМ/ФМ модулятор — несущая с огибающей
+    'dsp-modulator': (
+        <>
+            <path d="M2 12 C3 8, 4 8, 5 12 C6 16, 7 16, 8 12 C9 6, 10 6, 11 12 C12 18, 13 18, 14 12 C15 8, 16 8, 17 12 C18 14, 19 14, 20 12"
+                  strokeWidth="1.3" strokeLinecap="round" fill="none" />
+            <path d="M2 12 C6 6, 10 6, 12 4 C14 6, 18 18, 20 12"
+                  strokeWidth="1.8" strokeLinecap="round" fill="none" strokeDasharray="2 1" opacity="0.5" />
+        </>
+    ),
+
+    // АМ/ЧМ/ФМ демодулятор — огибающая извлекается из модулированного
+    'dsp-demodulator': (
+        <>
+            <path d="M2 12 C3 8, 4 8, 5 12 C6 16, 7 16, 8 12 C9 6, 10 6, 11 12 C12 18, 13 18, 14 12"
+                  strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.3" />
+            <path d="M14 12 L16 12 C17 12, 18 10, 19 8 L21 4"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M16 10 L19 10" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M17 8 L17 12" strokeWidth="1.5" strokeLinecap="round" />
+        </>
+    ),
+
+    // PSK модулятор — точки созвездия с несущей
+    'dsp-psk': (
+        <>
+            <line x1="12" y1="3" x2="12" y2="21" strokeWidth="1" opacity="0.2" />
+            <line x1="3" y1="12" x2="21" y2="12" strokeWidth="1" opacity="0.2" />
+            <circle cx="8" cy="8" r="2" fill="currentColor" stroke="none" />
+            <circle cx="16" cy="8" r="2" fill="currentColor" stroke="none" />
+            <circle cx="8" cy="16" r="2" fill="currentColor" stroke="none" />
+            <circle cx="16" cy="16" r="2" fill="currentColor" stroke="none" />
+            <path d="M2 20 L4 18 L6 20" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        </>
+    ),
+
+    // Timing Recovery — часы с петлёй
+    'dsp-timing': (
+        <>
+            <circle cx="12" cy="12" r="8" strokeWidth="1.5" fill="none" />
+            <line x1="12" y1="12" x2="12" y2="6" strokeWidth="2" strokeLinecap="round" />
+            <line x1="12" y1="12" x2="16" y2="14" strokeWidth="2" strokeLinecap="round" />
+            <path d="M20 8 L22 5 L19 5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
     /* ===================== VISUALIZATION ===================== */
 
     // Осциллограф — экран с формой волны
