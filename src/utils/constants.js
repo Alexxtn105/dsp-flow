@@ -32,9 +32,6 @@ export const DSP_BLOCK_TYPES = {
     REF_COSINE_GEN: 'Референсный косинусный генератор',
     NOISE_GENERATOR: 'Генератор шума',
 
-    // БПФ/Анализ
-    SPECTRUM_ANALYZER: 'Спектроанализатор',
-
     // Детекторы
     PHASE_DETECTOR: 'Фазовый детектор',
     FREQUENCY_DETECTOR: 'Частотный детектор',
@@ -61,6 +58,7 @@ export const DSP_BLOCK_TYPES = {
     PLL: 'ФАПЧ',
 
     // Визуализация
+    SPECTRUM_ANALYZER: 'Спектроанализатор',
     OSCILLOSCOPE: 'Осциллограф',
     CONSTELLATION: 'Фазовое созвездие',
     WATERFALL: 'Водопад',

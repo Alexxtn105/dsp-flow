@@ -12,8 +12,7 @@ export default function initPlugins() {
     // Регистрация групп (порядок определяет отображение в Toolbar)
     registry.registerGroup({ id: 'filters', name: 'Фильтры', collapsed: false });
     registry.registerGroup({ id: 'generators', name: 'Генераторы', collapsed: false });
-    registry.registerGroup({ id: 'fft-blocks', name: 'БПФ/Анализ', collapsed: false });
-    registry.registerGroup({ id: 'detectors', name: 'Детекторы', collapsed: false });
+registry.registerGroup({ id: 'detectors', name: 'Детекторы', collapsed: false });
     registry.registerGroup({ id: 'math-blocks', name: 'Математические', collapsed: false });
     registry.registerGroup({ id: 'visualization', name: 'Визуализация', collapsed: false });
     registry.registerGroup({ id: 'output', name: 'Вывод', collapsed: false });
