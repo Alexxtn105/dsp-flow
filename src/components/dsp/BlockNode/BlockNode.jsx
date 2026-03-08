@@ -221,7 +221,7 @@ function BlockNode({ data, selected }) {
                             className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
                             style={{ top: `${((i + 1) * 100) / (inputsCount + 1)}%` }}
                             data-signal-type={signalConfig.input}
-                            title={`Вход ${i + 1}`}
+                            title={signalConfig.inputLabels?.[i] ?? `Вход ${i + 1}`}
                         />
                     ))
                 ) : (

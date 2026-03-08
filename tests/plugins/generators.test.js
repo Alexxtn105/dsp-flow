@@ -119,6 +119,42 @@ describe('RefSineGeneratorPlugin', () => {
         const out2 = proc.process([], params, 512, 'rs4');
         expect(out2[0]).not.toBeCloseTo(out1[0], 5);
     });
+
+    it('управление частотой через вход input-0', () => {
+        const proc = RefSineGeneratorPlugin.processor;
+        proc.clearStates();
+        const chunkSize = 1024;
+        // Входной сигнал частоты: постоянное значение 2000 Гц
+        const freqInput = new Float32Array(chunkSize).fill(2000);
+        const output = proc.process([freqInput], { frequency: 1000, amplitude: 1.0, phase: 0, sampleRate: 48000 }, chunkSize, 'rs5');
+        expect(output).toBeInstanceOf(Float32Array);
+        expect(output.length).toBe(chunkSize * 2);
+
+        // Сравним с генерацией без входа, но с frequency=2000
+        proc.clearStates();
+        const outputDirect = proc.process([], { frequency: 2000, amplitude: 1.0, phase: 0, sampleRate: 48000 }, chunkSize, 'rs6');
+        // Результаты должны совпадать
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBeCloseTo(outputDirect[i], 5);
+        }
+    });
+
+    it('управление фазой через вход input-1', () => {
+        const proc = RefSineGeneratorPlugin.processor;
+        proc.clearStates();
+        const chunkSize = 64;
+        // Смещение фазы π/2 рад на каждом сэмпле
+        const phaseInput = new Float32Array(chunkSize).fill(Math.PI / 2);
+        const output = proc.process([null, phaseInput], { frequency: 1000, amplitude: 1.0, phase: 0, sampleRate: 48000 }, chunkSize, 'rs7');
+        // При фазе 0 + смещении π/2: I = sin(π/2) = 1, Q = cos(π/2) = 0
+        expect(output[0]).toBeCloseTo(1.0, 3);
+        expect(output[1]).toBeCloseTo(0, 3);
+    });
+
+    it('имеет 2 входа типа real', () => {
+        expect(RefSineGeneratorPlugin.signals.input).toBe('real');
+        expect(RefSineGeneratorPlugin.signals.inputsCount).toBe(2);
+    });
 });
 
 describe('RefCosineGeneratorPlugin', () => {
@@ -155,5 +191,37 @@ describe('RefCosineGeneratorPlugin', () => {
         const outB = proc.process([], params, 512, 'rcB');
         // Новый узел начинает с cos(0) = amplitude
         expect(outB[0]).toBeCloseTo(1.0, 3);
+    });
+
+    it('управление частотой через вход input-0', () => {
+        const proc = RefCosineGeneratorPlugin.processor;
+        proc.clearStates();
+        const chunkSize = 1024;
+        const freqInput = new Float32Array(chunkSize).fill(2000);
+        const output = proc.process([freqInput], { frequency: 1000, amplitude: 1.0, phase: 0, sampleRate: 48000 }, chunkSize, 'rc5');
+        expect(output).toBeInstanceOf(Float32Array);
+        expect(output.length).toBe(chunkSize * 2);
+
+        proc.clearStates();
+        const outputDirect = proc.process([], { frequency: 2000, amplitude: 1.0, phase: 0, sampleRate: 48000 }, chunkSize, 'rc6');
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBeCloseTo(outputDirect[i], 5);
+        }
+    });
+
+    it('управление фазой через вход input-1', () => {
+        const proc = RefCosineGeneratorPlugin.processor;
+        proc.clearStates();
+        const chunkSize = 64;
+        const phaseInput = new Float32Array(chunkSize).fill(Math.PI / 2);
+        const output = proc.process([null, phaseInput], { frequency: 1000, amplitude: 1.0, phase: 0, sampleRate: 48000 }, chunkSize, 'rc7');
+        // При фазе 0 + смещении π/2: I = cos(π/2) = 0, Q = -sin(π/2) = -1
+        expect(output[0]).toBeCloseTo(0, 3);
+        expect(output[1]).toBeCloseTo(-1.0, 3);
+    });
+
+    it('имеет 2 входа типа real', () => {
+        expect(RefCosineGeneratorPlugin.signals.input).toBe('real');
+        expect(RefCosineGeneratorPlugin.signals.inputsCount).toBe(2);
     });
 });
