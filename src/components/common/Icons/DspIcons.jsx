@@ -58,6 +58,12 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Генератор шума — случайный сигнал (зигзаг)
+    'dsp-noise': (
+        <path d="M2 12 L4 6 L6 17 L8 8 L10 16 L12 5 L14 19 L16 9 L18 15 L20 7 L22 12"
+              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+
     /* ===================== FILTERS ===================== */
 
     // ФНЧ — плоский слева, спад справа
@@ -138,6 +144,18 @@ const DSP_ICONS = {
                   strokeWidth="2" strokeLinecap="round" />
             <path d="M14 4 L18 4 L16 2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
             <path d="M14 4 L18 4 L16 6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Децимация/Интерполяция — стрелки вверх/вниз с коэффициентом
+    'dsp-resample': (
+        <>
+            <path d="M7 4 L7 20" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M4 8 L7 4 L10 8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <path d="M4 16 L7 20 L10 16" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <text x="14" y="15" fontSize="11" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">N</text>
         </>
     ),
 
@@ -343,6 +361,22 @@ const DSP_ICONS = {
                   fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
                   fill="currentColor" stroke="none">4</text>
         </>
+    ),
+
+    // АРУ — треугольник усилителя с петлёй обратной связи
+    'dsp-agc': (
+        <>
+            <polygon points="4,6 4,18 16,12" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
+            <path d="M16 12 L20 12 L20 20 L8 20 L8 18"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Абсолютное значение — |x|
+    'dsp-abs': (
+        <text x="3" y="19" fontSize="18" fontWeight="800"
+              fontFamily="'Times New Roman',Georgia,serif"
+              fill="currentColor" stroke="none">|x|</text>
     ),
 
     /* ===================== VISUALIZATION ===================== */
