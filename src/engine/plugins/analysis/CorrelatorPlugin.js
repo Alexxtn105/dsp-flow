@@ -67,12 +67,10 @@ const CorrelatorPlugin = {
             const halfChunk = Math.floor(chunkSize / 2);
             for (let lag = 0; lag <= actualMaxLag && lag < chunkSize; lag++) {
                 let sum = 0;
-                let count = 0;
                 for (let i = 0; i < chunkSize - lag; i++) {
                     const v1 = normalize ? (input1[i] - mean1) : input1[i];
                     const v2 = normalize ? (input2[i + lag] - mean2) : input2[i + lag];
                     sum += v1 * v2;
-                    count++;
                 }
 
                 // Размещаем результат: lag 0 в центре

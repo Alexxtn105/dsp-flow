@@ -12,9 +12,6 @@ function designButterworthLowpass(order, wc) {
     for (let k = 0; k < numSections; k++) {
         const theta = (Math.PI * (2 * k + 1)) / (2 * order);
         const sinT = Math.sin(theta);
-        const alpha = sinT * Math.tan(wc / 2);
-
-        const a0 = 1 + 2 * alpha;
         const Kw = Math.tan(wc / 2);
         const Kw2 = Kw * Kw;
 
