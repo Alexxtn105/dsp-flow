@@ -14,7 +14,7 @@ export default {
 
         process(inputs, params, chunkSize) {
             const output = new Float32Array(chunkSize);
-            const val = Math.max(-100, Math.min(100, params.value ?? 1.0));
+            const val = params.value ?? 1.0;
             output.fill(val);
             return output;
         }

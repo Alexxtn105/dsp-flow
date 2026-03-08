@@ -367,11 +367,22 @@ class DSPProcessor {
      */
     executeBlock(block) {
         // Входы уже отсортированы при компиляции графа (GraphCompiler)
+        // Для блоков с несколькими входами сохраняем позиционную привязку:
+        // input-0 → inputs[0], input-1 → inputs[1] и т.д.
         const inputs = [];
         for (const input of block.inputs) {
             const sourceState = this.blockStates.get(input.sourceNodeId);
-            if (sourceState?.output) {
-                inputs.push(sourceState.output);
+            const handleMatch = input.targetHandle?.match(/^input-(\d+)$/);
+            if (handleMatch) {
+                const idx = parseInt(handleMatch[1], 10);
+                // Заполняем промежутки null-ами для корректной позиции
+                while (inputs.length <= idx) inputs.push(null);
+                inputs[idx] = sourceState?.output ?? null;
+            } else {
+                // Одиночный вход (handle = "input") или legacy
+                if (sourceState?.output) {
+                    inputs.push(sourceState.output);
+                }
             }
         }
 

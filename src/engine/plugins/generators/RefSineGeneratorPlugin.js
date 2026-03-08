@@ -42,8 +42,10 @@ export default {
                 output[i * 2] = amplitude * Math.sin(phase);
                 output[i * 2 + 1] = amplitude * Math.cos(phase);
                 state.currentPhase += phaseIncrement;
-                if (state.currentPhase >= 2 * Math.PI) {
-                    state.currentPhase %= (2 * Math.PI);
+                // Нормализация фазы в [0, 2π) для предотвращения потери точности
+                if (state.currentPhase >= 2 * Math.PI || state.currentPhase < 0) {
+                    state.currentPhase = state.currentPhase % (2 * Math.PI);
+                    if (state.currentPhase < 0) state.currentPhase += 2 * Math.PI;
                 }
             }
 
