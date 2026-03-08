@@ -356,6 +356,26 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Числовой индикатор — цифровой дисплей с числом
+    'dsp-numeric': (
+        <>
+            <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" />
+            <text x="12" y="16" fontSize="12" fontWeight="700"
+                  fontFamily="'Segoe UI Mono','SF Mono','Consolas',monospace"
+                  fill="currentColor" stroke="none" textAnchor="middle">42</text>
+        </>
+    ),
+
+    // Комплексный числовой индикатор — цифровой дисплей с комплексным числом
+    'dsp-complex-numeric': (
+        <>
+            <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" />
+            <text x="12" y="16" fontSize="9" fontWeight="700" fontStyle="italic"
+                  fontFamily="'Segoe UI Mono','SF Mono','Consolas',monospace"
+                  fill="currentColor" stroke="none" textAnchor="middle">a+jb</text>
+        </>
+    ),
+
     /* ===================== OUTPUT ===================== */
 
     // Динамик — конус с звуковыми волнами
