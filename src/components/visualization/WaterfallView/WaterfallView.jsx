@@ -317,7 +317,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                 ctx.strokeStyle = c.cursorBorder;
                 ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.roundRect(tx, ty, textW, boxH, 3);
+                if (ctx.roundRect) ctx.roundRect(tx, ty, textW, boxH, 3); else ctx.rect(tx, ty, textW, boxH);
                 ctx.fill();
                 ctx.stroke();
 

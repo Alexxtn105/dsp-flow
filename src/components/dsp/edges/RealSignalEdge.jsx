@@ -15,7 +15,7 @@ function RealSignalEdge({ id, sourceX, sourceY, targetX, targetY, data }) {
             id={id}
             path={edgePath}
             style={{
-                stroke: '#3b82f6',
+                stroke: 'var(--signal-real, #3b82f6)',
                 strokeWidth: 2,
                 strokeDasharray: '5,5',
                 fill: 'none',

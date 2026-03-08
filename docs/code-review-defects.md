@@ -2,16 +2,11 @@
 
 Источник: `CODE_REVIEW.md` в корне репозитория.
 
-## Открытые дефекты (3)
+## Открытые дефекты (0)
 
-### Низкий приоритет
-| # | Дефект | Файл | Суть |
-|---|--------|------|------|
-| 15 | Canvas roundRect без fallback | BlockNode | Может не работать в старых браузерах |
-| 17 | Hardcoded цвета | RealSignalEdge, Header | `#3b82f6` вместо CSS-переменных |
-| 18 | Goertzel Math.round | GoertzelFilterPlugin.js:29 | Math.round может дать bin за пределами спектра |
+Все дефекты из ревью исправлены.
 
-## Исправленные дефекты (16)
+## Исправленные дефекты (19)
 
 | # | Дефект | Статус |
 |---|--------|--------|
@@ -28,5 +23,8 @@
 | 11 | VisualizationManager nodeIds | Исправлено — обёрнуто в `useMemo()` |
 | 12 | Spread params на hot path | Исправлено — cachedParams при initialize(), переиспользуется в executeBlock() |
 | 13 | Multiplier деление на ноль | По дизайну — возврат 0 |
+| 15 | Canvas roundRect fallback | Исправлено — fallback на `ctx.rect()` в 5 файлах визуализации |
 | 16 | Мёртвый CSS | Всё ещё присутствует (закомментирован) |
+| 17 | Hardcoded цвета | Исправлено — `var(--signal-real)` / `var(--signal-complex)` в RealSignalEdge и Header |
+| 18 | Goertzel Math.round | Исправлено — заменено на `Math.floor` для гарантии bin в [0, N-1] |
 | 19 | FFTUtils dB underflow | Исправлено — проверка `mag > 0`, MIN_DB = -120 |

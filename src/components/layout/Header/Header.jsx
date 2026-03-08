@@ -44,16 +44,16 @@ function Header({ currentScheme }) {
                         <div className="hdr-legend-item">
                             <svg width="32" height="2" className="hdr-legend-svg">
                                 <line x1="0" y1="1" x2="32" y2="1"
-                                    stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,3" />
+                                    stroke="var(--signal-real, #3b82f6)" strokeWidth="2" strokeDasharray="5,3" />
                             </svg>
                             <span className="hdr-legend-label">Real</span>
                         </div>
                         <div className="hdr-legend-item">
                             <svg width="32" height="6" className="hdr-legend-svg">
                                 <line x1="0" y1="1" x2="32" y2="1"
-                                    stroke="#a78bfa" strokeWidth="2" strokeDasharray="5,3" />
+                                    stroke="var(--signal-complex, #8b5cf6)" strokeWidth="2" strokeDasharray="5,3" />
                                 <line x1="0" y1="5" x2="32" y2="5"
-                                    stroke="#a78bfa" strokeWidth="2" strokeDasharray="5,3" />
+                                    stroke="var(--signal-complex, #8b5cf6)" strokeWidth="2" strokeDasharray="5,3" />
                             </svg>
                             <span className="hdr-legend-label">Complex</span>
                         </div>

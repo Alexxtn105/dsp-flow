@@ -26,7 +26,7 @@ export default {
             const targetFreq = Math.min(params.targetFrequency ?? 1000, sampleRate / 2);
             const N = params.N ?? 256;
 
-            const k = Math.min(Math.max(0, Math.round(N * targetFreq / sampleRate)), N - 1);
+            const k = Math.min(Math.max(0, Math.floor(N * targetFreq / sampleRate)), N - 1);
             const coeff = 2 * Math.cos(2 * Math.PI * k / N);
 
             const output = new Float32Array(input.length);

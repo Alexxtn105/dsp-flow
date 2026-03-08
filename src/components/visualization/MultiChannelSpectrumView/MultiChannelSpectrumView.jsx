@@ -311,7 +311,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                 ctx.strokeStyle = c.cursorBorder;
                 ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.roundRect(tx, ty, textW, boxH, 3);
+                if (ctx.roundRect) ctx.roundRect(tx, ty, textW, boxH, 3); else ctx.rect(tx, ty, textW, boxH);
                 ctx.fill();
                 ctx.stroke();
                 ctx.fillStyle = c.cursorText;
