@@ -1,0 +1,197 @@
+/* ===== Multi-Channel Spectrum Analyzer — Themed ===== */
+
+.multi-spectrum-view.audition-theme {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel-bg-alt);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* ---- Toolbar ---- */
+.msa-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--panel-border);
+    flex-shrink: 0;
+    min-height: 30px;
+    flex-wrap: wrap;
+}
+
+.msa-toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.msa-toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--panel-active-bg);
+    flex-shrink: 0;
+}
+
+/* Labels */
+.msa-label {
+    font-size: 10px;
+    color: var(--panel-text-4);
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.msa-unit {
+    font-size: 9px;
+    color: var(--panel-text-5);
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    user-select: none;
+}
+
+/* Sliders */
+.msa-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 64px;
+    height: 4px;
+    background: var(--panel-slider);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.msa-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--panel-slider-thumb);
+    border: 1px solid var(--panel-slider-thumb-border);
+    cursor: pointer;
+    transition: background 120ms ease;
+}
+
+.msa-slider::-webkit-slider-thumb:hover {
+    background: var(--panel-slider-thumb-hover);
+}
+
+.msa-slider::-moz-range-thumb {
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--panel-slider-thumb);
+    border: 1px solid var(--panel-slider-thumb-border);
+    cursor: pointer;
+}
+
+.msa-slider::-moz-range-track {
+    background: var(--panel-slider);
+    height: 4px;
+    border-radius: 2px;
+}
+
+/* Numeric inputs */
+.msa-input {
+    width: 56px;
+    height: 20px;
+    padding: 0 4px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    background: var(--panel-input-bg);
+    color: var(--panel-text-3);
+    font-size: 10px;
+    font-family: 'Segoe UI Mono', 'SF Mono', 'Consolas', monospace;
+    text-align: right;
+    outline: none;
+    transition: border-color 120ms ease;
+}
+
+.msa-input:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+    color: var(--panel-text-2);
+}
+
+.msa-input-narrow {
+    width: 42px;
+}
+
+.msa-input::-webkit-inner-spin-button,
+.msa-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.msa-input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* Select (FFT size) */
+.msa-select {
+    height: 22px;
+    padding: 0 4px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    background: var(--panel-input-bg);
+    color: var(--panel-text-3);
+    font-size: 10px;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 120ms ease;
+}
+
+.msa-select:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+}
+
+/* ---- Channel toggles ---- */
+.msa-channels {
+    gap: 2px !important;
+}
+
+.msa-channel-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: background 120ms ease;
+    user-select: none;
+}
+
+.msa-channel-toggle:hover {
+    background: var(--panel-active-bg);
+}
+
+.msa-channel-toggle input[type='checkbox'] {
+    display: none;
+}
+
+.msa-channel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    flex-shrink: 0;
+    transition: background 120ms ease;
+}
+
+.msa-channel-label {
+    font-size: 9px;
+    color: var(--panel-text-4);
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+}
+
+.msa-channel-toggle.active .msa-channel-label {
+    color: var(--panel-text-2);
+}
+
+/* ---- Canvas ---- */
+.msa-canvas {
+    display: block;
+    cursor: crosshair;
+}

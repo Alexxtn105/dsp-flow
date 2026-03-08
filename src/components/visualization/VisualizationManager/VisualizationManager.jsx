@@ -6,6 +6,7 @@ import SpectrumView from '../SpectrumView';
 import WaterfallView from '../WaterfallView';
 import ConstellationView from '../ConstellationView';
 import NumericIndicatorView from '../NumericIndicatorView';
+import MultiChannelSpectrumView from '../MultiChannelSpectrumView';
 import { ErrorBoundary } from '../../common';
 
 /**
@@ -40,6 +41,8 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             vizType = 'numeric-indicator';
         } else if (blockType === 'Комплексный числовой индикатор') {
             vizType = 'complex-numeric-indicator';
+        } else if (blockType === 'Многоканальный спектроанализатор') {
+            vizType = 'multi-spectrum';
         }
 
         setOpenWindows(prev => {
@@ -224,6 +227,15 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                                 width={config.width}
                                 height={config.height - 70}
                                 isComplex
+                            />
+                        ) : config.vizType === 'multi-spectrum' ? (
+                            <MultiChannelSpectrumView
+                                data={data}
+                                sampleRate={sampleRate}
+                                width={config.width}
+                                height={config.height - 70}
+                                fftSize={nodeFftSize}
+                                onFftSizeChange={onUpdateNodeParams ? (size) => handleFftSizeChange(config.nodeId, size) : undefined}
                             />
                         ) : (
                             <OscilloscopeView

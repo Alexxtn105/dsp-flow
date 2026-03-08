@@ -60,6 +60,7 @@ export const DSP_BLOCK_TYPES = {
     WATERFALL: 'Водопад',
     NUMERIC_INDICATOR: 'Числовой индикатор',
     COMPLEX_NUMERIC_INDICATOR: 'Комплексный числовой индикатор',
+    MULTI_SPECTRUM_ANALYZER: 'Многоканальный спектроанализатор',
     SPEAKER: 'Динамик'
 };
 

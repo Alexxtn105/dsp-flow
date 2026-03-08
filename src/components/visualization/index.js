@@ -5,3 +5,4 @@ export { default as SpectrumView } from './SpectrumView';
 export { default as WaterfallView } from './WaterfallView';
 export { default as ConstellationView } from './ConstellationView';
 export { default as NumericIndicatorView } from './NumericIndicatorView';
+export { default as MultiChannelSpectrumView } from './MultiChannelSpectrumView';

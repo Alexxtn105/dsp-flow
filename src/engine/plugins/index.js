@@ -48,6 +48,7 @@ import ConstellationPlugin from './visualization/ConstellationPlugin.js';
 import WaterfallPlugin from './visualization/WaterfallPlugin.js';
 import NumericIndicatorPlugin from './visualization/NumericIndicatorPlugin.js';
 import ComplexNumericIndicatorPlugin from './visualization/ComplexNumericIndicatorPlugin.js';
+import MultiChannelSpectrumAnalyzerPlugin from './visualization/MultiChannelSpectrumAnalyzerPlugin.js';
 
 // Вывод
 import SpeakerPlugin from './output/SpeakerPlugin.js';
@@ -103,6 +104,7 @@ export default [
     WaterfallPlugin,
     NumericIndicatorPlugin,
     ComplexNumericIndicatorPlugin,
+    MultiChannelSpectrumAnalyzerPlugin,
 
     // Вывод
     SpeakerPlugin,

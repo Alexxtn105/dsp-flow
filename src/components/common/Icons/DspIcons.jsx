@@ -152,6 +152,17 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Многоканальный спектроанализатор — несколько спектральных кривых
+    'dsp-multi-spectrum': (
+        <>
+            <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" />
+            <path d="M4 18 L6 16 C8 13, 9 9, 11 7 L12 8 C13 10, 14 13, 16 15 L18 17 L20 18"
+                  strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+            <path d="M4 17 L7 14 C9 11, 10 8, 12 6 L13 7 C14 9, 15 12, 17 14 L19 16 L20 17"
+                  strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+    ),
+
     /* ===================== DETECTORS ===================== */
 
     // Частотомер — "Hz" с перекрестьем
