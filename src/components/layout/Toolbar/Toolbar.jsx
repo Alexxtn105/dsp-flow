@@ -7,7 +7,11 @@ import './Toolbar.css';
 function Toolbar() {
     const { isDarkTheme } = useThemeContext();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [collapsedGroups, setCollapsedGroups] = useState({});
+    const [collapsedGroups, setCollapsedGroups] = useState(() => {
+        const initial = {};
+        registry.getGroups().forEach(g => { initial[g.id] = true; });
+        return initial;
+    });
     const [, setDraggingBlock] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
