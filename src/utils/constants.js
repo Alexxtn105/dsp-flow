@@ -21,6 +21,7 @@ export const DSP_BLOCK_TYPES = {
     GOERTZEL_FILTER: 'Фильтр Герцеля',
     REMEZ_FILTER: 'Фильтр Ремеза',
     DELAY_LINE: 'Линия задержки',
+    DECIMATOR_INTERPOLATOR: 'Децимация/Интерполяция',
 
     // Генераторы
     CONSTANT: 'Константа',
@@ -29,6 +30,7 @@ export const DSP_BLOCK_TYPES = {
     COSINE_GENERATOR: 'Косинусный генератор',
     REF_SINE_GEN: 'Референсный синусный генератор',
     REF_COSINE_GEN: 'Референсный косинусный генератор',
+    NOISE_GENERATOR: 'Генератор шума',
 
     // БПФ/Анализ
     SPECTRUM_ANALYZER: 'Спектроанализатор',
@@ -53,6 +55,8 @@ export const DSP_BLOCK_TYPES = {
     REAL_SQUARE: 'Квадрат (действ.)',
     REAL_POWER4: 'Степень 4 (действ.)',
     ATAN2: 'Арктангенс',
+    AGC: 'АРУ',
+    ABSOLUTE_VALUE: 'Абсолютное значение',
 
     PLL: 'ФАПЧ',
 

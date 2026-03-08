@@ -82,6 +82,17 @@ export default function initPlugins() {
         { value: 'divide', label: 'Деление' }
     ]);
 
+    registry.registerParamOptions('noiseType', [
+        { value: 'white', label: 'Белый (White)' },
+        { value: 'pink', label: 'Розовый (Pink)' },
+        { value: 'brown', label: 'Красный/Броуновский (Brown)' }
+    ]);
+
+    registry.registerParamOptions('mode', [
+        { value: 'decimate', label: 'Децимация (↓)' },
+        { value: 'interpolate', label: 'Интерполяция (↑)' }
+    ]);
+
     // Регистрация всех плагинов
     registry.registerAll(allPlugins);
 

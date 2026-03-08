@@ -5,6 +5,7 @@ import RefSineGeneratorPlugin from './generators/RefSineGeneratorPlugin.js';
 import RefCosineGeneratorPlugin from './generators/RefCosineGeneratorPlugin.js';
 import AudioFilePlugin from './generators/AudioFilePlugin.js';
 import ConstantPlugin from './generators/ConstantPlugin.js';
+import NoiseGeneratorPlugin from './generators/NoiseGeneratorPlugin.js';
 
 // Фильтры
 import NotchFIRPlugin from './filters/NotchFIRPlugin.js';
@@ -15,6 +16,7 @@ import HilbertTransformerPlugin from './filters/HilbertTransformerPlugin.js';
 import GoertzelFilterPlugin from './filters/GoertzelFilterPlugin.js';
 import RemezFilterPlugin from './filters/RemezFilterPlugin.js';
 import DelayLinePlugin from './filters/DelayLinePlugin.js';
+import DecimatorInterpolatorPlugin from './filters/DecimatorInterpolatorPlugin.js';
 
 // Анализ
 import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin.js';
@@ -36,6 +38,8 @@ import ComplexConjugatePlugin from './math/ComplexConjugatePlugin.js';
 import RealSquarePlugin from './math/RealSquarePlugin.js';
 import RealPower4Plugin from './math/RealPower4Plugin.js';
 import Atan2Plugin from './math/Atan2Plugin.js';
+import AGCPlugin from './math/AGCPlugin.js';
+import AbsoluteValuePlugin from './math/AbsoluteValuePlugin.js';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
@@ -64,6 +68,7 @@ export default [
     GoertzelFilterPlugin,
     RemezFilterPlugin,
     DelayLinePlugin,
+    DecimatorInterpolatorPlugin,
 
     // Генераторы
     AudioFilePlugin,
@@ -72,6 +77,7 @@ export default [
     CosineGeneratorPlugin,
     RefSineGeneratorPlugin,
     RefCosineGeneratorPlugin,
+    NoiseGeneratorPlugin,
 
     // Анализ
     SpectrumAnalyzerPlugin,
@@ -99,6 +105,8 @@ export default [
     RealSquarePlugin,
     RealPower4Plugin,
     Atan2Plugin,
+    AGCPlugin,
+    AbsoluteValuePlugin,
 
     // Визуализация
     OscilloscopePlugin,

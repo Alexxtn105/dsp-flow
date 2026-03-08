@@ -9,7 +9,7 @@ npm run dev       # Запуск dev-сервера (http://localhost:5173)
 npm run build     # Продакшн-сборка в /dist
 npm run preview   # Предпросмотр продакшн-сборки
 npm run lint      # ESLint (v9, flat config)
-npm run test      # Vitest — все 177 тестов (13 файлов)
+npm run test      # Vitest — все 200 тестов (14 файлов)
 npx vitest run tests/plugins/generators.test.js  # Запуск одного тест-файла
 ```
 
@@ -21,13 +21,13 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 
 Центральный паттерн — `PluginRegistry` (синглтон в `src/engine/PluginRegistry.js`). Каждый DSP-блок — плагин с метаданными и процессором. Реестр «замораживается» после инициализации (`initPlugins.js`), новые плагины в рантайме не добавляются.
 
-**25 плагинов** в `src/engine/plugins/` по категориям:
-- **generators/** (5) — Sine, Cosine, RefSine, RefCosine, AudioFile
-- **filters/** (6) — FIR, LowpassFIR, HighpassFIR, BandpassFIR, HilbertTransformer, Goertzel
-- **analysis/** (3) — FFT, SlidingFFT, SpectrumAnalyzer
-- **detectors/** (2) — FrequencyDetector, PhaseDetector
-- **math/** (5) — Summer, Multiplier, Integrator, RealPart, ImagPart
-- **visualization/** (3) — Oscilloscope, Constellation, Waterfall
+**35 плагинов** в `src/engine/plugins/` по категориям:
+- **generators/** (7) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator
+- **filters/** (9) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, DecimatorInterpolator
+- **analysis/** (1) — SpectrumAnalyzer
+- **detectors/** (4) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL
+- **math/** (18) — Summer, Multiplier, Integrator, RealPart, ImagPart, ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealSquare, RealPower4, Atan2, AGC, AbsoluteValue
+- **visualization/** (6) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer
 - **output/** (1) — Speaker
 
 Общие утилиты в `_shared/`: FFTUtils, FilterDesign, WindowFunctions.
@@ -79,7 +79,7 @@ GitHub Actions (`.github/workflows/deploy.yml`):
 
 ## Тесты
 
-177 тестов в 13 файлах (Vitest):
+200 тестов в 14 файлах (Vitest):
 - `tests/engine/` — PluginRegistry, GraphCompiler, DSPProcessor, WavFileService
 - `tests/plugins/` — generators, filters, analysis, detectors, math, visualization, shared
 - `tests/integration/` — signal-pipeline, helpers-compat
