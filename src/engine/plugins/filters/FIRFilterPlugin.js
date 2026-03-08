@@ -69,15 +69,8 @@ export function createFIRProcessor(fixedFilterType) {
                 const currentOrder = params.order || 31;
                 const currentFilterType = fixedFilterType || params.filterType || 'lowpass';
                 if (state._cutoff !== currentCutoff || state._order !== currentOrder || state._filterType !== currentFilterType) {
-                    const oldBuffer = state.buffer;
-                    const oldPointer = state.pointer;
                     this.init(nodeId, params, sampleRate);
                     state = this.states.get(nodeId);
-                    // Сохраняем буфер, если размер не изменился
-                    if (oldBuffer.length === state.buffer.length) {
-                        state.buffer.set(oldBuffer);
-                        state.pointer = oldPointer;
-                    }
                 }
             }
 

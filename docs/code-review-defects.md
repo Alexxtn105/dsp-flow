@@ -2,15 +2,7 @@
 
 Источник: `CODE_REVIEW.md` в корне репозитория.
 
-## Открытые дефекты (9)
-
-### Критические / Высокий приоритет
-| # | Дефект | Файл | Суть |
-|---|--------|------|------|
-| 2 | FIR buffer overflow | FIRFilterPlugin.js:77-80 | oldPointer от старого буфера без bounds check при смене order |
-| 3 | Integrator defaultParams | IntegratorPlugin.js:9,27 | `resetOnOverflow: false` в defaults, но `?? true` в process() |
-| 6 | sampleRate без валидации | Множество плагинов | `params.sampleRate ?? 48000` без проверки > 0 |
-| 7 | Дублирование phase unwrapping | FrequencyDetectorPlugin, PhaseDetectorPlugin | Идентичный код, нужно вынести в `_shared/` |
+## Открытые дефекты (5)
 
 ### Средний приоритет
 | # | Дефект | Файл | Суть |
@@ -27,13 +19,17 @@
 | 17 | Hardcoded цвета | RealSignalEdge, Header | `#3b82f6` вместо CSS-переменных |
 | 18 | Goertzel Math.round | GoertzelFilterPlugin.js:29 | Math.round может дать bin за пределами спектра |
 
-## Исправленные дефекты (8)
+## Исправленные дефекты (12)
 
 | # | Дефект | Статус |
 |---|--------|--------|
 | 1 | FFT output type | Исправлено — SpectrumAnalyzer корректно возвращает `output: null` |
+| 2 | FIR buffer overflow | Исправлено — убрано переиспользование старого буфера/указателя при смене order |
+| 3 | Integrator defaultParams | Исправлено — `defaultParams.resetOnOverflow` синхронизирован с `?? true` в process() |
 | 4 | Remez деление на ноль | Требует перепроверки |
 | 5 | rewind не вызывает clearStates | Исправлено — `registry.clearAllStates()` вызывается |
+| 6 | sampleRate без валидации | Исправлено — `setSampleRate()` проверяет `rate > 0`, `start()` валидирует sampleRate |
+| 7 | Дублирование phase unwrapping | Исправлено — вынесено в `_shared/SignalUtils.js: unwrapPhaseDelta()` |
 | 8 | NotchFIR buffer resize | Исправлено — проверка размеров при пересоздании |
 | 13 | Multiplier деление на ноль | По дизайну — возврат 0 |
 | 16 | Мёртвый CSS | Всё ещё присутствует (закомментирован) |

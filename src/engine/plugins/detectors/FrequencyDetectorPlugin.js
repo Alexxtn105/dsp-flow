@@ -1,3 +1,5 @@
+import { unwrapPhaseDelta } from '../_shared/SignalUtils.js';
+
 export default {
     type: 'Частотный детектор',
     id: 'frequency-detector',
@@ -46,10 +48,8 @@ export default {
 
                 const phase = Math.atan2(Q, I);
 
-                // Разность фаз с unwrapping (M4: while вместо if для скачков > 2π)
-                let dPhase = phase - state.prevPhase;
-                while (dPhase > Math.PI) dPhase -= 2 * Math.PI;
-                while (dPhase < -Math.PI) dPhase += 2 * Math.PI;
+                // Разность фаз с unwrapping
+                const dPhase = unwrapPhaseDelta(phase - state.prevPhase);
                 state.prevPhase = phase;
 
                 // Мгновенная частота = dPhase * sampleRate / (2 * pi)

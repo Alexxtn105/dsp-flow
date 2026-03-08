@@ -1,3 +1,5 @@
+import { unwrapPhaseDelta } from '../_shared/SignalUtils.js';
+
 export default {
     type: 'Фазовый детектор',
     id: 'phase-detector',
@@ -43,10 +45,8 @@ export default {
 
                 let phase = Math.atan2(Q, I);
 
-                // Phase unwrapping (M4: while вместо if для скачков > 2π)
-                let delta = phase - state.prevPhase;
-                while (delta > Math.PI) delta -= 2 * Math.PI;
-                while (delta < -Math.PI) delta += 2 * Math.PI;
+                // Phase unwrapping
+                const delta = unwrapPhaseDelta(phase - state.prevPhase);
                 state.accumPhase += delta;
                 state.prevPhase = phase;
 

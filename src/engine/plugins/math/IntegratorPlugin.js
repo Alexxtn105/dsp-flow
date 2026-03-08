@@ -6,7 +6,7 @@ export default {
     group: 'math-blocks',
     signals: { input: 'real', output: 'real' },
     defaultParams: {
-        resetOnOverflow: false,
+        resetOnOverflow: true,
         maxValue: 1000,
     },
     processor: {

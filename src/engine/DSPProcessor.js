@@ -454,6 +454,10 @@ class DSPProcessor {
      * Устанавливает частоту дискретизации
      */
     setSampleRate(rate) {
+        if (!rate || rate <= 0) {
+            console.error(`Некорректная частота дискретизации: ${rate}`);
+            return;
+        }
         this.sampleRate = rate;
     }
 
