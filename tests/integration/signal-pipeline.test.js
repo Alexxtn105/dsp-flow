@@ -69,11 +69,15 @@ describe('Интеграционные тесты сигнального тра�
         expect(outputs.has('fir')).toBe(true);
         expect(outputs.has('osc')).toBe(true);
 
-        // Все выходы — Float32Array
-        for (const [, data] of outputs) {
-            expect(data).toBeInstanceOf(Float32Array);
-            expect(data.length).toBe(1024);
-        }
+        // Генератор и фильтр — Float32Array
+        expect(outputs.get('gen')).toBeInstanceOf(Float32Array);
+        expect(outputs.get('gen').length).toBe(1024);
+        expect(outputs.get('fir')).toBeInstanceOf(Float32Array);
+        expect(outputs.get('fir').length).toBe(1024);
+
+        // Осциллограф возвращает объект с каналами
+        const oscOut = outputs.get('osc');
+        expect(oscOut).toHaveProperty('channels');
 
         // Фильтр 5кГц пропускает синус 1кГц — сигнал должен быть ненулевым
         const firOut = outputs.get('fir');
@@ -137,12 +141,14 @@ describe('Интеграционные тесты сигнального тра�
         // Все три блока должны выдать output
         expect(outputs.size).toBe(3);
 
-        // Осциллограф и генератор имеют одинаковый выход (pass-through)
+        // Осциллограф возвращает объект с каналами, первый канал — pass-through от генератора
         const genOut = outputs.get('gen');
         const oscOut = outputs.get('osc');
-        expect(genOut.length).toBe(oscOut.length);
+        expect(oscOut).toHaveProperty('channels');
+        expect(oscOut.channels[0]).toBeInstanceOf(Float32Array);
+        expect(genOut.length).toBe(oscOut.channels[0].length);
         for (let i = 0; i < genOut.length; i++) {
-            expect(oscOut[i]).toBeCloseTo(genOut[i], 5);
+            expect(oscOut.channels[0][i]).toBeCloseTo(genOut[i], 5);
         }
 
         // Спектроанализатор выдаёт результат

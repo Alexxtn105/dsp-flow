@@ -227,18 +227,18 @@ describe('DSPProcessor', () => {
             expect(outputs.has('n2')).toBe(true);
             expect(outputs.has('n3')).toBe(true);
 
-            // Каждый output — Float32Array корректной длины
-            for (const [, data] of outputs) {
-                expect(data).toBeInstanceOf(Float32Array);
-                expect(data.length).toBe(1024);
-            }
+            // Генератор и сумматор — Float32Array
+            expect(outputs.get('n1')).toBeInstanceOf(Float32Array);
+            expect(outputs.get('n1').length).toBe(1024);
+            expect(outputs.get('n2')).toBeInstanceOf(Float32Array);
+            expect(outputs.get('n2').length).toBe(1024);
 
-            // Выходные данные осциллографа должны совпадать с выходом сумматора
-            // (осциллограф передаёт input напрямую)
-            const summerOut = outputs.get('n2');
+            // Осциллограф возвращает объект с каналами
             const oscOut = outputs.get('n3');
+            expect(oscOut).toHaveProperty('channels');
+            const summerOut = outputs.get('n2');
             for (let i = 0; i < summerOut.length; i++) {
-                expect(oscOut[i]).toBeCloseTo(summerOut[i], 5);
+                expect(oscOut.channels[0][i]).toBeCloseTo(summerOut[i], 5);
             }
         });
 
@@ -549,11 +549,12 @@ describe('DSPProcessor', () => {
             const oscBlock = DSPProcessor.compiledGraph[1];
             const oscOutput = DSPProcessor.executeBlock(oscBlock);
 
-            expect(oscOutput).toBeInstanceOf(Float32Array);
-            expect(oscOutput.length).toBe(genOutput.length);
-            // Осциллограф возвращает input как есть
-            for (let i = 0; i < oscOutput.length; i++) {
-                expect(oscOutput[i]).toBeCloseTo(genOutput[i], 5);
+            // Осциллограф возвращает объект с каналами
+            expect(oscOutput).toHaveProperty('channels');
+            expect(oscOutput.channels[0]).toBeInstanceOf(Float32Array);
+            expect(oscOutput.channels[0].length).toBe(genOutput.length);
+            for (let i = 0; i < oscOutput.channels[0].length; i++) {
+                expect(oscOutput.channels[0][i]).toBeCloseTo(genOutput[i], 5);
             }
         });
     });

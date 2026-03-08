@@ -339,7 +339,7 @@ describe('GraphCompiler', () => {
             expect(sequence[2].blockType).toBe(OSC);
             expect(sequence[2].inputs).toHaveLength(1);
             expect(sequence[2].inputs[0].sourceNodeId).toBe('flt');
-            expect(sequence[2].signalConfig).toEqual({ input: 'real', output: null, inputsCount: 1 });
+            expect(sequence[2].signalConfig).toEqual({ input: 'real', output: null, inputsCount: 4, inputLabels: ['Канал 1', 'Канал 2', 'Канал 3', 'Канал 4'] });
         });
 
         it('узел с двумя входами получает оба в inputs', () => {

@@ -120,6 +120,49 @@
     -moz-appearance: textfield;
 }
 
+/* ---- Channel toggles ---- */
+.osc-channels {
+    gap: 2px !important;
+}
+
+.osc-channel-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: background 120ms ease;
+    user-select: none;
+}
+
+.osc-channel-toggle:hover {
+    background: var(--panel-active-bg);
+}
+
+.osc-channel-toggle input[type='checkbox'] {
+    display: none;
+}
+
+.osc-channel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    flex-shrink: 0;
+    transition: background 120ms ease;
+}
+
+.osc-channel-label {
+    font-size: 9px;
+    color: var(--panel-text-4);
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+}
+
+.osc-channel-toggle.active .osc-channel-label {
+    color: var(--panel-text-2);
+}
+
 /* ---- Canvas ---- */
 .osc-canvas {
     display: block;

@@ -4,6 +4,13 @@ import { setupCanvasDPR } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './OscilloscopeView.css';
 
+const CHANNEL_COLORS = [
+    { line: '#00bfff', glow: 'rgba(0, 191, 255, 0.12)', name: 'Канал 1' },
+    { line: '#00e564', glow: 'rgba(0, 229, 100, 0.12)', name: 'Канал 2' },
+    { line: '#ffd200', glow: 'rgba(255, 210, 0, 0.12)', name: 'Канал 3' },
+    { line: '#ff4040', glow: 'rgba(255, 64, 64, 0.12)', name: 'Канал 4' },
+];
+
 const COLORS = {
     bg: '#1a1a2e',
     gridMajor: 'rgba(255, 255, 255, 0.08)',
@@ -11,8 +18,6 @@ const COLORS = {
     axisLine: 'rgba(255, 255, 255, 0.2)',
     axisText: '#7a8599',
     axisTextBright: '#99a8bf',
-    signal: '#00e5a0',
-    signalGlow: 'rgba(0, 229, 160, 0.12)',
     crosshair: 'rgba(255, 255, 255, 0.35)',
     cursorBg: 'rgba(10, 10, 30, 0.92)',
     cursorBorder: 'rgba(255, 255, 255, 0.15)',
@@ -49,27 +54,47 @@ function formatTime(samples, sampleRate) {
 }
 
 /**
- * Осциллограф — профессиональный вид в стиле Adobe Audition
+ * Извлекает массив каналов из данных осциллографа.
+ * Поддерживает как новый формат { channels: [...] }, так и legacy Float32Array.
+ */
+function extractChannels(data) {
+    if (!data) return [null, null, null, null];
+    if (data.channels) return data.channels;
+    // Legacy: одиночный Float32Array — трактуем как канал 1
+    if (data instanceof Float32Array) return [data, null, null, null];
+    return [null, null, null, null];
+}
+
+/**
+ * Осциллограф — 4-канальный, профессиональный вид
  */
 function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 }) {
     const { isDarkTheme } = useThemeContext();
     const canvasRef = useRef(null);
 
-    // Horizontal zoom (visible samples)
     const [visibleSamples, setVisibleSamples] = useState(1024);
-    // Vertical zoom (amplitude range ±)
     const [ampRange, setAmpRange] = useState(1.0);
-    // Cursor
     const [cursorX, setCursorX] = useState(null);
     const [cursorY, setCursorY] = useState(null);
     const [hoverSample, setHoverSample] = useState(null);
     const [hoverAmplitude, setHoverAmplitude] = useState(null);
     const [hoverTime, setHoverTime] = useState(null);
+    const [channelVisible, setChannelVisible] = useState([true, true, true, true]);
 
     const plotLeft = AXIS_LEFT;
     const plotBottom = AXIS_BOTTOM;
     const plotW = width - plotLeft;
     const plotH = height - plotBottom;
+
+    const channels = extractChannels(data);
+
+    const toggleChannel = useCallback((idx) => {
+        setChannelVisible(prev => {
+            const next = [...prev];
+            next[idx] = !next[idx];
+            return next;
+        });
+    }, []);
 
     const drawWaveform = useCallback(() => {
         const canvas = canvasRef.current;
@@ -93,7 +118,6 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
         ctx.rect(px, 0, pw, ph);
         ctx.clip();
 
-        // Horizontal amplitude grid
         const ampStep = niceStep(ampRange * 2, Math.max(3, Math.floor(ph / 50)));
         for (let v = -Math.ceil(ampRange / ampStep) * ampStep; v <= ampRange; v += ampStep) {
             const y = cy - (v / ampRange) * (ph / 2);
@@ -108,7 +132,6 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             ctx.stroke();
         }
 
-        // Vertical time grid
         const timeStep = niceStep(visibleSamples, Math.max(4, Math.floor(pw / 80)));
         for (let s = 0; s <= visibleSamples; s += timeStep) {
             const x = px + (s / visibleSamples) * pw;
@@ -121,15 +144,19 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             ctx.stroke();
         }
 
-        // --- Signal ---
-        if (data && data.length > 0) {
-            const pointsToDraw = Math.min(visibleSamples, data.length);
+        // --- Signals (4 channels) ---
+        for (let ch = 0; ch < 4; ch++) {
+            const chData = channels[ch];
+            if (!chData || !channelVisible[ch] || chData.length === 0) continue;
+
+            const color = CHANNEL_COLORS[ch];
+            const pointsToDraw = Math.min(visibleSamples, chData.length);
 
             // Gradient fill
             ctx.beginPath();
             for (let i = 0; i < pointsToDraw; i++) {
                 const x = px + (i / (visibleSamples - 1)) * pw;
-                const val = Math.max(-ampRange, Math.min(ampRange, data[i]));
+                const val = Math.max(-ampRange, Math.min(ampRange, chData[i]));
                 const y = cy - (val / ampRange) * (ph / 2);
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -141,9 +168,9 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             ctx.closePath();
 
             const grad = ctx.createLinearGradient(0, 0, 0, ph);
-            grad.addColorStop(0, c.signalGlow);
+            grad.addColorStop(0, color.glow);
             grad.addColorStop(0.5, 'transparent');
-            grad.addColorStop(1, c.signalGlow);
+            grad.addColorStop(1, color.glow);
             ctx.fillStyle = grad;
             ctx.fill();
 
@@ -151,12 +178,12 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             ctx.beginPath();
             for (let i = 0; i < pointsToDraw; i++) {
                 const x = px + (i / (visibleSamples - 1)) * pw;
-                const val = Math.max(-ampRange, Math.min(ampRange, data[i]));
+                const val = Math.max(-ampRange, Math.min(ampRange, chData[i]));
                 const y = cy - (val / ampRange) * (ph / 2);
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             }
-            ctx.strokeStyle = c.signal;
+            ctx.strokeStyle = color.line;
             ctx.lineWidth = 1.2;
             ctx.stroke();
         }
@@ -175,7 +202,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
         ctx.lineTo(px + pw, ph);
         ctx.stroke();
 
-        // --- Y-axis labels (amplitude) ---
+        // --- Y-axis labels ---
         ctx.font = '10px "Segoe UI", "SF Pro", sans-serif';
         ctx.fillStyle = c.axisText;
         ctx.textAlign = 'right';
@@ -192,7 +219,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             ctx.stroke();
         }
 
-        // --- X-axis labels (time/samples) ---
+        // --- X-axis labels ---
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = c.axisText;
@@ -275,7 +302,8 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, isDarkTheme, width, height, visibleSamples, ampRange, sampleRate,
-        cursorX, cursorY, hoverSample, hoverAmplitude, hoverTime, plotLeft, plotW, plotH]);
+        cursorX, cursorY, hoverSample, hoverAmplitude, hoverTime, plotLeft, plotW, plotH,
+        channels, channelVisible]);
 
     useEffect(() => {
         drawWaveform();
@@ -324,6 +352,9 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             setAmpRange(val);
         }
     }, []);
+
+    // Определяем, какие каналы имеют данные
+    const hasAnyChannel = channels.some(ch => ch !== null);
 
     return (
         <div className={`oscilloscope-view audition-theme ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -377,6 +408,29 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                         title="Диапазон ±"
                     />
                 </div>
+
+                <div className="osc-toolbar-divider" />
+
+                <div className="osc-toolbar-section osc-channels">
+                    {CHANNEL_COLORS.map((color, idx) => (
+                        <label
+                            key={idx}
+                            className={`osc-channel-toggle ${channelVisible[idx] ? 'active' : ''}`}
+                            title={color.name}
+                        >
+                            <input
+                                type="checkbox"
+                                checked={channelVisible[idx]}
+                                onChange={() => toggleChannel(idx)}
+                            />
+                            <span
+                                className="osc-channel-dot"
+                                style={{ background: channelVisible[idx] ? color.line : 'transparent', borderColor: color.line }}
+                            />
+                            <span className="osc-channel-label">{idx + 1}</span>
+                        </label>
+                    ))}
+                </div>
             </div>
 
             <canvas
@@ -386,14 +440,19 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 role="img"
-                aria-label="Осциллограф"
+                aria-label={`Осциллограф${hasAnyChannel ? '' : ' (нет данных)'}`}
             />
         </div>
     );
 }
 
 OscilloscopeView.propTypes = {
-    data: PropTypes.instanceOf(Float32Array),
+    data: PropTypes.oneOfType([
+        PropTypes.instanceOf(Float32Array),
+        PropTypes.shape({
+            channels: PropTypes.arrayOf(PropTypes.instanceOf(Float32Array))
+        })
+    ]),
     sampleRate: PropTypes.number,
     width: PropTypes.number,
     height: PropTypes.number

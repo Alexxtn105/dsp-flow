@@ -94,11 +94,15 @@ class PluginRegistry {
         if (!plugin) {
             return { input: 'real', output: 'real', inputsCount: 1 };
         }
-        return {
+        const config = {
             input: plugin.signals.input,
             output: plugin.signals.output,
             inputsCount: plugin.signals.inputsCount || 1
         };
+        if (plugin.signals.inputLabels) {
+            config.inputLabels = plugin.signals.inputLabels;
+        }
+        return config;
     }
 
     /**
