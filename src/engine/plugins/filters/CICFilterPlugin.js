@@ -4,7 +4,12 @@
  * Эффективная реализация децимации/интерполяции
  * без использования умножителей.
  * Структура: каскад интеграторов → изменение частоты → каскад гребёнок.
+ *
+ * Интеграторы используют модульную арифметику (wrapping)
+ * через Int32Array для корректной работы при длительном сигнале.
  */
+
+const CIC_INT_SCALE = 32768; // масштаб float → int
 
 const CICFilterPlugin = {
     type: 'CIC-фильтр',
@@ -41,36 +46,35 @@ const CICFilterPlugin = {
 
             if (!this.states.has(nodeId)) {
                 this.states.set(nodeId, {
-                    integrators: new Float64Array(stages),
-                    combDelays: Array.from({ length: stages }, () => new Float64Array(R)),
-                    combIndices: new Array(stages).fill(0),
+                    integrators: new Int32Array(stages),
+                    combPrev: new Int32Array(stages),
                     sampleCounter: 0,
                     lastKey: ''
                 });
             }
             const state = this.states.get(nodeId);
 
-            // Сброс при изменении параметров
             const key = `${stages}_${R}_${mode}`;
             if (state.lastKey !== key) {
-                state.integrators = new Float64Array(stages);
-                state.combDelays = Array.from({ length: stages }, () => new Float64Array(R));
-                state.combIndices = new Array(stages).fill(0);
+                state.integrators = new Int32Array(stages);
+                state.combPrev = new Int32Array(stages);
                 state.sampleCounter = 0;
                 state.lastKey = key;
             }
 
             const output = new Float32Array(chunkSize);
+            const gain = Math.pow(R, stages) * CIC_INT_SCALE;
 
             if (mode === 'decimate') {
                 let outIdx = 0;
-                const gain = Math.pow(R, stages);
 
                 for (let i = 0; i < chunkSize; i++) {
-                    // Каскад интеграторов
-                    let val = input[i];
+                    // Масштабируем вход в целочисленный диапазон
+                    let val = (input[i] * CIC_INT_SCALE) | 0;
+
+                    // Каскад интеграторов (wrapping arithmetic через Int32)
                     for (let s = 0; s < stages; s++) {
-                        state.integrators[s] += val;
+                        state.integrators[s] = (state.integrators[s] + val) | 0;
                         val = state.integrators[s];
                     }
 
@@ -78,50 +82,45 @@ const CICFilterPlugin = {
                     if (state.sampleCounter >= R) {
                         state.sampleCounter = 0;
 
-                        // Каскад гребёнок (comb) — на пониженной частоте
+                        // Каскад гребёнок (comb): y = x - x_prev, задержка M=1
                         let combVal = val;
                         for (let s = 0; s < stages; s++) {
-                            const delayed = state.combDelays[s][state.combIndices[s]];
-                            state.combDelays[s][state.combIndices[s]] = combVal;
-                            state.combIndices[s] = (state.combIndices[s] + 1) % R;
-                            combVal = combVal - delayed;
+                            const prev = state.combPrev[s];
+                            state.combPrev[s] = combVal;
+                            combVal = (combVal - prev) | 0;
                         }
 
-                        // Нормализация и запись
                         if (outIdx < chunkSize) {
                             output[outIdx] = combVal / gain;
                             outIdx++;
                         }
                     }
                 }
-
-                // Заполнить оставшиеся нулями (уже Float32Array)
             } else {
                 // Интерполяция
-                const gain = Math.pow(R, stages);
                 let outIdx = 0;
 
                 for (let i = 0; i < chunkSize; i++) {
-                    // Каскад гребёнок (на входной частоте)
-                    let combVal = input[i];
+                    let val = (input[i] * CIC_INT_SCALE) | 0;
+
+                    // Каскад гребёнок (comb): y = x - x_prev, задержка M=1
+                    let combVal = val;
                     for (let s = 0; s < stages; s++) {
-                        const delayed = state.combDelays[s][state.combIndices[s]];
-                        state.combDelays[s][state.combIndices[s]] = combVal;
-                        state.combIndices[s] = (state.combIndices[s] + 1) % R;
-                        combVal = combVal - delayed;
+                        const prev = state.combPrev[s];
+                        state.combPrev[s] = combVal;
+                        combVal = (combVal - prev) | 0;
                     }
 
                     // Вставка R сэмплов (zero-stuffing + интегрирование)
                     for (let r = 0; r < R && outIdx < chunkSize; r++) {
-                        let val = (r === 0) ? combVal : 0;
+                        let intVal = (r === 0) ? combVal : 0;
 
-                        // Каскад интеграторов (на выходной частоте)
                         for (let s = 0; s < stages; s++) {
-                            state.integrators[s] += val;
-                            val = state.integrators[s];
+                            state.integrators[s] = (state.integrators[s] + intVal) | 0;
+                            intVal = state.integrators[s];
                         }
 
-                        output[outIdx] = val / gain;
+                        output[outIdx] = intVal / gain;
                         outIdx++;
                     }
                 }

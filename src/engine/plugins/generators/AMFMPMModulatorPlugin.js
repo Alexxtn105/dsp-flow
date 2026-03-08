@@ -41,7 +41,7 @@ const AMFMPMModulatorPlugin = {
             const modType = params.modulationType ?? 'AM';
 
             if (!this.states.has(nodeId)) {
-                this.states.set(nodeId, { carrierPhase: 0, fmIntegral: 0 });
+                this.states.set(nodeId, { phase: 0 });
             }
             const state = this.states.get(nodeId);
 
@@ -51,22 +51,23 @@ const AMFMPMModulatorPlugin = {
                 const x = input ? input[i] : 0;
 
                 if (modType === 'AM') {
-                    output[i] = (1 + m * x) * Math.cos(state.carrierPhase);
-                    state.carrierPhase += phaseInc;
+                    output[i] = (1 + m * x) * Math.cos(state.phase);
+                    state.phase += phaseInc;
                 } else if (modType === 'FM') {
-                    // m = частотная девиация (Гц)
-                    state.fmIntegral += x / sampleRate;
-                    const phase = state.carrierPhase + 2 * Math.PI * m * state.fmIntegral;
-                    output[i] = Math.cos(phase);
-                    state.carrierPhase += phaseInc;
+                    // m = частотная девиация (Гц), единый фазовый аккумулятор
+                    state.phase += phaseInc + (2 * Math.PI * m * x) / sampleRate;
+                    output[i] = Math.cos(state.phase);
                 } else {
                     // PM: m = индекс фазовой модуляции (рад)
-                    output[i] = Math.cos(state.carrierPhase + m * x);
-                    state.carrierPhase += phaseInc;
+                    output[i] = Math.cos(state.phase + m * x);
+                    state.phase += phaseInc;
                 }
 
-                if (state.carrierPhase >= 2 * Math.PI) {
-                    state.carrierPhase -= 2 * Math.PI;
+                // Нормализация фазы в обе стороны
+                if (state.phase >= 2 * Math.PI) {
+                    state.phase -= 2 * Math.PI;
+                } else if (state.phase < 0) {
+                    state.phase += 2 * Math.PI;
                 }
             }
 

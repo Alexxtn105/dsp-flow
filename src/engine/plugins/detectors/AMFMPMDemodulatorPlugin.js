@@ -2,9 +2,23 @@
  * АМ/ЧМ/ФМ демодулятор
  *
  * - AM: детектор огибающей (|аналитический сигнал| через Гильберт)
- * - FM: производная фазы (мгновенная частота)
+ * - FM: мгновенная частота через conj(z[n-1])·z[n]
  * - PM: извлечение фазы (atan2 аналитического сигнала)
  */
+
+// Предвычисленные коэффициенты Гильберт-фильтра (31-point, окно Хэмминга)
+const HILBERT_N = 31;
+const HILBERT_M = Math.floor(HILBERT_N / 2);
+const HILBERT_COEFFS = new Float64Array(HILBERT_N);
+for (let n = 0; n < HILBERT_N; n++) {
+    if (n === HILBERT_M) {
+        HILBERT_COEFFS[n] = 0;
+    } else {
+        const k = n - HILBERT_M;
+        HILBERT_COEFFS[n] = (k % 2 !== 0) ? (2 / (Math.PI * k)) : 0;
+        HILBERT_COEFFS[n] *= 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / (HILBERT_N - 1));
+    }
+}
 
 const AMFMPMDemodulatorPlugin = {
     type: 'АМ/ЧМ/ФМ демодулятор',
@@ -42,56 +56,34 @@ const AMFMPMDemodulatorPlugin = {
                 this.states.set(nodeId, {
                     prevI: 0,
                     prevQ: 0,
-                    prevPhase: 0,
-                    // Гильберт-фильтр (15 коэфф.)
-                    hilbertBuffer: new Float32Array(15),
-                    hilbertIdx: 0,
-                    delayBuffer: new Float32Array(15),
-                    delayIdx: 0,
+                    buffer: new Float32Array(HILBERT_N),
+                    bufIdx: 0,
                     dcBlock: 0,
                     prevDcIn: 0
                 });
             }
             const state = this.states.get(nodeId);
 
-            // Коэффициенты Гильберт-фильтра (15-point)
-            const N = 15;
-            const M = Math.floor(N / 2);
-            const hilbertCoeffs = new Float32Array(N);
-            for (let n = 0; n < N; n++) {
-                if (n === M) {
-                    hilbertCoeffs[n] = 0;
-                } else {
-                    const k = n - M;
-                    hilbertCoeffs[n] = (k % 2 !== 0) ? (2 / (Math.PI * k)) : 0;
-                    // Окно Хэмминга
-                    hilbertCoeffs[n] *= 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / (N - 1));
-                }
-            }
-
             for (let i = 0; i < chunkSize; i++) {
                 const x = input[i];
 
-                // Заполняем буферы Гильберта и задержки
-                state.hilbertBuffer[state.hilbertIdx] = x;
-                state.delayBuffer[state.delayIdx] = x;
+                // Записываем в кольцевой буфер
+                state.buffer[state.bufIdx] = x;
 
                 // Выход Гильберт-фильтра (Q-компонента)
                 let q = 0;
-                for (let k = 0; k < N; k++) {
-                    const idx = (state.hilbertIdx - k + N) % N;
-                    q += hilbertCoeffs[k] * state.hilbertBuffer[idx];
+                for (let k = 0; k < HILBERT_N; k++) {
+                    const idx = (state.bufIdx - k + HILBERT_N) % HILBERT_N;
+                    q += HILBERT_COEFFS[k] * state.buffer[idx];
                 }
 
                 // Задержанный вход (I-компонента)
-                const delayedIdx = (state.delayIdx - M + N) % N;
-                const iComp = state.delayBuffer[delayedIdx];
+                const delayedIdx = (state.bufIdx - HILBERT_M + HILBERT_N) % HILBERT_N;
+                const iComp = state.buffer[delayedIdx];
 
-                state.hilbertIdx = (state.hilbertIdx + 1) % N;
-                state.delayIdx = (state.delayIdx + 1) % N;
+                state.bufIdx = (state.bufIdx + 1) % HILBERT_N;
 
                 if (modType === 'AM') {
-                    // Огибающая = |аналитический сигнал|
                     const envelope = Math.sqrt(iComp * iComp + q * q);
                     // DC-блокировка
                     const dcOut = envelope - state.prevDcIn + 0.995 * state.dcBlock;
@@ -99,26 +91,15 @@ const AMFMPMDemodulatorPlugin = {
                     state.dcBlock = dcOut;
                     output[i] = dcOut;
                 } else if (modType === 'FM') {
-                    // Мгновенная частота из производной фазы
-                    const dI = iComp - state.prevI;
-                    const dQ = q - state.prevQ;
-                    const denom = iComp * iComp + q * q;
-                    let instFreq = 0;
-                    if (denom > 1e-10) {
-                        instFreq = (iComp * dQ - q * dI) / denom;
-                    }
-                    output[i] = instFreq * sampleRate / (2 * Math.PI);
+                    // conj(prev) * current → мгновенная частота
+                    const crossI = iComp * state.prevI + q * state.prevQ;
+                    const crossQ = q * state.prevI - iComp * state.prevQ;
+                    output[i] = Math.atan2(crossQ, crossI) * sampleRate / (2 * Math.PI);
                     state.prevI = iComp;
                     state.prevQ = q;
                 } else {
                     // PM: извлечение фазы
-                    let phase = Math.atan2(q, iComp);
-                    // Unwrap
-                    let delta = phase - state.prevPhase;
-                    if (delta > Math.PI) delta -= 2 * Math.PI;
-                    if (delta < -Math.PI) delta += 2 * Math.PI;
-                    state.prevPhase = phase;
-                    output[i] = phase;
+                    output[i] = Math.atan2(q, iComp);
                 }
             }
 

@@ -40,27 +40,31 @@ const TimingRecoveryPlugin = {
             const zeta = params.damping ?? 0.707;
 
             if (!this.states.has(nodeId)) {
-                // Вычисление коэффициентов петлевого фильтра (PI)
-                const theta = Bn / (zeta + 1 / (4 * zeta));
-                const d = 1 + 2 * zeta * theta + theta * theta;
-                const kp = (4 * zeta * theta) / d;
-                const ki = (4 * theta * theta) / d;
-
                 this.states.set(nodeId, {
-                    mu: 0,             // дробный интервал [0, 1)
-                    counter: 0,        // счётчик сэмплов
+                    counter: 0,
                     prevI: 0,
                     prevQ: 0,
                     prevMidI: 0,
                     prevMidQ: 0,
                     loopIntegrator: 0,
-                    kp,
-                    ki,
-                    period: sps,       // текущий период (подстраивается)
-                    inputIdx: 0
+                    kp: 0,
+                    ki: 0,
+                    period: sps,
+                    lastKey: ''
                 });
             }
             const state = this.states.get(nodeId);
+
+            // Пересчёт коэффициентов при изменении параметров
+            const key = `${sps}_${Bn}_${zeta}`;
+            if (state.lastKey !== key) {
+                const theta = Bn / (zeta + 1 / (4 * zeta));
+                const d = 1 + 2 * zeta * theta + theta * theta;
+                state.kp = (4 * zeta * theta) / d;
+                state.ki = (4 * theta * theta) / d;
+                state.period = sps;
+                state.lastKey = key;
+            }
 
             const output = new Float32Array(chunkSize * 2);
             let outIdx = 0;

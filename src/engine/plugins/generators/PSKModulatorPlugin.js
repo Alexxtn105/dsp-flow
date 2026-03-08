@@ -53,7 +53,7 @@ const PSKModulatorPlugin = {
             // LFSR для PRBS
             function nextBit() {
                 const bit = state.lfsr & 1;
-                state.lfsr = (state.lfsr >>> 1) ^ (bit ? 0x80200003 : 0);
+                state.lfsr = (state.lfsr >>> 1) ^ (bit ? 0x80000057 : 0);
                 return bit;
             }
 

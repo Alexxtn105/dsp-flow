@@ -5,7 +5,6 @@
  * выполняя перенос спектра на заданную частоту.
  *
  * Вход: real → выход complex (I/Q)
- * Вход: complex → выход complex (I/Q)
  */
 
 const MixerPlugin = {
@@ -46,22 +45,12 @@ const MixerPlugin = {
             const output = new Float32Array(chunkSize * 2);
             const phaseInc = (2 * Math.PI * fShift) / sampleRate;
 
-            // Определяем, является ли вход комплексным (длина 2*chunkSize)
-            const isComplex = input.length === chunkSize * 2;
-
             for (let i = 0; i < chunkSize; i++) {
                 const cosP = Math.cos(state.phase);
                 const sinP = Math.sin(state.phase);
 
-                if (isComplex) {
-                    const inI = input[i * 2];
-                    const inQ = input[i * 2 + 1];
-                    output[i * 2] = inI * cosP - inQ * sinP;
-                    output[i * 2 + 1] = inI * sinP + inQ * cosP;
-                } else {
-                    output[i * 2] = input[i] * cosP;
-                    output[i * 2 + 1] = input[i] * sinP;
-                }
+                output[i * 2] = input[i] * cosP;
+                output[i * 2 + 1] = input[i] * sinP;
 
                 state.phase += phaseInc;
                 if (state.phase >= 2 * Math.PI) {
