@@ -361,8 +361,12 @@ function DSPEditor({
             return false; // Уже есть соединение на этот вход
         }
 
-        // Проверяем типы сигналов
-        const sourceSignalType = sourceNode.data?.signalConfig?.output;
+        // Проверяем типы сигналов (с учётом множественных выходов)
+        let sourceSignalType = sourceNode.data?.signalConfig?.output;
+        const srcHMatch = connection.sourceHandle?.match(/^output-(\d+)$/);
+        if (srcHMatch && sourceNode.data?.signalConfig?.outputTypes) {
+            sourceSignalType = sourceNode.data.signalConfig.outputTypes[parseInt(srcHMatch[1], 10)] ?? sourceSignalType;
+        }
         const targetSignalType = targetNode.data?.signalConfig?.input;
 
         // Если у источника нет выхода или у цели нет входа
@@ -393,8 +397,12 @@ function DSPEditor({
                 return; // Такое соединение уже существует
             }
 
-            // Получаем тип сигнала от источника
-            const signalType = sourceNode.data?.signalConfig?.output || 'real';
+            // Получаем тип сигнала от источника (с учётом множественных выходов)
+            let signalType = sourceNode.data?.signalConfig?.output || 'real';
+            const srcHandleMatch = params.sourceHandle?.match(/^output-(\d+)$/);
+            if (srcHandleMatch && sourceNode.data?.signalConfig?.outputTypes) {
+                signalType = sourceNode.data.signalConfig.outputTypes[parseInt(srcHandleMatch[1], 10)] ?? signalType;
+            }
 
             // Создаём ребро с информацией о типе сигнала
             const edge = {

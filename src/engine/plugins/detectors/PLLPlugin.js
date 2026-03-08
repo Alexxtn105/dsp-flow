@@ -19,7 +19,8 @@
  *      управляемый суммой базовой частоты и выхода петлевого фильтра
  *
  * Выходы:
- *   - Комплексный выход NCO (interleaved I/Q) — восстановленная несущая
+ *   - [0] Комплексный выход NCO (interleaved I/Q) — восстановленная несущая
+ *   - [1] Фазовая ошибка (real) — сигнал рассогласования петли
  *
  * Параметры:
  *   - centerFrequency: начальная частота NCO (Гц)
@@ -33,7 +34,13 @@ export default {
     icon: 'dsp-pll',
     description: 'Фазовая автоподстройка частоты (PLL 2-го порядка)',
     group: 'detectors',
-    signals: { input: 'complex', output: 'complex' },
+    signals: {
+        input: 'complex',
+        output: 'complex',
+        outputsCount: 2,
+        outputTypes: ['complex', 'real'],
+        outputLabels: ['NCO (I/Q)', 'Фазовая ошибка']
+    },
     defaultParams: {
         centerFrequency: 1000,
         bandwidth: 50,
@@ -45,10 +52,12 @@ export default {
 
         process(inputs, params, chunkSize, nodeId) {
             const input = inputs[0];
-            // Комплексный выход: interleaved [I0, Q0, I1, Q1, ...]
-            const output = new Float32Array(chunkSize * 2);
+            // Комплексный выход NCO: interleaved [I0, Q0, I1, Q1, ...]
+            const ncoOutput = new Float32Array(chunkSize * 2);
+            // Действительный выход фазовой ошибки
+            const errorOutput = new Float32Array(chunkSize);
 
-            if (!input) return output;
+            if (!input) return { outputs: [ncoOutput, errorOutput] };
 
             const sampleRate = params.sampleRate ?? 48000;
             const centerFreq = params.centerFrequency ?? 1000;
@@ -103,12 +112,13 @@ export default {
                 if (state.ncoPhase >= 2 * Math.PI) state.ncoPhase -= 2 * Math.PI;
                 else if (state.ncoPhase < 0) state.ncoPhase += 2 * Math.PI;
 
-                // 6. Выход — комплексный сигнал NCO (восстановленная несущая)
-                output[i * 2] = ncoI;
-                output[i * 2 + 1] = ncoQ;
+                // 6. Выходы
+                ncoOutput[i * 2] = Math.cos(state.ncoPhase);
+                ncoOutput[i * 2 + 1] = Math.sin(state.ncoPhase);
+                errorOutput[i] = phaseError;
             }
 
-            return output;
+            return { outputs: [ncoOutput, errorOutput] };
         }
     }
 };

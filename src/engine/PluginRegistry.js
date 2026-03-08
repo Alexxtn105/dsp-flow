@@ -92,15 +92,22 @@ class PluginRegistry {
     getSignalConfig(type) {
         const plugin = this.#plugins.get(type);
         if (!plugin) {
-            return { input: 'real', output: 'real', inputsCount: 1 };
+            return { input: 'real', output: 'real', inputsCount: 1, outputsCount: 1 };
         }
         const config = {
             input: plugin.signals.input,
             output: plugin.signals.output,
-            inputsCount: plugin.signals.inputsCount || 1
+            inputsCount: plugin.signals.inputsCount || 1,
+            outputsCount: plugin.signals.outputsCount || 1
         };
         if (plugin.signals.inputLabels) {
             config.inputLabels = plugin.signals.inputLabels;
+        }
+        if (plugin.signals.outputLabels) {
+            config.outputLabels = plugin.signals.outputLabels;
+        }
+        if (plugin.signals.outputTypes) {
+            config.outputTypes = plugin.signals.outputTypes;
         }
         return config;
     }

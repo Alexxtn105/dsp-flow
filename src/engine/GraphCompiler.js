@@ -93,11 +93,18 @@ class GraphCompiler {
             const sourceConfig = getBlockSignalConfig(sourceNode.data.blockType);
             const targetConfig = getBlockSignalConfig(targetNode.data.blockType);
 
+            // Определяем тип выхода с учётом множественных выходов
+            let sourceOutputType = sourceConfig.output;
+            const srcHandleMatch = edge.sourceHandle?.match(/^output-(\d+)$/);
+            if (srcHandleMatch && sourceConfig.outputTypes) {
+                sourceOutputType = sourceConfig.outputTypes[parseInt(srcHandleMatch[1], 10)] ?? sourceConfig.output;
+            }
+
             // Проверяем совместимость типов сигналов
-            if (!areSignalsCompatible(sourceConfig.output, targetConfig.input)) {
+            if (!areSignalsCompatible(sourceOutputType, targetConfig.input)) {
                 errors.push({
                     type: 'type_mismatch',
-                    message: `Несовместимые типы сигналов: ${sourceNode.data.label} (${sourceConfig.output}) → ${targetNode.data.label} (${targetConfig.input})`,
+                    message: `Несовместимые типы сигналов: ${sourceNode.data.label} (${sourceOutputType}) → ${targetNode.data.label} (${targetConfig.input})`,
                     sourceNode: sourceNode.id,
                     targetNode: targetNode.id
                 });

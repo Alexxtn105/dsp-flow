@@ -33,7 +33,7 @@ describe('helpers.js — обратная совместимость', () => {
 
     it('getBlockSignalConfig возвращает конфигурацию', () => {
         const config = getBlockSignalConfig('Синусный генератор');
-        expect(config).toEqual({ input: null, output: 'real', inputsCount: 1 });
+        expect(config).toEqual({ input: null, output: 'real', inputsCount: 1, outputsCount: 1 });
     });
 
     it('isGeneratorBlock определяет генераторы', () => {

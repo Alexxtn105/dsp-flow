@@ -321,18 +321,20 @@ class DSPProcessor {
                     initialized: true
                 });
                 if (output && this.onBlockOutput) {
-                    this.onBlockOutput(block.nodeId, output);
+                    // Для множественных выходов передаём primary (первый) для совместимости
+                    const primaryOutput = output?.outputs ? output.outputs[0] : output;
+                    this.onBlockOutput(block.nodeId, primaryOutput);
                 }
 
                 // Если это Speaker — воспроизводим (muted обрабатывается в SpeakerPlugin.process)
                 if (block.blockType === 'Динамик' && output && this.audioContext) {
-                    // Проверяем, что выход не тишина (muted плагин вернёт нули)
+                    const speakerData = output?.outputs ? output.outputs[0] : output;
                     let hasSignal = false;
-                    for (let i = 0; i < output.length; i++) {
-                        if (output[i] !== 0) { hasSignal = true; break; }
+                    for (let i = 0; i < speakerData.length; i++) {
+                        if (speakerData[i] !== 0) { hasSignal = true; break; }
                     }
                     if (hasSignal) {
-                        this.playAudioChunk(output);
+                        this.playAudioChunk(speakerData);
                     }
                 }
             }
@@ -372,16 +374,30 @@ class DSPProcessor {
         const inputs = [];
         for (const input of block.inputs) {
             const sourceState = this.blockStates.get(input.sourceNodeId);
+            // Определяем данные источника с учётом множественных выходов
+            let sourceData = null;
+            if (sourceState?.output) {
+                const srcHandleMatch = input.sourceHandle?.match(/^output-(\d+)$/);
+                if (srcHandleMatch && sourceState.output.outputs) {
+                    // Множественный выход — выбираем нужный
+                    sourceData = sourceState.output.outputs[parseInt(srcHandleMatch[1], 10)] ?? null;
+                } else if (sourceState.output.outputs) {
+                    // Множественный выход, но sourceHandle = "output" — берём первый
+                    sourceData = sourceState.output.outputs[0] ?? null;
+                } else {
+                    // Одиночный выход (обычный Float32Array)
+                    sourceData = sourceState.output;
+                }
+            }
+
             const handleMatch = input.targetHandle?.match(/^input-(\d+)$/);
             if (handleMatch) {
                 const idx = parseInt(handleMatch[1], 10);
-                // Заполняем промежутки null-ами для корректной позиции
                 while (inputs.length <= idx) inputs.push(null);
-                inputs[idx] = sourceState?.output ?? null;
+                inputs[idx] = sourceData;
             } else {
-                // Одиночный вход (handle = "input") или legacy
-                if (sourceState?.output) {
-                    inputs.push(sourceState.output);
+                if (sourceData) {
+                    inputs.push(sourceData);
                 }
             }
         }

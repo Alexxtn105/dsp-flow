@@ -312,8 +312,24 @@ function BlockNode({ data, selected }) {
                 </div>
             ) : null}
 
-            {
-                hasOutput && (
+            {hasOutput && (
+                (signalConfig.outputsCount > 1) ? (
+                    Array.from({ length: signalConfig.outputsCount }).map((_, i) => {
+                        const outType = signalConfig.outputTypes?.[i] ?? signalConfig.output;
+                        return (
+                            <Handle
+                                key={`output-${i}`}
+                                type="source"
+                                position={Position.Right}
+                                id={`output-${i}`}
+                                className={`block-handle ${getSignalTypeClass(outType)}`}
+                                style={{ top: `${((i + 1) * 100) / (signalConfig.outputsCount + 1)}%` }}
+                                data-signal-type={outType}
+                                title={signalConfig.outputLabels?.[i] ?? `Выход ${i + 1}`}
+                            />
+                        );
+                    })
+                ) : (
                     <Handle
                         type="source"
                         position={Position.Right}
@@ -323,7 +339,7 @@ function BlockNode({ data, selected }) {
                         title={`Выход: ${getSignalTypeDescription(signalConfig.output)} сигнал`}
                     />
                 )
-            }
+            )}
         </div>
     );
 }
