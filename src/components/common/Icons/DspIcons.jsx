@@ -216,6 +216,18 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Частотный дискриминатор — Δf
+    'dsp-freq-discrim': (
+        <>
+            <text x="1" y="18" fontSize="13" fontWeight="800"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">Δf</text>
+            <path d="M16 6 L16 18" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M16 6 L22 12" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M16 6 L20 6" strokeWidth="1.5" strokeLinecap="round" />
+        </>
+    ),
+
     // ФАПЧ — петля обратной связи с φ
     'dsp-pll': (
         <>

@@ -92,6 +92,11 @@ registry.registerGroup({ id: 'detectors', name: 'Детекторы', collapsed:
         { value: 'interpolate', label: 'Интерполяция (↑)' }
     ]);
 
+    registry.registerParamOptions('outputMode', [
+        { value: 'deviation', label: 'Отклонение от центральной (Гц)' },
+        { value: 'absolute', label: 'Абсолютная частота (Гц)' }
+    ]);
+
     // Регистрация всех плагинов
     registry.registerAll(allPlugins);
 

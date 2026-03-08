@@ -46,6 +46,7 @@ import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
 import FrequencyDetectorPlugin from './detectors/FrequencyDetectorPlugin.js';
 import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin.js';
 import PLLPlugin from './detectors/PLLPlugin.js';
+import FrequencyDiscriminatorPlugin from './detectors/FrequencyDiscriminatorPlugin.js';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin.js';
@@ -87,6 +88,7 @@ export default [
     FrequencyDetectorPlugin,
     AmplitudeDetectorPlugin,
     PLLPlugin,
+    FrequencyDiscriminatorPlugin,
 
     // Математические
     IntegratorPlugin,

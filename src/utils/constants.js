@@ -36,6 +36,7 @@ export const DSP_BLOCK_TYPES = {
     PHASE_DETECTOR: 'Фазовый детектор',
     FREQUENCY_DETECTOR: 'Частотный детектор',
     AMPLITUDE_DETECTOR: 'Амплитудный детектор',
+    FREQUENCY_DISCRIMINATOR: 'Частотный дискриминатор',
 
     // Математические
     INTEGRATOR: 'Интегратор',
