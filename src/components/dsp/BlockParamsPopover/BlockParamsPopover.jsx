@@ -163,8 +163,9 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!file.name.toLowerCase().endsWith('.wav')) {
-            setError('Пожалуйста, выберите WAV файл');
+        const ext = file.name.toLowerCase();
+        if (!ext.endsWith('.wav') && !ext.endsWith('.mp3')) {
+            setError('Пожалуйста, выберите WAV или MP3 файл');
             return;
         }
 
@@ -199,8 +200,8 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
             audioContext.close();
             audioContextRef.current = null;
         } catch (err) {
-            console.error('Ошибка чтения WAV файла:', err);
-            setError('Не удалось прочитать WAV файл');
+            console.error('Ошибка чтения аудиофайла:', err);
+            setError('Не удалось прочитать аудиофайл');
         }
     };
 
@@ -254,13 +255,13 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                         <div className="wav-file-input">
                             <input
                                 type="file"
-                                accept=".wav"
+                                accept=".wav,.mp3"
                                 onChange={handleFileSelect}
                                 id="wav-file-input-popover"
                                 className="hidden-file-input"
                             />
                             <label htmlFor="wav-file-input-popover" className="wav-file-btn">
-                                {wavFileName || 'Выбрать WAV файл'}
+                                {wavFileName || 'Выбрать аудиофайл'}
                             </label>
                         </div>
                         {localParams.detectedSampleRate && (

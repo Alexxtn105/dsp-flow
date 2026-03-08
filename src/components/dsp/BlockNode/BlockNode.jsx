@@ -290,7 +290,7 @@ function BlockNode({ data, selected }) {
                             </div>
                         </>
                     ) : (
-                        <div className="audio-file-empty">WAV не выбран</div>
+                        <div className="audio-file-empty">Файл не выбран</div>
                     )}
                 </div>
             ) : editableParams.length > 0 ? (

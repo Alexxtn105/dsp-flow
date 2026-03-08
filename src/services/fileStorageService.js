@@ -1,6 +1,6 @@
 /**
  * FileStorageService — хранение аудиофайлов в IndexedDB
- * Позволяет сохранять/восстанавливать WAV-файлы между сессиями.
+ * Позволяет сохранять/восстанавливать аудиофайлы (WAV, MP3) между сессиями.
  * Ключ — nodeId блока AudioFile.
  */
 
@@ -36,7 +36,7 @@ class FileStorageService {
     /**
      * Сохранить файл в IndexedDB
      * @param {string} nodeId — ID узла
-     * @param {File} file — WAV-файл
+     * @param {File} file — аудиофайл (WAV, MP3)
      */
     static async saveFile(nodeId, file) {
         try {
