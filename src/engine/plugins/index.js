@@ -46,6 +46,8 @@ import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin.js';
 import OscilloscopePlugin from './visualization/OscilloscopePlugin.js';
 import ConstellationPlugin from './visualization/ConstellationPlugin.js';
 import WaterfallPlugin from './visualization/WaterfallPlugin.js';
+import NumericIndicatorPlugin from './visualization/NumericIndicatorPlugin.js';
+import ComplexNumericIndicatorPlugin from './visualization/ComplexNumericIndicatorPlugin.js';
 
 // Вывод
 import SpeakerPlugin from './output/SpeakerPlugin.js';
@@ -99,6 +101,8 @@ export default [
     OscilloscopePlugin,
     ConstellationPlugin,
     WaterfallPlugin,
+    NumericIndicatorPlugin,
+    ComplexNumericIndicatorPlugin,
 
     // Вывод
     SpeakerPlugin,

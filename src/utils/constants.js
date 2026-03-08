@@ -58,6 +58,8 @@ export const DSP_BLOCK_TYPES = {
     OSCILLOSCOPE: 'Осциллограф',
     CONSTELLATION: 'Фазовое созвездие',
     WATERFALL: 'Водопад',
+    NUMERIC_INDICATOR: 'Числовой индикатор',
+    COMPLEX_NUMERIC_INDICATOR: 'Комплексный числовой индикатор',
     SPEAKER: 'Динамик'
 };
 

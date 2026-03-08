@@ -5,6 +5,7 @@ import OscilloscopeView from '../OscilloscopeView';
 import SpectrumView from '../SpectrumView';
 import WaterfallView from '../WaterfallView';
 import ConstellationView from '../ConstellationView';
+import NumericIndicatorView from '../NumericIndicatorView';
 import { ErrorBoundary } from '../../common';
 
 /**
@@ -35,6 +36,10 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             vizType = 'waterfall';
         } else if (blockType === 'Фазовое созвездие') {
             vizType = 'constellation';
+        } else if (blockType === 'Числовой индикатор') {
+            vizType = 'numeric-indicator';
+        } else if (blockType === 'Комплексный числовой индикатор') {
+            vizType = 'complex-numeric-indicator';
         }
 
         setOpenWindows(prev => {
@@ -206,6 +211,19 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                                 data={data}
                                 width={config.width}
                                 height={config.height - 70}
+                            />
+                        ) : config.vizType === 'numeric-indicator' ? (
+                            <NumericIndicatorView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'complex-numeric-indicator' ? (
+                            <NumericIndicatorView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                                isComplex
                             />
                         ) : (
                             <OscilloscopeView
