@@ -6,6 +6,7 @@ import RealPartPlugin from '../../src/engine/plugins/math/RealPartPlugin.js';
 import ImagPartPlugin from '../../src/engine/plugins/math/ImagPartPlugin.js';
 import ComplexComposerPlugin from '../../src/engine/plugins/math/ComplexComposerPlugin.js';
 import ComplexConjugatePlugin from '../../src/engine/plugins/math/ComplexConjugatePlugin.js';
+import Atan2Plugin from '../../src/engine/plugins/math/Atan2Plugin.js';
 
 describe('SummerPlugin', () => {
     it('суммирует два входа', () => {
@@ -265,5 +266,53 @@ describe('ComplexConjugatePlugin', () => {
         expect(output.length).toBe(2);
         expect(output[0]).toBeCloseTo(7.5);
         expect(output[1]).toBeCloseTo(3.2);
+    });
+});
+
+describe('Atan2Plugin', () => {
+    it('вычисляет atan2(y, x) поэлементно', () => {
+        const y = new Float32Array([1.0, 0.0, -1.0]);
+        const x = new Float32Array([0.0, 1.0, 0.0]);
+        const output = Atan2Plugin.processor.process([y, x], {}, 3);
+        expect(output[0]).toBeCloseTo(Math.PI / 2);   // atan2(1, 0) = π/2
+        expect(output[1]).toBeCloseTo(0);              // atan2(0, 1) = 0
+        expect(output[2]).toBeCloseTo(-Math.PI / 2);   // atan2(-1, 0) = -π/2
+    });
+
+    it('atan2(1, 1) = π/4', () => {
+        const y = new Float32Array([1.0]);
+        const x = new Float32Array([1.0]);
+        const output = Atan2Plugin.processor.process([y, x], {}, 1);
+        expect(output[0]).toBeCloseTo(Math.PI / 4);
+    });
+
+    it('atan2(0, 0) = 0', () => {
+        const y = new Float32Array([0.0]);
+        const x = new Float32Array([0.0]);
+        const output = Atan2Plugin.processor.process([y, x], {}, 1);
+        expect(output[0]).toBeCloseTo(0);
+    });
+
+    it('работает с одним входом (x = 0)', () => {
+        const y = new Float32Array([1.0, -1.0]);
+        const output = Atan2Plugin.processor.process([y], {}, 2);
+        expect(output[0]).toBeCloseTo(Math.PI / 2);
+        expect(output[1]).toBeCloseTo(-Math.PI / 2);
+    });
+
+    it('возвращает нули при пустых входах', () => {
+        const output = Atan2Plugin.processor.process([], {}, 64);
+        expect(output.length).toBe(64);
+        for (let i = 0; i < 64; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('метаданные плагина корректны', () => {
+        expect(Atan2Plugin.type).toBe('Арктангенс');
+        expect(Atan2Plugin.id).toBe('atan2');
+        expect(Atan2Plugin.signals.input).toBe('real');
+        expect(Atan2Plugin.signals.output).toBe('real');
+        expect(Atan2Plugin.signals.inputsCount).toBe(2);
     });
 });

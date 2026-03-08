@@ -31,8 +31,6 @@ export const DSP_BLOCK_TYPES = {
     REF_COSINE_GEN: 'Референсный косинусный генератор',
 
     // БПФ/Анализ
-    SLIDING_FFT: 'Скользящее БПФ',
-    FFT: 'БПФ',
     SPECTRUM_ANALYZER: 'Спектроанализатор',
 
     // Детекторы
@@ -54,6 +52,7 @@ export const DSP_BLOCK_TYPES = {
     COMPLEX_CONJUGATE: 'Комплексное сопряжение',
     REAL_SQUARE: 'Квадрат (действ.)',
     REAL_POWER4: 'Степень 4 (действ.)',
+    ATAN2: 'Арктангенс',
 
     // Визуализация
     OSCILLOSCOPE: 'Осциллограф',

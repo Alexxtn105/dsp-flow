@@ -29,7 +29,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
 
         // Определяем тип визуализации по типу блока
         let vizType = 'oscilloscope';
-        if (blockType === 'Спектроанализатор' || blockType === 'БПФ') {
+        if (blockType === 'Спектроанализатор') {
             vizType = 'spectrum';
         } else if (blockType === 'Водопад') {
             vizType = 'waterfall';

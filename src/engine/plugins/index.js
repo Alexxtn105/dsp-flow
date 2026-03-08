@@ -17,8 +17,6 @@ import RemezFilterPlugin from './filters/RemezFilterPlugin.js';
 import DelayLinePlugin from './filters/DelayLinePlugin.js';
 
 // Анализ
-import FFTPlugin from './analysis/FFTPlugin.js';
-import SlidingFFTPlugin from './analysis/SlidingFFTPlugin.js';
 import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin.js';
 
 // Математические
@@ -37,6 +35,7 @@ import ComplexComposerPlugin from './math/ComplexComposerPlugin.js';
 import ComplexConjugatePlugin from './math/ComplexConjugatePlugin.js';
 import RealSquarePlugin from './math/RealSquarePlugin.js';
 import RealPower4Plugin from './math/RealPower4Plugin.js';
+import Atan2Plugin from './math/Atan2Plugin.js';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
@@ -71,8 +70,6 @@ export default [
     RefCosineGeneratorPlugin,
 
     // Анализ
-    SlidingFFTPlugin,
-    FFTPlugin,
     SpectrumAnalyzerPlugin,
 
     // Детекторы
@@ -96,6 +93,7 @@ export default [
     ComplexConjugatePlugin,
     RealSquarePlugin,
     RealPower4Plugin,
+    Atan2Plugin,
 
     // Визуализация
     OscilloscopePlugin,

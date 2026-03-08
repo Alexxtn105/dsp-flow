@@ -143,28 +143,6 @@ const DSP_ICONS = {
 
     /* ===================== ANALYSIS ===================== */
 
-    // БПФ — спектральные столбцы разной высоты
-    'dsp-fft': (
-        <>
-            <rect x="3" y="14" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
-            <rect x="7.5" y="9" width="3" height="12" rx="0.5" fill="currentColor" stroke="none" />
-            <rect x="12" y="4" width="3" height="17" rx="0.5" fill="currentColor" stroke="none" />
-            <rect x="16.5" y="11" width="3" height="10" rx="0.5" fill="currentColor" stroke="none" />
-        </>
-    ),
-
-    // Скользящее БПФ — столбцы + маркер скользящего окна сверху
-    'dsp-sliding-fft': (
-        <>
-            <rect x="4" y="12" width="2.5" height="9" rx="0.5" fill="currentColor" stroke="none" />
-            <rect x="8" y="7" width="2.5" height="14" rx="0.5" fill="currentColor" stroke="none" />
-            <rect x="12" y="4" width="2.5" height="17" rx="0.5" fill="currentColor" stroke="none" />
-            <rect x="16" y="10" width="2.5" height="11" rx="0.5" fill="currentColor" stroke="none" />
-            <path d="M3 2.5 L21 2.5" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.4" />
-            <path d="M10.5 1 L12 2.5 L13.5 1" strokeWidth="1.2" fill="none" opacity="0.5" />
-        </>
-    ),
-
     // Спектроанализатор — гладкая спектральная кривая на экране
     'dsp-spectrum': (
         <>
@@ -317,6 +295,18 @@ const DSP_ICONS = {
             <text x="2" y="18" fontSize="16" fontWeight="800"
                   fontFamily="'Times New Roman',Georgia,serif"
                   fill="currentColor" stroke="none">|z|</text>
+        </>
+    ),
+
+    // Арктангенс — atan2(y,x)
+    'dsp-atan2': (
+        <>
+            <text x="1" y="18" fontSize="13" fontWeight="700" fontStyle="italic"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none">atan</text>
+            <text x="17" y="21" fontSize="9" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">2</text>
         </>
     ),
 

@@ -28,7 +28,7 @@ describe('helpers.js — обратная совместимость', () => {
     });
 
     it('getBlockDescription возвращает описание', () => {
-        expect(getBlockDescription('БПФ')).toBe('БПФ (размер кратен степени двойки)');
+        expect(getBlockDescription('Спектроанализатор')).toBe('Спектральный анализ');
     });
 
     it('getBlockSignalConfig возвращает конфигурацию', () => {
