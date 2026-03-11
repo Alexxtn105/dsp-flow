@@ -104,7 +104,7 @@ class ValidationService {
      */
     static validateBlockParams(blockType, params) {
         const validators = {
-            'Режекторный КИХ-фильтр': (p) => {
+            'notch-fir-filter': (p) => {
                 const errors = [];
                 if (!p.order || p.order < 1 || p.order > 1024) {
                     errors.push('Порядок фильтра должен быть от 1 до 1024');
@@ -117,7 +117,7 @@ class ValidationService {
                 }
                 return errors;
             },
-            'Полосовой КИХ-фильтр': (p) => {
+            'bandpass-fir-filter': (p) => {
                 const errors = [];
                 if (!p.order || p.order < 1 || p.order > 1024) {
                     errors.push('Порядок фильтра должен быть от 1 до 1024');
@@ -133,7 +133,7 @@ class ValidationService {
                 }
                 return errors;
             },
-            'Входной сигнал': (p) => {
+            'ref-sine-generator': (p) => {
                 const errors = [];
                 if (!p.frequency || p.frequency <= 0) {
                     errors.push('Частота должна быть положительной');
@@ -143,17 +143,7 @@ class ValidationService {
                 }
                 return errors;
             },
-            'Референсный синусный генератор': (p) => {
-                const errors = [];
-                if (!p.frequency || p.frequency <= 0) {
-                    errors.push('Частота должна быть положительной');
-                }
-                if (p.amplitude === undefined || p.amplitude <= 0) {
-                    errors.push('Амплитуда должна быть положительной');
-                }
-                return errors;
-            },
-            'Референсный косинусный генератор': (p) => {
+            'ref-cosine-generator': (p) => {
                 const errors = [];
                 if (!p.frequency || p.frequency <= 0) {
                     errors.push('Частота должна быть положительной');

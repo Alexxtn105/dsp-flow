@@ -43,9 +43,9 @@ describe('Интеграционные тесты сигнального тра�
 
     it('Линейный пайплайн: SineGenerator → LowpassFIR → Oscilloscope', () => {
         const nodes = [
-            makeNode('gen', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-            makeNode('fir', 'ФНЧ КИХ-фильтр', { order: 32, cutoff: 5000, filterType: 'lowpass' }),
-            makeNode('osc', 'Осциллограф'),
+            makeNode('gen', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+            makeNode('fir', 'lowpass-fir-filter', { order: 32, cutoff: 5000, filterType: 'lowpass' }),
+            makeNode('osc', 'oscilloscope'),
         ];
         const edges = [
             makeEdge('e1', 'gen', 'fir'),
@@ -87,8 +87,8 @@ describe('Интеграционные тесты сигнального тра�
 
     it('Комплексный пайплайн: RefSineGenerator → PhaseDetector', () => {
         const nodes = [
-            makeNode('ref', 'Референсный синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-            makeNode('det', 'Фазовый детектор', { referenceFrequency: 1000, sensitivity: 1.0, outputRange: '±π' }),
+            makeNode('ref', 'ref-sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+            makeNode('det', 'phase-detector', { referenceFrequency: 1000, sensitivity: 1.0, outputRange: '±π' }),
         ];
         const edges = [
             makeEdge('e1', 'ref', 'det'),
@@ -118,9 +118,9 @@ describe('Интеграционные тесты сигнального тра�
 
     it('Разветвление: SineGenerator → [Oscilloscope + SpectrumAnalyzer]', () => {
         const nodes = [
-            makeNode('gen', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-            makeNode('osc', 'Осциллограф'),
-            makeNode('spec', 'Спектроанализатор'),
+            makeNode('gen', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+            makeNode('osc', 'oscilloscope'),
+            makeNode('spec', 'spectrum-analyzer'),
         ];
         const edges = [
             makeEdge('e1', 'gen', 'osc'),
@@ -159,10 +159,10 @@ describe('Интеграционные тесты сигнального тра�
 
     it('Мульти-вход: [Sine1 + Sine2] → Summer → Oscilloscope', () => {
         const nodes = [
-            makeNode('s1', 'Синусный генератор', { frequency: 1000, amplitude: 0.5, phase: 0 }),
-            makeNode('s2', 'Косинусный генератор', { frequency: 2000, amplitude: 0.3, phase: 0 }),
-            makeNode('sum', 'Сумматор', { numInputs: 2, weights: [1.0, 1.0] }),
-            makeNode('osc', 'Осциллограф'),
+            makeNode('s1', 'sine-generator', { frequency: 1000, amplitude: 0.5, phase: 0 }),
+            makeNode('s2', 'cosine-generator', { frequency: 2000, amplitude: 0.3, phase: 0 }),
+            makeNode('sum', 'summer', { numInputs: 2, weights: [1.0, 1.0] }),
+            makeNode('osc', 'oscilloscope'),
         ];
         const edges = [
             makeEdge('e1', 's1', 'sum', 'output', 'input-0'),

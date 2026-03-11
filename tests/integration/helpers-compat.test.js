@@ -17,35 +17,35 @@ beforeAll(() => {
 
 describe('helpers.js — обратная совместимость', () => {
     it('getDefaultParams возвращает параметры синусного генератора', () => {
-        const params = getDefaultParams('Синусный генератор');
+        const params = getDefaultParams('sine-generator');
         expect(params).toHaveProperty('frequency', 1000);
         expect(params).toHaveProperty('amplitude', 1.0);
     });
 
     it('getBlockIcon возвращает иконку', () => {
-        expect(getBlockIcon('Синусный генератор')).toBe('dsp-sine');
-        expect(getBlockIcon('Режекторный КИХ-фильтр')).toBe('dsp-notch');
+        expect(getBlockIcon('sine-generator')).toBe('dsp-sine');
+        expect(getBlockIcon('notch-fir-filter')).toBe('dsp-notch');
     });
 
     it('getBlockDescription возвращает описание', () => {
-        expect(getBlockDescription('Спектроанализатор')).toBe('Спектральный анализ');
+        expect(getBlockDescription('spectrum-analyzer')).toBe('Спектральный анализ');
     });
 
     it('getBlockSignalConfig возвращает конфигурацию', () => {
-        const config = getBlockSignalConfig('Синусный генератор');
+        const config = getBlockSignalConfig('sine-generator');
         expect(config).toEqual({ input: null, output: 'real', inputsCount: 1, outputsCount: 1 });
     });
 
     it('isGeneratorBlock определяет генераторы', () => {
-        expect(isGeneratorBlock('Синусный генератор')).toBe(true);
-        expect(isGeneratorBlock('Audio File')).toBe(true);
-        expect(isGeneratorBlock('Режекторный КИХ-фильтр')).toBe(false);
-        expect(isGeneratorBlock('Осциллограф')).toBe(false);
+        expect(isGeneratorBlock('sine-generator')).toBe(true);
+        expect(isGeneratorBlock('audio-file')).toBe(true);
+        expect(isGeneratorBlock('notch-fir-filter')).toBe(false);
+        expect(isGeneratorBlock('oscilloscope')).toBe(false);
     });
 
     it('isVisualizationBlock определяет визуализации', () => {
-        expect(isVisualizationBlock('Осциллограф')).toBe(true);
-        expect(isVisualizationBlock('Динамик')).toBe(true);
-        expect(isVisualizationBlock('Синусный генератор')).toBe(false);
+        expect(isVisualizationBlock('oscilloscope')).toBe(true);
+        expect(isVisualizationBlock('speaker')).toBe(true);
+        expect(isVisualizationBlock('sine-generator')).toBe(false);
     });
 });

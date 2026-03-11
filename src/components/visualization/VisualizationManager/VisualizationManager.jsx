@@ -30,20 +30,15 @@ const VisualizationManager = forwardRef(function VisualizationManager({
         const windowId = nodeId;
 
         // Определяем тип визуализации по типу блока
-        let vizType = 'oscilloscope';
-        if (blockType === 'Спектроанализатор') {
-            vizType = 'spectrum';
-        } else if (blockType === 'Водопад') {
-            vizType = 'waterfall';
-        } else if (blockType === 'Фазовое созвездие') {
-            vizType = 'constellation';
-        } else if (blockType === 'Числовой индикатор') {
-            vizType = 'numeric-indicator';
-        } else if (blockType === 'Комплексный числовой индикатор') {
-            vizType = 'complex-numeric-indicator';
-        } else if (blockType === 'Многоканальный спектроанализатор') {
-            vizType = 'multi-spectrum';
-        }
+        const vizTypeMap = {
+            'spectrum-analyzer': 'spectrum',
+            'waterfall': 'waterfall',
+            'constellation': 'constellation',
+            'numeric-indicator': 'numeric-indicator',
+            'complex-numeric-indicator': 'complex-numeric-indicator',
+            'multi-channel-spectrum-analyzer': 'multi-spectrum'
+        };
+        const vizType = vizTypeMap[blockType] || 'oscilloscope';
 
         setOpenWindows(prev => {
             // Позиционирование окна (ближе к правому краю)

@@ -21,13 +21,17 @@ function Toolbar() {
 
     const groups = registry.getGroups();
 
+    // Translate block/group names for display and search
+    const blockDisplayName = (blockId) => t(blockId, { ns: 'blocks' });
+    const groupDisplayName = (groupId) => t(groupId, { ns: 'groups' });
+
     const query = searchQuery.trim().toLowerCase();
     const filteredGroups = query
         ? groups
             .map(group => ({
                 ...group,
                 blocks: group.blocks.filter(block =>
-                    block.name.toLowerCase().includes(query) ||
+                    blockDisplayName(block.name).toLowerCase().includes(query) ||
                     (block.description && block.description.toLowerCase().includes(query))
                 )
             }))
@@ -49,10 +53,10 @@ function Toolbar() {
         setCollapsedGroups({});
     };
 
-    const onDragStart = (event, blockName) => {
-        event.dataTransfer.setData('application/reactflow', blockName);
+    const onDragStart = (event, blockId) => {
+        event.dataTransfer.setData('application/reactflow', blockId);
         event.dataTransfer.effectAllowed = 'move';
-        setDraggingBlock(blockName);
+        setDraggingBlock(blockId);
         event.currentTarget.classList.add('dragging');
     };
 
@@ -165,7 +169,7 @@ function Toolbar() {
                                 aria-expanded={!collapsedGroups[group.id]}
                                 aria-controls={`group-${group.id}`}
                             >
-                                <span className="tb-group-name">{group.name}</span>
+                                <span className="tb-group-name">{groupDisplayName(group.id)}</span>
                                 <span className="tb-group-badge">{group.blocks.length}</span>
                                 <Icon
                                     name={collapsedGroups[group.id] ? 'expand_more' : 'expand_less'}
@@ -179,43 +183,43 @@ function Toolbar() {
                                     className="tb-group-blocks"
                                     id={`group-${group.id}`}
                                     role="region"
-                                    aria-label={t('toolbar.blocksGroup', { name: group.name })}
+                                    aria-label={t('toolbar.blocksGroup', { name: groupDisplayName(group.id) })}
                                 >
-                                    {group.blocks.map((block) => (
-                                        <div
-                                            key={block.id}
-                                            className="tb-block"
-                                            draggable
-                                            onDragStart={(e) => onDragStart(e, block.name)}
-                                            onDragEnd={onDragEnd}
-                                            title={block.description}
-                                            role="button"
-                                            tabIndex={0}
-                                            aria-label={t('toolbar.addBlockNamed', { name: block.name, description: block.description })}
-                                        >
-                                            <div className="tb-block-icon">
-                                                <Icon name={block.icon} size="medium" aria-hidden="true" />
-                                            </div>
-                                            <div className="tb-block-info">
-                                                <span className="tb-block-name">{block.name}</span>
-                                                {block.description && (
-                                                    <span className="tb-block-desc">{block.description}</span>
-                                                )}
-                                            </div>
-                                            <button
-                                                className="tb-block-help-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setHelpBlock(block);
-                                                }}
-                                                draggable={false}
-                                                title={t('toolbar.help')}
-                                                aria-label={t('toolbar.helpForBlock', { name: block.name })}
+                                    {group.blocks.map((block) => {
+                                        const displayName = blockDisplayName(block.name);
+                                        return (
+                                            <div
+                                                key={block.id}
+                                                className="tb-block"
+                                                draggable
+                                                onDragStart={(e) => onDragStart(e, block.name)}
+                                                onDragEnd={onDragEnd}
+                                                title={displayName}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label={t('toolbar.addBlockNamed', { name: displayName, description: '' })}
                                             >
-                                                <Icon name="help_outline" size="small" aria-hidden="true" />
-                                            </button>
-                                        </div>
-                                    ))}
+                                                <div className="tb-block-icon">
+                                                    <Icon name={block.icon} size="medium" aria-hidden="true" />
+                                                </div>
+                                                <div className="tb-block-info">
+                                                    <span className="tb-block-name">{displayName}</span>
+                                                </div>
+                                                <button
+                                                    className="tb-block-help-btn"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setHelpBlock({ ...block, displayName });
+                                                    }}
+                                                    draggable={false}
+                                                    title={t('toolbar.help')}
+                                                    aria-label={t('toolbar.helpForBlock', { name: displayName })}
+                                                >
+                                                    <Icon name="help_outline" size="small" aria-hidden="true" />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -233,10 +237,10 @@ function Toolbar() {
                             draggable
                             onDragStart={(e) => onDragStart(e, block.name)}
                             onDragEnd={onDragEnd}
-                            title={`${block.name}: ${block.description}`}
+                            title={blockDisplayName(block.name)}
                             role="button"
                             tabIndex={0}
-                            aria-label={t('toolbar.addBlock') + ' ' + block.name}
+                            aria-label={t('toolbar.addBlock') + ' ' + blockDisplayName(block.name)}
                         >
                             <Icon name={block.icon} size="medium" aria-hidden="true" />
                         </div>
@@ -247,7 +251,7 @@ function Toolbar() {
             {helpBlock && (
                 <BlockHelpDialog
                     blockId={helpBlock.id}
-                    blockName={helpBlock.name}
+                    blockName={helpBlock.displayName || blockDisplayName(helpBlock.name)}
                     blockIcon={helpBlock.icon}
                     onClose={() => setHelpBlock(null)}
                 />

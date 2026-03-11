@@ -58,8 +58,8 @@ describe('DSPProcessor', () => {
     describe('initialize()', () => {
         it('компилирует валидный граф (генератор -> осциллограф) успешно', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'oscilloscope'),
             ];
             const edges = [makeEdge('e1', 'n1', 'n2')];
 
@@ -81,8 +81,8 @@ describe('DSPProcessor', () => {
         // 3. initialize() с циклическим графом
         it('возвращает success: false при наличии цикла', () => {
             const nodes = [
-                makeNode('n1', 'Сумматор', { numInputs: 2, weights: [1.0, 1.0] }),
-                makeNode('n2', 'Сумматор', { numInputs: 2, weights: [1.0, 1.0] }),
+                makeNode('n1', 'summer', { numInputs: 2, weights: [1.0, 1.0] }),
+                makeNode('n2', 'summer', { numInputs: 2, weights: [1.0, 1.0] }),
             ];
             const edges = [
                 makeEdge('e1', 'n1', 'n2'),
@@ -104,9 +104,9 @@ describe('DSPProcessor', () => {
             // Используем ФНЧ КИХ-фильтр с order=0, что может не дать ошибку,
             // поэтому проверяем косвенно — через валидный граф с фильтром.
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'ФНЧ КИХ-фильтр', { order: 64, cutoff: 1000, filterType: 'lowpass' }),
-                makeNode('n3', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'lowpass-fir-filter', { order: 64, cutoff: 1000, filterType: 'lowpass' }),
+                makeNode('n3', 'oscilloscope'),
             ];
             const edges = [
                 makeEdge('e1', 'n1', 'n2'),
@@ -121,9 +121,9 @@ describe('DSPProcessor', () => {
             DSPProcessor.reset();
             DSPProcessor.setSampleRate(10); // Очень низкий sampleRate
             const nodes2 = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'ФНЧ КИХ-фильтр', { order: 64, cutoff: 100000, filterType: 'lowpass' }),
-                makeNode('n3', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'lowpass-fir-filter', { order: 64, cutoff: 100000, filterType: 'lowpass' }),
+                makeNode('n3', 'oscilloscope'),
             ];
             const edges2 = [
                 makeEdge('e1', 'n1', 'n2'),
@@ -145,8 +145,8 @@ describe('DSPProcessor', () => {
         it('очищает blockStates при повторной инициализации с новым графом', () => {
             // Первая инициализация с n1, n2
             const nodes1 = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'oscilloscope'),
             ];
             const edges1 = [makeEdge('e1', 'n1', 'n2')];
             DSPProcessor.initialize(nodes1, edges1);
@@ -160,8 +160,8 @@ describe('DSPProcessor', () => {
 
             // Вторая инициализация — другие узлы (n3, n4), n1 и n2 должны пропасть
             const nodes2 = [
-                makeNode('n3', 'Косинусный генератор', { frequency: 500, amplitude: 1.0, phase: 0 }),
-                makeNode('n4', 'Осциллограф'),
+                makeNode('n3', 'cosine-generator', { frequency: 500, amplitude: 1.0, phase: 0 }),
+                makeNode('n4', 'oscilloscope'),
             ];
             const edges2 = [makeEdge('e2', 'n3', 'n4')];
             DSPProcessor.initialize(nodes2, edges2);
@@ -179,7 +179,7 @@ describe('DSPProcessor', () => {
     describe('processNextChunk()', () => {
         it('вызывает onBlockOutput с Float32Array для генератора', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             const edges = [];
 
@@ -202,9 +202,9 @@ describe('DSPProcessor', () => {
         // 5. Цепочка генератор -> сумматор -> осциллограф
         it('пропускает данные через цепочку генератор -> сумматор -> осциллограф', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'Сумматор', { numInputs: 2, weights: [1.0, 1.0] }),
-                makeNode('n3', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'summer', { numInputs: 2, weights: [1.0, 1.0] }),
+                makeNode('n3', 'oscilloscope'),
             ];
             const edges = [
                 makeEdge('e1', 'n1', 'n2'),
@@ -245,7 +245,7 @@ describe('DSPProcessor', () => {
         // 11. processNextChunk() вызывает onProgress callback
         it('вызывает onProgress callback после обработки чанка', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.isRunning = true;
@@ -265,7 +265,7 @@ describe('DSPProcessor', () => {
         // 12. processNextChunk() вызывает onError при ошибке
         it('вызывает onError callback при ошибке обработки', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.isRunning = true;
@@ -274,7 +274,7 @@ describe('DSPProcessor', () => {
             const originalGraph = DSPProcessor.compiledGraph;
             DSPProcessor.compiledGraph = [{
                 nodeId: 'n1',
-                blockType: 'Синусный генератор',
+                blockType: 'sine-generator',
                 params: { frequency: 1000 },
                 inputs: [{ sourceNodeId: 'nonexistent' }],
             }];
@@ -307,7 +307,7 @@ describe('DSPProcessor', () => {
     describe('step()', () => {
         it('обрабатывает заданное количество сэмплов', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
 
@@ -329,7 +329,7 @@ describe('DSPProcessor', () => {
 
         it('увеличивает currentSample на величину шага', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
 
@@ -347,8 +347,8 @@ describe('DSPProcessor', () => {
     describe('reset()', () => {
         it('очищает blockStates и сбрасывает currentSample', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'oscilloscope'),
             ];
             const edges = [makeEdge('e1', 'n1', 'n2')];
 
@@ -369,7 +369,7 @@ describe('DSPProcessor', () => {
 
         it('закрывает audioContext при сбросе', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.start();
@@ -398,7 +398,7 @@ describe('DSPProcessor', () => {
             DSPProcessor.setSampleRate(8000);
 
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.isRunning = true;
@@ -436,7 +436,7 @@ describe('DSPProcessor', () => {
             DSPProcessor.setChunkSize(256);
 
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.isRunning = true;
@@ -457,7 +457,7 @@ describe('DSPProcessor', () => {
     describe('start() и stop()', () => {
         it('start() устанавливает isRunning в true', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.start();
@@ -469,7 +469,7 @@ describe('DSPProcessor', () => {
 
         it('stop() устанавливает isRunning в false', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.start();
@@ -485,7 +485,7 @@ describe('DSPProcessor', () => {
 
         it('повторный вызов start() игнорируется', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.start();
@@ -507,7 +507,7 @@ describe('DSPProcessor', () => {
 
         it('при включении останавливает запущенную обработку', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
             DSPProcessor.start();
@@ -521,7 +521,7 @@ describe('DSPProcessor', () => {
     describe('executeBlock()', () => {
         it('возвращает Float32Array для генератора без входов', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
             ];
             DSPProcessor.initialize(nodes, []);
 
@@ -534,8 +534,8 @@ describe('DSPProcessor', () => {
 
         it('передаёт данные от источника на вход блока', () => {
             const nodes = [
-                makeNode('n1', 'Синусный генератор', { frequency: 1000, amplitude: 1.0, phase: 0 }),
-                makeNode('n2', 'Осциллограф'),
+                makeNode('n1', 'sine-generator', { frequency: 1000, amplitude: 1.0, phase: 0 }),
+                makeNode('n2', 'oscilloscope'),
             ];
             const edges = [makeEdge('e1', 'n1', 'n2')];
             DSPProcessor.initialize(nodes, edges);

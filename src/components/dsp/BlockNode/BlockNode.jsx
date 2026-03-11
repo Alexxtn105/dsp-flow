@@ -1,5 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { Handle, Position } from '@xyflow/react';
 import Icon from '../../common/Icons/Icon.jsx';
 import registry from '../../../engine/PluginRegistry';
@@ -32,6 +33,7 @@ function getParamType(key, value) {
 }
 
 function BlockNode({ data, selected }) {
+    const { t } = useTranslation();
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
@@ -39,7 +41,8 @@ function BlockNode({ data, selected }) {
     const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
     const canVisualize = isVisualizationBlock(data.blockType);
-    const isAudioFile = data.blockType === 'Audio File';
+    const isAudioFile = data.blockType === 'audio-file';
+    const displayName = t(data.blockType, { ns: 'blocks' });
 
     // Inline editing state
     const [editingParam, setEditingParam] = useState(null);
@@ -151,7 +154,7 @@ function BlockNode({ data, selected }) {
                     >
                         {paramType.options.map(opt => (
                             <option key={opt.value} value={opt.value}>
-                                {opt.label}
+                                {opt.labelKey ? t(opt.labelKey, { ns: 'params' }) : opt.label}
                             </option>
                         ))}
                     </select>
@@ -266,7 +269,7 @@ function BlockNode({ data, selected }) {
                         <Icon name={iconName} size="medium" />
                     </span>
                     <div className="block-title">
-                        <div className="block-name">{data.label}</div>
+                        <div className="block-name">{displayName}</div>
                         <div className="block-type">{description}</div>
                     </div>
                 </div>

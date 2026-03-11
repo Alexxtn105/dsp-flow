@@ -10,28 +10,30 @@ import allPlugins from './plugins/index.js';
 
 export default function initPlugins() {
     // Регистрация групп (порядок определяет отображение в Toolbar)
-    registry.registerGroup({ id: 'filters', name: 'Фильтры', collapsed: false });
-    registry.registerGroup({ id: 'generators', name: 'Генераторы', collapsed: false });
-registry.registerGroup({ id: 'detectors', name: 'Детекторы', collapsed: false });
-    registry.registerGroup({ id: 'math-blocks', name: 'Математические', collapsed: false });
-    registry.registerGroup({ id: 'visualization', name: 'Визуализация', collapsed: false });
-    registry.registerGroup({ id: 'output', name: 'Вывод', collapsed: false });
+    // Display names are in locales/*/groups.json
+    registry.registerGroup({ id: 'filters', collapsed: false });
+    registry.registerGroup({ id: 'generators', collapsed: false });
+    registry.registerGroup({ id: 'detectors', collapsed: false });
+    registry.registerGroup({ id: 'math-blocks', collapsed: false });
+    registry.registerGroup({ id: 'visualization', collapsed: false });
+    registry.registerGroup({ id: 'output', collapsed: false });
 
     // Регистрация опций параметров (выпадающие списки)
+    // Labels are translation keys resolved at render time via params namespace
     registry.registerParamOptions('windowFunction', [
-        { value: 'rectangular', label: 'Прямоугольное (Rectangular)' },
-        { value: 'hamming', label: 'Хэмминга (Hamming)' },
-        { value: 'hanning', label: 'Ханна (Hanning)' },
-        { value: 'blackman', label: 'Блэкмана (Blackman)' },
-        { value: 'blackman-harris', label: 'Блэкмана-Харриса (Blackman-Harris)' },
-        { value: 'nuttall', label: 'Наттолла (Nuttall)' },
-        { value: 'flattop', label: 'Flat Top' }
+        { value: 'rectangular', labelKey: 'windowFunction.rectangular' },
+        { value: 'hamming', labelKey: 'windowFunction.hamming' },
+        { value: 'hanning', labelKey: 'windowFunction.hanning' },
+        { value: 'blackman', labelKey: 'windowFunction.blackman' },
+        { value: 'blackman-harris', labelKey: 'windowFunction.blackman-harris' },
+        { value: 'nuttall', labelKey: 'windowFunction.nuttall' },
+        { value: 'flattop', labelKey: 'windowFunction.flattop' }
     ]);
 
     registry.registerParamOptions('filterType', [
-        { value: 'lowpass', label: 'ФНЧ (Lowpass)' },
-        { value: 'highpass', label: 'ФВЧ (Highpass)' },
-        { value: 'bandpass', label: 'Полосовой (Bandpass)' }
+        { value: 'lowpass', labelKey: 'filterType.lowpass' },
+        { value: 'highpass', labelKey: 'filterType.highpass' },
+        { value: 'bandpass', labelKey: 'filterType.bandpass' }
     ]);
 
     registry.registerParamOptions('fftSize', [
@@ -64,66 +66,66 @@ registry.registerGroup({ id: 'detectors', name: 'Детекторы', collapsed:
     ]);
 
     registry.registerParamOptions('outputRange', [
-        { value: '±180°', label: '±180°' },
-        { value: '±π', label: '±π (радианы)' },
-        { value: '0-360°', label: '0–360°' },
-        { value: '0-2π', label: '0–2π (радианы)' }
+        { value: '±180°', labelKey: 'outputRange.±180°' },
+        { value: '±π', labelKey: 'outputRange.±π' },
+        { value: '0-360°', labelKey: 'outputRange.0-360°' },
+        { value: '0-2π', labelKey: 'outputRange.0-2π' }
     ]);
 
     registry.registerParamOptions('normalization', [
-        { value: 'none', label: 'Без нормализации' },
-        { value: 'average', label: 'Среднее (÷N)' },
-        { value: 'peak', label: 'По пиковому значению' }
+        { value: 'none', labelKey: 'normalization.none' },
+        { value: 'average', labelKey: 'normalization.average' },
+        { value: 'peak', labelKey: 'normalization.peak' }
     ]);
 
     registry.registerParamOptions('operation', [
-        { value: 'multiply', label: 'Умножение' },
-        { value: 'divide', label: 'Деление' }
+        { value: 'multiply', labelKey: 'operation.multiply' },
+        { value: 'divide', labelKey: 'operation.divide' }
     ]);
 
     registry.registerParamOptions('noiseType', [
-        { value: 'white', label: 'Белый (White)' },
-        { value: 'pink', label: 'Розовый (Pink)' },
-        { value: 'brown', label: 'Красный/Броуновский (Brown)' }
+        { value: 'white', labelKey: 'noiseType.white' },
+        { value: 'pink', labelKey: 'noiseType.pink' },
+        { value: 'brown', labelKey: 'noiseType.brown' }
     ]);
 
     registry.registerParamOptions('mode', [
-        { value: 'decimate', label: 'Децимация (↓)' },
-        { value: 'interpolate', label: 'Интерполяция (↑)' }
+        { value: 'decimate', labelKey: 'mode.decimate' },
+        { value: 'interpolate', labelKey: 'mode.interpolate' }
     ]);
 
     registry.registerParamOptions('outputMode', [
-        { value: 'deviation', label: 'Отклонение от центральной (Гц)' },
-        { value: 'absolute', label: 'Абсолютная частота (Гц)' }
+        { value: 'deviation', labelKey: 'outputMode.deviation' },
+        { value: 'absolute', labelKey: 'outputMode.absolute' }
     ]);
 
     registry.registerParamOptions('modulationType', [
-        { value: 'AM', label: 'АМ (амплитудная)' },
-        { value: 'FM', label: 'ЧМ (частотная)' },
-        { value: 'PM', label: 'ФМ (фазовая)' }
+        { value: 'AM', labelKey: 'modulationType.AM' },
+        { value: 'FM', labelKey: 'modulationType.FM' },
+        { value: 'PM', labelKey: 'modulationType.PM' }
     ]);
 
     registry.registerParamOptions('filterDesign', [
-        { value: 'butterworth', label: 'Баттерворт (Butterworth)' },
-        { value: 'chebyshev1', label: 'Чебышев I (Chebyshev I)' }
+        { value: 'butterworth', labelKey: 'filterDesign.butterworth' },
+        { value: 'chebyshev1', labelKey: 'filterDesign.chebyshev1' }
     ]);
 
     registry.registerParamOptions('iirFilterType', [
-        { value: 'lowpass', label: 'ФНЧ (Lowpass)' },
-        { value: 'highpass', label: 'ФВЧ (Highpass)' }
+        { value: 'lowpass', labelKey: 'iirFilterType.lowpass' },
+        { value: 'highpass', labelKey: 'iirFilterType.highpass' }
     ]);
 
     registry.registerParamOptions('gainMode', [
-        { value: 'linear', label: 'Линейный' },
-        { value: 'dB', label: 'Децибелы (дБ)' }
+        { value: 'linear', labelKey: 'gainMode.linear' },
+        { value: 'dB', labelKey: 'gainMode.dB' }
     ]);
 
     registry.registerParamOptions('logFunction', [
-        { value: 'ln', label: 'ln (натуральный)' },
-        { value: 'log10', label: 'log₁₀ (десятичный)' },
-        { value: 'dB', label: 'дБ (20·log₁₀|x|)' },
-        { value: 'exp', label: 'exp (eˣ)' },
-        { value: 'pow10', label: '10ˣ' }
+        { value: 'ln', labelKey: 'logFunction.ln' },
+        { value: 'log10', labelKey: 'logFunction.log10' },
+        { value: 'dB', labelKey: 'logFunction.dB' },
+        { value: 'exp', labelKey: 'logFunction.exp' },
+        { value: 'pow10', labelKey: 'logFunction.pow10' }
     ]);
 
     registry.registerParamOptions('pskConstellation', [

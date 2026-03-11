@@ -8,7 +8,7 @@
 const REQUIRED_FIELDS = ['type', 'id', 'icon', 'description', 'group', 'signals', 'defaultParams', 'processor'];
 
 class PluginRegistry {
-    /** @type {Map<string, object>} type → plugin */
+    /** @type {Map<string, object>} id → plugin */
     #plugins = new Map();
 
     /** @type {Array<{id: string, name: string, collapsed: boolean}>} */
@@ -27,25 +27,25 @@ class PluginRegistry {
      */
     register(plugin) {
         if (this.#frozen) {
-            throw new Error(`PluginRegistry заморожен, невозможно зарегистрировать "${plugin?.type}"`);
+            throw new Error(`PluginRegistry заморожен, невозможно зарегистрировать "${plugin?.id}"`);
         }
 
         // Валидация обязательных полей
         for (const field of REQUIRED_FIELDS) {
             if (plugin[field] === undefined) {
-                throw new Error(`Плагин "${plugin?.type || '?'}" не содержит обязательное поле "${field}"`);
+                throw new Error(`Плагин "${plugin?.id || '?'}" не содержит обязательное поле "${field}"`);
             }
         }
 
         if (typeof plugin.processor.process !== 'function') {
-            throw new Error(`Плагин "${plugin.type}" должен иметь processor.process()`);
+            throw new Error(`Плагин "${plugin.id}" должен иметь processor.process()`);
         }
 
-        if (this.#plugins.has(plugin.type)) {
-            throw new Error(`Плагин "${plugin.type}" уже зарегистрирован`);
+        if (this.#plugins.has(plugin.id)) {
+            throw new Error(`Плагин "${plugin.id}" уже зарегистрирован`);
         }
 
-        this.#plugins.set(plugin.type, plugin);
+        this.#plugins.set(plugin.id, plugin);
     }
 
     /**
@@ -161,7 +161,7 @@ class PluginRegistry {
                 .filter(p => p.group === group.id)
                 .map(p => ({
                     id: p.id,
-                    name: p.type,
+                    name: p.id,
                     icon: p.icon,
                     description: p.description
                 }))

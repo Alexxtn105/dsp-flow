@@ -39,11 +39,10 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
 
         setNodes(currentNodes);
 
-        const inputNode = currentNodes.find(n => n.data.blockType === 'Audio File');
+        const inputNode = currentNodes.find(n => n.data.blockType === 'audio-file');
 
         const hasGenerators = currentNodes.some(n =>
-            ['Синусный генератор', 'Косинусный генератор', 'Референсный синусный генератор', 'Референсный косинусный генератор'].includes(n.data.blockType) ||
-            n.data.blockType === 'Audio File'
+            ['sine-generator', 'cosine-generator', 'ref-sine-generator', 'ref-cosine-generator', 'constant', 'noise-generator', 'amfmpm-modulator', 'psk-modulator', 'audio-file'].includes(n.data.blockType)
         );
 
         if (!hasGenerators) {

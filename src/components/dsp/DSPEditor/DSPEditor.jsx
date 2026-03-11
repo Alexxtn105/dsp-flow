@@ -26,8 +26,26 @@ import {
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import FileStorageService from '../../../services/fileStorageService';
+import { LEGACY_TYPE_TO_ID } from '../../../utils/constants';
 import './DSPEditor.css';
 import './ReactFlowTheme.css';
+
+/**
+ * Миграция blockType из legacy русских имён в machine ID.
+ * Для обратной совместимости со схемами, сохранёнными до локализации.
+ */
+function migrateBlockTypes(nodes) {
+    let changed = false;
+    const migrated = nodes.map(node => {
+        const legacyId = LEGACY_TYPE_TO_ID[node.data.blockType];
+        if (legacyId) {
+            changed = true;
+            return { ...node, data: { ...node.data, blockType: legacyId } };
+        }
+        return node;
+    });
+    return changed ? migrated : nodes;
+}
 
 /**
  * Восстановить аудиофайлы из IndexedDB для узлов AudioFile.
@@ -35,12 +53,12 @@ import './ReactFlowTheme.css';
  */
 async function restoreAudioFiles(nodes) {
     const hasAudioFiles = nodes.some(
-        n => n.data.blockType === 'Audio File' && n.data.params?.wavFileName
+        n => n.data.blockType === 'audio-file' && n.data.params?.wavFileName
     );
     if (!hasAudioFiles) return nodes;
 
     return Promise.all(nodes.map(async (node) => {
-        if (node.data.blockType !== 'Audio File' || !node.data.params?.wavFileName) {
+        if (node.data.blockType !== 'audio-file' || !node.data.params?.wavFileName) {
             return node;
         }
 
@@ -261,7 +279,8 @@ function DSPEditor({
             if (!hasLoadedExternalScheme.current) {
                 const autoSaved = loadAutoSave();
                 if (autoSaved) {
-                    const nodesWithCallbacks = injectCallbacks(autoSaved.nodes || []);
+                    const migratedNodes = migrateBlockTypes(autoSaved.nodes || []);
+                    const nodesWithCallbacks = injectCallbacks(migratedNodes);
                     const restoredNodes = await restoreAudioFiles(nodesWithCallbacks);
                     setNodes(restoredNodes);
                     setEdges(autoSaved.edges || []);
@@ -278,7 +297,8 @@ function DSPEditor({
             if (loadedSchemeData && loadedSchemeData.nodes && loadedSchemeData !== processedSchemeRef.current) {
                 processedSchemeRef.current = loadedSchemeData;
                 clearAutoSave();
-                const nodesWithCallbacks = injectCallbacks(loadedSchemeData.nodes || []);
+                const migratedNodes = migrateBlockTypes(loadedSchemeData.nodes || []);
+                const nodesWithCallbacks = injectCallbacks(migratedNodes);
                 const restoredNodes = await restoreAudioFiles(nodesWithCallbacks);
                 setNodes(restoredNodes);
                 setEdges(loadedSchemeData.edges || []);

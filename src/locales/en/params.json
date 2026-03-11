@@ -1,0 +1,68 @@
+{
+  "windowFunction": {
+    "rectangular": "Rectangular",
+    "hamming": "Hamming",
+    "hanning": "Hanning",
+    "blackman": "Blackman",
+    "blackman-harris": "Blackman-Harris",
+    "nuttall": "Nuttall",
+    "flattop": "Flat Top"
+  },
+  "filterType": {
+    "lowpass": "Lowpass",
+    "highpass": "Highpass",
+    "bandpass": "Bandpass"
+  },
+  "normalization": {
+    "none": "No normalization",
+    "average": "Average (÷N)",
+    "peak": "Peak normalization"
+  },
+  "operation": {
+    "multiply": "Multiply",
+    "divide": "Divide"
+  },
+  "noiseType": {
+    "white": "White",
+    "pink": "Pink",
+    "brown": "Brown"
+  },
+  "mode": {
+    "decimate": "Decimation (↓)",
+    "interpolate": "Interpolation (↑)"
+  },
+  "outputMode": {
+    "deviation": "Deviation from center (Hz)",
+    "absolute": "Absolute frequency (Hz)"
+  },
+  "outputRange": {
+    "±180°": "±180°",
+    "±π": "±π (radians)",
+    "0-360°": "0–360°",
+    "0-2π": "0–2π (radians)"
+  },
+  "modulationType": {
+    "AM": "AM (amplitude)",
+    "FM": "FM (frequency)",
+    "PM": "PM (phase)"
+  },
+  "filterDesign": {
+    "butterworth": "Butterworth",
+    "chebyshev1": "Chebyshev I"
+  },
+  "iirFilterType": {
+    "lowpass": "Lowpass",
+    "highpass": "Highpass"
+  },
+  "gainMode": {
+    "linear": "Linear",
+    "dB": "Decibels (dB)"
+  },
+  "logFunction": {
+    "ln": "ln (natural)",
+    "log10": "log₁₀ (decimal)",
+    "dB": "dB (20·log₁₀|x|)",
+    "exp": "exp (eˣ)",
+    "pow10": "10ˣ"
+  }
+}

@@ -25,9 +25,9 @@ function makeEdge(id, source, target) {
 }
 
 // Реальные типы блоков из проекта
-const SINE = 'Синусный генератор';   // group: generators, input: null, output: real
-const LPF  = 'ФНЧ КИХ-фильтр';     // group: filters,    input: real, output: real
-const OSC  = 'Осциллограф';          // group: visualization, input: real, output: null
+const SINE = 'sine-generator';        // group: generators, input: null, output: real
+const LPF  = 'lowpass-fir-filter';   // group: filters,    input: real, output: real
+const OSC  = 'oscilloscope';         // group: visualization, input: real, output: null
 
 // --- Тесты ---
 

@@ -334,7 +334,7 @@ class DSPProcessor {
                 }
 
                 // Если это Speaker — воспроизводим (muted обрабатывается в SpeakerPlugin.process)
-                if (block.blockType === 'Динамик' && output && this.audioContext) {
+                if (block.blockType === 'speaker' && output && this.audioContext) {
                     const speakerData = output?.outputs ? output.outputs[0] : output;
                     let hasSignal = false;
                     for (let i = 0; i < speakerData.length; i++) {
@@ -418,7 +418,7 @@ class DSPProcessor {
         }
 
         // Для генераторов (Входной сигнал) - читаем из WAV
-        if (block.blockType === 'Audio File' && this._fileMode) {
+        if (block.blockType === 'audio-file' && this._fileMode) {
             return WavFileService.readChunk(this.currentSample, this.chunkSize);
         }
 

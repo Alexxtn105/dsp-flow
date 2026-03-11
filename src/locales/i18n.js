@@ -12,6 +12,13 @@ import ptCommon from './pt/common.json';
 import jaCommon from './ja/common.json';
 import koCommon from './ko/common.json';
 
+import ruBlocks from './ru/blocks.json';
+import enBlocks from './en/blocks.json';
+import ruGroups from './ru/groups.json';
+import enGroups from './en/groups.json';
+import ruParams from './ru/params.json';
+import enParams from './en/params.json';
+
 /** Supported languages: flagCode maps to FlagIcon component */
 export const LANGUAGES = [
     { code: 'en', flagCode: 'gb', name: 'English' },
@@ -30,8 +37,8 @@ i18n
     .use(initReactI18next)
     .init({
         resources: {
-            en: { common: enCommon },
-            ru: { common: ruCommon },
+            en: { common: enCommon, blocks: enBlocks, groups: enGroups, params: enParams },
+            ru: { common: ruCommon, blocks: ruBlocks, groups: ruGroups, params: ruParams },
             es: { common: esCommon },
             fr: { common: frCommon },
             de: { common: deCommon },

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { getBlockDescription, formatParamName, getDefaultParams } from '../../../utils/helpers';
 import registry from '../../../engine/PluginRegistry';
 import { HIDDEN_PARAMS } from '../../../utils/constants';
@@ -42,6 +43,7 @@ function computePosition(nodeRect) {
  */
 function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation('params');
 
     const [localParams, setLocalParams] = useState({});
     const [wavFileName, setWavFileName] = useState('');
@@ -131,7 +133,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
     }, [onClose]);
 
     const blockType = node?.data?.blockType || 'Неизвестный блок';
-    const isInputSignal = blockType === 'Audio File';
+    const isInputSignal = blockType === 'audio-file';
 
     const handleParamChange = (key, value, type = 'text') => {
         let parsedValue = value;
@@ -313,7 +315,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                                         >
                                             {paramOptions.map(opt => (
                                                 <option key={opt.value} value={opt.value}>
-                                                    {opt.label}
+                                                    {opt.labelKey ? t(opt.labelKey) : opt.label}
                                                 </option>
                                             ))}
                                         </select>

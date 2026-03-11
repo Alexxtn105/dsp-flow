@@ -1,0 +1,68 @@
+{
+  "windowFunction": {
+    "rectangular": "Прямоугольное (Rectangular)",
+    "hamming": "Хэмминга (Hamming)",
+    "hanning": "Ханна (Hanning)",
+    "blackman": "Блэкмана (Blackman)",
+    "blackman-harris": "Блэкмана-Харриса (Blackman-Harris)",
+    "nuttall": "Наттолла (Nuttall)",
+    "flattop": "Flat Top"
+  },
+  "filterType": {
+    "lowpass": "ФНЧ (Lowpass)",
+    "highpass": "ФВЧ (Highpass)",
+    "bandpass": "Полосовой (Bandpass)"
+  },
+  "normalization": {
+    "none": "Без нормализации",
+    "average": "Среднее (÷N)",
+    "peak": "По пиковому значению"
+  },
+  "operation": {
+    "multiply": "Умножение",
+    "divide": "Деление"
+  },
+  "noiseType": {
+    "white": "Белый (White)",
+    "pink": "Розовый (Pink)",
+    "brown": "Красный/Броуновский (Brown)"
+  },
+  "mode": {
+    "decimate": "Децимация (↓)",
+    "interpolate": "Интерполяция (↑)"
+  },
+  "outputMode": {
+    "deviation": "Отклонение от центральной (Гц)",
+    "absolute": "Абсолютная частота (Гц)"
+  },
+  "outputRange": {
+    "±180°": "±180°",
+    "±π": "±π (радианы)",
+    "0-360°": "0–360°",
+    "0-2π": "0–2π (радианы)"
+  },
+  "modulationType": {
+    "AM": "АМ (амплитудная)",
+    "FM": "ЧМ (частотная)",
+    "PM": "ФМ (фазовая)"
+  },
+  "filterDesign": {
+    "butterworth": "Баттерворт (Butterworth)",
+    "chebyshev1": "Чебышев I (Chebyshev I)"
+  },
+  "iirFilterType": {
+    "lowpass": "ФНЧ (Lowpass)",
+    "highpass": "ФВЧ (Highpass)"
+  },
+  "gainMode": {
+    "linear": "Линейный",
+    "dB": "Децибелы (дБ)"
+  },
+  "logFunction": {
+    "ln": "ln (натуральный)",
+    "log10": "log₁₀ (десятичный)",
+    "dB": "дБ (20·log₁₀|x|)",
+    "exp": "exp (eˣ)",
+    "pow10": "10ˣ"
+  }
+}

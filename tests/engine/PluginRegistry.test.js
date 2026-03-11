@@ -29,17 +29,17 @@ describe('PluginRegistry', () => {
     it('регистрирует плагин и находит его', () => {
         const plugin = makePlugin();
         registry.register(plugin);
-        expect(registry.has('Тестовый блок')).toBe(true);
+        expect(registry.has('test-block')).toBe(true);
     });
 
     it('registerAll регистрирует массив плагинов', () => {
         const plugins = [
-            makePlugin({ type: 'Блок A', id: 'a' }),
-            makePlugin({ type: 'Блок B', id: 'b' }),
+            makePlugin({ type: 'Блок A', id: 'block-a' }),
+            makePlugin({ type: 'Блок B', id: 'block-b' }),
         ];
         registry.registerAll(plugins);
-        expect(registry.has('Блок A')).toBe(true);
-        expect(registry.has('Блок B')).toBe(true);
+        expect(registry.has('block-a')).toBe(true);
+        expect(registry.has('block-b')).toBe(true);
     });
 
     it('выбрасывает ошибку при дублировании типа', () => {
@@ -79,7 +79,7 @@ describe('PluginRegistry', () => {
     it('getProcessor возвращает процессор', () => {
         const plugin = makePlugin();
         registry.register(plugin);
-        const proc = registry.getProcessor('Тестовый блок');
+        const proc = registry.getProcessor('test-block');
         expect(typeof proc.process).toBe('function');
     });
 
@@ -89,7 +89,7 @@ describe('PluginRegistry', () => {
 
     it('getSignalConfig возвращает конфигурацию сигналов', () => {
         registry.register(makePlugin({ signals: { input: null, output: 'real' } }));
-        const config = registry.getSignalConfig('Тестовый блок');
+        const config = registry.getSignalConfig('test-block');
         expect(config).toEqual({ input: null, output: 'real', inputsCount: 1, outputsCount: 1 });
     });
 
@@ -100,41 +100,41 @@ describe('PluginRegistry', () => {
 
     it('getDefaultParams возвращает параметры', () => {
         registry.register(makePlugin({ defaultParams: { freq: 1000 } }));
-        expect(registry.getDefaultParams('Тестовый блок')).toEqual({ freq: 1000 });
+        expect(registry.getDefaultParams('test-block')).toEqual({ freq: 1000 });
     });
 
     it('getIcon и getDescription', () => {
         registry.register(makePlugin({ icon: 'waves', description: 'Описание' }));
-        expect(registry.getIcon('Тестовый блок')).toBe('waves');
-        expect(registry.getDescription('Тестовый блок')).toBe('Описание');
+        expect(registry.getIcon('test-block')).toBe('waves');
+        expect(registry.getDescription('test-block')).toBe('Описание');
     });
 
     // --- isGenerator / isVisualization ---
 
     it('isGenerator определяет генератор (input: null)', () => {
         registry.register(makePlugin({ type: 'Gen', id: 'gen', signals: { input: null, output: 'real' } }));
-        expect(registry.isGenerator('Gen')).toBe(true);
-        expect(registry.isVisualization('Gen')).toBe(false);
+        expect(registry.isGenerator('gen')).toBe(true);
+        expect(registry.isVisualization('gen')).toBe(false);
     });
 
     it('isVisualization определяет визуализацию (output: null)', () => {
         registry.register(makePlugin({ type: 'Viz', id: 'viz', signals: { input: 'real', output: null } }));
-        expect(registry.isVisualization('Viz')).toBe(true);
-        expect(registry.isGenerator('Viz')).toBe(false);
+        expect(registry.isVisualization('viz')).toBe(true);
+        expect(registry.isGenerator('viz')).toBe(false);
     });
 
     // --- Группы ---
 
     it('getGroups возвращает группы с блоками', () => {
         registry.registerGroup({ id: 'g1', name: 'Группа 1', collapsed: false });
-        registry.register(makePlugin({ type: 'A', id: 'a', group: 'g1' }));
-        registry.register(makePlugin({ type: 'B', id: 'b', group: 'g1' }));
-        registry.register(makePlugin({ type: 'C', id: 'c', group: 'g2' }));
+        registry.register(makePlugin({ type: 'A', id: 'block-a', group: 'g1' }));
+        registry.register(makePlugin({ type: 'B', id: 'block-b', group: 'g1' }));
+        registry.register(makePlugin({ type: 'C', id: 'block-c', group: 'g2' }));
 
         const groups = registry.getGroups();
         expect(groups).toHaveLength(1);
         expect(groups[0].blocks).toHaveLength(2);
-        expect(groups[0].blocks[0].name).toBe('A');
+        expect(groups[0].blocks[0].name).toBe('block-a');
     });
 
     // --- paramOptions ---
@@ -170,7 +170,7 @@ describe('PluginRegistry', () => {
 
         registry.reset();
 
-        expect(registry.has('Тестовый блок')).toBe(false);
+        expect(registry.has('test-block')).toBe(false);
         expect(registry.getGroups()).toHaveLength(0);
         expect(registry.getParamOptions('p')).toBeNull();
         // После reset можно снова регистрировать
