@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import BlockHelpDialog from '../../dialogs/BlockHelpDialog/BlockHelpDialog.jsx';
@@ -10,6 +10,8 @@ function Toolbar() {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [legendOpen, setLegendOpen] = useState(false);
+    const legendRef = useRef(null);
     const [collapsedGroups, setCollapsedGroups] = useState(() => {
         const initial = {};
         registry.getGroups().forEach(g => { initial[g.id] = true; });
@@ -18,6 +20,18 @@ function Toolbar() {
     const [, setDraggingBlock] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [helpBlock, setHelpBlock] = useState(null);
+
+    // Close legend on outside click
+    useEffect(() => {
+        if (!legendOpen) return;
+        const handleClick = (e) => {
+            if (legendRef.current && !legendRef.current.contains(e.target)) {
+                setLegendOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [legendOpen]);
 
     const groups = registry.getGroups();
 
@@ -247,6 +261,38 @@ function Toolbar() {
                     ))}
                 </div>
             )}
+            {/* Signal Legend (bottom) */}
+            <div className="tb-legend-wrapper" ref={legendRef}>
+                <button
+                    className={`tb-legend-btn ${legendOpen ? 'active' : ''}`}
+                    onClick={() => setLegendOpen(!legendOpen)}
+                    title={t('header.signalLegend')}
+                >
+                    <span className="material-icons" style={{ fontSize: 16 }}>legend_toggle</span>
+                    {!isCollapsed && <span className="tb-legend-text">{t('header.signals')}</span>}
+                </button>
+                {legendOpen && (
+                    <div className="tb-legend-panel">
+                        <div className="tb-legend-item">
+                            <svg width="32" height="2">
+                                <line x1="0" y1="1" x2="32" y2="1"
+                                    stroke="var(--signal-real, #3b82f6)" strokeWidth="2" strokeDasharray="5,3" />
+                            </svg>
+                            <span className="tb-legend-label">Real</span>
+                        </div>
+                        <div className="tb-legend-item">
+                            <svg width="32" height="6">
+                                <line x1="0" y1="1" x2="32" y2="1"
+                                    stroke="var(--signal-complex, #8b5cf6)" strokeWidth="2" strokeDasharray="5,3" />
+                                <line x1="0" y1="5" x2="32" y2="5"
+                                    stroke="var(--signal-complex, #8b5cf6)" strokeWidth="2" strokeDasharray="5,3" />
+                            </svg>
+                            <span className="tb-legend-label">Complex</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             {/* Help Dialog */}
             {helpBlock && (
                 <BlockHelpDialog

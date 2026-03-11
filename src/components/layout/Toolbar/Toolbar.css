@@ -402,6 +402,89 @@
     to { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
+/* ---- Signal Legend (bottom) ---- */
+.tb-legend-wrapper {
+    flex-shrink: 0;
+    border-top: 1px solid var(--panel-border);
+    padding: 6px;
+    position: relative;
+}
+
+.tb-legend-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    background: var(--panel-subtle-bg);
+    color: var(--panel-text-4);
+    font-size: 10px;
+    font-weight: 500;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+
+.tb.tb-collapsed .tb-legend-btn {
+    justify-content: center;
+    padding: 0;
+}
+
+.tb-legend-btn:hover {
+    background: var(--panel-hover-bg);
+    color: var(--panel-text-3);
+    border-color: var(--panel-border-hover);
+}
+
+.tb-legend-btn.active {
+    background: rgba(0, 229, 160, 0.08);
+    color: var(--panel-accent);
+    border-color: rgba(0, 229, 160, 0.2);
+}
+
+.tb-legend-text {
+    letter-spacing: 0.3px;
+}
+
+.tb-legend-panel {
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 6px;
+    right: 6px;
+    padding: 8px 12px;
+    background: var(--panel-dropdown-bg);
+    border: 1px solid var(--panel-dropdown-border);
+    border-radius: 4px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: tb-legend-show 120ms ease-out;
+}
+
+@keyframes tb-legend-show {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tb-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tb-legend-label {
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    color: var(--panel-text-3);
+    letter-spacing: 0.5px;
+}
+
 /* ---- Drag state ---- */
 .tb-block.dragging,
 .tb-block-mini.dragging {

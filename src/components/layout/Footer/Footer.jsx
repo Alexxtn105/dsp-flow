@@ -180,6 +180,8 @@ function Footer({
                     <span className="ft-nodes">
                         <span className="ft-nodes-icon">●</span> {nodesCount}
                     </span>
+                    <span className="ft-divider" />
+                    <span className="ft-version">v1.0.0 · AlexxTN105</span>
                 </div>
 
                 {/* Right: manual controls */}

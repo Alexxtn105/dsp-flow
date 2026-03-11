@@ -14,7 +14,7 @@ function ControlToolbar({
     isSaveAsEnabled,
     isRunning
 }) {
-    const { isDarkTheme, toggleTheme } = useThemeContext();
+    const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
 
     return (
@@ -64,17 +64,6 @@ function ControlToolbar({
                         title={t('controlToolbar.settings')}
                     >
                         <Icon name="tune" size="large" className="ct-icon" />
-                    </button>
-                    <button
-                        className="ct-btn ct-btn-theme"
-                        onClick={toggleTheme}
-                        title={isDarkTheme ? t('controlToolbar.lightTheme') : t('controlToolbar.darkTheme')}
-                    >
-                        <Icon
-                            name={isDarkTheme ? 'light_mode' : 'dark_mode'}
-                            size="large"
-                            className="ct-icon"
-                        />
                     </button>
                 </div>
             </div>

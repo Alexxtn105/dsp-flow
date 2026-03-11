@@ -125,9 +125,6 @@
 /* Settings */
 .ct-btn-settings:hover:not(:disabled) { color: var(--panel-text-2); }
 
-/* Theme */
-.ct-btn-theme:hover:not(:disabled) { color: var(--panel-accent-gold); }
-
 /* ---- Scrollbar ---- */
 .ct-content::-webkit-scrollbar {
     width: 3px;

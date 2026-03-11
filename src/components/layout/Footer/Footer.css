@@ -339,6 +339,13 @@
     color: var(--panel-text-6);
 }
 
+.ft-version {
+    font-size: 9px;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    color: var(--panel-text-6);
+    letter-spacing: 0.3px;
+}
+
 /* ---- Manual controls ---- */
 .ft-manual-toggle {
     display: flex;
