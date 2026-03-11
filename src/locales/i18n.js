@@ -12,17 +12,17 @@ import ptCommon from './pt/common.json';
 import jaCommon from './ja/common.json';
 import koCommon from './ko/common.json';
 
-/** Supported languages with flag emoji, native name, and dev status */
+/** Supported languages: flagCode maps to FlagIcon component */
 export const LANGUAGES = [
-    { code: 'en', flag: '🇬🇧', name: 'English' },
-    { code: 'ru', flag: '🇷🇺', name: 'Русский' },
-    { code: 'es', flag: '🇪🇸', name: 'Español', dev: true },
-    { code: 'fr', flag: '🇫🇷', name: 'Français', dev: true },
-    { code: 'de', flag: '🇩🇪', name: 'Deutsch', dev: true },
-    { code: 'zh', flag: '🇨🇳', name: '中文', dev: true },
-    { code: 'pt', flag: '🇧🇷', name: 'Português', dev: true },
-    { code: 'ja', flag: '🇯🇵', name: '日本語', dev: true },
-    { code: 'ko', flag: '🇰🇷', name: '한국어', dev: true }
+    { code: 'en', flagCode: 'gb', name: 'English' },
+    { code: 'ru', flagCode: 'ru', name: 'Русский' },
+    { code: 'es', flagCode: 'es', name: 'Español', dev: true },
+    { code: 'fr', flagCode: 'fr', name: 'Français', dev: true },
+    { code: 'de', flagCode: 'de', name: 'Deutsch', dev: true },
+    { code: 'zh', flagCode: 'cn', name: '中文', dev: true },
+    { code: 'pt', flagCode: 'br', name: 'Português', dev: true },
+    { code: 'ja', flagCode: 'jp', name: '日本語', dev: true },
+    { code: 'ko', flagCode: 'kr', name: '한국어', dev: true }
 ];
 
 i18n

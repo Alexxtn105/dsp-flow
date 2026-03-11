@@ -133,11 +133,6 @@
     border-color: rgba(0, 229, 160, 0.2);
 }
 
-.hdr-lang-flag {
-    font-size: 14px;
-    line-height: 1;
-}
-
 .hdr-lang-code {
     line-height: 1;
 }
@@ -187,11 +182,6 @@
     background: rgba(0, 229, 160, 0.1);
     color: var(--panel-accent);
     font-weight: 600;
-}
-
-.hdr-lang-option-flag {
-    font-size: 16px;
-    line-height: 1;
 }
 
 .hdr-lang-option-name {

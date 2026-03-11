@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../../../locales/i18n.js';
+import FlagIcon from '../../common/FlagIcon/FlagIcon.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Header.css';
 
@@ -61,7 +62,7 @@ function Header({ currentScheme }) {
                         onClick={() => setLangOpen(!langOpen)}
                         title={currentLang.name}
                     >
-                        <span className="hdr-lang-flag">{currentLang.flag}</span>
+                        <FlagIcon code={currentLang.flagCode} size={12} />
                         <span className="hdr-lang-code">{currentLang.code.toUpperCase()}</span>
                     </button>
 
@@ -73,7 +74,7 @@ function Header({ currentScheme }) {
                                     className={`hdr-lang-option ${lang.code === i18n.language ? 'active' : ''}`}
                                     onClick={() => handleLanguageChange(lang.code)}
                                 >
-                                    <span className="hdr-lang-option-flag">{lang.flag}</span>
+                                    <FlagIcon code={lang.flagCode} size={14} />
                                     <span className="hdr-lang-option-name">{lang.name}</span>
                                     {lang.dev && <span className="hdr-lang-wip">WIP</span>}
                                 </button>
