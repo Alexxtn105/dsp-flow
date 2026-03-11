@@ -52,8 +52,20 @@ function Header({ currentScheme }) {
                 </div>
             </div>
 
-            {/* Right: theme + language */}
+            {/* Right: sponsor + theme + language */}
             <div className="hdr-right">
+                {/* Sponsor */}
+                <a
+                    className="hdr-sponsor"
+                    href="https://github.com/sponsors/Alexxtn105"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={t('footer.sponsor', 'Support the project')}
+                >
+                    <span className="material-icons hdr-sponsor-icon">favorite</span>
+                    <span className="hdr-sponsor-text">Sponsor</span>
+                </a>
+
                 {/* Theme toggle */}
                 <button
                     className="hdr-theme-btn"
