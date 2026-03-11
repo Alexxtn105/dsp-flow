@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Icon from '../../common/Icons/Icon.jsx';
+import BlockHelpDialog from '../../dialogs/BlockHelpDialog/BlockHelpDialog.jsx';
 import registry from '../../../engine/PluginRegistry';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Toolbar.css';
@@ -14,6 +15,7 @@ function Toolbar() {
     });
     const [, setDraggingBlock] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [helpBlock, setHelpBlock] = useState(null);
 
     const groups = registry.getGroups();
 
@@ -198,6 +200,18 @@ function Toolbar() {
                                                     <span className="tb-block-desc">{block.description}</span>
                                                 )}
                                             </div>
+                                            <button
+                                                className="tb-block-help-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setHelpBlock(block);
+                                                }}
+                                                draggable={false}
+                                                title="Справка"
+                                                aria-label={`Справка по блоку ${block.name}`}
+                                            >
+                                                <Icon name="help_outline" size="small" aria-hidden="true" />
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
@@ -226,6 +240,15 @@ function Toolbar() {
                         </div>
                     ))}
                 </div>
+            )}
+            {/* Help Dialog */}
+            {helpBlock && (
+                <BlockHelpDialog
+                    blockId={helpBlock.id}
+                    blockName={helpBlock.name}
+                    blockIcon={helpBlock.icon}
+                    onClose={() => setHelpBlock(null)}
+                />
             )}
         </div>
     );
