@@ -1,0 +1,54 @@
+{
+  "scheme": {
+    "nameEmpty": "Scheme name cannot be empty",
+    "nameTooLong": "Name is too long (maximum 100 characters)",
+    "nameInvalidChars": "Name can only contain letters, numbers, spaces, hyphens and underscores",
+    "descriptionTooLong": "Description is too long (maximum 500 characters)",
+    "dataEmpty": "Scheme data is missing",
+    "invalidNodes": "Invalid node format",
+    "nodeNoId": "Node {{index}} has no ID",
+    "nodeNoType": "Node {{index}} has no type",
+    "nodeInvalidPosition": "Node {{index}} has invalid position",
+    "nodeNoData": "Node {{index}} has no data",
+    "invalidEdges": "Invalid edge format",
+    "edgeNoId": "Edge {{index}} has no ID",
+    "edgeNoSource": "Edge {{index}} has no source",
+    "edgeInvalidSource": "Edge {{index}} references non-existent source node",
+    "edgeNoTarget": "Edge {{index}} has no target",
+    "edgeInvalidTarget": "Edge {{index}} references non-existent target node"
+  },
+  "block": {
+    "filterOrderRange": "Filter order must be between 1 and 1024",
+    "notchFrequencyPositive": "Notch frequency must be positive",
+    "notchBandwidthPositive": "Notch bandwidth must be positive",
+    "lowCutoffPositive": "Low cutoff frequency must be positive",
+    "highCutoffPositive": "High cutoff frequency must be positive",
+    "lowCutoffLessThanHigh": "Low cutoff must be less than high cutoff",
+    "frequencyPositive": "Frequency must be positive",
+    "amplitudePositive": "Amplitude must be positive"
+  },
+  "compiler": {
+    "cycleDetected": "Cycle detected in graph",
+    "disconnectedComponents": "Graph contains {{count}} disconnected components",
+    "invalidConnection": "Edge references non-existent node",
+    "typeMismatch": "Incompatible signal types: {{source}} ({{sourceType}}) → {{target}} ({{targetType}})",
+    "disconnectedInput": "Block \"{{label}}\" has no input connection"
+  },
+  "processor": {
+    "initError": "Block \"{{blockType}}\" initialization error: {{message}}",
+    "graphNotCompiled": "Graph not compiled",
+    "invalidSampleRate": "Invalid sample rate: {{rate}}",
+    "processingError": "Processing error:"
+  },
+  "simulation": {
+    "noNodes": "Add at least one node to start simulation",
+    "noGenerators": "Add at least one signal source (Audio File or Generator) to start",
+    "noWavFile": "Select a WAV file in the \"Audio File\" block",
+    "compilationErrors": "Compilation errors:\n{{errors}}",
+    "processingError": "Processing error: {{message}}",
+    "wavLoadError": "WAV file loading error: {{message}}",
+    "startTitle": "Start",
+    "compilationErrorTitle": "Compilation Error",
+    "errorTitle": "Error"
+  }
+}

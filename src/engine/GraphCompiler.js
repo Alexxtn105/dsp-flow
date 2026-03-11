@@ -9,6 +9,9 @@
  */
 
 import { getBlockSignalConfig, areSignalsCompatible } from '../utils/helpers';
+import i18n from '../locales/i18n';
+
+const t = (key, options) => i18n.t(key, { ns: 'validation', ...options });
 
 class GraphCompiler {
     /**
@@ -31,7 +34,7 @@ class GraphCompiler {
         if (sortResult.hasCycle) {
             errors.push({
                 type: 'cycle',
-                message: 'Обнаружен цикл в графе',
+                message: t('compiler.cycleDetected'),
                 nodes: sortResult.cycleNodes
             });
         }
@@ -42,7 +45,7 @@ class GraphCompiler {
             if (components.length > 1) {
                 warnings.push({
                     type: 'disconnected_components',
-                    message: `Граф содержит ${components.length} несвязных компонента`,
+                    message: t('compiler.disconnectedComponents', { count: components.length }),
                     components
                 });
             }
@@ -84,7 +87,7 @@ class GraphCompiler {
             if (!sourceNode || !targetNode) {
                 errors.push({
                     type: 'invalid_connection',
-                    message: `Соединение ссылается на несуществующий узел`,
+                    message: t('compiler.invalidConnection'),
                     edge: edge.id
                 });
                 continue;
@@ -104,7 +107,7 @@ class GraphCompiler {
             if (!areSignalsCompatible(sourceOutputType, targetConfig.input)) {
                 errors.push({
                     type: 'type_mismatch',
-                    message: `Несовместимые типы сигналов: ${sourceNode.data.label} (${sourceOutputType}) → ${targetNode.data.label} (${targetConfig.input})`,
+                    message: t('compiler.typeMismatch', { source: sourceNode.data.label, sourceType: sourceOutputType, target: targetNode.data.label, targetType: targetConfig.input }),
                     sourceNode: sourceNode.id,
                     targetNode: targetNode.id
                 });
@@ -118,7 +121,7 @@ class GraphCompiler {
             if (config.input && !nodesWithInputs.has(node.id)) {
                 warnings.push({
                     type: 'disconnected_input',
-                    message: `Блок "${node.data.label}" не имеет входного соединения`,
+                    message: t('compiler.disconnectedInput', { label: node.data.label }),
                     node: node.id
                 });
             }

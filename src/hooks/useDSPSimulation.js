@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GraphCompiler, DSPProcessor, WavFileService } from '../engine';
 
 /**
@@ -6,6 +7,7 @@ import { GraphCompiler, DSPProcessor, WavFileService } from '../engine';
  * start/stop, manual mode, progress, визуализация.
  */
 export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate, showAlert, visualizationManagerRef }) {
+    const { t } = useTranslation('validation');
     const [isRunning, setIsRunning] = useState(false);
     const [processingProgress, setProcessingProgress] = useState({
         currentSample: 0,
@@ -33,7 +35,7 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         const edges = reactFlowInstance.getEdges();
 
         if (currentNodes.length === 0) {
-            showAlert('Добавьте хотя бы один узел для запуска симуляции', 'Запуск');
+            showAlert(t('simulation.noNodes'), t('simulation.startTitle'));
             return;
         }
 
@@ -46,13 +48,13 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         );
 
         if (!hasGenerators) {
-            showAlert('Добавьте хотя бы один источник сигнала (Audio File или Генератор) для запуска', 'Запуск');
+            showAlert(t('simulation.noGenerators'), t('simulation.startTitle'));
             return;
         }
 
         const wavFile = inputNode?.data?.params?.wavFile;
         if (inputNode && !wavFile) {
-            showAlert('Выберите WAV файл в блоке "Audio File"', 'Запуск');
+            showAlert(t('simulation.noWavFile'), t('simulation.startTitle'));
             return;
         }
 
@@ -60,7 +62,7 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
 
         if (!compilationResult.success) {
             const errorMessages = compilationResult.errors.map(e => e.message).join('\n');
-            showAlert(`Ошибки компиляции:\n${errorMessages}`, 'Ошибка компиляции');
+            showAlert(t('simulation.compilationErrors', { errors: errorMessages }), t('simulation.compilationErrorTitle'));
             return;
         }
 
@@ -111,7 +113,7 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
             DSPProcessor.onError = (error) => {
                 setIsRunning(false);
                 setIsPaused(false);
-                showAlert(`Ошибка обработки: ${error.message}`, 'Ошибка');
+                showAlert(t('simulation.processingError', { message: error.message }), t('simulation.errorTitle'));
             };
 
             DSPProcessor.start();
@@ -132,13 +134,13 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
                 WavFileService.loadFile(wavFile).then((fileInfo) => {
                     startProcessing(fileInfo.sampleRate);
                 }).catch(error => {
-                    showAlert(`Ошибка загрузки WAV файла: ${error.message}`, 'Ошибка');
+                    showAlert(t('simulation.wavLoadError', { message: error.message }), t('simulation.errorTitle'));
                 });
             }
         } else {
             startProcessing(null);
         }
-    }, [reactFlowInstance, sampleRate, isManualMode, isPaused, manualStepSize, showAlert, setSampleRate, visualizationManagerRef]);
+    }, [reactFlowInstance, sampleRate, isManualMode, isPaused, manualStepSize, showAlert, setSampleRate, visualizationManagerRef, t]);
 
     const handleManualStep = useCallback(() => {
         if (!isRunning && !isPaused) {

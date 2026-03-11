@@ -1,0 +1,54 @@
+{
+  "scheme": {
+    "nameEmpty": "Название схемы не может быть пустым",
+    "nameTooLong": "Название слишком длинное (максимум 100 символов)",
+    "nameInvalidChars": "Название может содержать только буквы, цифры, пробелы, дефисы и подчеркивания",
+    "descriptionTooLong": "Описание слишком длинное (максимум 500 символов)",
+    "dataEmpty": "Данные схемы отсутствуют",
+    "invalidNodes": "Неверный формат узлов",
+    "nodeNoId": "Узел {{index}} не имеет ID",
+    "nodeNoType": "Узел {{index}} не имеет типа",
+    "nodeInvalidPosition": "Узел {{index}} имеет неверную позицию",
+    "nodeNoData": "Узел {{index}} не имеет данных",
+    "invalidEdges": "Неверный формат соединений",
+    "edgeNoId": "Соединение {{index}} не имеет ID",
+    "edgeNoSource": "Соединение {{index}} не имеет источника",
+    "edgeInvalidSource": "Соединение {{index}} ссылается на несуществующий узел-источник",
+    "edgeNoTarget": "Соединение {{index}} не имеет цели",
+    "edgeInvalidTarget": "Соединение {{index}} ссылается на несуществующий узел-цель"
+  },
+  "block": {
+    "filterOrderRange": "Порядок фильтра должен быть от 1 до 1024",
+    "notchFrequencyPositive": "Частота режекции должна быть положительной",
+    "notchBandwidthPositive": "Ширина полосы режекции должна быть положительной",
+    "lowCutoffPositive": "Нижняя частота среза должна быть положительной",
+    "highCutoffPositive": "Верхняя частота среза должна быть положительной",
+    "lowCutoffLessThanHigh": "Нижняя частота должна быть меньше верхней",
+    "frequencyPositive": "Частота должна быть положительной",
+    "amplitudePositive": "Амплитуда должна быть положительной"
+  },
+  "compiler": {
+    "cycleDetected": "Обнаружен цикл в графе",
+    "disconnectedComponents": "Граф содержит {{count}} несвязных компонента",
+    "invalidConnection": "Соединение ссылается на несуществующий узел",
+    "typeMismatch": "Несовместимые типы сигналов: {{source}} ({{sourceType}}) → {{target}} ({{targetType}})",
+    "disconnectedInput": "Блок \"{{label}}\" не имеет входного соединения"
+  },
+  "processor": {
+    "initError": "Ошибка инициализации блока \"{{blockType}}\": {{message}}",
+    "graphNotCompiled": "Граф не скомпилирован",
+    "invalidSampleRate": "Некорректная частота дискретизации: {{rate}}",
+    "processingError": "Ошибка обработки:"
+  },
+  "simulation": {
+    "noNodes": "Добавьте хотя бы один узел для запуска симуляции",
+    "noGenerators": "Добавьте хотя бы один источник сигнала (Audio File или Генератор) для запуска",
+    "noWavFile": "Выберите WAV файл в блоке \"Audio File\"",
+    "compilationErrors": "Ошибки компиляции:\n{{errors}}",
+    "processingError": "Ошибка обработки: {{message}}",
+    "wavLoadError": "Ошибка загрузки WAV файла: {{message}}",
+    "startTitle": "Запуск",
+    "compilationErrorTitle": "Ошибка компиляции",
+    "errorTitle": "Ошибка"
+  }
+}

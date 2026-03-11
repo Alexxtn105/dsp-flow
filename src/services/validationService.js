@@ -1,3 +1,7 @@
+import i18n from '../locales/i18n';
+
+const t = (key, options) => i18n.t(key, { ns: 'validation', ...options });
+
 /**
  * ValidationService - сервис для валидации данных
  */
@@ -9,14 +13,14 @@ class ValidationService {
         const errors = [];
 
         if (!name || !name.trim()) {
-            errors.push('Название схемы не может быть пустым');
+            errors.push(t('scheme.nameEmpty'));
         } else {
             if (name.length > 100) {
-                errors.push('Название слишком длинное (максимум 100 символов)');
+                errors.push(t('scheme.nameTooLong'));
             }
 
             if (!/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/.test(name)) {
-                errors.push('Название может содержать только буквы, цифры, пробелы, дефисы и подчеркивания');
+                errors.push(t('scheme.nameInvalidChars'));
             }
         }
 
@@ -33,7 +37,7 @@ class ValidationService {
         const errors = [];
 
         if (description && description.length > 500) {
-            errors.push('Описание слишком длинное (максимум 500 символов)');
+            errors.push(t('scheme.descriptionTooLong'));
         }
 
         return {
@@ -49,46 +53,46 @@ class ValidationService {
         const errors = [];
 
         if (!schemeData) {
-            errors.push('Данные схемы отсутствуют');
+            errors.push(t('scheme.dataEmpty'));
             return { isValid: false, errors };
         }
 
         if (!schemeData.nodes || !Array.isArray(schemeData.nodes)) {
-            errors.push('Неверный формат узлов');
+            errors.push(t('scheme.invalidNodes'));
         } else {
             schemeData.nodes.forEach((node, index) => {
                 if (!node.id) {
-                    errors.push(`Узел ${index} не имеет ID`);
+                    errors.push(t('scheme.nodeNoId', { index }));
                 }
                 if (!node.type) {
-                    errors.push(`Узел ${index} не имеет типа`);
+                    errors.push(t('scheme.nodeNoType', { index }));
                 }
                 if (!node.position || typeof node.position.x !== 'number' || typeof node.position.y !== 'number') {
-                    errors.push(`Узел ${index} имеет неверную позицию`);
+                    errors.push(t('scheme.nodeInvalidPosition', { index }));
                 }
                 if (!node.data) {
-                    errors.push(`Узел ${index} не имеет данных`);
+                    errors.push(t('scheme.nodeNoData', { index }));
                 }
             });
         }
 
         if (!schemeData.edges || !Array.isArray(schemeData.edges)) {
-            errors.push('Неверный формат соединений');
+            errors.push(t('scheme.invalidEdges'));
         } else {
             const nodeIds = new Set(schemeData.nodes?.map(n => n.id) || []);
             schemeData.edges.forEach((edge, index) => {
                 if (!edge.id) {
-                    errors.push(`Соединение ${index} не имеет ID`);
+                    errors.push(t('scheme.edgeNoId', { index }));
                 }
                 if (!edge.source) {
-                    errors.push(`Соединение ${index} не имеет источника`);
+                    errors.push(t('scheme.edgeNoSource', { index }));
                 } else if (!nodeIds.has(edge.source)) {
-                    errors.push(`Соединение ${index} ссылается на несуществующий узел-источник`);
+                    errors.push(t('scheme.edgeInvalidSource', { index }));
                 }
                 if (!edge.target) {
-                    errors.push(`Соединение ${index} не имеет цели`);
+                    errors.push(t('scheme.edgeNoTarget', { index }));
                 } else if (!nodeIds.has(edge.target)) {
-                    errors.push(`Соединение ${index} ссылается на несуществующий узел-цель`);
+                    errors.push(t('scheme.edgeInvalidTarget', { index }));
                 }
             });
         }
@@ -107,49 +111,49 @@ class ValidationService {
             'notch-fir-filter': (p) => {
                 const errors = [];
                 if (!p.order || p.order < 1 || p.order > 1024) {
-                    errors.push('Порядок фильтра должен быть от 1 до 1024');
+                    errors.push(t('block.filterOrderRange'));
                 }
                 if (!p.notchFrequency || p.notchFrequency <= 0) {
-                    errors.push('Частота режекции должна быть положительной');
+                    errors.push(t('block.notchFrequencyPositive'));
                 }
                 if (!p.bandwidth || p.bandwidth <= 0) {
-                    errors.push('Ширина полосы режекции должна быть положительной');
+                    errors.push(t('block.notchBandwidthPositive'));
                 }
                 return errors;
             },
             'bandpass-fir-filter': (p) => {
                 const errors = [];
                 if (!p.order || p.order < 1 || p.order > 1024) {
-                    errors.push('Порядок фильтра должен быть от 1 до 1024');
+                    errors.push(t('block.filterOrderRange'));
                 }
                 if (!p.lowCutoff || p.lowCutoff <= 0) {
-                    errors.push('Нижняя частота среза должна быть положительной');
+                    errors.push(t('block.lowCutoffPositive'));
                 }
                 if (!p.highCutoff || p.highCutoff <= 0) {
-                    errors.push('Верхняя частота среза должна быть положительной');
+                    errors.push(t('block.highCutoffPositive'));
                 }
                 if (p.lowCutoff && p.highCutoff && p.lowCutoff >= p.highCutoff) {
-                    errors.push('Нижняя частота должна быть меньше верхней');
+                    errors.push(t('block.lowCutoffLessThanHigh'));
                 }
                 return errors;
             },
             'ref-sine-generator': (p) => {
                 const errors = [];
                 if (!p.frequency || p.frequency <= 0) {
-                    errors.push('Частота должна быть положительной');
+                    errors.push(t('block.frequencyPositive'));
                 }
                 if (p.amplitude === undefined || p.amplitude <= 0) {
-                    errors.push('Амплитуда должна быть положительной');
+                    errors.push(t('block.amplitudePositive'));
                 }
                 return errors;
             },
             'ref-cosine-generator': (p) => {
                 const errors = [];
                 if (!p.frequency || p.frequency <= 0) {
-                    errors.push('Частота должна быть положительной');
+                    errors.push(t('block.frequencyPositive'));
                 }
                 if (p.amplitude === undefined || p.amplitude <= 0) {
-                    errors.push('Амплитуда должна быть положительной');
+                    errors.push(t('block.amplitudePositive'));
                 }
                 return errors;
             }

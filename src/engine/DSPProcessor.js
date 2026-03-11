@@ -8,6 +8,9 @@
 import GraphCompiler from './GraphCompiler';
 import WavFileService from './WavFileService';
 import registry from './PluginRegistry';
+import i18n from '../locales/i18n';
+
+const t = (key, options) => i18n.t(key, { ns: 'validation', ...options });
 
 const ProcessorState = Object.freeze({
     IDLE: 'IDLE',
@@ -149,7 +152,7 @@ class DSPProcessor {
                         success: false,
                         errors: [{
                             type: 'init_error',
-                            message: `Ошибка инициализации блока "${block.blockType}": ${error.message}`,
+                            message: t('processor.initError', { blockType: block.blockType, message: error.message }),
                             nodeId: block.nodeId
                         }],
                         warnings: result.warnings || [],
@@ -169,7 +172,7 @@ class DSPProcessor {
     async start(processingSpeed = null) {
         if (this.isRunning) return;
         if (!this.compiledGraph) {
-            console.error('Граф не скомпилирован');
+            console.error(t('processor.graphNotCompiled'));
             return;
         }
 
@@ -177,7 +180,7 @@ class DSPProcessor {
         const sampleRate = this._fileMode ? WavFileService.getSampleRate() : this.sampleRate;
 
         if (!sampleRate || sampleRate <= 0) {
-            const error = new Error(`Некорректная частота дискретизации: ${sampleRate}`);
+            const error = new Error(t('processor.invalidSampleRate', { rate: sampleRate }));
             if (this.onError) {
                 this.onError(error);
             } else {
@@ -361,7 +364,7 @@ class DSPProcessor {
                 });
             }
         } catch (error) {
-            console.error('Ошибка обработки:', error);
+            console.error(t('processor.processingError'), error);
             this.stop();
             if (this.onError) {
                 this.onError(error);
@@ -466,7 +469,7 @@ class DSPProcessor {
      */
     setSampleRate(rate) {
         if (!rate || rate <= 0) {
-            console.error(`Некорректная частота дискретизации: ${rate}`);
+            console.error(t('processor.invalidSampleRate', { rate }));
             return;
         }
         this.sampleRate = rate;
