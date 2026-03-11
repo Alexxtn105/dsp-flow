@@ -1,79 +1,31 @@
-# Документация плагинов DSP Flow
+# DSP Flow Plugin Documentation / Документация плагинов DSP Flow
 
-Справочник по всем 59 плагинам (DSP-блокам), доступным в редакторе DSP Flow. Каждый плагин описан с указанием назначения, алгоритма, параметров и примеров использования.
+## English
 
-## Категории
+Full reference for all 59 DSP plugins available in the DSP Flow editor.
 
-| Категория | Кол-во | Описание |
-|-----------|--------|----------|
-| [Генераторы](generators.md) | 9 | Источники сигналов: тоны, шум, модуляторы, аудиофайлы |
-| [Фильтры](filters.md) | 12 | КИХ- и БИХ-фильтры, преобразование Гильберта, децимация/интерполяция |
-| [Анализ](analysis.md) | 2 | Спектроанализатор и коррелятор |
-| [Детекторы](detectors.md) | 7 | Извлечение параметров сигнала: фаза, частота, амплитуда, синхронизация |
-| [Математика](math.md) | 22 | Арифметика, комплексные операции, AGC, микшер, пороговый элемент |
-| [Визуализация](visualization.md) | 6 | Осциллограф, спектр, водопад, созвездие, числовые индикаторы |
-| [Выход](output.md) | 1 | Воспроизведение через аудиосистему |
+| Document | Description |
+|----------|-------------|
+| [README](en/README.md) | Plugin index with all 59 blocks |
+| [Generators](en/generators.md) | Signal sources: tones, noise, modulators, audio files (9 plugins) |
+| [Filters](en/filters.md) | FIR and IIR filters, Hilbert transform, decimation/interpolation (12 plugins) |
+| [Analysis](en/analysis.md) | Spectrum analyzer and correlator (2 plugins) |
+| [Detectors](en/detectors.md) | Phase, frequency, amplitude detectors, PLL, timing recovery (7 plugins) |
+| [Math](en/math.md) | Arithmetic, complex operations, AGC, mixer, threshold (22 plugins) |
+| [Visualization](en/visualization.md) | Oscilloscope, spectrum, waterfall, constellation, numeric indicators (6 plugins) |
+| [Output](en/output.md) | Audio playback via Speaker (1 plugin) |
 
-## Все плагины
+## Русский
 
-| Название | ID | Группа | Вход | Выход |
-|----------|----|--------|------|-------|
-| [Синусоидальный генератор](generators.md#синусоидальный-генератор-sine-generator) | `sine` | generators | null | real |
-| [Косинусоидальный генератор](generators.md#косинусоидальный-генератор-cosine-generator) | `cosine` | generators | null | real |
-| [Опорный синус (NCO)](generators.md#опорный-синус-refsine--nco) | `ref-sine` | generators | null | complex |
-| [Опорный косинус (NCO)](generators.md#опорный-косинус-refcosine--nco) | `ref-cosine` | generators | null | complex |
-| [Аудиофайл](generators.md#аудиофайл-audio-file) | `audio-file` | generators | null | real |
-| [Константа](generators.md#константа-constant) | `constant` | generators | null | real |
-| [Генератор шума](generators.md#генератор-шума-noise-generator) | `noise-generator` | generators | null | real |
-| [АМ/ЧМ/ФМ модулятор](generators.md#амчмфм-модулятор-amfmpm-modulator) | `amfmpm-modulator` | generators | null | real |
-| [PSK модулятор](generators.md#psk-модулятор-psk-modulator) | `psk-modulator` | generators | null | complex |
-| [Режекторный фильтр](filters.md#режекторный-фильтр-notch-fir) | `notch-fir` | filters | real | real |
-| [Полосовой фильтр](filters.md#полосовой-фильтр-bandpass-fir) | `bandpass-fir` | filters | real | real |
-| [Фильтр верхних частот](filters.md#фильтр-верхних-частот-highpass-fir) | `highpass-fir` | filters | real | real |
-| [Фильтр нижних частот](filters.md#фильтр-нижних-частот-lowpass-fir) | `lowpass-fir` | filters | real | real |
-| [Преобразование Гильберта](filters.md#преобразование-гильберта-hilbert-transformer) | `hilbert-transformer` | filters | real | complex |
-| [Фильтр Гёрцеля](filters.md#фильтр-гёрцеля-goertzel) | `goertzel` | filters | real | real |
-| [Фильтр Ремеза](filters.md#фильтр-ремеза-remez) | `remez` | filters | real | real |
-| [Линия задержки](filters.md#линия-задержки-delay-line) | `delay-line` | filters | real | real |
-| [Дециматор / Интерполятор](filters.md#дециматор--интерполятор-decimatorinterpolator) | `decimator-interpolator` | filters | real | real |
-| [CIC-фильтр](filters.md#cic-фильтр-cic-filter) | `cic-filter` | filters | real | real |
-| [КИХ-фильтр](filters.md#ких-фильтр-fir-filter) | `fir-filter` | filters | real | real |
-| [БИХ-фильтр](filters.md#бих-фильтр-iir-filter) | `iir-filter` | filters | real | real |
-| [Спектроанализатор](analysis.md#спектроанализатор-spectrum-analyzer) | `spectrum-analyzer` | visualization | real | null |
-| [Коррелятор](analysis.md#коррелятор-correlator) | `correlator` | math-blocks | 2x real | real |
-| [Фазовый детектор](detectors.md#фазовый-детектор-phase-detector) | `phase-detector` | detectors | complex | real |
-| [Частотный детектор](detectors.md#частотный-детектор-frequency-detector) | `frequency-detector` | detectors | complex | real |
-| [Амплитудный детектор](detectors.md#амплитудный-детектор-amplitude-detector) | `amplitude-detector` | detectors | real | real |
-| [ФАПЧ (PLL)](detectors.md#фапч-phase-locked-loop--pll) | `pll` | detectors | complex | complex + real |
-| [АМ/ЧМ/ФМ демодулятор](detectors.md#амчмфм-демодулятор-amfmpm-demodulator) | `amfmpm-demodulator` | detectors | real | real |
-| [Частотный дискриминатор](detectors.md#частотный-дискриминатор-frequency-discriminator) | `frequency-discriminator` | detectors | complex | real |
-| [Символьная синхронизация](detectors.md#символьная-синхронизация-timing-recovery) | `timing-recovery` | detectors | complex | complex |
-| [Сумматор](math.md#сумматор-summer) | `summer` | math-blocks | 2x real | real |
-| [Умножитель](math.md#умножитель-multiplier) | `multiplier` | math-blocks | 2x real | real |
-| [Интегратор](math.md#интегратор-integrator) | `integrator` | math-blocks | real | real |
-| [Вещественная часть](math.md#вещественная-часть-real-part) | `real-part` | math-blocks | complex | real |
-| [Мнимая часть](math.md#мнимая-часть-imaginary-part) | `imag-part` | math-blocks | complex | real |
-| [Комплексный умножитель](math.md#комплексный-умножитель-complex-multiplier) | `complex-multiplier` | math-blocks | 2x complex | complex |
-| [Комплексный сумматор](math.md#комплексный-сумматор-complex-summer) | `complex-summer` | math-blocks | 2x complex | complex |
-| [Комплексный квадрат](math.md#комплексный-квадрат-complex-square) | `complex-square` | math-blocks | complex | complex |
-| [Комплексный корень](math.md#комплексный-корень-complex-sqrt) | `complex-sqrt` | math-blocks | complex | complex |
-| [Комплексная фаза](math.md#комплексная-фаза-complex-phase) | `complex-phase` | math-blocks | complex | real |
-| [Комплексная амплитуда](math.md#комплексная-амплитуда-complex-magnitude) | `complex-magnitude` | math-blocks | complex | real |
-| [Комплексный композитор](math.md#комплексный-композитор-complex-composer) | `complex-composer` | math-blocks | 2x real | complex |
-| [Комплексное сопряжение](math.md#комплексное-сопряжение-complex-conjugate) | `complex-conjugate` | math-blocks | complex | complex |
-| [Квадрат](math.md#квадрат-real-square) | `real-square` | math-blocks | real | real |
-| [Четвёртая степень](math.md#четвёртая-степень-real-power-4) | `real-power4` | math-blocks | real | real |
-| [Арктангенс-2](math.md#арктангенс-2-atan2) | `atan2` | math-blocks | 2x real | real |
-| [АРУ](math.md#ару-agc) | `agc` | math-blocks | real | real |
-| [Модуль](math.md#модуль-absolute-value) | `absolute-value` | math-blocks | real | real |
-| [Усилитель](math.md#усилитель-gain) | `gain` | math-blocks | real | real |
-| [Логарифм / Экспонента](math.md#логарифм--экспонента-logexp) | `log-exp` | math-blocks | real | real |
-| [Микшер](math.md#микшер-mixer) | `mixer` | math-blocks | 2x real | real |
-| [Пороговый элемент](math.md#пороговый-элемент-threshold) | `threshold` | math-blocks | real | real |
-| [Осциллограф](visualization.md#осциллограф-oscilloscope) | `oscilloscope` | visualization | 4x real | null |
-| [Фазовое созвездие](visualization.md#фазовое-созвездие-constellation) | `constellation` | visualization | complex | null |
-| [Водопад](visualization.md#водопад-waterfall) | `waterfall` | visualization | real | null |
-| [Числовой индикатор](visualization.md#числовой-индикатор-numeric-indicator) | `numeric-indicator` | visualization | real | null |
-| [Комплексный числовой индикатор](visualization.md#комплексный-числовой-индикатор-complex-numeric-indicator) | `complex-numeric-indicator` | visualization | complex | null |
-| [Многоканальный спектроанализатор](visualization.md#многоканальный-спектроанализатор-multi-channel-spectrum-analyzer) | `multi-spectrum-analyzer` | visualization | 4x real | null |
-| [Динамик](output.md#динамик-speaker) | `speaker` | output | real | null |
+Полный справочник по всем 59 плагинам (DSP-блокам) редактора DSP Flow.
+
+| Документ | Описание |
+|----------|----------|
+| [README](ru/README.md) | Индекс плагинов со всеми 59 блоками |
+| [Генераторы](ru/generators.md) | Источники сигналов: тоны, шум, модуляторы, аудиофайлы (9 плагинов) |
+| [Фильтры](ru/filters.md) | КИХ- и БИХ-фильтры, преобразование Гильберта, децимация/интерполяция (12 плагинов) |
+| [Анализ](ru/analysis.md) | Спектроанализатор и коррелятор (2 плагина) |
+| [Детекторы](ru/detectors.md) | Детекторы фазы, частоты, амплитуды, ФАПЧ, символьная синхронизация (7 плагинов) |
+| [Математика](ru/math.md) | Арифметика, комплексные операции, АРУ, микшер, пороговый элемент (22 плагина) |
+| [Визуализация](ru/visualization.md) | Осциллограф, спектр, водопад, созвездие, числовые индикаторы (6 плагинов) |
+| [Выход](ru/output.md) | Воспроизведение через динамик (1 плагин) |

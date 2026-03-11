@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import Icon from '../../common/Icons/Icon.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
-import pluginHelp from '../../../data/pluginHelp.js';
+import pluginHelpTechnical from '../../../data/pluginHelpTechnical.json';
 import './BlockHelpDialog.css';
 
 /**
@@ -12,8 +12,11 @@ import './BlockHelpDialog.css';
  */
 function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
     const { isDarkTheme } = useThemeContext();
-    const { t } = useTranslation();
-    const help = pluginHelp[blockId];
+    const { t, i18n } = useTranslation('help');
+    const { t: tCommon } = useTranslation();
+
+    const tech = pluginHelpTechnical[blockId];
+    const hasHelp = i18n.exists(`${blockId}.title`, { ns: 'help' });
 
     const signalLabel = (type, prefix) => {
         if (!type) return (
@@ -25,6 +28,34 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
             <span className={`block-help-signal ${cls}`}>{prefix}: {label}</span>
         );
     };
+
+    const title = hasHelp ? t(`${blockId}.title`) : blockName;
+    const purpose = hasHelp ? t(`${blockId}.purpose`, { defaultValue: '' }) : '';
+    const algorithm = hasHelp ? t(`${blockId}.algorithm`, { defaultValue: '' }) : '';
+    const inputDescription = hasHelp ? t(`${blockId}.inputDescription`, { defaultValue: '' }) : '';
+    const outputDescription = hasHelp ? t(`${blockId}.outputDescription`, { defaultValue: '' }) : '';
+
+    // Build params array combining technical data with translated descriptions
+    const params = tech?.params?.map(p => ({
+        name: p.name,
+        type: p.type,
+        default: p.default,
+        description: hasHelp ? t(`${blockId}.params.${p.name}.description`, { defaultValue: '' }) : ''
+    })) || [];
+
+    // Get translated examples
+    const examples = [];
+    if (hasHelp) {
+        const examplesData = i18n.getResource(i18n.language, 'help', `${blockId}.examples`)
+            || i18n.getResource('en', 'help', `${blockId}.examples`)
+            || [];
+        for (let i = 0; i < examplesData.length; i++) {
+            examples.push({
+                title: t(`${blockId}.examples.${i}.title`, { defaultValue: '' }),
+                description: t(`${blockId}.examples.${i}.description`, { defaultValue: '' })
+            });
+        }
+    }
 
     return (
         <Dialog
@@ -40,20 +71,20 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                     </div>
                     <div className="block-help-header-info">
                         <h3 className="block-help-title">
-                            {help ? help.title : blockName}
+                            {title}
                         </h3>
-                        {help && (
+                        {tech && (
                             <div className="block-help-signals">
-                                {signalLabel(help.input, t('helpDialog.input'))}
-                                {signalLabel(help.output, t('helpDialog.output'))}
+                                {signalLabel(tech.input, tCommon('helpDialog.input'))}
+                                {signalLabel(tech.output, tCommon('helpDialog.output'))}
                             </div>
                         )}
                     </div>
                     <button
                         className="block-help-close-x"
                         onClick={onClose}
-                        title={t('helpDialog.close')}
-                        aria-label={t('helpDialog.closeHelp')}
+                        title={tCommon('helpDialog.close')}
+                        aria-label={tCommon('helpDialog.closeHelp')}
                     >
                         <Icon name="close" size="small" aria-hidden="true" />
                     </button>
@@ -61,47 +92,47 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
 
                 {/* Прокручиваемое тело */}
                 <div className="block-help-body">
-                    {!help && (
+                    {!hasHelp && (
                         <div className="block-help-empty">
-                            {t('helpDialog.noHelp')}
+                            {tCommon('helpDialog.noHelp')}
                         </div>
                     )}
 
-                    {help && (
+                    {hasHelp && (
                         <>
                             {/* Purpose */}
-                            {help.purpose && (
+                            {purpose && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">{t('helpDialog.purpose')}</h4>
-                                    <p className="block-help-section-text">{help.purpose}</p>
+                                    <h4 className="block-help-section-title">{tCommon('helpDialog.purpose')}</h4>
+                                    <p className="block-help-section-text">{purpose}</p>
                                 </div>
                             )}
 
                             {/* Algorithm */}
-                            {help.algorithm && (
+                            {algorithm && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">{t('helpDialog.algorithm')}</h4>
-                                    <p className="block-help-section-text">{help.algorithm}</p>
+                                    <h4 className="block-help-section-title">{tCommon('helpDialog.algorithm')}</h4>
+                                    <p className="block-help-section-text">{algorithm}</p>
                                 </div>
                             )}
 
                             {/* Parameters */}
-                            {help.params && help.params.length > 0 && (
+                            {params.length > 0 && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">{t('helpDialog.parameters')}</h4>
+                                    <h4 className="block-help-section-title">{tCommon('helpDialog.parameters')}</h4>
                                     <table className="block-help-params">
                                         <thead>
                                             <tr>
-                                                <th>{t('helpDialog.paramName')}</th>
-                                                <th>{t('helpDialog.paramDefault')}</th>
-                                                <th>{t('helpDialog.paramDescription')}</th>
+                                                <th>{tCommon('helpDialog.paramName')}</th>
+                                                <th>{tCommon('helpDialog.paramDefault')}</th>
+                                                <th>{tCommon('helpDialog.paramDescription')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {help.params.map((p, i) => (
+                                            {params.map((p, i) => (
                                                 <tr key={i}>
                                                     <td className="param-name">{p.name}</td>
-                                                    <td className="param-default">{p.default}</td>
+                                                    <td className="param-default">{String(p.default)}</td>
                                                     <td>{p.description}</td>
                                                 </tr>
                                             ))}
@@ -111,27 +142,27 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             )}
 
                             {/* I/O description */}
-                            {(help.inputDescription || help.outputDescription) && (
+                            {(inputDescription || outputDescription) && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">{t('helpDialog.signals')}</h4>
+                                    <h4 className="block-help-section-title">{tCommon('helpDialog.signals')}</h4>
                                     <p className="block-help-section-text">
-                                        {help.inputDescription && <>
-                                            <strong>{t('helpDialog.inputLabel')}</strong> {help.inputDescription}
+                                        {inputDescription && <>
+                                            <strong>{tCommon('helpDialog.inputLabel')}</strong> {inputDescription}
                                         </>}
-                                        {help.inputDescription && help.outputDescription && '\n'}
-                                        {help.outputDescription && <>
-                                            <strong>{t('helpDialog.outputLabel')}</strong> {help.outputDescription}
+                                        {inputDescription && outputDescription && '\n'}
+                                        {outputDescription && <>
+                                            <strong>{tCommon('helpDialog.outputLabel')}</strong> {outputDescription}
                                         </>}
                                     </p>
                                 </div>
                             )}
 
                             {/* Examples */}
-                            {help.examples && help.examples.length > 0 && (
+                            {examples.length > 0 && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">{t('helpDialog.examples')}</h4>
+                                    <h4 className="block-help-section-title">{tCommon('helpDialog.examples')}</h4>
                                     <div className="block-help-examples">
-                                        {help.examples.map((ex, i) => (
+                                        {examples.map((ex, i) => (
                                             <div key={i} className="block-help-example">
                                                 <p className="block-help-example-title">
                                                     {i + 1}. {ex.title}

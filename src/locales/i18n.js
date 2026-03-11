@@ -20,6 +20,8 @@ import ruParams from './ru/params.json';
 import enParams from './en/params.json';
 import ruValidation from './ru/validation.json';
 import enValidation from './en/validation.json';
+import ruHelp from './ru/help.json';
+import enHelp from './en/help.json';
 
 /** Supported languages: flagCode maps to FlagIcon component */
 export const LANGUAGES = [
@@ -39,8 +41,8 @@ i18n
     .use(initReactI18next)
     .init({
         resources: {
-            en: { common: enCommon, blocks: enBlocks, groups: enGroups, params: enParams, validation: enValidation },
-            ru: { common: ruCommon, blocks: ruBlocks, groups: ruGroups, params: ruParams, validation: ruValidation },
+            en: { common: enCommon, blocks: enBlocks, groups: enGroups, params: enParams, validation: enValidation, help: enHelp },
+            ru: { common: ruCommon, blocks: ruBlocks, groups: ruGroups, params: ruParams, validation: ruValidation, help: ruHelp },
             es: { common: esCommon },
             fr: { common: frCommon },
             de: { common: deCommon },
