@@ -1388,7 +1388,7 @@
             }
         ]
     },
-    "multi-spectrum-analyzer": {
+    "multi-channel-spectrum-analyzer": {
         "title": "Multi-Channel Spectrum Analyzer",
         "purpose": "Four independent spectrum analyzers on one screen. Allows simultaneous observation of spectra from multiple signals — for example, comparing spectrum before and after filtering, analyzing different processing branches, or monitoring multiple communication channels in parallel. Each channel performs a full spectral analysis cycle independently: its own circular buffer, window function, FFT, and averaging. Unconnected channels are not displayed.",
         "algorithm": "Identical to the single-channel SpectrumAnalyzer: 1. Input samples are written into a circular buffer of size fftSize. 2. Buffer contents are multiplied by a window function. 3. Fast Fourier Transform (FFT) is performed. 4. Magnitude is computed (in dB or linear). 5. Exponential averaging is applied. Results from all channels are packaged into an object {channels: [ch1, ch2, ch3, ch4]}.",

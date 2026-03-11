@@ -56,8 +56,8 @@ import WindowFunctions from '../_shared/WindowFunctions.js';
 import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
 
 export default {
-    type: 'Многоканальный спектроанализатор',
-    id: 'multi-spectrum-analyzer',
+    type: 'multi-channel-spectrum-analyzer',
+    id: 'multi-channel-spectrum-analyzer',
     icon: 'dsp-multi-spectrum',
     description: 'Спектральный анализ (4 канала)',
     group: 'visualization',

@@ -877,7 +877,7 @@
         "output": null,
         "params": []
     },
-    "multi-spectrum-analyzer": {
+    "multi-channel-spectrum-analyzer": {
         "input": "real",
         "output": null,
         "params": [
