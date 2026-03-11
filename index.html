@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DSP Flow Editor — Visual DSP Graph Editor</title>
-    <meta name="description" content="Free browser-based visual editor for digital signal processing (DSP) graphs. Build, simulate, and analyze signal processing chains with 59+ blocks: filters, generators, modulators, spectrum analyzers, and more." />
-    <meta name="keywords" content="DSP, digital signal processing, signal flow graph, filter design, spectrum analyzer, FIR, IIR, FFT, modulation, demodulation, React, web audio" />
+    <title>DSP Flow Editor — Visual Digital Signal Processing Simulator</title>
+    <meta name="description" content="Free online visual editor for digital signal processing (DSP). Design and simulate signal flow graphs with 59+ blocks: FIR/IIR filters, FFT spectrum analyzer, oscilloscope, AM/FM/PM modulation, PLL, BPSK/QPSK demodulation, Hilbert transform, Goertzel algorithm, CIC filters, AGC, and more. Real-time Web Audio playback." />
+    <meta name="keywords" content="DSP, digital signal processing, ЦОС, цифровая обработка сигналов, signal flow graph, filter design, FIR filter, IIR filter, lowpass filter, highpass filter, bandpass filter, notch filter, FFT, fast Fourier transform, spectrum analyzer, spectrogram, waterfall, oscilloscope, constellation diagram, AM modulation, FM modulation, PM modulation, PSK modulation, BPSK, QPSK, 8PSK, 16QAM, demodulation, PLL, phase locked loop, ФАПЧ, Hilbert transform, Goertzel algorithm, CIC filter, decimation, interpolation, AGC, automatic gain control, noise generator, signal generator, sine wave, cosine, Web Audio API, real-time simulation, SDR, software defined radio, frequency detector, phase detector, amplitude detector, timing recovery, correlation, matched filter, I/Q signal, complex signal, quadrature, eye diagram, Remez algorithm, window function, Hann, Hamming, Blackman, audio processing, spectral analysis, frequency response, impulse response, signal visualization, DSP education, DSP learning tool, signal processing simulator, block diagram editor, node-based editor, React Flow" />
     <meta name="author" content="AlexxTN105" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d1117" />
     <link rel="canonical" href="https://alexxtn105.github.io/dsp-flow/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="DSP Flow Editor — Visual DSP Graph Editor" />
-    <meta property="og:description" content="Free browser-based visual editor for digital signal processing graphs. 59+ DSP blocks, real-time simulation, spectrum analysis." />
+    <meta property="og:title" content="DSP Flow Editor — Visual Digital Signal Processing Simulator" />
+    <meta property="og:description" content="Free online DSP simulator: 59+ blocks including FIR/IIR filters, FFT spectrum analyzer, AM/FM/PSK modulation, PLL, oscilloscope, constellation diagram. Build signal processing chains visually and simulate in real-time." />
     <meta property="og:url" content="https://alexxtn105.github.io/dsp-flow/" />
     <meta property="og:site_name" content="DSP Flow Editor" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="DSP Flow Editor — Visual DSP Graph Editor" />
-    <meta name="twitter:description" content="Free browser-based visual editor for digital signal processing graphs. 59+ DSP blocks, real-time simulation." />
+    <meta name="twitter:title" content="DSP Flow Editor — Visual DSP Simulator" />
+    <meta name="twitter:description" content="Free online DSP simulator: 59+ blocks — filters, FFT, modulation, PLL, oscilloscope, constellation. Build and simulate signal processing chains in your browser." />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -28,12 +31,34 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "DSP Flow Editor",
-        "description": "Visual editor for digital signal processing graphs with 59+ DSP blocks, real-time simulation, and spectrum analysis",
+        "alternateName": ["DSP Simulator", "Signal Processing Editor", "Редактор ЦОС"],
+        "description": "Free visual editor and simulator for digital signal processing graphs. 59+ DSP blocks including FIR/IIR filters, FFT spectrum analyzer, AM/FM/PSK modulation/demodulation, PLL, oscilloscope, constellation diagram, waterfall spectrogram. Real-time simulation with Web Audio API.",
         "url": "https://alexxtn105.github.io/dsp-flow/",
         "applicationCategory": "EducationalApplication",
+        "applicationSubCategory": "Signal Processing Simulation",
         "operatingSystem": "Any (Web Browser)",
+        "browserRequirements": "Requires a modern browser with Web Audio API support",
+        "softwareVersion": "1.0.0",
+        "inLanguage": ["en", "ru"],
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "author": { "@type": "Person", "name": "AlexxTN105", "url": "https://github.com/Alexxtn105" }
+        "author": { "@type": "Person", "name": "AlexxTN105", "url": "https://github.com/Alexxtn105" },
+        "keywords": "DSP, digital signal processing, FIR, IIR, FFT, modulation, demodulation, PLL, spectrum analyzer, oscilloscope, signal simulation",
+        "featureList": [
+            "59+ DSP processing blocks",
+            "FIR and IIR filter design",
+            "FFT spectrum analysis",
+            "AM/FM/PM modulation and demodulation",
+            "BPSK/QPSK/8PSK digital modulation",
+            "PLL phase-locked loop",
+            "Real-time oscilloscope",
+            "Constellation diagram",
+            "Waterfall spectrogram",
+            "Web Audio real-time playback",
+            "Drag-and-drop graph editor",
+            "Hilbert transform",
+            "CIC decimation/interpolation filters",
+            "AGC automatic gain control"
+        ]
     }
     </script>
 
