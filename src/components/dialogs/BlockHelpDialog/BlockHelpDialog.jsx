@@ -57,91 +57,94 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                     </button>
                 </div>
 
-                {!help && (
-                    <div className="block-help-empty">
-                        Справка для этого блока пока недоступна.
-                    </div>
-                )}
+                {/* Прокручиваемое тело */}
+                <div className="block-help-body">
+                    {!help && (
+                        <div className="block-help-empty">
+                            Справка для этого блока пока недоступна.
+                        </div>
+                    )}
 
-                {help && (
-                    <>
-                        {/* Purpose */}
-                        {help.purpose && (
-                            <div className="block-help-section">
-                                <h4 className="block-help-section-title">Назначение</h4>
-                                <p className="block-help-section-text">{help.purpose}</p>
-                            </div>
-                        )}
-
-                        {/* Algorithm */}
-                        {help.algorithm && (
-                            <div className="block-help-section">
-                                <h4 className="block-help-section-title">Алгоритм</h4>
-                                <p className="block-help-section-text">{help.algorithm}</p>
-                            </div>
-                        )}
-
-                        {/* Parameters */}
-                        {help.params && help.params.length > 0 && (
-                            <div className="block-help-section">
-                                <h4 className="block-help-section-title">Параметры</h4>
-                                <table className="block-help-params">
-                                    <thead>
-                                        <tr>
-                                            <th>Параметр</th>
-                                            <th>По умолч.</th>
-                                            <th>Описание</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {help.params.map((p, i) => (
-                                            <tr key={i}>
-                                                <td className="param-name">{p.name}</td>
-                                                <td className="param-default">{p.default}</td>
-                                                <td>{p.description}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-
-                        {/* I/O description */}
-                        {(help.inputDescription || help.outputDescription) && (
-                            <div className="block-help-section">
-                                <h4 className="block-help-section-title">Сигналы</h4>
-                                <p className="block-help-section-text">
-                                    {help.inputDescription && <>
-                                        <strong>Вход:</strong> {help.inputDescription}
-                                    </>}
-                                    {help.inputDescription && help.outputDescription && '\n'}
-                                    {help.outputDescription && <>
-                                        <strong>Выход:</strong> {help.outputDescription}
-                                    </>}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Examples */}
-                        {help.examples && help.examples.length > 0 && (
-                            <div className="block-help-section">
-                                <h4 className="block-help-section-title">Примеры использования</h4>
-                                <div className="block-help-examples">
-                                    {help.examples.map((ex, i) => (
-                                        <div key={i} className="block-help-example">
-                                            <p className="block-help-example-title">
-                                                {i + 1}. {ex.title}
-                                            </p>
-                                            <p className="block-help-example-desc">
-                                                {ex.description}
-                                            </p>
-                                        </div>
-                                    ))}
+                    {help && (
+                        <>
+                            {/* Purpose */}
+                            {help.purpose && (
+                                <div className="block-help-section">
+                                    <h4 className="block-help-section-title">Назначение</h4>
+                                    <p className="block-help-section-text">{help.purpose}</p>
                                 </div>
-                            </div>
-                        )}
-                    </>
-                )}
+                            )}
+
+                            {/* Algorithm */}
+                            {help.algorithm && (
+                                <div className="block-help-section">
+                                    <h4 className="block-help-section-title">Алгоритм</h4>
+                                    <p className="block-help-section-text">{help.algorithm}</p>
+                                </div>
+                            )}
+
+                            {/* Parameters */}
+                            {help.params && help.params.length > 0 && (
+                                <div className="block-help-section">
+                                    <h4 className="block-help-section-title">Параметры</h4>
+                                    <table className="block-help-params">
+                                        <thead>
+                                            <tr>
+                                                <th>Параметр</th>
+                                                <th>По умолч.</th>
+                                                <th>Описание</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {help.params.map((p, i) => (
+                                                <tr key={i}>
+                                                    <td className="param-name">{p.name}</td>
+                                                    <td className="param-default">{p.default}</td>
+                                                    <td>{p.description}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            {/* I/O description */}
+                            {(help.inputDescription || help.outputDescription) && (
+                                <div className="block-help-section">
+                                    <h4 className="block-help-section-title">Сигналы</h4>
+                                    <p className="block-help-section-text">
+                                        {help.inputDescription && <>
+                                            <strong>Вход:</strong> {help.inputDescription}
+                                        </>}
+                                        {help.inputDescription && help.outputDescription && '\n'}
+                                        {help.outputDescription && <>
+                                            <strong>Выход:</strong> {help.outputDescription}
+                                        </>}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Examples */}
+                            {help.examples && help.examples.length > 0 && (
+                                <div className="block-help-section">
+                                    <h4 className="block-help-section-title">Примеры использования</h4>
+                                    <div className="block-help-examples">
+                                        {help.examples.map((ex, i) => (
+                                            <div key={i} className="block-help-example">
+                                                <p className="block-help-example-title">
+                                                    {i + 1}. {ex.title}
+                                                </p>
+                                                <p className="block-help-example-desc">
+                                                    {ex.description}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </Dialog>
     );
