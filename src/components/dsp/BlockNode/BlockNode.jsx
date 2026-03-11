@@ -33,7 +33,7 @@ function getParamType(key, value) {
 }
 
 function BlockNode({ data, selected }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['params', 'blocks']);
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
@@ -43,6 +43,7 @@ function BlockNode({ data, selected }) {
     const canVisualize = isVisualizationBlock(data.blockType);
     const isAudioFile = data.blockType === 'audio-file';
     const displayName = t(data.blockType, { ns: 'blocks' });
+    const tp = (key, opts) => t(key, { ns: 'params', ...opts });
 
     // Inline editing state
     const [editingParam, setEditingParam] = useState(null);
@@ -175,8 +176,8 @@ function BlockNode({ data, selected }) {
                         onKeyDown={(e) => handleKeyDown(e, key)}
                         onMouseDown={stopPropagation}
                     >
-                        <option value="true">Да</option>
-                        <option value="false">Нет</option>
+                        <option value="true">{tp('booleanTrue')}</option>
+                        <option value="false">{tp('booleanFalse')}</option>
                     </select>
                 );
             }
@@ -203,7 +204,7 @@ function BlockNode({ data, selected }) {
             <span
                 className="param-value param-value-editable"
                 onDoubleClick={(e) => enterEditMode(e, key, value)}
-                title="Двойной клик для редактирования"
+                title={tp('blockNode.editHint')}
             >
                 {formatParamValue(value)}
             </span>
@@ -224,7 +225,7 @@ function BlockNode({ data, selected }) {
                             className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
                             style={{ top: `${((i + 1) * 100) / (inputsCount + 1)}%` }}
                             data-signal-type={signalConfig.input}
-                            title={signalConfig.inputLabels?.[i] ?? `Вход ${i + 1}`}
+                            title={signalConfig.inputLabels?.[i] ?? tp('blockNode.input', { index: i + 1 })}
                         />
                     ))
                 ) : (
@@ -235,7 +236,7 @@ function BlockNode({ data, selected }) {
                         id="input"
                         className={`block-handle ${getSignalTypeClass(signalConfig.input)}`}
                         data-signal-type={signalConfig.input}
-                        title={`Вход: ${getSignalTypeDescription(signalConfig.input)} сигнал`}
+                        title={tp('blockNode.inputSignal', { type: getSignalTypeDescription(signalConfig.input) })}
                     />
                 )
             )}
@@ -245,7 +246,7 @@ function BlockNode({ data, selected }) {
                 <button
                     className="block-action-btn params-btn"
                     onClick={handleOpenParams}
-                    title="Настройки блока"
+                    title={tp('blockNode.blockSettings')}
                 >
                     <Icon name="tune" size="small" />
                 </button>
@@ -253,7 +254,7 @@ function BlockNode({ data, selected }) {
                     <button
                         className="block-action-btn visualization-btn"
                         onClick={handleOpenVisualization}
-                        title="Открыть визуализацию"
+                        title={tp('blockNode.openVisualization')}
                     >
                         <Icon name="visibility" size="small" />
                     </button>
@@ -264,7 +265,7 @@ function BlockNode({ data, selected }) {
                 <div className="block-icon-title">
                     <span
                         className="block-icon"
-                        title={`${description}\nВход: ${getSignalTypeDescription(signalConfig.input)}\nВыход: ${getSignalTypeDescription(signalConfig.output)}`}
+                        title={`${description}\n${tp('blockNode.inputSignal', { type: getSignalTypeDescription(signalConfig.input) })}\n${tp('blockNode.outputSignal', { type: getSignalTypeDescription(signalConfig.output) })}`}
                     >
                         <Icon name={iconName} size="medium" />
                     </span>
@@ -293,7 +294,7 @@ function BlockNode({ data, selected }) {
                             </div>
                         </>
                     ) : (
-                        <div className="audio-file-empty">Файл не выбран</div>
+                        <div className="audio-file-empty">{tp('blockNode.fileNotSelected')}</div>
                     )}
                 </div>
             ) : editableParams.length > 0 ? (
@@ -308,7 +309,7 @@ function BlockNode({ data, selected }) {
                         <div className="block-param block-param-more" onClick={handleOpenParams}>
                             <span className="param-label">...</span>
                             <span className="param-value param-value-more">
-                                ещё {hiddenCount}
+                                {tp('blockNode.more', { count: hiddenCount })}
                             </span>
                         </div>
                     )}
@@ -328,7 +329,7 @@ function BlockNode({ data, selected }) {
                                 className={`block-handle ${getSignalTypeClass(outType)}`}
                                 style={{ top: `${((i + 1) * 100) / (signalConfig.outputsCount + 1)}%` }}
                                 data-signal-type={outType}
-                                title={signalConfig.outputLabels?.[i] ?? `Выход ${i + 1}`}
+                                title={signalConfig.outputLabels?.[i] ?? tp('blockNode.output', { index: i + 1 })}
                             />
                         );
                     })
@@ -339,7 +340,7 @@ function BlockNode({ data, selected }) {
                         id="output"
                         className={`block-handle ${getSignalTypeClass(signalConfig.output)}`}
                         data-signal-type={signalConfig.output}
-                        title={`Выход: ${getSignalTypeDescription(signalConfig.output)} сигнал`}
+                        title={tp('blockNode.outputSignal', { type: getSignalTypeDescription(signalConfig.output) })}
                     />
                 )
             )}

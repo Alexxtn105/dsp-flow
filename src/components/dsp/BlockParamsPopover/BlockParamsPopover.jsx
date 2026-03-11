@@ -70,7 +70,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
         const currentParams = node.data.params || {};
         setLocalParams({ ...defaultParams, ...currentParams });
         if (currentParams.wavFile) {
-            setWavFileName(currentParams.wavFile.name || currentParams.wavFileName || 'Файл выбран');
+            setWavFileName(currentParams.wavFile.name || currentParams.wavFileName || t('popover.fileSelected'));
         } else if (currentParams.wavFileName) {
             setWavFileName(currentParams.wavFileName);
         }
@@ -170,7 +170,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
         const validMime = file.type === 'audio/wav' || file.type === 'audio/x-wav' ||
                           file.type === 'audio/mpeg' || file.type === 'audio/mp3';
         if (!validExtensions && !validMime) {
-            setError('Пожалуйста, выберите WAV или MP3 файл');
+            setError(t('popover.audioFileError'));
             return;
         }
 
@@ -206,7 +206,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
             audioContextRef.current = null;
         } catch (err) {
             console.error('Ошибка чтения аудиофайла:', err);
-            setError('Не удалось прочитать аудиофайл');
+            setError(t('popover.audioReadError'));
         }
     };
 
@@ -256,7 +256,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                 {/* WAV-секция для Audio File */}
                 {isInputSignal && (
                     <div className="param-section wav-section">
-                        <label className="param-section-label">Источник сигнала</label>
+                        <label className="param-section-label">{t('popover.signalSource')}</label>
                         <div className="wav-file-input">
                             <input
                                 type="file"
@@ -266,25 +266,25 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                                 className="hidden-file-input"
                             />
                             <label htmlFor="wav-file-input-popover" className="wav-file-btn">
-                                {wavFileName || 'Выбрать аудиофайл'}
+                                {wavFileName || t('popover.selectAudioFile')}
                             </label>
                         </div>
                         {localParams.detectedSampleRate && (
                             <div className="wav-info">
                                 <div className="wav-info-item">
                                     <span>Sample Rate:</span>
-                                    <strong>{localParams.detectedSampleRate} Гц</strong>
+                                    <strong>{localParams.detectedSampleRate} Hz</strong>
                                 </div>
                                 <div className="wav-info-item">
-                                    <span>Длительность:</span>
-                                    <strong>{localParams.duration?.toFixed(2)} сек</strong>
+                                    <span>{t('popover.duration')}:</span>
+                                    <strong>{localParams.duration?.toFixed(2)}s</strong>
                                 </div>
                                 <div className="wav-info-item">
-                                    <span>Каналов:</span>
+                                    <span>{t('popover.channelsLabel')}:</span>
                                     <strong>{localParams.channels}</strong>
                                 </div>
                                 <div className="wav-info-item">
-                                    <span>Отсчётов:</span>
+                                    <span>{t('popover.samples')}:</span>
                                     <strong>{localParams.totalSamples?.toLocaleString()}</strong>
                                 </div>
                             </div>
@@ -295,7 +295,7 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                 {/* Редактируемые параметры */}
                 {editableParams.length > 0 && (
                     <div className="param-section">
-                        <label className="param-section-label">Параметры</label>
+                        <label className="param-section-label">{t('popover.parameters')}</label>
                         {editableParams.map(([key, value]) => {
                             if (['detectedSampleRate', 'duration', 'channels', 'totalSamples', 'wavFileName', 'sourceType'].includes(key)) {
                                 return null;
@@ -325,8 +325,8 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                                             onChange={(e) => handleParamChange(key, e.target.value, 'boolean')}
                                             className="param-input"
                                         >
-                                            <option value="true">Да</option>
-                                            <option value="false">Нет</option>
+                                            <option value="true">{t('booleanTrue')}</option>
+                                            <option value="false">{t('booleanFalse')}</option>
                                         </select>
                                     ) : inputType === 'array' ? (
                                         <input
@@ -358,8 +358,8 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
                 )}
 
                 <div className="popover-actions">
-                    <button type="submit" className="popover-btn popover-btn-primary">Применить</button>
-                    <button type="button" className="popover-btn popover-btn-secondary" onClick={onClose}>Отмена</button>
+                    <button type="submit" className="popover-btn popover-btn-primary">{t('popover.apply')}</button>
+                    <button type="button" className="popover-btn popover-btn-secondary" onClick={onClose}>{t('popover.cancel')}</button>
                 </div>
             </form>
         </div>,

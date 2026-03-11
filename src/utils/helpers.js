@@ -3,6 +3,7 @@
  */
 
 import registry from '../engine/PluginRegistry';
+import i18n from '../locales/i18n';
 import { SIGNAL_TYPES } from './constants';
 
 /**
@@ -69,7 +70,8 @@ export const deepClone = (obj) => {
  */
 export const formatDate = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleString('ru-RU', {
+    const locale = i18n.language === 'ru' ? 'ru-RU' : 'en-US';
+    return date.toLocaleString(locale, {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -200,58 +202,18 @@ export const getBlockDescription = (blockType) => {
 };
 
 /**
- * Форматировать имя параметра для отображения
+ * Форматировать имя параметра для отображения (i18n)
  */
 export const formatParamName = (name) => {
-    // Точные соответствия для составных имён
-    const exactNames = {
-        'windowFunction': 'Оконная функция',
-        'filterType': 'Тип фильтра',
-        'cutoffFrequency': 'Частота среза',
-        'lowCutoff': 'Низ. частота среза',
-        'highCutoff': 'Выс. частота среза',
-        'fftSize': 'Размер БПФ',
-        'outputRange': 'Диапазон выхода',
-        'normalization': 'Нормализация',
-        'scaleFactor': 'Масштаб. коэффициент',
-        'numInputs': 'Кол-во входов',
-        'integrationTime': 'Время интеграции',
-        'resetOnOverflow': 'Сброс при переполнении',
-        'maxValue': 'Макс. значение',
-        'referenceFrequency': 'Опорная частота',
-        'centerFrequency': 'Центральная частота',
-        'targetFrequency': 'Целевая частота',
-        'samplingRate': 'Частота дискретизации',
-        'symbolRate': 'Символьная скорость',
-        'eyeDiagram': 'Глазковая диаграмма',
-        'dBScale': 'Шкала дБ',
-        'timeWindow': 'Временное окно',
-        'phaseShift': 'Сдвиг фазы',
-        'colorMap': 'Цветовая карта',
-        'windowSize': 'Размер окна',
-        'sensitivity': 'Чувствительность',
-        'averaging': 'Усреднение',
-        'frequencyRange': 'Диапазон частот',
-        'constellation': 'Созвездие',
-        'operation': 'Операция',
-        'notchFrequency': 'Частота режекции',
-        'bandwidth': 'Ширина полосы',
-        'value': 'Значение',
-    };
+    const translated = i18n.t(`names.${name}`, { ns: 'params' });
+    // Если перевод найден (не совпадает с ключом), возвращаем его
+    if (translated !== `names.${name}`) return translated;
 
-    if (exactNames[name]) return exactNames[name];
-
+    // Fallback: camelCase → человекочитаемый формат
     return name
         .replace(/([A-Z])/g, ' $1')
         .replace(/^./, str => str.toUpperCase())
-        .replace('Cutoff', 'Частота')
-        .replace('Order', 'Порядок')
-        .replace('Frequency', 'Частота')
-        .replace('Amplitude', 'Амплитуда')
-        .replace('Low', 'Низ.')
-        .replace('High', 'Выс.')
-        .replace('Type', 'Тип')
-        .replace('Size', 'Размер');
+        .trim();
 };
 
 /**
@@ -271,7 +233,9 @@ export const formatParamValue = (value) => {
         return value.toString();
     }
     if (typeof value === 'boolean') {
-        return value ? 'Да' : 'Нет';
+        return value
+            ? i18n.t('booleanTrue', { ns: 'params' })
+            : i18n.t('booleanFalse', { ns: 'params' });
     }
     return String(value);
 };
@@ -339,9 +303,9 @@ export const getSignalTypeClass = (signalType) => {
  */
 export const getSignalTypeDescription = (signalType) => {
     switch (signalType) {
-        case SIGNAL_TYPES.COMPLEX: return 'Комплексный';
-        case SIGNAL_TYPES.REAL: return 'Действительный';
-        default: return 'Неизвестный';
+        case SIGNAL_TYPES.COMPLEX: return i18n.t('signalType.complex', { ns: 'params' });
+        case SIGNAL_TYPES.REAL: return i18n.t('signalType.real', { ns: 'params' });
+        default: return i18n.t('signalType.unknown', { ns: 'params' });
     }
 };
 
