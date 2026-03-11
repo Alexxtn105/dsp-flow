@@ -198,6 +198,19 @@
     line-height: 1;
 }
 
+.hdr-lang-wip {
+    margin-left: auto;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--panel-accent-orange);
+    background: rgba(255, 140, 0, 0.12);
+    border: 1px solid rgba(255, 140, 0, 0.2);
+    border-radius: 2px;
+    padding: 1px 4px;
+    line-height: 1.2;
+}
+
 .hdr-legend-btn {
     display: flex;
     align-items: center;

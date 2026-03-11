@@ -75,6 +75,7 @@ function Header({ currentScheme }) {
                                 >
                                     <span className="hdr-lang-option-flag">{lang.flag}</span>
                                     <span className="hdr-lang-option-name">{lang.name}</span>
+                                    {lang.dev && <span className="hdr-lang-wip">WIP</span>}
                                 </button>
                             ))}
                         </div>
