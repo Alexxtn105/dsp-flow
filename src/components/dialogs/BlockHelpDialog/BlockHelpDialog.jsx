@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import Icon from '../../common/Icons/Icon.jsx';
@@ -13,20 +12,6 @@ import './BlockHelpDialog.css';
 function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
     const { isDarkTheme } = useThemeContext();
     const help = pluginHelp[blockId];
-    const contentRef = useRef(null);
-
-    // Прокрутка к началу после открытия
-    // Dialog автофокусирует первый focusable (кнопку «Закрыть» внизу),
-    // что прокручивает контент вниз. setTimeout гарантирует выполнение после автофокуса.
-    useEffect(() => {
-        const timerId = setTimeout(() => {
-            if (contentRef.current) {
-                const dialog = contentRef.current.closest('.dialog');
-                if (dialog) dialog.scrollTop = 0;
-            }
-        }, 50);
-        return () => clearTimeout(timerId);
-    }, []);
 
     const signalLabel = (type, prefix) => {
         if (!type) return (
@@ -45,8 +30,8 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
             onClose={onClose}
             className={`block-help-dialog ${isDarkTheme ? 'dark-theme' : ''}`}
         >
-            <div className="block-help" ref={contentRef}>
-                {/* Header */}
+            <div className="block-help">
+                {/* Header с кнопкой закрытия (автофокус идёт сюда — скролл остаётся вверху) */}
                 <div className="block-help-header">
                     <div className="block-help-icon">
                         <Icon name={blockIcon} size="large" aria-hidden="true" />
@@ -62,6 +47,14 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             </div>
                         )}
                     </div>
+                    <button
+                        className="block-help-close-x"
+                        onClick={onClose}
+                        title="Закрыть"
+                        aria-label="Закрыть справку"
+                    >
+                        <Icon name="close" size="small" aria-hidden="true" />
+                    </button>
                 </div>
 
                 {!help && (
@@ -149,13 +142,6 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                         )}
                     </>
                 )}
-
-                {/* Footer */}
-                <div className="block-help-footer">
-                    <button className="block-help-close-btn" onClick={onClose}>
-                        Закрыть
-                    </button>
-                </div>
             </div>
         </Dialog>
     );

@@ -1,8 +1,10 @@
 /* ===== Block Help Dialog ===== */
 
-.block-help-dialog .dialog {
+/* Dialog и block-help-dialog — классы на ОДНОМ элементе, поэтому без пробела */
+.dialog.block-help-dialog {
     width: 720px;
     min-width: 400px;
+    min-height: 300px;
     max-width: 90vw;
     max-height: 85vh;
     resize: both;
@@ -81,6 +83,27 @@
     background: rgba(107, 114, 128, 0.1);
     color: var(--text-tertiary);
     border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+/* ---- Close button (X) in header ---- */
+.block-help-close-x {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 120ms ease;
+}
+
+.block-help-close-x:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 /* ---- Sections ---- */
@@ -179,37 +202,12 @@
     white-space: pre-line;
 }
 
-/* ---- Footer ---- */
-.block-help-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 8px;
-    border-top: 1px solid var(--border-primary);
-}
-
-.block-help-close-btn {
-    padding: 8px 20px;
-    border: none;
-    border-radius: var(--radius-md);
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.block-help-close-btn:hover {
-    background: var(--border-primary);
-    transform: translateY(-1px);
-}
-
 /* ---- Dark theme ---- */
-.dark-theme .block-help-icon {
+.dark-theme.block-help-dialog .block-help-icon {
     background: var(--bg-primary);
 }
 
-.dark-theme .block-help-example {
+.dark-theme.block-help-dialog .block-help-example {
     background: var(--bg-primary);
 }
 
