@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DSP Flow Editor — Visual Digital Signal Processing Simulator</title>
     <meta name="description" content="Free online visual editor for digital signal processing (DSP). Design and simulate signal flow graphs with 59+ blocks: FIR/IIR filters, FFT spectrum analyzer, oscilloscope, AM/FM/PM modulation, PLL, BPSK/QPSK demodulation, Hilbert transform, Goertzel algorithm, CIC filters, AGC, and more. Real-time Web Audio playback." />
-    <meta name="keywords" content="DSP, digital signal processing, ЦОС, цифровая обработка сигналов, signal flow graph, filter design, FIR filter, IIR filter, lowpass filter, highpass filter, bandpass filter, notch filter, FFT, fast Fourier transform, spectrum analyzer, spectrogram, waterfall, oscilloscope, constellation diagram, AM modulation, FM modulation, PM modulation, PSK modulation, BPSK, QPSK, 8PSK, 16QAM, demodulation, PLL, phase locked loop, ФАПЧ, Hilbert transform, Goertzel algorithm, CIC filter, decimation, interpolation, AGC, automatic gain control, noise generator, signal generator, sine wave, cosine, Web Audio API, real-time simulation, SDR, software defined radio, frequency detector, phase detector, amplitude detector, timing recovery, correlation, matched filter, I/Q signal, complex signal, quadrature, eye diagram, Remez algorithm, window function, Hann, Hamming, Blackman, audio processing, spectral analysis, frequency response, impulse response, signal visualization, DSP education, DSP learning tool, signal processing simulator, block diagram editor, node-based editor, React Flow" />
+    <meta name="keywords" content="DSP, digital signal processing, ЦОС, цифровая обработка сигналов, signal flow graph, FIR filter, IIR filter, FFT, spectrum analyzer, oscilloscope, AM FM PM modulation, BPSK QPSK demodulation, PLL, Hilbert transform, Goertzel, CIC filter, AGC, SDR, waterfall spectrogram, constellation diagram, Web Audio, signal processing simulator" />
     <meta name="author" content="AlexxTN105" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0d1117" />
     <link rel="icon" type="image/svg+xml" href="/dsp-flow/favicon.svg" />
     <link rel="canonical" href="https://alexxtn105.github.io/dsp-flow/" />
+    <link rel="alternate" hreflang="en" href="https://alexxtn105.github.io/dsp-flow/" />
+    <link rel="alternate" hreflang="ru" href="https://alexxtn105.github.io/dsp-flow/" />
+    <link rel="alternate" hreflang="x-default" href="https://alexxtn105.github.io/dsp-flow/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -18,13 +21,18 @@
     <meta property="og:description" content="Free online DSP simulator: 59+ blocks including FIR/IIR filters, FFT spectrum analyzer, AM/FM/PSK modulation, PLL, oscilloscope, constellation diagram. Build signal processing chains visually and simulate in real-time." />
     <meta property="og:url" content="https://alexxtn105.github.io/dsp-flow/" />
     <meta property="og:site_name" content="DSP Flow Editor" />
+    <meta property="og:image" content="https://alexxtn105.github.io/dsp-flow/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="ru_RU" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="DSP Flow Editor — Visual DSP Simulator" />
     <meta name="twitter:description" content="Free online DSP simulator: 59+ blocks — filters, FFT, modulation, PLL, oscilloscope, constellation. Build and simulate signal processing chains in your browser." />
+    <meta name="twitter:image" content="https://alexxtn105.github.io/dsp-flow/og-image.png" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -78,6 +86,24 @@
 </head>
 <body>
     <div id="app"></div>
+    <noscript>
+        <div style="max-width:720px;margin:40px auto;padding:24px;font-family:system-ui,sans-serif;color:#e6edf3;background:#0d1117;border-radius:8px">
+            <h1>DSP Flow Editor</h1>
+            <p>Free browser-based visual editor and simulator for digital signal processing (DSP) graphs.</p>
+            <h2>Features</h2>
+            <ul>
+                <li>59+ DSP blocks: generators, FIR/IIR filters, FFT spectrum analyzer, oscilloscope, waterfall spectrogram</li>
+                <li>AM/FM/PM and BPSK/QPSK/8PSK digital modulation and demodulation</li>
+                <li>PLL, AGC, Hilbert transform, Goertzel algorithm, CIC filters</li>
+                <li>Constellation diagram, multi-channel spectrum analyzer, numeric indicators</li>
+                <li>Real-time simulation with Web Audio API playback</li>
+                <li>Drag-and-drop graph editor with topological sorting</li>
+                <li>Save/load schemes, dark/light theme, English and Russian UI</li>
+            </ul>
+            <p>Please enable JavaScript to use the application.</p>
+            <p><a href="https://github.com/Alexxtn105/dsp-flow" style="color:#00e5a0">View on GitHub</a></p>
+        </div>
+    </noscript>
     <script type="module" src="./src/index.jsx"></script>
 </body>
 </html>
