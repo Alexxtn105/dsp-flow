@@ -15,7 +15,7 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 
 ## Архитектура
 
-**DSP Flow Editor** — визуальный редактор графов цифровой обработки сигналов на React 19 + React Flow (`@xyflow/react`). Вся документация и UI на русском языке. Деплой на GitHub Pages через GitHub Actions.
+**DSP Flow Editor** — визуальный редактор графов цифровой обработки сигналов на React 19 + React Flow (`@xyflow/react`). Деплой на GitHub Pages через GitHub Actions.
 
 ### Плагинная система (ядро)
 
@@ -84,6 +84,17 @@ GitHub Actions (`.github/workflows/deploy.yml`):
 - `tests/plugins/` — generators, filters, analysis, detectors, math, visualization, shared
 - `tests/integration/` — signal-pipeline, helpers-compat
 
+## Локализация (i18n)
+
+Система интернационализации на `i18next` + `react-i18next` + `i18next-browser-languagedetector`. Конфигурация в `src/locales/i18n.js`.
+
+- **Продакшн-языки:** English, Русский
+- **Стабы (dev):** Español, Français, Deutsch, 中文, Português, 日本語, 한국어
+- Файлы переводов: `src/locales/{lang}/` — JSON-файлы по неймспейсам (`blocks`, `groups`, `params`, `help`, `ui`, `validation`, `errors`)
+- Блоки DSP идентифицируются машинными ID (kebab-case, `DSP_BLOCK_TYPES` в `src/utils/constants.js`), отображаемые имена — через i18n-неймспейс `blocks`
+- `LEGACY_TYPE_TO_ID` — карта миграции старых русских названий → machine ID
+- Язык хранится в localStorage (`dsp-flow-language`), fallback — English
+
 ## Соглашения
 
 - Функциональные компоненты с хуками, PropTypes для валидации пропсов
@@ -91,4 +102,3 @@ GitHub Actions (`.github/workflows/deploy.yml`):
 - CSS-переменные в `src/styles/variables.css`, Material Icons для иконок
 - camelCase для переменных/функций, PascalCase для компонентов, UPPER_CASE для констант
 - Тесты в `tests/` повторяют структуру `src/engine/` и `src/engine/plugins/`
-- Все блоки DSP именуются на русском (см. `src/utils/constants.js` → `DSP_BLOCK_TYPES`)
