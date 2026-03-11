@@ -81,6 +81,11 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
 
     const [channelVisible, setChannelVisible] = useState([true, true, true, true]);
 
+    // Измерение частоты (выделение участка ЛКМ)
+    const [measuring, setMeasuring] = useState(false);
+    const [measureStartFreq, setMeasureStartFreq] = useState(null);
+    const [measureEndFreq, setMeasureEndFreq] = useState(null);
+
     const channels = extractChannels(data);
     const nyquist = sampleRate / 2;
 
@@ -278,6 +283,63 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
         ctx.textBaseline = 'top';
         ctx.fillText('Гц', px + pw - 2, py + ph + 14);
 
+        // --- Frequency measurement overlay ---
+        if (measureStartFreq !== null && measureEndFreq !== null) {
+            const f0 = Math.min(measureStartFreq, measureEndFreq);
+            const f1 = Math.max(measureStartFreq, measureEndFreq);
+            const x0 = px + ((f0 - startFreq) / actualRange) * pw;
+            const x1 = px + ((f1 - startFreq) / actualRange) * pw;
+
+            ctx.fillStyle = 'rgba(0, 191, 255, 0.12)';
+            ctx.fillRect(x0, py, x1 - x0, ph);
+
+            ctx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x0, py); ctx.lineTo(x0, py + ph);
+            ctx.moveTo(x1, py); ctx.lineTo(x1, py + ph);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const deltaFreq = f1 - f0;
+            if (deltaFreq > 0) {
+                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} Гц | ${Math.round(deltaFreq)} Гц`;
+                ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
+                const textW = ctx.measureText(label).width + 14;
+                const boxH = 20;
+
+                let bx = (x0 + x1) / 2 - textW / 2;
+                if (bx < px) bx = px + 2;
+                if (bx + textW > px + pw) bx = px + pw - textW - 2;
+                const by = 6;
+
+                ctx.fillStyle = 'rgba(0, 30, 60, 0.92)';
+                ctx.strokeStyle = 'rgba(0, 191, 255, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(bx, by, textW, boxH, 3); else ctx.rect(bx, by, textW, boxH);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#7ad4ff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, bx + 7, by + boxH / 2);
+
+                const arrowY = by + boxH + 6;
+                if (x1 - x0 > 20) {
+                    ctx.strokeStyle = 'rgba(0, 191, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x0, arrowY); ctx.lineTo(x1, arrowY);
+                    ctx.moveTo(x0 + 5, arrowY - 3); ctx.lineTo(x0, arrowY); ctx.lineTo(x0 + 5, arrowY + 3);
+                    ctx.moveTo(x1 - 5, arrowY - 3); ctx.lineTo(x1, arrowY); ctx.lineTo(x1 - 5, arrowY + 3);
+                    ctx.stroke();
+                }
+            }
+        }
+
         // --- Crosshair ---
         if (cursorX !== null && cursorY !== null &&
             cursorX >= px && cursorX <= px + pw &&
@@ -326,7 +388,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
     }, [data, sampleRate, isDarkTheme, width, height,
         cursorX, cursorY, hoverFreq, hoverDb, startFreq, visibleRange, minDb,
         plotWidth, plotHeight, dbRange, nyquist, actualRange, endFreq,
-        channels, channelVisible]);
+        channels, channelVisible, measureStartFreq, measureEndFreq]);
 
     useEffect(() => {
         drawSpectrum();
@@ -341,14 +403,48 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
         setCursorY(y);
         const fx = (x - AXIS_LEFT) / plotWidth;
         const fy = 1 - (y / plotHeight);
-        setHoverFreq(Math.max(0, startFreq + fx * actualRange));
+        const freq = Math.max(0, Math.min(startFreq + actualRange, startFreq + fx * actualRange));
+        setHoverFreq(freq);
         setHoverDb(minDb + fy * dbRange);
-    }, [plotWidth, plotHeight, startFreq, actualRange, minDb, dbRange]);
+
+        if (measuring) {
+            setMeasureEndFreq(freq);
+        }
+    }, [plotWidth, plotHeight, startFreq, actualRange, minDb, dbRange, measuring]);
+
+    const handleMouseDown = useCallback((e) => {
+        if (e.button !== 0) return;
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const fx = (x - AXIS_LEFT) / plotWidth;
+        const freq = Math.max(0, Math.min(startFreq + actualRange, startFreq + fx * actualRange));
+
+        if (x >= AXIS_LEFT && x <= AXIS_LEFT + plotWidth) {
+            setMeasuring(true);
+            setMeasureStartFreq(freq);
+            setMeasureEndFreq(freq);
+        }
+    }, [plotWidth, startFreq, actualRange]);
+
+    const handleMouseUp = useCallback(() => {
+        if (measuring) {
+            setMeasuring(false);
+            if (measureStartFreq !== null && measureEndFreq !== null &&
+                Math.abs(measureEndFreq - measureStartFreq) < 1) {
+                setMeasureStartFreq(null);
+                setMeasureEndFreq(null);
+            }
+        }
+    }, [measuring, measureStartFreq, measureEndFreq]);
 
     const handleMouseLeave = useCallback(() => {
         setCursorX(null);
         setCursorY(null);
-    }, []);
+        if (measuring) {
+            setMeasuring(false);
+        }
+    }, [measuring]);
 
     const handleWheel = useCallback((e) => {
         e.preventDefault();
@@ -502,6 +598,8 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                 style={{ width, height }}
                 className="msa-canvas"
                 onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
                 aria-label="Многоканальный спектроанализатор"
