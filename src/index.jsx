@@ -3,6 +3,7 @@ import initPlugins from './engine/initPlugins.js';
 import { ThemeProvider } from './contexts/ThemeContext';
 import App from './App';
 
+import './locales/i18n.js';
 import './styles/index.css';
 
 try {

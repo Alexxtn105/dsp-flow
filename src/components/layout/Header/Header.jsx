@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Header.css';
 
 function Header({ currentScheme }) {
     const { isDarkTheme } = useThemeContext();
+    const { t, i18n } = useTranslation();
     const [legendOpen, setLegendOpen] = useState(false);
 
     const unsaved = !currentScheme.isSaved && currentScheme.name !== 'not_saved';
+
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'ru' ? 'en' : 'ru';
+        i18n.changeLanguage(newLang);
+    };
 
     return (
         <header className={`hdr ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -22,21 +29,29 @@ function Header({ currentScheme }) {
                 <div className={`hdr-scheme ${unsaved ? 'hdr-scheme-unsaved' : ''}`}>
                     <span className="hdr-scheme-dot" />
                     <span className="hdr-scheme-name" title={currentScheme.name}>
-                        {currentScheme.name === 'not_saved' ? 'Без имени' : currentScheme.name}
+                        {currentScheme.name === 'not_saved' ? t('header.unnamed') : currentScheme.name}
                     </span>
-                    {unsaved && <span className="hdr-scheme-badge">изменено</span>}
+                    {unsaved && <span className="hdr-scheme-badge">{t('header.modified')}</span>}
                 </div>
             </div>
 
-            {/* Right: collapsible signal legend */}
+            {/* Right: language + legend */}
             <div className="hdr-right">
+                <button
+                    className="hdr-lang-btn"
+                    onClick={toggleLanguage}
+                    title={t(`language.${i18n.language === 'ru' ? 'en' : 'ru'}`)}
+                >
+                    <span className="hdr-lang-code">{i18n.language === 'ru' ? 'EN' : 'RU'}</span>
+                </button>
+
                 <button
                     className={`hdr-legend-btn ${legendOpen ? 'active' : ''}`}
                     onClick={() => setLegendOpen(!legendOpen)}
-                    title="Легенда типов сигналов"
+                    title={t('header.signalLegend')}
                 >
                     <span className="material-icons" style={{ fontSize: 16 }}>legend_toggle</span>
-                    <span className="hdr-legend-btn-text">Сигналы</span>
+                    <span className="hdr-legend-btn-text">{t('header.signals')}</span>
                 </button>
 
                 {legendOpen && (

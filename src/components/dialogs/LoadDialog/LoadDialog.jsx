@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import Dialog from '../../common/Dialog/Dialog';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import { useThemeContext } from '../../../contexts/ThemeContext';
@@ -7,6 +8,7 @@ import { formatDate } from '../../../utils/helpers';
 
 function LoadDialog({ onClose, onLoadSuccess, showConfirm, showAlert }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const { getSavedSchemes, loadScheme, deleteScheme, setLoadedSchemeData } = useDSPEditor();
     const [schemes, setSchemes] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +32,10 @@ function LoadDialog({ onClose, onLoadSuccess, showConfirm, showAlert }) {
                 onLoadSuccess(schemeName);
             } else if (!result.success) {
                 const message = result.error === 'VALIDATION_FAILED'
-                    ? `Схема "${schemeName}" содержит ошибки:\n${result.errors.join('\n')}`
-                    : result.message || 'Не удалось загрузить схему';
+                    ? t('loadDialog.validationErrors', { name: schemeName, errors: result.errors.join('\n') })
+                    : result.message || t('loadDialog.loadFailed');
                 if (showAlert) {
-                    showAlert(message, 'Ошибка загрузки');
+                    showAlert(message, t('loadDialog.loadError'));
                 }
             }
         } finally {
@@ -45,7 +47,7 @@ function LoadDialog({ onClose, onLoadSuccess, showConfirm, showAlert }) {
 
     const handleDelete = async (schemeName) => {
         if (showConfirm) {
-            showConfirm(`Удалить схему "${schemeName}"?`, 'Удаление', async () => {
+            showConfirm(t('loadDialog.deleteScheme', { name: schemeName }) + '?', t('loadDialog.delete'), async () => {
                 await deleteScheme(schemeName);
                 if (mountedRef.current) {
                     setSchemes(getSavedSchemes());
@@ -63,12 +65,12 @@ function LoadDialog({ onClose, onLoadSuccess, showConfirm, showAlert }) {
         <Dialog
             isOpen={true}
             onClose={onClose}
-            title="Загрузить схему"
+            title={t('loadDialog.loadScheme')}
             className={`${isDarkTheme ? 'dark-theme' : ''} load-dialog`}
         >
             <div className="schemes-list">
                 {schemes.length === 0 ? (
-                    <p>Нет сохраненных схем</p>
+                    <p>{t('loadDialog.noSavedSchemes')}</p>
                 ) : (
                     schemes.map((scheme) => (
                         <div key={scheme.name} className="scheme-item">
@@ -80,19 +82,19 @@ function LoadDialog({ onClose, onLoadSuccess, showConfirm, showAlert }) {
                                     onClick={() => handleLoad(scheme.name)}
                                     disabled={isLoading}
                                 >
-                                    {isLoading ? 'Загрузка...' : 'Загрузить'}
+                                    {isLoading ? t('loadDialog.loading') : t('loadDialog.load')}
                                 </button>
                                 <button
                                     onClick={() => handleDelete(scheme.name)}
-                                    aria-label={`Удалить схему ${scheme.name}`}
-                                >Удалить</button>
+                                    aria-label={t('loadDialog.deleteScheme', { name: scheme.name })}
+                                >{t('loadDialog.delete')}</button>
                             </div>
                         </div>
                     ))
                 )}
             </div>
             <div className="dialog-buttons">
-                <button onClick={onClose}>Закрыть</button>
+                <button onClick={onClose}>{t('loadDialog.close')}</button>
             </div>
         </Dialog>
     );

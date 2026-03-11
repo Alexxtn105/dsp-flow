@@ -1,5 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Footer.css';
 
@@ -35,6 +36,7 @@ function Footer({
     onRewind
 }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
 
     const pct = Math.round((progress || 0) * 100);
 
@@ -121,7 +123,7 @@ function Footer({
                     <button
                         className="ft-tr-btn ft-tr-rewind"
                         onClick={onRewind}
-                        title="В начало"
+                        title={t('footer.rewind')}
                         disabled={!isRunning && !isPaused}
                     >
                         <span className="material-icons">skip_previous</span>
@@ -129,7 +131,7 @@ function Footer({
                     <button
                         className={`ft-tr-btn ft-tr-play ${isRunning ? 'active' : ''} ${isPaused ? 'paused' : ''}`}
                         onClick={onStart}
-                        title={isPaused ? 'Продолжить' : 'Старт'}
+                        title={isPaused ? t('footer.resume') : t('footer.start')}
                         disabled={isRunning}
                     >
                         <span className="material-icons">play_arrow</span>
@@ -137,7 +139,7 @@ function Footer({
                     <button
                         className="ft-tr-btn ft-tr-stop"
                         onClick={onStop}
-                        title="Стоп"
+                        title={t('footer.stop')}
                         disabled={!isRunning}
                     >
                         <span className="material-icons">stop</span>
@@ -182,7 +184,7 @@ function Footer({
 
                 {/* Right: manual controls */}
                 <div className="ft-section ft-section-right">
-                    <label className="ft-manual-toggle" title="Ручной режим управления">
+                    <label className="ft-manual-toggle" title={t('footer.manualMode')}>
                         <input
                             type="checkbox"
                             checked={isManualMode}
@@ -190,26 +192,26 @@ function Footer({
                             className="ft-manual-cb"
                         />
                         <span className="ft-manual-switch" />
-                        <span className="ft-manual-label">Manual</span>
+                        <span className="ft-manual-label">{t('footer.manualLabel')}</span>
                     </label>
 
                     {isManualMode && (
                         <div className="ft-step-group">
-                            <span className="ft-step-label">Step</span>
+                            <span className="ft-step-label">{t('footer.stepLabel')}</span>
                             <input
                                 type="number"
                                 value={manualStepSize}
                                 onChange={(e) => onStepSizeChange(Math.max(1, parseInt(e.target.value) || 1))}
                                 className="ft-step-input"
-                                title="Количество отсчётов за шаг"
+                                title={t('footer.stepSizeTitle')}
                             />
                             <button
                                 className="ft-step-btn"
                                 onClick={onStep}
-                                title="Выполнить шаг"
+                                title={t('footer.executeStep')}
                             >
                                 <span className="material-icons" style={{ fontSize: 14 }}>play_arrow</span>
-                                Шаг
+                                {t('footer.stepButton')}
                             </button>
                         </div>
                     )}

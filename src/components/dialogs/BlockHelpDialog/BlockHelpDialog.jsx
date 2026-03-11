@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import Icon from '../../common/Icons/Icon.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
@@ -11,6 +12,7 @@ import './BlockHelpDialog.css';
  */
 function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const help = pluginHelp[blockId];
 
     const signalLabel = (type, prefix) => {
@@ -42,16 +44,16 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                         </h3>
                         {help && (
                             <div className="block-help-signals">
-                                {signalLabel(help.input, 'Вход')}
-                                {signalLabel(help.output, 'Выход')}
+                                {signalLabel(help.input, t('helpDialog.input'))}
+                                {signalLabel(help.output, t('helpDialog.output'))}
                             </div>
                         )}
                     </div>
                     <button
                         className="block-help-close-x"
                         onClick={onClose}
-                        title="Закрыть"
-                        aria-label="Закрыть справку"
+                        title={t('helpDialog.close')}
+                        aria-label={t('helpDialog.closeHelp')}
                     >
                         <Icon name="close" size="small" aria-hidden="true" />
                     </button>
@@ -61,7 +63,7 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                 <div className="block-help-body">
                     {!help && (
                         <div className="block-help-empty">
-                            Справка для этого блока пока недоступна.
+                            {t('helpDialog.noHelp')}
                         </div>
                     )}
 
@@ -70,7 +72,7 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             {/* Purpose */}
                             {help.purpose && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">Назначение</h4>
+                                    <h4 className="block-help-section-title">{t('helpDialog.purpose')}</h4>
                                     <p className="block-help-section-text">{help.purpose}</p>
                                 </div>
                             )}
@@ -78,7 +80,7 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             {/* Algorithm */}
                             {help.algorithm && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">Алгоритм</h4>
+                                    <h4 className="block-help-section-title">{t('helpDialog.algorithm')}</h4>
                                     <p className="block-help-section-text">{help.algorithm}</p>
                                 </div>
                             )}
@@ -86,13 +88,13 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             {/* Parameters */}
                             {help.params && help.params.length > 0 && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">Параметры</h4>
+                                    <h4 className="block-help-section-title">{t('helpDialog.parameters')}</h4>
                                     <table className="block-help-params">
                                         <thead>
                                             <tr>
-                                                <th>Параметр</th>
-                                                <th>По умолч.</th>
-                                                <th>Описание</th>
+                                                <th>{t('helpDialog.paramName')}</th>
+                                                <th>{t('helpDialog.paramDefault')}</th>
+                                                <th>{t('helpDialog.paramDescription')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -111,14 +113,14 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             {/* I/O description */}
                             {(help.inputDescription || help.outputDescription) && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">Сигналы</h4>
+                                    <h4 className="block-help-section-title">{t('helpDialog.signals')}</h4>
                                     <p className="block-help-section-text">
                                         {help.inputDescription && <>
-                                            <strong>Вход:</strong> {help.inputDescription}
+                                            <strong>{t('helpDialog.inputLabel')}</strong> {help.inputDescription}
                                         </>}
                                         {help.inputDescription && help.outputDescription && '\n'}
                                         {help.outputDescription && <>
-                                            <strong>Выход:</strong> {help.outputDescription}
+                                            <strong>{t('helpDialog.outputLabel')}</strong> {help.outputDescription}
                                         </>}
                                     </p>
                                 </div>
@@ -127,7 +129,7 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
                             {/* Examples */}
                             {help.examples && help.examples.length > 0 && (
                                 <div className="block-help-section">
-                                    <h4 className="block-help-section-title">Примеры использования</h4>
+                                    <h4 className="block-help-section-title">{t('helpDialog.examples')}</h4>
                                     <div className="block-help-examples">
                                         {help.examples.map((ex, i) => (
                                             <div key={i} className="block-help-example">

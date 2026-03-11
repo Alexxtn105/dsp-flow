@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './ConfirmDialog.css';
@@ -10,6 +11,7 @@ import './ConfirmDialog.css';
  */
 function ConfirmDialog({ message, title, onConfirm, onClose, mode = 'confirm' }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     return (
         <Dialog
             isOpen
@@ -24,7 +26,7 @@ function ConfirmDialog({ message, title, onConfirm, onClose, mode = 'confirm' })
                 {mode === 'confirm' ? (
                     <>
                         <button onClick={onConfirm}>OK</button>
-                        <button onClick={onClose}>Отмена</button>
+                        <button onClick={onClose}>{t('confirmDialog.cancel')}</button>
                     </>
                 ) : (
                     <button onClick={onClose}>OK</button>

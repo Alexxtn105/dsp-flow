@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './SettingsDialog.css';
@@ -9,6 +10,7 @@ import './SettingsDialog.css';
  */
 function SettingsDialog({ onClose, sampleRate, onSampleRateChange }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const [localSampleRate, setLocalSampleRate] = useState(sampleRate);
     const [error, setError] = useState('');
 
@@ -21,7 +23,7 @@ function SettingsDialog({ onClose, sampleRate, onSampleRateChange }) {
         const rate = parseInt(localSampleRate, 10);
 
         if (isNaN(rate) || rate < 1000 || rate > 384000) {
-            setError('Частота дискретизации должна быть от 1000 до 384000 Гц');
+            setError(t('settingsDialog.sampleRateError'));
             return;
         }
 
@@ -38,13 +40,13 @@ function SettingsDialog({ onClose, sampleRate, onSampleRateChange }) {
         <Dialog
             isOpen={true}
             onClose={onClose}
-            title="Настройки схемы"
+            title={t('settingsDialog.title')}
             className={isDarkTheme ? 'dark-theme' : ''}
         >
             <form onSubmit={handleSubmit} className="settings-form">
                 <div className="settings-section">
                     <label className="settings-label">
-                        Частота дискретизации (Гц)
+                        {t('settingsDialog.sampleRateLabel')}
                     </label>
                     <input
                         type="number"
@@ -60,7 +62,7 @@ function SettingsDialog({ onClose, sampleRate, onSampleRateChange }) {
                     />
 
                     <div className="quick-select">
-                        <span className="quick-select-label">Быстрый выбор:</span>
+                        <span className="quick-select-label">{t('settingsDialog.quickSelect')}</span>
                         <div className="quick-select-buttons">
                             {standardRates.map((rate) => (
                                 <button
@@ -79,8 +81,8 @@ function SettingsDialog({ onClose, sampleRate, onSampleRateChange }) {
                 {error && <div className="error-message">⚠️ {error}</div>}
 
                 <div className="dialog-buttons">
-                    <button type="submit">Применить</button>
-                    <button type="button" onClick={onClose}>Отмена</button>
+                    <button type="submit">{t('settingsDialog.apply')}</button>
+                    <button type="button" onClick={onClose}>{t('settingsDialog.cancel')}</button>
                 </div>
             </form>
         </Dialog>

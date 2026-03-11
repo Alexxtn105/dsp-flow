@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import BlockHelpDialog from '../../dialogs/BlockHelpDialog/BlockHelpDialog.jsx';
 import registry from '../../../engine/PluginRegistry';
@@ -7,6 +8,7 @@ import './Toolbar.css';
 
 function Toolbar() {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [collapsedGroups, setCollapsedGroups] = useState(() => {
         const initial = {};
@@ -73,15 +75,15 @@ function Toolbar() {
             <div className="tb-header">
                 {!isCollapsed && (
                     <div className="tb-header-info">
-                        <span className="tb-header-title">Блоки</span>
+                        <span className="tb-header-title">{t('toolbar.blocks')}</span>
                         <span className="tb-header-count">{totalBlocks}</span>
                     </div>
                 )}
                 <button
                     className="tb-collapse-btn"
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    title={isCollapsed ? 'Развернуть' : 'Свернуть'}
-                    aria-label={isCollapsed ? 'Развернуть панель' : 'Свернуть панель'}
+                    title={isCollapsed ? t('toolbar.expand') : t('toolbar.collapse')}
+                    aria-label={isCollapsed ? t('toolbar.expandPanel') : t('toolbar.collapsePanel')}
                 >
                     <Icon
                         name={isCollapsed ? 'chevron_right' : 'chevron_left'}
@@ -96,18 +98,18 @@ function Toolbar() {
                     <Icon name="search" size="small" className="tb-search-icon" aria-hidden="true" />
                     <input
                         type="text"
-                        placeholder="Поиск..."
+                        placeholder={t('toolbar.searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="tb-search-input"
-                        aria-label="Поиск блоков"
+                        aria-label={t('toolbar.searchBlocks')}
                     />
                     {searchQuery && (
                         <button
                             className="tb-search-clear"
                             onClick={() => setSearchQuery('')}
-                            title="Очистить"
-                            aria-label="Очистить поиск"
+                            title={t('toolbar.clearSearch')}
+                            aria-label={t('toolbar.clearSearchLabel')}
                         >
                             <Icon name="close" size="small" aria-hidden="true" />
                         </button>
@@ -122,21 +124,21 @@ function Toolbar() {
                         className={`tb-group-action-btn ${allExpanded ? 'active' : ''}`}
                         onClick={expandAll}
                         disabled={allExpanded}
-                        title="Развернуть все группы"
-                        aria-label="Развернуть все группы"
+                        title={t('toolbar.expandAllGroups')}
+                        aria-label={t('toolbar.expandAllGroups')}
                     >
                         <Icon name="unfold_more" size="small" aria-hidden="true" />
-                        <span>Развернуть</span>
+                        <span>{t('toolbar.expand')}</span>
                     </button>
                     <button
                         className={`tb-group-action-btn ${allCollapsed ? 'active' : ''}`}
                         onClick={collapseAll}
                         disabled={allCollapsed}
-                        title="Свернуть все группы"
-                        aria-label="Свернуть все группы"
+                        title={t('toolbar.collapseAllGroups')}
+                        aria-label={t('toolbar.collapseAllGroups')}
                     >
                         <Icon name="unfold_less" size="small" aria-hidden="true" />
-                        <span>Свернуть</span>
+                        <span>{t('toolbar.collapse')}</span>
                     </button>
                 </div>
             )}
@@ -145,7 +147,7 @@ function Toolbar() {
             {!isCollapsed && (
                 <div className="tb-content">
                     {filteredGroups.length === 0 && (
-                        <div className="tb-empty">Ничего не найдено</div>
+                        <div className="tb-empty">{t('toolbar.nothingFound')}</div>
                     )}
                     {filteredGroups.map((group) => (
                         <div key={group.id} className="tb-group">
@@ -177,7 +179,7 @@ function Toolbar() {
                                     className="tb-group-blocks"
                                     id={`group-${group.id}`}
                                     role="region"
-                                    aria-label={`Блоки: ${group.name}`}
+                                    aria-label={t('toolbar.blocksGroup', { name: group.name })}
                                 >
                                     {group.blocks.map((block) => (
                                         <div
@@ -189,7 +191,7 @@ function Toolbar() {
                                             title={block.description}
                                             role="button"
                                             tabIndex={0}
-                                            aria-label={`Добавить блок ${block.name}. ${block.description}`}
+                                            aria-label={t('toolbar.addBlockNamed', { name: block.name, description: block.description })}
                                         >
                                             <div className="tb-block-icon">
                                                 <Icon name={block.icon} size="medium" aria-hidden="true" />
@@ -207,8 +209,8 @@ function Toolbar() {
                                                     setHelpBlock(block);
                                                 }}
                                                 draggable={false}
-                                                title="Справка"
-                                                aria-label={`Справка по блоку ${block.name}`}
+                                                title={t('toolbar.help')}
+                                                aria-label={t('toolbar.helpForBlock', { name: block.name })}
                                             >
                                                 <Icon name="help_outline" size="small" aria-hidden="true" />
                                             </button>
@@ -234,7 +236,7 @@ function Toolbar() {
                             title={`${block.name}: ${block.description}`}
                             role="button"
                             tabIndex={0}
-                            aria-label={`Добавить блок ${block.name}`}
+                            aria-label={t('toolbar.addBlock') + ' ' + block.name}
                         >
                             <Icon name={block.icon} size="medium" aria-hidden="true" />
                         </div>

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './ControlToolbar.css';
@@ -14,6 +15,7 @@ function ControlToolbar({
     isRunning
 }) {
     const { isDarkTheme, toggleTheme } = useThemeContext();
+    const { t } = useTranslation();
 
     return (
         <div className={`ct ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -23,14 +25,14 @@ function ControlToolbar({
                     <button
                         className="ct-btn ct-btn-new"
                         onClick={onNewScheme}
-                        title="Новая схема"
+                        title={t('controlToolbar.newScheme')}
                     >
                         <Icon name="add" size="large" className="ct-icon" />
                     </button>
                     <button
                         className="ct-btn ct-btn-save"
                         onClick={onSave}
-                        title={isRunning ? 'Остановите для сохранения' : 'Сохранить'}
+                        title={isRunning ? t('controlToolbar.stopToSave') : t('controlToolbar.save')}
                         disabled={!isSaveEnabled || isRunning}
                     >
                         <Icon name="save" size="large" className="ct-icon" />
@@ -38,7 +40,7 @@ function ControlToolbar({
                     <button
                         className="ct-btn ct-btn-saveas"
                         onClick={onSaveAs}
-                        title={isRunning ? 'Остановите для сохранения' : 'Сохранить как'}
+                        title={isRunning ? t('controlToolbar.stopToSave') : t('controlToolbar.saveAs')}
                         disabled={!isSaveAsEnabled || isRunning}
                     >
                         <Icon name="save_as" size="large" className="ct-icon" />
@@ -46,7 +48,7 @@ function ControlToolbar({
                     <button
                         className="ct-btn ct-btn-load"
                         onClick={onLoad}
-                        title="Загрузить схему"
+                        title={t('controlToolbar.loadScheme')}
                     >
                         <Icon name="folder_open" size="large" className="ct-icon" />
                     </button>
@@ -59,14 +61,14 @@ function ControlToolbar({
                     <button
                         className="ct-btn ct-btn-settings"
                         onClick={onSettings}
-                        title="Настройки схемы"
+                        title={t('controlToolbar.settings')}
                     >
                         <Icon name="tune" size="large" className="ct-icon" />
                     </button>
                     <button
                         className="ct-btn ct-btn-theme"
                         onClick={toggleTheme}
-                        title={isDarkTheme ? 'Светлая тема' : 'Тёмная тема'}
+                        title={isDarkTheme ? t('controlToolbar.lightTheme') : t('controlToolbar.darkTheme')}
                     >
                         <Icon
                             name={isDarkTheme ? 'light_mode' : 'dark_mode'}

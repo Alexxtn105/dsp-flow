@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import { useDSPEditor } from '../../../contexts/DSPEditorContext';
 import { useThemeContext } from '../../../contexts/ThemeContext';
@@ -7,6 +8,7 @@ import ValidationService from '../../../services/validationService';
 
 function SaveDialog({ onClose, schemeName, onSaveSuccess, mode }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const { saveScheme, reactFlowInstance } = useDSPEditor();
     const [formData, setFormData] = useState({
         name: mode === 'saveAs' ? '' : schemeName,
@@ -24,7 +26,7 @@ function SaveDialog({ onClose, schemeName, onSaveSuccess, mode }) {
         }
 
         if (!reactFlowInstance) {
-            setError('Редактор не готов');
+            setError(t('saveDialog.editorNotReady'));
             return;
         }
 
@@ -50,12 +52,12 @@ function SaveDialog({ onClose, schemeName, onSaveSuccess, mode }) {
                 console.log('Схема успешно сохранена:', formData.name);
                 onSaveSuccess(formData.name);
             } else {
-                setError(result.errors?.join(', ') || result.message || 'Ошибка сохранения');
+                setError(result.errors?.join(', ') || result.message || t('saveDialog.saveError'));
                 console.error('Ошибка сохранения:', result);
             }
         } catch (err) {
             console.error('Ошибка при сохранении:', err);
-            setError('Неожиданная ошибка при сохранении');
+            setError(t('saveDialog.unexpectedError'));
         }
     };
 
@@ -63,28 +65,28 @@ function SaveDialog({ onClose, schemeName, onSaveSuccess, mode }) {
         <Dialog
             isOpen={true}
             onClose={onClose}
-            title={mode === 'saveAs' ? 'Сохранить схему как' : 'Сохранить схему'}
+            title={mode === 'saveAs' ? t('saveDialog.saveSchemeAs') : t('saveDialog.saveScheme')}
             className={isDarkTheme ? 'dark-theme' : ''}
         >
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Название схемы"
+                    placeholder={t('saveDialog.schemeName')}
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     disabled={mode === 'save'}
                     autoFocus={mode === 'saveAs'}
                 />
                 <textarea
-                    placeholder="Описание (необязательно)"
+                    placeholder={t('saveDialog.descriptionOptional')}
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
                 />
                 {error && <div className="error-message" role="alert">⚠️ {error}</div>}
                 <div className="dialog-buttons">
-                    <button type="submit">{mode === 'saveAs' ? 'Сохранить' : 'Обновить'}</button>
-                    <button type="button" onClick={onClose}>Отмена</button>
+                    <button type="submit">{mode === 'saveAs' ? t('saveDialog.saveButton') : t('saveDialog.updateButton')}</button>
+                    <button type="button" onClick={onClose}>{t('saveDialog.cancel')}</button>
                 </div>
             </form>
         </Dialog>

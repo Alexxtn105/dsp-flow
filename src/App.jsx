@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useThemeContext } from './contexts/ThemeContext';
 import { DSPEditorProvider } from './contexts/DSPEditorContext';
 import Header from './components/layout/Header';
@@ -18,6 +19,7 @@ import './App.css';
 
 function App() {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const visualizationManagerRef = useRef(null);
 
@@ -76,14 +78,14 @@ function App() {
     const handleNewScheme = useCallback(() => {
         if (!currentScheme.isSaved) {
             dialogs.showConfirm(
-                'Текущая схема не сохранена. Создать новую схему?',
-                'Новая схема',
+                t('app.unsavedConfirm'),
+                t('app.newScheme'),
                 doCreateNewScheme
             );
             return;
         }
         doCreateNewScheme();
-    }, [currentScheme.isSaved, doCreateNewScheme, dialogs]);
+    }, [currentScheme.isSaved, doCreateNewScheme, dialogs, t]);
 
     const handleSave = useCallback(() => {
         if (currentScheme.name === 'not_saved') {
@@ -151,7 +153,7 @@ function App() {
                         isRunning={simulation.isRunning}
                     />
 
-                    <ErrorBoundary fallbackMessage="Ошибка редактора графа">
+                    <ErrorBoundary fallbackMessage={t('app.editorError')}>
                         <DSPEditor
                             currentScheme={currentScheme}
                             onSchemeUpdate={handleSchemeUpdate}
@@ -191,7 +193,7 @@ function App() {
                     onUpdateNodeParams={handleUpdateNodeParams}
                 />
 
-                <ErrorBoundary fallbackMessage="Ошибка диалогового окна">
+                <ErrorBoundary fallbackMessage={t('app.dialogError')}>
                     {dialogs.showSaveDialog && (
                         <SaveDialog
                             onClose={() => dialogs.setShowSaveDialog(false)}

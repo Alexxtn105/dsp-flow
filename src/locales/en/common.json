@@ -1,0 +1,115 @@
+{
+  "header": {
+    "unnamed": "Untitled",
+    "modified": "modified",
+    "signalLegend": "Signal type legend",
+    "signals": "Signals"
+  },
+  "footer": {
+    "rewind": "Rewind",
+    "resume": "Resume",
+    "start": "Start",
+    "stop": "Stop",
+    "manualMode": "Manual mode control",
+    "manualLabel": "Manual",
+    "stepLabel": "Step",
+    "stepSizeTitle": "Samples per step",
+    "executeStep": "Execute step",
+    "stepButton": "Step"
+  },
+  "toolbar": {
+    "blocks": "Blocks",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "expandPanel": "Expand panel",
+    "collapsePanel": "Collapse panel",
+    "searchPlaceholder": "Search...",
+    "searchBlocks": "Search blocks",
+    "clearSearch": "Clear",
+    "clearSearchLabel": "Clear search",
+    "expandAllGroups": "Expand all groups",
+    "collapseAllGroups": "Collapse all groups",
+    "nothingFound": "Nothing found",
+    "addBlock": "Add block",
+    "addBlockNamed": "Add block {{name}}. {{description}}",
+    "help": "Help",
+    "helpForBlock": "Help for block {{name}}",
+    "blocksGroup": "Blocks: {{name}}"
+  },
+  "controlToolbar": {
+    "newScheme": "New scheme",
+    "stopToSave": "Stop to save",
+    "save": "Save",
+    "saveAs": "Save as",
+    "loadScheme": "Load scheme",
+    "settings": "Scheme settings",
+    "lightTheme": "Light theme",
+    "darkTheme": "Dark theme"
+  },
+  "saveDialog": {
+    "editorNotReady": "Editor not ready",
+    "saveError": "Save error",
+    "unexpectedError": "Unexpected error while saving",
+    "saveSchemeAs": "Save scheme as",
+    "saveScheme": "Save scheme",
+    "schemeName": "Scheme name",
+    "descriptionOptional": "Description (optional)",
+    "saveButton": "Save",
+    "updateButton": "Update",
+    "cancel": "Cancel"
+  },
+  "loadDialog": {
+    "loadScheme": "Load scheme",
+    "noSavedSchemes": "No saved schemes",
+    "loading": "Loading...",
+    "load": "Load",
+    "deleteScheme": "Delete scheme {{name}}",
+    "delete": "Delete",
+    "close": "Close",
+    "validationErrors": "Scheme \"{{name}}\" contains errors:\n{{errors}}",
+    "loadFailed": "Failed to load scheme",
+    "loadError": "Load error"
+  },
+  "settingsDialog": {
+    "title": "Scheme settings",
+    "sampleRateLabel": "Sample rate (Hz)",
+    "sampleRateError": "Sample rate must be between 1000 and 384000 Hz",
+    "quickSelect": "Quick select:",
+    "apply": "Apply",
+    "cancel": "Cancel"
+  },
+  "confirmDialog": {
+    "cancel": "Cancel"
+  },
+  "helpDialog": {
+    "input": "Input",
+    "output": "Output",
+    "close": "Close",
+    "closeHelp": "Close help",
+    "noHelp": "Help for this block is not yet available.",
+    "purpose": "Purpose",
+    "algorithm": "Algorithm",
+    "parameters": "Parameters",
+    "paramName": "Parameter",
+    "paramDefault": "Default",
+    "paramDescription": "Description",
+    "signals": "Signals",
+    "inputLabel": "Input:",
+    "outputLabel": "Output:",
+    "examples": "Usage examples"
+  },
+  "app": {
+    "unsavedConfirm": "Current scheme is not saved. Create a new one?",
+    "newScheme": "New scheme",
+    "editorError": "Graph editor error",
+    "dialogError": "Dialog error"
+  },
+  "errorBoundary": {
+    "defaultMessage": "Display error",
+    "retry": "Retry"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English"
+  }
+}

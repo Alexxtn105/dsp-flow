@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import i18n from '../../../locales/i18n.js';
 import './ErrorBoundary.css';
 
 class ErrorBoundary extends Component {
@@ -24,12 +25,12 @@ class ErrorBoundary extends Component {
         if (this.state.hasError) {
             return (
                 <div className="error-boundary-fallback">
-                    <p>{this.props.fallbackMessage || 'Ошибка отображения'}</p>
+                    <p>{this.props.fallbackMessage || i18n.t('errorBoundary.defaultMessage')}</p>
                     <button
                         onClick={this.handleReset}
                         className="error-boundary-reset-btn"
                     >
-                        Повторить
+                        {i18n.t('errorBoundary.retry')}
                     </button>
                 </div>
             );

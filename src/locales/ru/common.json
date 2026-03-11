@@ -1,0 +1,115 @@
+{
+  "header": {
+    "unnamed": "Без имени",
+    "modified": "изменено",
+    "signalLegend": "Легенда типов сигналов",
+    "signals": "Сигналы"
+  },
+  "footer": {
+    "rewind": "В начало",
+    "resume": "Продолжить",
+    "start": "Старт",
+    "stop": "Стоп",
+    "manualMode": "Ручной режим управления",
+    "manualLabel": "Manual",
+    "stepLabel": "Step",
+    "stepSizeTitle": "Количество отсчётов за шаг",
+    "executeStep": "Выполнить шаг",
+    "stepButton": "Шаг"
+  },
+  "toolbar": {
+    "blocks": "Блоки",
+    "expand": "Развернуть",
+    "collapse": "Свернуть",
+    "expandPanel": "Развернуть панель",
+    "collapsePanel": "Свернуть панель",
+    "searchPlaceholder": "Поиск...",
+    "searchBlocks": "Поиск блоков",
+    "clearSearch": "Очистить",
+    "clearSearchLabel": "Очистить поиск",
+    "expandAllGroups": "Развернуть все группы",
+    "collapseAllGroups": "Свернуть все группы",
+    "nothingFound": "Ничего не найдено",
+    "addBlock": "Добавить блок",
+    "addBlockNamed": "Добавить блок {{name}}. {{description}}",
+    "help": "Справка",
+    "helpForBlock": "Справка по блоку {{name}}",
+    "blocksGroup": "Блоки: {{name}}"
+  },
+  "controlToolbar": {
+    "newScheme": "Новая схема",
+    "stopToSave": "Остановите для сохранения",
+    "save": "Сохранить",
+    "saveAs": "Сохранить как",
+    "loadScheme": "Загрузить схему",
+    "settings": "Настройки схемы",
+    "lightTheme": "Светлая тема",
+    "darkTheme": "Тёмная тема"
+  },
+  "saveDialog": {
+    "editorNotReady": "Редактор не готов",
+    "saveError": "Ошибка сохранения",
+    "unexpectedError": "Неожиданная ошибка при сохранении",
+    "saveSchemeAs": "Сохранить схему как",
+    "saveScheme": "Сохранить схему",
+    "schemeName": "Название схемы",
+    "descriptionOptional": "Описание (необязательно)",
+    "saveButton": "Сохранить",
+    "updateButton": "Обновить",
+    "cancel": "Отмена"
+  },
+  "loadDialog": {
+    "loadScheme": "Загрузить схему",
+    "noSavedSchemes": "Нет сохраненных схем",
+    "loading": "Загрузка...",
+    "load": "Загрузить",
+    "deleteScheme": "Удалить схему {{name}}",
+    "delete": "Удалить",
+    "close": "Закрыть",
+    "validationErrors": "Схема \"{{name}}\" содержит ошибки:\n{{errors}}",
+    "loadFailed": "Не удалось загрузить схему",
+    "loadError": "Ошибка загрузки"
+  },
+  "settingsDialog": {
+    "title": "Настройки схемы",
+    "sampleRateLabel": "Частота дискретизации (Гц)",
+    "sampleRateError": "Частота дискретизации должна быть от 1000 до 384000 Гц",
+    "quickSelect": "Быстрый выбор:",
+    "apply": "Применить",
+    "cancel": "Отмена"
+  },
+  "confirmDialog": {
+    "cancel": "Отмена"
+  },
+  "helpDialog": {
+    "input": "Вход",
+    "output": "Выход",
+    "close": "Закрыть",
+    "closeHelp": "Закрыть справку",
+    "noHelp": "Справка для этого блока пока недоступна.",
+    "purpose": "Назначение",
+    "algorithm": "Алгоритм",
+    "parameters": "Параметры",
+    "paramName": "Параметр",
+    "paramDefault": "По умолч.",
+    "paramDescription": "Описание",
+    "signals": "Сигналы",
+    "inputLabel": "Вход:",
+    "outputLabel": "Выход:",
+    "examples": "Примеры использования"
+  },
+  "app": {
+    "unsavedConfirm": "Текущая схема не сохранена. Создать новую схему?",
+    "newScheme": "Новая схема",
+    "editorError": "Ошибка редактора графа",
+    "dialogError": "Ошибка диалогового окна"
+  },
+  "errorBoundary": {
+    "defaultMessage": "Ошибка отображения",
+    "retry": "Повторить"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English"
+  }
+}

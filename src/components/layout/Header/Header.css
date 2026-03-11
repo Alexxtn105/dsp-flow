@@ -90,12 +90,42 @@
     white-space: nowrap;
 }
 
-/* ---- Right: legend ---- */
+/* ---- Right: legend + lang ---- */
 .hdr-right {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     position: relative;
+    gap: 6px;
+}
+
+/* Language switcher */
+.hdr-lang-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 26px;
+    padding: 0 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    background: var(--panel-subtle-bg);
+    color: var(--panel-text-4);
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    cursor: pointer;
+    transition: all 120ms ease;
+    letter-spacing: 0.5px;
+}
+
+.hdr-lang-btn:hover {
+    background: var(--panel-hover-bg);
+    color: var(--panel-text-3);
+    border-color: var(--panel-border-hover);
+}
+
+.hdr-lang-code {
+    line-height: 1;
 }
 
 .hdr-legend-btn {
