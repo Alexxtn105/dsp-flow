@@ -182,6 +182,16 @@ function Footer({
                     </span>
                     <span className="ft-divider" />
                     <span className="ft-version">v1.0.0 · AlexxTN105</span>
+                    <a
+                        className="ft-sponsor"
+                        href="https://github.com/sponsors/Alexxtn105"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t('footer.sponsor', 'Support the project')}
+                    >
+                        <span className="material-icons ft-sponsor-icon">favorite</span>
+                        <span className="ft-sponsor-text">Sponsor</span>
+                    </a>
                 </div>
 
                 {/* Right: manual controls */}

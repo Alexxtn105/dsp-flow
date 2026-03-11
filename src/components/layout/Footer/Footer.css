@@ -346,6 +346,39 @@
     letter-spacing: 0.3px;
 }
 
+.ft-sponsor {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(219, 39, 119, 0.2);
+    background: rgba(219, 39, 119, 0.06);
+    color: var(--panel-text-5);
+    font-size: 9px;
+    font-weight: 600;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 120ms ease;
+    letter-spacing: 0.3px;
+}
+
+.ft-sponsor:hover {
+    background: rgba(219, 39, 119, 0.12);
+    border-color: rgba(219, 39, 119, 0.35);
+    color: #db2777;
+}
+
+.ft-sponsor-icon {
+    font-size: 11px !important;
+    color: #db2777;
+}
+
+.ft-sponsor-text {
+    line-height: 1;
+}
+
 /* ---- Manual controls ---- */
 .ft-manual-toggle {
     display: flex;
