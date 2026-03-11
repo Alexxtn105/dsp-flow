@@ -43,6 +43,11 @@ function ConstellationView({ data, width = 380, height = 260 }) {
     const [hoverI, setHoverI] = useState(null);
     const [hoverQ, setHoverQ] = useState(null);
 
+    // Измерение вектора (выделение ЛКМ)
+    const [measuring, setMeasuring] = useState(false);
+    const [measureStart, setMeasureStart] = useState(null); // { i, q }
+    const [measureEnd, setMeasureEnd] = useState(null);     // { i, q }
+
     // Accumulate trail frames
     useEffect(() => {
         if (!data || data.length < 2) return;
@@ -257,6 +262,90 @@ function ConstellationView({ data, width = 380, height = 260 }) {
         ctx.textBaseline = 'top';
         ctx.fillText('0', px - 4, ph + 3);
 
+        // --- Vector measurement overlay ---
+        if (measureStart !== null && measureEnd !== null) {
+            const x0 = cx + measureStart.i * unitPx;
+            const y0 = cy - measureStart.q * unitPx;
+            const x1 = cx + measureEnd.i * unitPx;
+            const y1 = cy - measureEnd.q * unitPx;
+
+            const di = measureEnd.i - measureStart.i;
+            const dq = measureEnd.q - measureStart.q;
+            const dist = Math.sqrt(di * di + dq * dq);
+
+            if (dist > 0.001) {
+                // Vector line
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(px, 0, pw, ph);
+                ctx.clip();
+
+                ctx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.stroke();
+
+                // Arrowhead at end
+                const angle = Math.atan2(y1 - y0, x1 - x0);
+                const arrLen = 8;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x1 - arrLen * Math.cos(angle - 0.35), y1 - arrLen * Math.sin(angle - 0.35));
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x1 - arrLen * Math.cos(angle + 0.35), y1 - arrLen * Math.sin(angle + 0.35));
+                ctx.stroke();
+
+                // Start/end markers
+                ctx.fillStyle = 'rgba(0, 191, 255, 0.9)';
+                ctx.beginPath();
+                ctx.arc(x0, y0, 3, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x1, y1, 3, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.restore();
+
+                // Measurement label
+                const phaseStart = Math.atan2(measureStart.q, measureStart.i) * (180 / Math.PI);
+                const phaseEnd = Math.atan2(measureEnd.q, measureEnd.i) * (180 / Math.PI);
+                let dPhase = phaseEnd - phaseStart;
+                if (dPhase > 180) dPhase -= 360;
+                if (dPhase < -180) dPhase += 360;
+
+                const line1 = `d=${dist.toFixed(3)}  \u0394\u03C6=${dPhase >= 0 ? '+' : ''}${dPhase.toFixed(1)}\u00B0`;
+                const line2 = `\u0394I=${di >= 0 ? '+' : ''}${di.toFixed(3)}  \u0394Q=${dq >= 0 ? '+' : ''}${dq.toFixed(3)}`;
+
+                ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
+                const w1 = ctx.measureText(line1).width;
+                const w2 = ctx.measureText(line2).width;
+                const textW = Math.max(w1, w2) + 14;
+                const boxH = 34;
+
+                let bx = (x0 + x1) / 2 - textW / 2;
+                let by = Math.min(y0, y1) - boxH - 10;
+                if (bx < px) bx = px + 2;
+                if (bx + textW > px + pw) bx = px + pw - textW - 2;
+                if (by < 2) by = Math.max(y0, y1) + 10;
+
+                ctx.fillStyle = 'rgba(0, 30, 60, 0.92)';
+                ctx.strokeStyle = 'rgba(0, 191, 255, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(bx, by, textW, boxH, 3); else ctx.rect(bx, by, textW, boxH);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#7ad4ff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(line1, bx + 7, by + 11);
+                ctx.fillText(line2, bx + 7, by + 25);
+            }
+        }
+
         // --- Crosshair & cursor ---
         if (cursorX !== null && cursorY !== null &&
             cursorX >= px && cursorX <= px + pw &&
@@ -279,7 +368,9 @@ function ConstellationView({ data, width = 380, height = 260 }) {
             ctx.setLineDash([]);
 
             if (hoverI !== null && hoverQ !== null) {
-                const label = `I: ${hoverI.toFixed(3)}  Q: ${hoverQ.toFixed(3)}`;
+                const mag = Math.sqrt(hoverI * hoverI + hoverQ * hoverQ);
+                const phase = Math.atan2(hoverQ, hoverI) * (180 / Math.PI);
+                const label = `I: ${hoverI.toFixed(3)}  Q: ${hoverQ.toFixed(3)}  |${mag.toFixed(3)}| ${phase.toFixed(1)}\u00B0`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 12;
                 const boxH = 20;
@@ -308,7 +399,8 @@ function ConstellationView({ data, width = 380, height = 260 }) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, isDarkTheme, width, height, scale, showTrail,
-        cursorX, cursorY, hoverI, hoverQ, plotLeft, plotW, plotH, plotCx, plotCy, side, halfRange]);
+        cursorX, cursorY, hoverI, hoverQ, plotLeft, plotW, plotH, plotCx, plotCy, side, halfRange,
+        measureStart, measureEnd]);
 
     useEffect(() => {
         draw();
@@ -323,14 +415,54 @@ function ConstellationView({ data, width = 380, height = 260 }) {
         setCursorY(y);
 
         const unitPx = (side / 2) / halfRange;
-        setHoverI((x - plotCx) / unitPx);
-        setHoverQ((plotCy - y) / unitPx);
-    }, [side, halfRange, plotCx, plotCy]);
+        const i = (x - plotCx) / unitPx;
+        const q = (plotCy - y) / unitPx;
+        setHoverI(i);
+        setHoverQ(q);
+
+        if (measuring) {
+            setMeasureEnd({ i, q });
+        }
+    }, [side, halfRange, plotCx, plotCy, measuring]);
+
+    const handleMouseDown = useCallback((e) => {
+        if (e.button !== 0) return;
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (x >= plotLeft && x <= plotLeft + plotW && y >= 0 && y <= plotH) {
+            const unitPx = (side / 2) / halfRange;
+            const i = (x - plotCx) / unitPx;
+            const q = (plotCy - y) / unitPx;
+            setMeasuring(true);
+            setMeasureStart({ i, q });
+            setMeasureEnd({ i, q });
+        }
+    }, [plotLeft, plotW, plotH, side, halfRange, plotCx, plotCy]);
+
+    const handleMouseUp = useCallback(() => {
+        if (measuring) {
+            setMeasuring(false);
+            if (measureStart !== null && measureEnd !== null) {
+                const di = measureEnd.i - measureStart.i;
+                const dq = measureEnd.q - measureStart.q;
+                if (Math.sqrt(di * di + dq * dq) < 0.001) {
+                    setMeasureStart(null);
+                    setMeasureEnd(null);
+                }
+            }
+        }
+    }, [measuring, measureStart, measureEnd]);
 
     const handleMouseLeave = useCallback(() => {
         setCursorX(null);
         setCursorY(null);
-    }, []);
+        if (measuring) {
+            setMeasuring(false);
+        }
+    }, [measuring]);
 
     const handleScaleSlider = useCallback((e) => {
         setScale(parseFloat(e.target.value));
@@ -388,6 +520,8 @@ function ConstellationView({ data, width = 380, height = 260 }) {
                 style={{ width, height }}
                 className="cv-canvas"
                 onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
                 aria-label="Фазовое созвездие"
