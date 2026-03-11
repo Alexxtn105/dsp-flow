@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Dialog from '../../common/Dialog/Dialog.jsx';
 import Icon from '../../common/Icons/Icon.jsx';
@@ -12,6 +13,20 @@ import './BlockHelpDialog.css';
 function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
     const { isDarkTheme } = useThemeContext();
     const help = pluginHelp[blockId];
+    const contentRef = useRef(null);
+
+    // Прокрутка к началу после открытия
+    // Dialog автофокусирует первый focusable (кнопку «Закрыть» внизу),
+    // что прокручивает контент вниз. setTimeout гарантирует выполнение после автофокуса.
+    useEffect(() => {
+        const timerId = setTimeout(() => {
+            if (contentRef.current) {
+                const dialog = contentRef.current.closest('.dialog');
+                if (dialog) dialog.scrollTop = 0;
+            }
+        }, 50);
+        return () => clearTimeout(timerId);
+    }, []);
 
     const signalLabel = (type, prefix) => {
         if (!type) return (
@@ -30,7 +45,7 @@ function BlockHelpDialog({ blockId, blockName, blockIcon, onClose }) {
             onClose={onClose}
             className={`block-help-dialog ${isDarkTheme ? 'dark-theme' : ''}`}
         >
-            <div className="block-help">
+            <div className="block-help" ref={contentRef}>
                 {/* Header */}
                 <div className="block-help-header">
                     <div className="block-help-icon">

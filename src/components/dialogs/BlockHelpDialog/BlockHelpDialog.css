@@ -1,8 +1,12 @@
 /* ===== Block Help Dialog ===== */
 
 .block-help-dialog .dialog {
-    width: 600px;
+    width: 720px;
+    min-width: 400px;
+    max-width: 90vw;
     max-height: 85vh;
+    resize: both;
+    overflow: auto;
 }
 
 .block-help {
