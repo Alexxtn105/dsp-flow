@@ -107,6 +107,11 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
     const [cursorY, setCursorY] = useState(null);
     const [hoverFreq, setHoverFreq] = useState(null);
 
+    // Измерение частотной полосы (выделение ЛКМ)
+    const [measuring, setMeasuring] = useState(false);
+    const [measureStartFreq, setMeasureStartFreq] = useState(null);
+    const [measureEndFreq, setMeasureEndFreq] = useState(null);
+
     const nyquist = sampleRate / 2;
     const plotLeft = AXIS_LEFT;
     const plotW = width - plotLeft - LEGEND_W - LEGEND_PAD * 2;
@@ -281,6 +286,63 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
             ctx.fillText(`${minDb}`, legLabelX, legTop + legH);
         }
 
+        // --- Frequency band measurement overlay ---
+        if (measureStartFreq !== null && measureEndFreq !== null) {
+            const f0 = Math.min(measureStartFreq, measureEndFreq);
+            const f1 = Math.max(measureStartFreq, measureEndFreq);
+            const x0 = plotLeft + ((f0 - startFreq) / actualRange) * plotW;
+            const x1 = plotLeft + ((f1 - startFreq) / actualRange) * plotW;
+
+            ctx.fillStyle = 'rgba(0, 191, 255, 0.15)';
+            ctx.fillRect(x0, 0, x1 - x0, plotH);
+
+            ctx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x0, 0); ctx.lineTo(x0, plotH);
+            ctx.moveTo(x1, 0); ctx.lineTo(x1, plotH);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const deltaFreq = f1 - f0;
+            if (deltaFreq > 0) {
+                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} Гц | ${Math.round(deltaFreq)} Гц`;
+                ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
+                const textW = ctx.measureText(label).width + 14;
+                const boxH = 20;
+
+                let bx = (x0 + x1) / 2 - textW / 2;
+                if (bx < plotLeft) bx = plotLeft + 2;
+                if (bx + textW > plotLeft + plotW) bx = plotLeft + plotW - textW - 2;
+                const by = 6;
+
+                ctx.fillStyle = 'rgba(0, 30, 60, 0.92)';
+                ctx.strokeStyle = 'rgba(0, 191, 255, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(bx, by, textW, boxH, 3); else ctx.rect(bx, by, textW, boxH);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#7ad4ff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, bx + 7, by + boxH / 2);
+
+                const arrowY = by + boxH + 6;
+                if (x1 - x0 > 20) {
+                    ctx.strokeStyle = 'rgba(0, 191, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x0, arrowY); ctx.lineTo(x1, arrowY);
+                    ctx.moveTo(x0 + 5, arrowY - 3); ctx.lineTo(x0, arrowY); ctx.lineTo(x0 + 5, arrowY + 3);
+                    ctx.moveTo(x1 - 5, arrowY - 3); ctx.lineTo(x1, arrowY); ctx.lineTo(x1 - 5, arrowY + 3);
+                    ctx.stroke();
+                }
+            }
+        }
+
         // --- Cursor ---
         if (cursorX !== null && cursorY !== null &&
             cursorX >= plotLeft && cursorX <= plotLeft + plotW &&
@@ -332,7 +394,8 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [width, height, sampleRate, startFreq, visibleRange, minDb, plotLeft, plotW, plotH, legendX,
-        colorMap, isNormalized, getColor, cursorX, cursorY, hoverFreq, isDarkTheme, actualRange, endFreq]);
+        colorMap, isNormalized, getColor, cursorX, cursorY, hoverFreq, isDarkTheme, actualRange, endFreq,
+        measureStartFreq, measureEndFreq]);
 
     drawSceneRef.current = drawScene;
 
@@ -404,13 +467,47 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
         setCursorX(x);
         setCursorY(y);
         const fx = (x - plotLeft) / plotW;
-        setHoverFreq(Math.max(0, startFreq + fx * actualRange));
+        const freq = Math.max(0, Math.min(startFreq + actualRange, startFreq + fx * actualRange));
+        setHoverFreq(freq);
+
+        if (measuring) {
+            setMeasureEndFreq(freq);
+        }
+    }, [plotLeft, plotW, startFreq, actualRange, measuring]);
+
+    const handleMouseDown = useCallback((e) => {
+        if (e.button !== 0) return;
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const fx = (x - plotLeft) / plotW;
+        const freq = Math.max(0, Math.min(startFreq + actualRange, startFreq + fx * actualRange));
+
+        if (x >= plotLeft && x <= plotLeft + plotW) {
+            setMeasuring(true);
+            setMeasureStartFreq(freq);
+            setMeasureEndFreq(freq);
+        }
     }, [plotLeft, plotW, startFreq, actualRange]);
+
+    const handleMouseUp = useCallback(() => {
+        if (measuring) {
+            setMeasuring(false);
+            if (measureStartFreq !== null && measureEndFreq !== null &&
+                Math.abs(measureEndFreq - measureStartFreq) < 1) {
+                setMeasureStartFreq(null);
+                setMeasureEndFreq(null);
+            }
+        }
+    }, [measuring, measureStartFreq, measureEndFreq]);
 
     const handleMouseLeave = useCallback(() => {
         setCursorX(null);
         setCursorY(null);
-    }, []);
+        if (measuring) {
+            setMeasuring(false);
+        }
+    }, [measuring]);
 
     // Wheel zoom centered on cursor
     const handleWheel = useCallback((e) => {
@@ -568,6 +665,8 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                 style={{ width, height }}
                 className="wf-canvas"
                 onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
                 aria-label="Спектрограмма (водопад)"
