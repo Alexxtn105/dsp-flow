@@ -81,6 +81,11 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
     const [hoverTime, setHoverTime] = useState(null);
     const [channelVisible, setChannelVisible] = useState([true, true, true, true]);
 
+    // Состояние измерения времени (выделение участка ЛКМ)
+    const [measuring, setMeasuring] = useState(false);
+    const [measureStart, setMeasureStart] = useState(null); // sample index
+    const [measureEnd, setMeasureEnd] = useState(null);     // sample index
+
     const plotLeft = AXIS_LEFT;
     const plotBottom = AXIS_BOTTOM;
     const plotW = width - plotLeft;
@@ -250,6 +255,72 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
         ctx.textBaseline = 'top';
         ctx.fillText('Время', px + pw - 2, ph + 14);
 
+        // --- Measurement selection overlay ---
+        if (measureStart !== null && measureEnd !== null) {
+            const s0 = Math.min(measureStart, measureEnd);
+            const s1 = Math.max(measureStart, measureEnd);
+            const x0 = px + (s0 / visibleSamples) * pw;
+            const x1 = px + (s1 / visibleSamples) * pw;
+
+            // Highlighted region
+            ctx.fillStyle = 'rgba(0, 191, 255, 0.12)';
+            ctx.fillRect(x0, 0, x1 - x0, ph);
+
+            // Boundary lines
+            ctx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x0, 0); ctx.lineTo(x0, ph);
+            ctx.moveTo(x1, 0); ctx.lineTo(x1, ph);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Measurement label
+            const deltaSamples = Math.round(s1 - s0);
+            if (deltaSamples > 0) {
+                const deltaTime = formatTime(deltaSamples, sampleRate);
+                const freqHz = sampleRate / deltaSamples;
+                const freqStr = freqHz >= 1000 ? `${(freqHz / 1000).toFixed(2)} кГц` : `${freqHz.toFixed(1)} Гц`;
+                const label = `\u0394: ${deltaSamples} отсч. | ${deltaTime} | ${freqStr}`;
+                ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
+                const textW = ctx.measureText(label).width + 14;
+                const boxH = 20;
+
+                let bx = (x0 + x1) / 2 - textW / 2;
+                if (bx < px) bx = px + 2;
+                if (bx + textW > px + pw) bx = px + pw - textW - 2;
+                const by = 6;
+
+                ctx.fillStyle = 'rgba(0, 30, 60, 0.92)';
+                ctx.strokeStyle = 'rgba(0, 191, 255, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(bx, by, textW, boxH, 3); else ctx.rect(bx, by, textW, boxH);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#7ad4ff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, bx + 7, by + boxH / 2);
+
+                // Arrow between boundaries
+                const arrowY = by + boxH + 6;
+                if (x1 - x0 > 20) {
+                    ctx.strokeStyle = 'rgba(0, 191, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x0, arrowY); ctx.lineTo(x1, arrowY);
+                    // Left arrowhead
+                    ctx.moveTo(x0 + 5, arrowY - 3); ctx.lineTo(x0, arrowY); ctx.lineTo(x0 + 5, arrowY + 3);
+                    // Right arrowhead
+                    ctx.moveTo(x1 - 5, arrowY - 3); ctx.lineTo(x1, arrowY); ctx.lineTo(x1 - 5, arrowY + 3);
+                    ctx.stroke();
+                }
+            }
+        }
+
         // --- Crosshair & cursor ---
         if (cursorX !== null && cursorY !== null &&
             cursorX >= px && cursorX <= px + pw &&
@@ -303,7 +374,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, isDarkTheme, width, height, visibleSamples, ampRange, sampleRate,
         cursorX, cursorY, hoverSample, hoverAmplitude, hoverTime, plotLeft, plotW, plotH,
-        channels, channelVisible]);
+        channels, channelVisible, measureStart, measureEnd]);
 
     useEffect(() => {
         drawWaveform();
@@ -318,18 +389,54 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
         setCursorY(y);
 
         const fx = (x - plotLeft) / plotW;
-        const sample = fx * visibleSamples;
+        const sample = Math.max(0, Math.min(visibleSamples, fx * visibleSamples));
         const amp = ampRange * (1 - 2 * y / plotH);
 
-        setHoverSample(Math.max(0, sample));
+        setHoverSample(sample);
         setHoverAmplitude(amp);
         setHoverTime(sample);
-    }, [plotLeft, plotW, plotH, visibleSamples, ampRange]);
+
+        // Обновляем конец выделения при перетаскивании
+        if (measuring) {
+            setMeasureEnd(sample);
+        }
+    }, [plotLeft, plotW, plotH, visibleSamples, ampRange, measuring]);
+
+    const handleMouseDown = useCallback((e) => {
+        if (e.button !== 0) return; // только ЛКМ
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const fx = (x - plotLeft) / plotW;
+        const sample = Math.max(0, Math.min(visibleSamples, fx * visibleSamples));
+
+        // Начинаем только если клик в области графика
+        if (x >= plotLeft && x <= plotLeft + plotW) {
+            setMeasuring(true);
+            setMeasureStart(sample);
+            setMeasureEnd(sample);
+        }
+    }, [plotLeft, plotW, visibleSamples]);
+
+    const handleMouseUp = useCallback(() => {
+        if (measuring) {
+            setMeasuring(false);
+            // Если выделение слишком маленькое — сбрасываем
+            if (measureStart !== null && measureEnd !== null &&
+                Math.abs(measureEnd - measureStart) < 0.5) {
+                setMeasureStart(null);
+                setMeasureEnd(null);
+            }
+        }
+    }, [measuring, measureStart, measureEnd]);
 
     const handleMouseLeave = useCallback(() => {
         setCursorX(null);
         setCursorY(null);
-    }, []);
+        if (measuring) {
+            setMeasuring(false);
+        }
+    }, [measuring]);
 
     const handleSamplesSlider = useCallback((e) => {
         setVisibleSamples(parseInt(e.target.value));
@@ -438,6 +545,8 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                 style={{ width, height }}
                 className="osc-canvas"
                 onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
                 aria-label={`Осциллограф${hasAnyChannel ? '' : ' (нет данных)'}`}
