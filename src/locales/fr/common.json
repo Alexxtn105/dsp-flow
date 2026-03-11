@@ -1,0 +1,118 @@
+{
+  "header": {
+    "unnamed": "Sans nom",
+    "modified": "modifié",
+    "signalLegend": "Légende des types de signaux",
+    "signals": "Signaux"
+  },
+  "footer": {
+    "rewind": "Retour au début",
+    "resume": "Reprendre",
+    "start": "Démarrer",
+    "stop": "Arrêter",
+    "manualMode": "Contrôle en mode manuel",
+    "manualLabel": "Manuel",
+    "stepLabel": "Pas",
+    "stepSizeTitle": "Échantillons par pas",
+    "executeStep": "Exécuter le pas",
+    "stepButton": "Pas"
+  },
+  "toolbar": {
+    "blocks": "Blocs",
+    "expand": "Développer",
+    "collapse": "Réduire",
+    "expandPanel": "Développer le panneau",
+    "collapsePanel": "Réduire le panneau",
+    "searchPlaceholder": "Rechercher...",
+    "searchBlocks": "Rechercher des blocs",
+    "clearSearch": "Effacer",
+    "clearSearchLabel": "Effacer la recherche",
+    "expandAllGroups": "Développer tous les groupes",
+    "collapseAllGroups": "Réduire tous les groupes",
+    "nothingFound": "Rien trouvé",
+    "addBlock": "Ajouter un bloc",
+    "addBlockNamed": "Ajouter le bloc {{name}}. {{description}}",
+    "help": "Aide",
+    "helpForBlock": "Aide du bloc {{name}}",
+    "blocksGroup": "Blocs : {{name}}"
+  },
+  "controlToolbar": {
+    "newScheme": "Nouveau schéma",
+    "stopToSave": "Arrêtez pour sauvegarder",
+    "save": "Sauvegarder",
+    "saveAs": "Sauvegarder sous",
+    "loadScheme": "Charger un schéma",
+    "settings": "Paramètres du schéma",
+    "lightTheme": "Thème clair",
+    "darkTheme": "Thème sombre"
+  },
+  "saveDialog": {
+    "editorNotReady": "L'éditeur n'est pas prêt",
+    "saveError": "Erreur de sauvegarde",
+    "unexpectedError": "Erreur inattendue lors de la sauvegarde",
+    "saveSchemeAs": "Sauvegarder le schéma sous",
+    "saveScheme": "Sauvegarder le schéma",
+    "schemeName": "Nom du schéma",
+    "descriptionOptional": "Description (facultatif)",
+    "saveButton": "Sauvegarder",
+    "updateButton": "Mettre à jour",
+    "cancel": "Annuler"
+  },
+  "loadDialog": {
+    "loadScheme": "Charger un schéma",
+    "noSavedSchemes": "Aucun schéma sauvegardé",
+    "loading": "Chargement...",
+    "load": "Charger",
+    "deleteScheme": "Supprimer le schéma {{name}}",
+    "delete": "Supprimer",
+    "close": "Fermer",
+    "validationErrors": "Le schéma \"{{name}}\" contient des erreurs :\n{{errors}}",
+    "loadFailed": "Impossible de charger le schéma",
+    "loadError": "Erreur de chargement"
+  },
+  "settingsDialog": {
+    "title": "Paramètres du schéma",
+    "sampleRateLabel": "Fréquence d'échantillonnage (Hz)",
+    "sampleRateError": "La fréquence d'échantillonnage doit être entre 1000 et 384000 Hz",
+    "quickSelect": "Sélection rapide :",
+    "apply": "Appliquer",
+    "cancel": "Annuler"
+  },
+  "confirmDialog": {
+    "cancel": "Annuler"
+  },
+  "helpDialog": {
+    "input": "Entrée",
+    "output": "Sortie",
+    "close": "Fermer",
+    "closeHelp": "Fermer l'aide",
+    "noHelp": "L'aide pour ce bloc n'est pas encore disponible.",
+    "purpose": "Objectif",
+    "algorithm": "Algorithme",
+    "parameters": "Paramètres",
+    "paramName": "Paramètre",
+    "paramDefault": "Par défaut",
+    "paramDescription": "Description",
+    "signals": "Signaux",
+    "inputLabel": "Entrée :",
+    "outputLabel": "Sortie :",
+    "examples": "Exemples d'utilisation"
+  },
+  "app": {
+    "unsavedConfirm": "Le schéma actuel n'est pas sauvegardé. En créer un nouveau ?",
+    "newScheme": "Nouveau schéma",
+    "editorError": "Erreur de l'éditeur de graphes",
+    "dialogError": "Erreur du dialogue"
+  },
+  "errorBoundary": {
+    "defaultMessage": "Erreur d'affichage",
+    "retry": "Réessayer"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "de": "Deutsch"
+  }
+}

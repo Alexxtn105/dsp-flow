@@ -4,6 +4,18 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import ruCommon from './ru/common.json';
 import enCommon from './en/common.json';
+import esCommon from './es/common.json';
+import frCommon from './fr/common.json';
+import deCommon from './de/common.json';
+
+/** Supported languages with flag emoji and native name */
+export const LANGUAGES = [
+    { code: 'ru', flag: '🇷🇺', name: 'Русский' },
+    { code: 'en', flag: '🇬🇧', name: 'English' },
+    { code: 'es', flag: '🇪🇸', name: 'Español' },
+    { code: 'fr', flag: '🇫🇷', name: 'Français' },
+    { code: 'de', flag: '🇩🇪', name: 'Deutsch' }
+];
 
 i18n
     .use(LanguageDetector)
@@ -11,15 +23,18 @@ i18n
     .init({
         resources: {
             ru: { common: ruCommon },
-            en: { common: enCommon }
+            en: { common: enCommon },
+            es: { common: esCommon },
+            fr: { common: frCommon },
+            de: { common: deCommon }
         },
         defaultNS: 'common',
-        fallbackLng: 'ru',
+        fallbackLng: 'en',
         interpolation: {
             escapeValue: false
         },
         detection: {
-            order: ['localStorage', 'navigator'],
+            order: ['localStorage'],
             lookupLocalStorage: 'dsp-flow-language',
             caches: ['localStorage']
         }

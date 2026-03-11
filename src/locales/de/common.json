@@ -1,0 +1,118 @@
+{
+  "header": {
+    "unnamed": "Unbenannt",
+    "modified": "geändert",
+    "signalLegend": "Legende der Signaltypen",
+    "signals": "Signale"
+  },
+  "footer": {
+    "rewind": "Zum Anfang",
+    "resume": "Fortsetzen",
+    "start": "Start",
+    "stop": "Stopp",
+    "manualMode": "Manuelle Steuerung",
+    "manualLabel": "Manuell",
+    "stepLabel": "Schritt",
+    "stepSizeTitle": "Abtastwerte pro Schritt",
+    "executeStep": "Schritt ausführen",
+    "stepButton": "Schritt"
+  },
+  "toolbar": {
+    "blocks": "Blöcke",
+    "expand": "Erweitern",
+    "collapse": "Reduzieren",
+    "expandPanel": "Panel erweitern",
+    "collapsePanel": "Panel reduzieren",
+    "searchPlaceholder": "Suchen...",
+    "searchBlocks": "Blöcke suchen",
+    "clearSearch": "Löschen",
+    "clearSearchLabel": "Suche löschen",
+    "expandAllGroups": "Alle Gruppen erweitern",
+    "collapseAllGroups": "Alle Gruppen reduzieren",
+    "nothingFound": "Nichts gefunden",
+    "addBlock": "Block hinzufügen",
+    "addBlockNamed": "Block {{name}} hinzufügen. {{description}}",
+    "help": "Hilfe",
+    "helpForBlock": "Hilfe zum Block {{name}}",
+    "blocksGroup": "Blöcke: {{name}}"
+  },
+  "controlToolbar": {
+    "newScheme": "Neues Schema",
+    "stopToSave": "Zum Speichern anhalten",
+    "save": "Speichern",
+    "saveAs": "Speichern unter",
+    "loadScheme": "Schema laden",
+    "settings": "Schema-Einstellungen",
+    "lightTheme": "Helles Thema",
+    "darkTheme": "Dunkles Thema"
+  },
+  "saveDialog": {
+    "editorNotReady": "Editor nicht bereit",
+    "saveError": "Fehler beim Speichern",
+    "unexpectedError": "Unerwarteter Fehler beim Speichern",
+    "saveSchemeAs": "Schema speichern unter",
+    "saveScheme": "Schema speichern",
+    "schemeName": "Schemaname",
+    "descriptionOptional": "Beschreibung (optional)",
+    "saveButton": "Speichern",
+    "updateButton": "Aktualisieren",
+    "cancel": "Abbrechen"
+  },
+  "loadDialog": {
+    "loadScheme": "Schema laden",
+    "noSavedSchemes": "Keine gespeicherten Schemata",
+    "loading": "Laden...",
+    "load": "Laden",
+    "deleteScheme": "Schema {{name}} löschen",
+    "delete": "Löschen",
+    "close": "Schließen",
+    "validationErrors": "Das Schema \"{{name}}\" enthält Fehler:\n{{errors}}",
+    "loadFailed": "Schema konnte nicht geladen werden",
+    "loadError": "Ladefehler"
+  },
+  "settingsDialog": {
+    "title": "Schema-Einstellungen",
+    "sampleRateLabel": "Abtastrate (Hz)",
+    "sampleRateError": "Die Abtastrate muss zwischen 1000 und 384000 Hz liegen",
+    "quickSelect": "Schnellauswahl:",
+    "apply": "Anwenden",
+    "cancel": "Abbrechen"
+  },
+  "confirmDialog": {
+    "cancel": "Abbrechen"
+  },
+  "helpDialog": {
+    "input": "Eingang",
+    "output": "Ausgang",
+    "close": "Schließen",
+    "closeHelp": "Hilfe schließen",
+    "noHelp": "Hilfe für diesen Block ist noch nicht verfügbar.",
+    "purpose": "Zweck",
+    "algorithm": "Algorithmus",
+    "parameters": "Parameter",
+    "paramName": "Parameter",
+    "paramDefault": "Standard",
+    "paramDescription": "Beschreibung",
+    "signals": "Signale",
+    "inputLabel": "Eingang:",
+    "outputLabel": "Ausgang:",
+    "examples": "Anwendungsbeispiele"
+  },
+  "app": {
+    "unsavedConfirm": "Das aktuelle Schema ist nicht gespeichert. Ein neues erstellen?",
+    "newScheme": "Neues Schema",
+    "editorError": "Fehler im Graph-Editor",
+    "dialogError": "Dialogfehler"
+  },
+  "errorBoundary": {
+    "defaultMessage": "Anzeigefehler",
+    "retry": "Erneut versuchen"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "de": "Deutsch"
+  }
+}

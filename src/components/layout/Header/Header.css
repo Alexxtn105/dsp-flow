@@ -99,11 +99,15 @@
     gap: 6px;
 }
 
-/* Language switcher */
+/* Language selector */
+.hdr-lang {
+    position: relative;
+}
+
 .hdr-lang-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 4px;
     height: 26px;
     padding: 0 8px;
     border: 1px solid var(--panel-border);
@@ -124,7 +128,73 @@
     border-color: var(--panel-border-hover);
 }
 
+.hdr-lang-btn.active {
+    background: rgba(0, 229, 160, 0.08);
+    border-color: rgba(0, 229, 160, 0.2);
+}
+
+.hdr-lang-flag {
+    font-size: 14px;
+    line-height: 1;
+}
+
 .hdr-lang-code {
+    line-height: 1;
+}
+
+/* Language dropdown */
+.hdr-lang-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    padding: 4px;
+    background: var(--panel-dropdown-bg);
+    border: 1px solid var(--panel-dropdown-border);
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 140px;
+    animation: hdr-dropdown 120ms ease-out;
+}
+
+.hdr-lang-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--panel-text-3);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    cursor: pointer;
+    transition: background 100ms ease;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.hdr-lang-option:hover {
+    background: var(--panel-hover-bg);
+}
+
+.hdr-lang-option.active {
+    background: rgba(0, 229, 160, 0.1);
+    color: var(--panel-accent);
+    font-weight: 600;
+}
+
+.hdr-lang-option-flag {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.hdr-lang-option-name {
     line-height: 1;
 }
 

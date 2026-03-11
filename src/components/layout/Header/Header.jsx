@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { LANGUAGES } from '../../../locales/i18n.js';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './Header.css';
 
@@ -8,13 +9,29 @@ function Header({ currentScheme }) {
     const { isDarkTheme } = useThemeContext();
     const { t, i18n } = useTranslation();
     const [legendOpen, setLegendOpen] = useState(false);
+    const [langOpen, setLangOpen] = useState(false);
+    const langRef = useRef(null);
 
     const unsaved = !currentScheme.isSaved && currentScheme.name !== 'not_saved';
 
-    const toggleLanguage = () => {
-        const newLang = i18n.language === 'ru' ? 'en' : 'ru';
-        i18n.changeLanguage(newLang);
+    const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
+
+    const handleLanguageChange = (code) => {
+        i18n.changeLanguage(code);
+        setLangOpen(false);
     };
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        if (!langOpen) return;
+        const handleClick = (e) => {
+            if (langRef.current && !langRef.current.contains(e.target)) {
+                setLangOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [langOpen]);
 
     return (
         <header className={`hdr ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -37,13 +54,32 @@ function Header({ currentScheme }) {
 
             {/* Right: language + legend */}
             <div className="hdr-right">
-                <button
-                    className="hdr-lang-btn"
-                    onClick={toggleLanguage}
-                    title={t(`language.${i18n.language === 'ru' ? 'en' : 'ru'}`)}
-                >
-                    <span className="hdr-lang-code">{i18n.language === 'ru' ? 'EN' : 'RU'}</span>
-                </button>
+                {/* Language selector */}
+                <div className="hdr-lang" ref={langRef}>
+                    <button
+                        className={`hdr-lang-btn ${langOpen ? 'active' : ''}`}
+                        onClick={() => setLangOpen(!langOpen)}
+                        title={currentLang.name}
+                    >
+                        <span className="hdr-lang-flag">{currentLang.flag}</span>
+                        <span className="hdr-lang-code">{currentLang.code.toUpperCase()}</span>
+                    </button>
+
+                    {langOpen && (
+                        <div className="hdr-lang-dropdown">
+                            {LANGUAGES.map((lang) => (
+                                <button
+                                    key={lang.code}
+                                    className={`hdr-lang-option ${lang.code === i18n.language ? 'active' : ''}`}
+                                    onClick={() => handleLanguageChange(lang.code)}
+                                >
+                                    <span className="hdr-lang-option-flag">{lang.flag}</span>
+                                    <span className="hdr-lang-option-name">{lang.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
                 <button
                     className={`hdr-legend-btn ${legendOpen ? 'active' : ''}`}

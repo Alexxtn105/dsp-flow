@@ -1,0 +1,118 @@
+{
+  "header": {
+    "unnamed": "Sin nombre",
+    "modified": "modificado",
+    "signalLegend": "Leyenda de tipos de señal",
+    "signals": "Señales"
+  },
+  "footer": {
+    "rewind": "Al inicio",
+    "resume": "Continuar",
+    "start": "Iniciar",
+    "stop": "Detener",
+    "manualMode": "Control en modo manual",
+    "manualLabel": "Manual",
+    "stepLabel": "Paso",
+    "stepSizeTitle": "Muestras por paso",
+    "executeStep": "Ejecutar paso",
+    "stepButton": "Paso"
+  },
+  "toolbar": {
+    "blocks": "Bloques",
+    "expand": "Expandir",
+    "collapse": "Contraer",
+    "expandPanel": "Expandir panel",
+    "collapsePanel": "Contraer panel",
+    "searchPlaceholder": "Buscar...",
+    "searchBlocks": "Buscar bloques",
+    "clearSearch": "Limpiar",
+    "clearSearchLabel": "Limpiar búsqueda",
+    "expandAllGroups": "Expandir todos los grupos",
+    "collapseAllGroups": "Contraer todos los grupos",
+    "nothingFound": "No se encontró nada",
+    "addBlock": "Añadir bloque",
+    "addBlockNamed": "Añadir bloque {{name}}. {{description}}",
+    "help": "Ayuda",
+    "helpForBlock": "Ayuda del bloque {{name}}",
+    "blocksGroup": "Bloques: {{name}}"
+  },
+  "controlToolbar": {
+    "newScheme": "Nuevo esquema",
+    "stopToSave": "Detenga para guardar",
+    "save": "Guardar",
+    "saveAs": "Guardar como",
+    "loadScheme": "Cargar esquema",
+    "settings": "Ajustes del esquema",
+    "lightTheme": "Tema claro",
+    "darkTheme": "Tema oscuro"
+  },
+  "saveDialog": {
+    "editorNotReady": "El editor no está listo",
+    "saveError": "Error al guardar",
+    "unexpectedError": "Error inesperado al guardar",
+    "saveSchemeAs": "Guardar esquema como",
+    "saveScheme": "Guardar esquema",
+    "schemeName": "Nombre del esquema",
+    "descriptionOptional": "Descripción (opcional)",
+    "saveButton": "Guardar",
+    "updateButton": "Actualizar",
+    "cancel": "Cancelar"
+  },
+  "loadDialog": {
+    "loadScheme": "Cargar esquema",
+    "noSavedSchemes": "No hay esquemas guardados",
+    "loading": "Cargando...",
+    "load": "Cargar",
+    "deleteScheme": "Eliminar esquema {{name}}",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "validationErrors": "El esquema \"{{name}}\" contiene errores:\n{{errors}}",
+    "loadFailed": "No se pudo cargar el esquema",
+    "loadError": "Error de carga"
+  },
+  "settingsDialog": {
+    "title": "Ajustes del esquema",
+    "sampleRateLabel": "Frecuencia de muestreo (Hz)",
+    "sampleRateError": "La frecuencia de muestreo debe estar entre 1000 y 384000 Hz",
+    "quickSelect": "Selección rápida:",
+    "apply": "Aplicar",
+    "cancel": "Cancelar"
+  },
+  "confirmDialog": {
+    "cancel": "Cancelar"
+  },
+  "helpDialog": {
+    "input": "Entrada",
+    "output": "Salida",
+    "close": "Cerrar",
+    "closeHelp": "Cerrar ayuda",
+    "noHelp": "La ayuda para este bloque aún no está disponible.",
+    "purpose": "Propósito",
+    "algorithm": "Algoritmo",
+    "parameters": "Parámetros",
+    "paramName": "Parámetro",
+    "paramDefault": "Por defecto",
+    "paramDescription": "Descripción",
+    "signals": "Señales",
+    "inputLabel": "Entrada:",
+    "outputLabel": "Salida:",
+    "examples": "Ejemplos de uso"
+  },
+  "app": {
+    "unsavedConfirm": "El esquema actual no está guardado. ¿Crear uno nuevo?",
+    "newScheme": "Nuevo esquema",
+    "editorError": "Error del editor de grafos",
+    "dialogError": "Error del diálogo"
+  },
+  "errorBoundary": {
+    "defaultMessage": "Error de visualización",
+    "retry": "Reintentar"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "de": "Deutsch"
+  }
+}
