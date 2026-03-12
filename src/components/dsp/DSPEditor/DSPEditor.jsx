@@ -114,7 +114,8 @@ function DSPEditor({
     onReactFlowInit,
     isRunning,
     onOpenVisualization,
-    onSampleRateChange
+    onSampleRateChange,
+    onBeforeDelete
 }) {
     const { isDarkTheme } = useThemeContext();
     const isTouch = useTouchDetect();
@@ -534,15 +535,18 @@ function DSPEditor({
         setTouchMenuElement(el);
     }, [isTouch]);
 
-    // Touch: удаление ноды
+    // Touch: удаление ноды (через deleteElements API React Flow)
     const handleDeleteNode = useCallback((nodeId) => {
-        setNodes(nds => nds.filter(n => n.id !== nodeId));
-        setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
+        if (!reactFlowInstance) return;
+        const node = reactFlowInstance.getNode(nodeId);
+        if (!node) return;
+        if (onBeforeDelete) onBeforeDelete();
+        reactFlowInstance.deleteElements({ nodes: [node] });
         setTouchMenuNode(null);
         if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
             onSchemeUpdate(currentScheme.name, false);
         }
-    }, [setNodes, setEdges, currentScheme, onSchemeUpdate]);
+    }, [reactFlowInstance, currentScheme, onSchemeUpdate, onBeforeDelete]);
 
     // Touch: дублирование ноды
     const handleDuplicateNode = useCallback((nodeId) => {
@@ -634,7 +638,8 @@ DSPEditor.propTypes = {
     onReactFlowInit: PropTypes.func,
     isRunning: PropTypes.bool.isRequired,
     onOpenVisualization: PropTypes.func,
-    onSampleRateChange: PropTypes.func
+    onSampleRateChange: PropTypes.func,
+    onBeforeDelete: PropTypes.func
 };
 
 export default DSPEditor;

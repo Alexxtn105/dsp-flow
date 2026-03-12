@@ -41,6 +41,9 @@ function App() {
     // Отслеживание выделения (для touch delete)
     const [hasSelection, setHasSelection] = useState(false);
 
+    // Undo-стек (snapshot нод и рёбер перед деструктивной операцией)
+    const undoStackRef = useRef([]);
+
     // Диалоги
     const dialogs = useDialogManager();
 
@@ -132,22 +135,36 @@ function App() {
         setCurrentScheme(prev => ({ ...prev, isSaved: false }));
     }, [reactFlowInstance]);
 
+    // Сохранение snapshot для undo
+    const pushUndoSnapshot = useCallback(() => {
+        if (!reactFlowInstance) return;
+        const snapshot = {
+            nodes: reactFlowInstance.getNodes().map(n => ({ ...n, data: { ...n.data } })),
+            edges: reactFlowInstance.getEdges().map(e => ({ ...e })),
+            scheme: { ...currentScheme },
+        };
+        undoStackRef.current = [...undoStackRef.current.slice(-9), snapshot];
+    }, [reactFlowInstance, currentScheme]);
+
     // Delete selected elements (for touch)
     const handleDeleteSelected = useCallback(() => {
         if (!reactFlowInstance) return;
         const selectedNodes = reactFlowInstance.getNodes().filter(n => n.selected);
         const selectedEdges = reactFlowInstance.getEdges().filter(e => e.selected);
         if (selectedNodes.length === 0 && selectedEdges.length === 0) return;
+        pushUndoSnapshot();
         reactFlowInstance.deleteElements({ nodes: selectedNodes, edges: selectedEdges });
         setCurrentScheme(prev => prev.isSaved ? { ...prev, isSaved: false } : prev);
-    }, [reactFlowInstance]);
+    }, [reactFlowInstance, pushUndoSnapshot]);
 
-    // Undo (simulate Ctrl+Z for touch)
+    // Undo — восстановление последнего snapshot
     const handleUndo = useCallback(() => {
-        document.dispatchEvent(new KeyboardEvent('keydown', {
-            key: 'z', code: 'KeyZ', ctrlKey: true, bubbles: true
-        }));
-    }, []);
+        if (!reactFlowInstance || undoStackRef.current.length === 0) return;
+        const snapshot = undoStackRef.current.pop();
+        reactFlowInstance.setNodes(snapshot.nodes);
+        reactFlowInstance.setEdges(snapshot.edges);
+        setCurrentScheme(snapshot.scheme);
+    }, [reactFlowInstance]);
 
     const handleOpenVisualization = useCallback((nodeId) => {
         if (visualizationManagerRef.current && reactFlowInstance) {
@@ -191,6 +208,7 @@ function App() {
                             isRunning={simulation.isRunning}
                             onOpenVisualization={handleOpenVisualization}
                             onSampleRateChange={handleSampleRateChange}
+                            onBeforeDelete={pushUndoSnapshot}
                         />
                     </ErrorBoundary>
                 </div>
