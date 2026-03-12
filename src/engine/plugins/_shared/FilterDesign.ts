@@ -5,7 +5,7 @@
 import WindowFunctions from './WindowFunctions';
 import type { WindowFunctionName } from './WindowFunctions';
 
-type FilterType = 'lowpass' | 'highpass';
+export type FilterType = 'lowpass' | 'highpass';
 
 /**
  * Sinc function
@@ -149,7 +149,7 @@ export const designRemez = (
     const CONVERGE_EPS = 1e-6;
     let prevDelta = 0;
     let converged = false;
-    const A = new Float64Array(G); // computed response on grid
+    let A = new Float64Array(G); // computed response on grid
 
     for (let iter = 0; iter < MAX_ITER; iter++) {
         // Step 1: Compute delta using Lagrange interpolation at extremal points
@@ -409,7 +409,7 @@ export const designRemezBandpass = (
     const CONVERGE_EPS = 1e-6;
     let prevDelta = 0;
     let converged = false;
-    const A = new Float64Array(G);
+    let A = new Float64Array(G);
 
     for (let iter = 0; iter < MAX_ITER; iter++) {
         const x = new Float64Array(numExtrema);
