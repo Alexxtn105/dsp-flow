@@ -82,7 +82,7 @@ export default {
         states: new Map<string, WaterfallState>(),
         clearStates() { this.states.clear(); },
 
-        process(inputs: (Float32Array | null)[], params: Record<string, unknown>, chunkSize: number, nodeId?: string) {
+        process(inputs: (Float32Array | null)[], params: Record<string, unknown>, chunkSize: number, nodeId: string) {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize / 2);
 

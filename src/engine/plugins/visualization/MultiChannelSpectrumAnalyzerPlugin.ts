@@ -87,7 +87,7 @@ export default {
         states: new Map<string, MultiChannelSpectrumState>(),
         clearStates() { this.states.clear(); },
 
-        process(inputs: (Float32Array | null)[], params: Record<string, unknown>, _chunkSize: number, nodeId?: string) {
+        process(inputs: (Float32Array | null)[], params: Record<string, unknown>, _chunkSize: number, nodeId: string) {
             const fftSize = (params.fftSize || 2048) as number;
             const windowName = (params.windowFunction || 'blackman-harris') as string;
             const windowFunc = WindowFunctions[windowName as keyof typeof WindowFunctions] || WindowFunctions['blackman-harris'];
