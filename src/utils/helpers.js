@@ -198,6 +198,9 @@ export const getBlockIcon = (blockType) => {
  * Получить описание для типа блока
  */
 export const getBlockDescription = (blockType) => {
+    const key = `desc.${blockType}`;
+    const translated = i18n.t(key, { ns: 'blocks' });
+    if (translated !== key) return translated;
     return registry.getDescription(blockType);
 };
 

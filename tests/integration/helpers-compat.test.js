@@ -28,7 +28,7 @@ describe('helpers.js — обратная совместимость', () => {
     });
 
     it('getBlockDescription возвращает описание', () => {
-        expect(getBlockDescription('spectrum-analyzer')).toBe('Спектральный анализ');
+        expect(getBlockDescription('spectrum-analyzer')).toBe('Spectral analysis');
     });
 
     it('getBlockSignalConfig возвращает конфигурацию', () => {
