@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './NumericIndicatorView.css';
 
@@ -9,6 +10,7 @@ import './NumericIndicatorView.css';
  */
 function NumericIndicatorView({ data, width = 380, height = 260, isComplex = false }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
 
     const stats = useMemo(() => {
         if (!data || data.length === 0) {
@@ -84,7 +86,7 @@ function NumericIndicatorView({ data, width = 380, height = 260, isComplex = fal
             {isComplex ? (
                 <>
                     <div className="ni-main-value">
-                        <span className="ni-main-label">Мгновенное значение</span>
+                        <span className="ni-main-label">{t('viz.numeric.instantValue')}</span>
                         <span className="ni-value-complex">
                             <span className="ni-re">{fmt(stats.re)}</span>
                             <span className="ni-sign">{stats.im >= 0 ? ' + j' : ' − j'}</span>
@@ -129,24 +131,24 @@ function NumericIndicatorView({ data, width = 380, height = 260, isComplex = fal
             ) : (
                 <>
                     <div className="ni-main-value">
-                        <span className="ni-main-label">Мгновенное значение</span>
+                        <span className="ni-main-label">{t('viz.numeric.instantValue')}</span>
                         <span className="ni-value-real">{fmt(stats.value)}</span>
                     </div>
                     <div className="ni-stats-grid">
                         <div className="ni-stat">
-                            <span className="ni-stat-label">Среднее</span>
+                            <span className="ni-stat-label">{t('viz.numeric.average')}</span>
                             <span className="ni-stat-value">{fmt(stats.avg)}</span>
                         </div>
                         <div className="ni-stat">
-                            <span className="ni-stat-label">СКЗ</span>
+                            <span className="ni-stat-label">{t('viz.numeric.rms')}</span>
                             <span className="ni-stat-value">{fmt(stats.rms)}</span>
                         </div>
                         <div className="ni-stat">
-                            <span className="ni-stat-label">Мин</span>
+                            <span className="ni-stat-label">{t('viz.numeric.min')}</span>
                             <span className="ni-stat-value">{fmt(stats.min)}</span>
                         </div>
                         <div className="ni-stat">
-                            <span className="ni-stat-label">Макс</span>
+                            <span className="ni-stat-label">{t('viz.numeric.max')}</span>
                             <span className="ni-stat-value">{fmt(stats.max)}</span>
                         </div>
                     </div>

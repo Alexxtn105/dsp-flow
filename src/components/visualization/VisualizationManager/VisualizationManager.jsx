@@ -1,5 +1,6 @@
 import { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import VisualizationWindow from '../VisualizationWindow';
 import OscilloscopeView from '../OscilloscopeView';
 import SpectrumView from '../SpectrumView';
@@ -18,6 +19,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
     nodes,
     onUpdateNodeParams
 }, ref) {
+    const { t } = useTranslation();
     const [openWindows, setOpenWindows] = useState(new Map());
     const [windowData, setWindowData] = useState(new Map());
 
@@ -185,7 +187,7 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                     width={config.width}
                     height={config.height}
                 >
-                    <ErrorBoundary fallbackMessage="Ошибка визуализации">
+                    <ErrorBoundary fallbackMessage={t('viz.error')}>
                         {config.vizType === 'spectrum' ? (
                             <SpectrumView
                                 data={data}

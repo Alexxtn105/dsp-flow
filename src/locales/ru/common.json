@@ -11,8 +11,8 @@
     "start": "Старт",
     "stop": "Стоп",
     "manualMode": "Ручной режим управления",
-    "manualLabel": "Manual",
-    "stepLabel": "Step",
+    "manualLabel": "Ручной",
+    "stepLabel": "Шаг",
     "stepSizeTitle": "Количество отсчётов за шаг",
     "executeStep": "Выполнить шаг",
     "stepButton": "Шаг"
@@ -178,5 +178,87 @@
     "es": "Español",
     "fr": "Français",
     "de": "Deutsch"
+  },
+  "footer_status": {
+    "ready": "ГОТОВ",
+    "run": "РАБОТА",
+    "pause": "ПАУЗА",
+    "manual": "РУЧНОЙ"
+  },
+  "viz": {
+    "closeWindow": "Закрыть окно визуализации",
+    "resizeWindow": "Изменить размер окна",
+    "error": "Ошибка визуализации",
+    "noData": "нет данных",
+    "units": {
+      "hz": "Гц",
+      "khz": "кГц",
+      "db": "дБ",
+      "samples": "отсч."
+    },
+    "osc": {
+      "amplitude": "Амплитуда",
+      "time": "Время",
+      "channel": "Канал {{n}}",
+      "horizontalScale": "Горизонтальный масштаб (отсчёты)",
+      "visibleSamples": "Видимые отсчёты",
+      "verticalScale": "Вертикальный масштаб (±)",
+      "range": "Диапазон ±",
+      "ariaLabel": "Осциллограф"
+    },
+    "spectrum": {
+      "maxHold": "Накопление максимумов (Max Hold)",
+      "showPeak": "Показать пиковую частоту",
+      "fftSize": "Размер FFT",
+      "scale": "Масштаб",
+      "freqScale": "Масштаб по частоте (или колесико мыши)",
+      "pan": "Сдвиг",
+      "freqScroll": "Прокрутка по частоте",
+      "level": "Уровень",
+      "levelScale": "Масштаб по уровню",
+      "minLevel": "Мин. уровень (дБ)",
+      "ariaLabel": "Спектроанализатор"
+    },
+    "waterfall": {
+      "colorScheme": "Цветовая схема",
+      "frameNorm": "Нормализация по кадру",
+      "timeUp": "Время ↑",
+      "now": "сейчас",
+      "fftSize": "Размер FFT",
+      "scale": "Масштаб",
+      "freqScale": "Масштаб по частоте (или колесико мыши)",
+      "pan": "Сдвиг",
+      "freqScroll": "Прокрутка по частоте",
+      "level": "Уровень",
+      "minLevel": "Мин. уровень",
+      "minLevelDb": "Мин. уровень (дБ)",
+      "ariaLabel": "Спектрограмма (водопад)"
+    },
+    "constellation": {
+      "trail": "След (персистентность)",
+      "scale": "Масштаб",
+      "displayScale": "Масштаб отображения",
+      "range": "Диапазон ±",
+      "ariaLabel": "Фазовое созвездие"
+    },
+    "numeric": {
+      "instantValue": "Мгновенное значение",
+      "average": "Среднее",
+      "rms": "СКЗ",
+      "min": "Мин",
+      "max": "Макс"
+    },
+    "multiSpectrum": {
+      "channel": "Канал {{n}}",
+      "fftSize": "Размер FFT",
+      "scale": "Масштаб",
+      "freqScale": "Масштаб по частоте",
+      "pan": "Сдвиг",
+      "freqScroll": "Прокрутка по частоте",
+      "level": "Уровень",
+      "levelScale": "Масштаб по уровню",
+      "minLevel": "Мин. уровень (дБ)",
+      "ariaLabel": "Многоканальный спектроанализатор"
+    }
   }
 }

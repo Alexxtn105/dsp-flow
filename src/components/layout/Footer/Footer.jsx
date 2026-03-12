@@ -41,8 +41,8 @@ function Footer({
     const pct = Math.round((progress || 0) * 100);
 
     const statusLabel = isRunning
-        ? (isManualMode ? 'MANUAL' : 'RUN')
-        : (isPaused ? 'PAUSE' : 'READY');
+        ? (isManualMode ? t('footer_status.manual') : t('footer_status.run'))
+        : (isPaused ? t('footer_status.pause') : t('footer_status.ready'));
 
     const statusClass = isRunning
         ? (isManualMode ? 'status-manual' : 'status-run')

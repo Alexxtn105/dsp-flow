@@ -1,14 +1,15 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { setupCanvasDPR } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './MultiChannelSpectrumView.css';
 
 const CHANNEL_COLORS = [
-    { line: '#00bfff', glow: 'rgba(0, 191, 255, 0.12)', name: 'Канал 1' },
-    { line: '#00e564', glow: 'rgba(0, 229, 100, 0.12)', name: 'Канал 2' },
-    { line: '#ffd200', glow: 'rgba(255, 210, 0, 0.12)', name: 'Канал 3' },
-    { line: '#ff4040', glow: 'rgba(255, 64, 64, 0.12)', name: 'Канал 4' },
+    { line: '#00bfff', glow: 'rgba(0, 191, 255, 0.12)' },
+    { line: '#00e564', glow: 'rgba(0, 229, 100, 0.12)' },
+    { line: '#ffd200', glow: 'rgba(255, 210, 0, 0.12)' },
+    { line: '#ff4040', glow: 'rgba(255, 64, 64, 0.12)' },
 ];
 
 const COLORS = {
@@ -67,6 +68,7 @@ function extractChannels(data) {
  */
 function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fftSize, onFftSizeChange }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const canvasRef = useRef(null);
 
     const [startFreq, setStartFreq] = useState(0);
@@ -277,11 +279,11 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
         ctx.rotate(-Math.PI / 2);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('дБ', 0, 0);
+        ctx.fillText(t('viz.units.db'), 0, 0);
         ctx.restore();
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText('Гц', px + pw - 2, py + ph + 14);
+        ctx.fillText(t('viz.units.hz'), px + pw - 2, py + ph + 14);
 
         // --- Frequency measurement overlay ---
         if (measureStartFreq !== null && measureEndFreq !== null) {
@@ -304,7 +306,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
 
             const deltaFreq = f1 - f0;
             if (deltaFreq > 0) {
-                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} Гц | ${Math.round(deltaFreq)} Гц`;
+                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} ${t('viz.units.hz')} | ${Math.round(deltaFreq)} ${t('viz.units.hz')}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 14;
                 const boxH = 20;
@@ -360,7 +362,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
             ctx.setLineDash([]);
 
             if (hoverFreq !== null && hoverDb !== null) {
-                const label = `${Math.round(hoverFreq)} Гц  ${hoverDb.toFixed(1)} дБ`;
+                const label = `${Math.round(hoverFreq)} ${t('viz.units.hz')}  ${hoverDb.toFixed(1)} ${t('viz.units.db')}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 12;
                 const boxH = 20;
@@ -388,7 +390,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
     }, [data, sampleRate, isDarkTheme, width, height,
         cursorX, cursorY, hoverFreq, hoverDb, startFreq, visibleRange, minDb,
         plotWidth, plotHeight, dbRange, nyquist, actualRange, endFreq,
-        channels, channelVisible, measureStartFreq, measureEndFreq]);
+        channels, channelVisible, measureStartFreq, measureEndFreq, t]);
 
     useEffect(() => {
         drawSpectrum();
@@ -503,7 +505,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                                 className="msa-select"
                                 value={fftSize}
                                 onChange={(e) => onFftSizeChange(parseInt(e.target.value))}
-                                title="Размер FFT"
+                                title={t('viz.multiSpectrum.fftSize')}
                             >
                                 {FFT_SIZES.map(size => (
                                     <option key={size} value={size}>{size}</option>
@@ -515,7 +517,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                 )}
 
                 <div className="msa-toolbar-section">
-                    <span className="msa-label">Масштаб</span>
+                    <span className="msa-label">{t('viz.multiSpectrum.scale')}</span>
                     <input
                         type="range"
                         className="msa-slider"
@@ -523,13 +525,13 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                         max="100"
                         value={zoomSliderValue}
                         onChange={handleZoomSlider}
-                        title="Масштаб по частоте"
+                        title={t('viz.multiSpectrum.freqScale')}
                     />
                 </div>
 
                 {visibleRange < nyquist && (
                     <div className="msa-toolbar-section">
-                        <span className="msa-label">Сдвиг</span>
+                        <span className="msa-label">{t('viz.multiSpectrum.pan')}</span>
                         <input
                             type="range"
                             className="msa-slider"
@@ -538,7 +540,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                             step={Math.max(1, Math.round(maxPan / 200))}
                             value={Math.round(startFreq)}
                             onChange={handlePanSlider}
-                            title="Прокрутка по частоте"
+                            title={t('viz.multiSpectrum.freqScroll')}
                         />
                     </div>
                 )}
@@ -546,7 +548,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                 <div className="msa-toolbar-divider" />
 
                 <div className="msa-toolbar-section">
-                    <span className="msa-label">Уровень</span>
+                    <span className="msa-label">{t('viz.multiSpectrum.level')}</span>
                     <input
                         type="range"
                         className="msa-slider"
@@ -554,7 +556,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                         max="-20"
                         value={minDb}
                         onChange={handleDbSlider}
-                        title="Масштаб по уровню"
+                        title={t('viz.multiSpectrum.levelScale')}
                     />
                     <input
                         type="number"
@@ -564,9 +566,9 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                         min="-160"
                         max="-20"
                         step="10"
-                        title="Мин. уровень (дБ)"
+                        title={t('viz.multiSpectrum.minLevel')}
                     />
-                    <span className="msa-unit">дБ</span>
+                    <span className="msa-unit">{t('viz.units.db')}</span>
                 </div>
 
                 <div className="msa-toolbar-divider" />
@@ -576,7 +578,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                         <label
                             key={idx}
                             className={`msa-channel-toggle ${channelVisible[idx] ? 'active' : ''}`}
-                            title={color.name}
+                            title={t('viz.multiSpectrum.channel', { n: idx + 1 })}
                         >
                             <input
                                 type="checkbox"
@@ -602,7 +604,7 @@ function MultiChannelSpectrumView({ data, sampleRate = 48000, width = 380, heigh
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
-                aria-label="Многоканальный спектроанализатор"
+                aria-label={t('viz.multiSpectrum.ariaLabel')}
             />
         </div>
     );

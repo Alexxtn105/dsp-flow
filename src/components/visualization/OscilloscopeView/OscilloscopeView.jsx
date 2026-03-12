@@ -1,14 +1,15 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { setupCanvasDPR } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './OscilloscopeView.css';
 
 const CHANNEL_COLORS = [
-    { line: '#00bfff', glow: 'rgba(0, 191, 255, 0.12)', name: 'Канал 1' },
-    { line: '#00e564', glow: 'rgba(0, 229, 100, 0.12)', name: 'Канал 2' },
-    { line: '#ffd200', glow: 'rgba(255, 210, 0, 0.12)', name: 'Канал 3' },
-    { line: '#ff4040', glow: 'rgba(255, 64, 64, 0.12)', name: 'Канал 4' },
+    { line: '#00bfff', glow: 'rgba(0, 191, 255, 0.12)' },
+    { line: '#00e564', glow: 'rgba(0, 229, 100, 0.12)' },
+    { line: '#ffd200', glow: 'rgba(255, 210, 0, 0.12)' },
+    { line: '#ff4040', glow: 'rgba(255, 64, 64, 0.12)' },
 ];
 
 const COLORS = {
@@ -70,6 +71,7 @@ function extractChannels(data) {
  */
 function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const canvasRef = useRef(null);
 
     const [visibleSamples, setVisibleSamples] = useState(1024);
@@ -248,12 +250,12 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
         ctx.rotate(-Math.PI / 2);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('Амплитуда', 0, 0);
+        ctx.fillText(t('viz.osc.amplitude'), 0, 0);
         ctx.restore();
 
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText('Время', px + pw - 2, ph + 14);
+        ctx.fillText(t('viz.osc.time'), px + pw - 2, ph + 14);
 
         // --- Measurement selection overlay ---
         if (measureStart !== null && measureEnd !== null) {
@@ -281,8 +283,8 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
             if (deltaSamples > 0) {
                 const deltaTime = formatTime(deltaSamples, sampleRate);
                 const freqHz = sampleRate / deltaSamples;
-                const freqStr = freqHz >= 1000 ? `${(freqHz / 1000).toFixed(2)} кГц` : `${freqHz.toFixed(1)} Гц`;
-                const label = `\u0394: ${deltaSamples} отсч. | ${deltaTime} | ${freqStr}`;
+                const freqStr = freqHz >= 1000 ? `${(freqHz / 1000).toFixed(2)} ${t('viz.units.khz')}` : `${freqHz.toFixed(1)} ${t('viz.units.hz')}`;
+                const label = `\u0394: ${deltaSamples} ${t('viz.units.samples')} | ${deltaTime} | ${freqStr}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 14;
                 const boxH = 20;
@@ -374,7 +376,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, isDarkTheme, width, height, visibleSamples, ampRange, sampleRate,
         cursorX, cursorY, hoverSample, hoverAmplitude, hoverTime, plotLeft, plotW, plotH,
-        channels, channelVisible, measureStart, measureEnd]);
+        channels, channelVisible, measureStart, measureEnd, t]);
 
     useEffect(() => {
         drawWaveform();
@@ -467,7 +469,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
         <div className={`oscilloscope-view audition-theme ${isDarkTheme ? 'dark-theme' : ''}`}>
             <div className="osc-toolbar">
                 <div className="osc-toolbar-section">
-                    <span className="osc-label">Время</span>
+                    <span className="osc-label">{t('viz.osc.time')}</span>
                     <input
                         type="range"
                         className="osc-slider"
@@ -476,7 +478,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                         step="1"
                         value={visibleSamples}
                         onChange={handleSamplesSlider}
-                        title="Горизонтальный масштаб (отсчёты)"
+                        title={t('viz.osc.horizontalScale')}
                     />
                     <input
                         type="number"
@@ -486,14 +488,14 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                         min="10"
                         max="65536"
                         step="64"
-                        title="Видимые отсчёты"
+                        title={t('viz.osc.visibleSamples')}
                     />
                 </div>
 
                 <div className="osc-toolbar-divider" />
 
                 <div className="osc-toolbar-section">
-                    <span className="osc-label">Амплитуда</span>
+                    <span className="osc-label">{t('viz.osc.amplitude')}</span>
                     <input
                         type="range"
                         className="osc-slider"
@@ -502,7 +504,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                         step="0.05"
                         value={ampRange}
                         onChange={handleAmpSlider}
-                        title="Вертикальный масштаб (±)"
+                        title={t('viz.osc.verticalScale')}
                     />
                     <input
                         type="number"
@@ -512,7 +514,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                         min="0.01"
                         max="10"
                         step="0.1"
-                        title="Диапазон ±"
+                        title={t('viz.osc.range')}
                     />
                 </div>
 
@@ -523,7 +525,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                         <label
                             key={idx}
                             className={`osc-channel-toggle ${channelVisible[idx] ? 'active' : ''}`}
-                            title={color.name}
+                            title={t('viz.osc.channel', { n: idx + 1 })}
                         >
                             <input
                                 type="checkbox"
@@ -549,7 +551,7 @@ function OscilloscopeView({ data, sampleRate = 48000, width = 380, height = 260 
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
-                aria-label={`Осциллограф${hasAnyChannel ? '' : ' (нет данных)'}`}
+                aria-label={`${t('viz.osc.ariaLabel')}${hasAnyChannel ? '' : ` (${t('viz.noData')})`}`}
             />
         </div>
     );

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './VisualizationWindow.css';
 
@@ -17,6 +18,7 @@ function VisualizationWindow({
     height = 300
 }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const windowRef = useRef(null);
     const headerRef = useRef(null);
     const [position, setPosition] = useState(initialPosition || { x: 100, y: 100 });
@@ -111,7 +113,7 @@ function VisualizationWindow({
                 <button
                     className="viz-window-close"
                     onClick={() => onClose(nodeId)}
-                    aria-label="Закрыть окно визуализации"
+                    aria-label={t('viz.closeWindow')}
                 >
                     ✕
                 </button>
@@ -125,7 +127,7 @@ function VisualizationWindow({
                 className="viz-window-resize-handle"
                 onMouseDown={handleResizeMouseDown}
                 role="separator"
-                aria-label="Изменить размер окна"
+                aria-label={t('viz.resizeWindow')}
                 tabIndex={0}
             />
         </div>

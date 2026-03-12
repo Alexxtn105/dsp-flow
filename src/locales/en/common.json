@@ -178,5 +178,87 @@
     "es": "Español",
     "fr": "Français",
     "de": "Deutsch"
+  },
+  "footer_status": {
+    "ready": "READY",
+    "run": "RUN",
+    "pause": "PAUSE",
+    "manual": "MANUAL"
+  },
+  "viz": {
+    "closeWindow": "Close visualization window",
+    "resizeWindow": "Resize window",
+    "error": "Visualization error",
+    "noData": "no data",
+    "units": {
+      "hz": "Hz",
+      "khz": "kHz",
+      "db": "dB",
+      "samples": "samp."
+    },
+    "osc": {
+      "amplitude": "Amplitude",
+      "time": "Time",
+      "channel": "Channel {{n}}",
+      "horizontalScale": "Horizontal scale (samples)",
+      "visibleSamples": "Visible samples",
+      "verticalScale": "Vertical scale (±)",
+      "range": "Range ±",
+      "ariaLabel": "Oscilloscope"
+    },
+    "spectrum": {
+      "maxHold": "Maximum hold (Max Hold)",
+      "showPeak": "Show peak frequency",
+      "fftSize": "FFT size",
+      "scale": "Scale",
+      "freqScale": "Frequency scale (or mouse wheel)",
+      "pan": "Pan",
+      "freqScroll": "Frequency scrolling",
+      "level": "Level",
+      "levelScale": "Level scale",
+      "minLevel": "Min. level (dB)",
+      "ariaLabel": "Spectrum analyzer"
+    },
+    "waterfall": {
+      "colorScheme": "Color scheme",
+      "frameNorm": "Frame normalization",
+      "timeUp": "Time ↑",
+      "now": "now",
+      "fftSize": "FFT size",
+      "scale": "Scale",
+      "freqScale": "Frequency scale (or mouse wheel)",
+      "pan": "Pan",
+      "freqScroll": "Frequency scrolling",
+      "level": "Level",
+      "minLevel": "Minimum level",
+      "minLevelDb": "Min. level (dB)",
+      "ariaLabel": "Spectrogram (waterfall)"
+    },
+    "constellation": {
+      "trail": "Trail (persistence)",
+      "scale": "Scale",
+      "displayScale": "Display scale",
+      "range": "Range ±",
+      "ariaLabel": "Phase constellation"
+    },
+    "numeric": {
+      "instantValue": "Instant value",
+      "average": "Average",
+      "rms": "RMS",
+      "min": "Min",
+      "max": "Max"
+    },
+    "multiSpectrum": {
+      "channel": "Channel {{n}}",
+      "fftSize": "FFT size",
+      "scale": "Scale",
+      "freqScale": "Frequency scale",
+      "pan": "Pan",
+      "freqScroll": "Frequency scrolling",
+      "level": "Level",
+      "levelScale": "Level scale",
+      "minLevel": "Min. level (dB)",
+      "ariaLabel": "Multi-channel spectrum analyzer"
+    }
   }
 }

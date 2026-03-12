@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { setupCanvasDPR } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './ConstellationView.css';
@@ -29,6 +30,7 @@ const AXIS_MARGIN = 36;
  */
 function ConstellationView({ data, width = 380, height = 260 }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const canvasRef = useRef(null);
 
     // Zoom (scale factor: 1.0 means ±1.0 range)
@@ -400,7 +402,7 @@ function ConstellationView({ data, width = 380, height = 260 }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, isDarkTheme, width, height, scale, showTrail,
         cursorX, cursorY, hoverI, hoverQ, plotLeft, plotW, plotH, plotCx, plotCy, side, halfRange,
-        measureStart, measureEnd]);
+        measureStart, measureEnd, t]);
 
     useEffect(() => {
         draw();
@@ -482,7 +484,7 @@ function ConstellationView({ data, width = 380, height = 260 }) {
                     <button
                         className={`cv-btn ${showTrail ? 'active' : ''}`}
                         onClick={() => setShowTrail(!showTrail)}
-                        title="След (персистентность)"
+                        title={t('viz.constellation.trail')}
                     >
                         TRAIL
                     </button>
@@ -491,7 +493,7 @@ function ConstellationView({ data, width = 380, height = 260 }) {
                 <div className="cv-toolbar-divider" />
 
                 <div className="cv-toolbar-section">
-                    <span className="cv-label">Масштаб</span>
+                    <span className="cv-label">{t('viz.constellation.scale')}</span>
                     <input
                         type="range"
                         className="cv-slider"
@@ -500,7 +502,7 @@ function ConstellationView({ data, width = 380, height = 260 }) {
                         step="0.1"
                         value={scale}
                         onChange={handleScaleSlider}
-                        title="Масштаб отображения"
+                        title={t('viz.constellation.displayScale')}
                     />
                     <input
                         type="number"
@@ -510,7 +512,7 @@ function ConstellationView({ data, width = 380, height = 260 }) {
                         min="0.1"
                         max="10"
                         step="0.1"
-                        title="Диапазон ±"
+                        title={t('viz.constellation.range')}
                     />
                 </div>
             </div>
@@ -524,7 +526,7 @@ function ConstellationView({ data, width = 380, height = 260 }) {
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
-                aria-label="Фазовое созвездие"
+                aria-label={t('viz.constellation.ariaLabel')}
             />
         </div>
     );

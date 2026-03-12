@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { setupCanvasDPR } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './WaterfallView.css';
@@ -91,6 +92,7 @@ const COLOR_MAPS = {
  */
 function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, fftSize, onFftSizeChange }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const canvasRef = useRef(null);
     const tempCanvasRef = useRef(null);
     const [colorMap, setColorMap] = useState('audition');
@@ -228,7 +230,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
         ctx.fillStyle = c.axisTextBright;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText('Гц', plotLeft + plotW - 2, plotH + 14);
+        ctx.fillText(t('viz.units.hz'), plotLeft + plotW - 2, plotH + 14);
 
         // Y-axis title (time arrow)
         ctx.save();
@@ -238,7 +240,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
         ctx.textBaseline = 'middle';
         ctx.fillStyle = c.axisTextBright;
         ctx.font = '9px "Segoe UI", sans-serif';
-        ctx.fillText('Время \u2191', 0, 0);
+        ctx.fillText(t('viz.waterfall.timeUp'), 0, 0);
         ctx.restore();
 
         // Y-axis time markers (relative)
@@ -246,7 +248,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
         ctx.fillStyle = c.axisText;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
-        ctx.fillText('сейчас', plotLeft - 4, 8);
+        ctx.fillText(t('viz.waterfall.now'), plotLeft - 4, 8);
 
         // --- Legend ---
         const legTop = 4;
@@ -307,7 +309,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
 
             const deltaFreq = f1 - f0;
             if (deltaFreq > 0) {
-                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} Гц | ${Math.round(deltaFreq)} Гц`;
+                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} ${t('viz.units.hz')} | ${Math.round(deltaFreq)} ${t('viz.units.hz')}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 14;
                 const boxH = 20;
@@ -365,7 +367,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
             ctx.setLineDash([]);
 
             if (hoverFreq !== null) {
-                const label = `${Math.round(hoverFreq)} Гц`;
+                const label = `${Math.round(hoverFreq)} ${t('viz.units.hz')}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 12;
                 const boxH = 20;
@@ -395,7 +397,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [width, height, sampleRate, startFreq, visibleRange, minDb, plotLeft, plotW, plotH, legendX,
         colorMap, isNormalized, getColor, cursorX, cursorY, hoverFreq, isDarkTheme, actualRange, endFreq,
-        measureStartFreq, measureEndFreq]);
+        measureStartFreq, measureEndFreq, t]);
 
     drawSceneRef.current = drawScene;
 
@@ -566,7 +568,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                         value={colorMap}
                         onChange={(e) => setColorMap(e.target.value)}
                         className="wf-select"
-                        title="Цветовая схема"
+                        title={t('viz.waterfall.colorScheme')}
                     >
                         <option value="audition">Audition</option>
                         <option value="inferno">Inferno</option>
@@ -575,7 +577,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                     <button
                         className={`wf-btn ${isNormalized ? 'active' : ''}`}
                         onClick={() => setIsNormalized(!isNormalized)}
-                        title="Нормализация по кадру"
+                        title={t('viz.waterfall.frameNorm')}
                     >
                         NORM
                     </button>
@@ -590,7 +592,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                                 className="wf-select"
                                 value={fftSize}
                                 onChange={(e) => onFftSizeChange(parseInt(e.target.value))}
-                                title="Размер FFT"
+                                title={t('viz.waterfall.fftSize')}
                             >
                                 {FFT_SIZES.map(size => (
                                     <option key={size} value={size}>{size}</option>
@@ -604,7 +606,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
 
                 {/* Zoom */}
                 <div className="wf-toolbar-section">
-                    <span className="wf-label">Масштаб</span>
+                    <span className="wf-label">{t('viz.waterfall.scale')}</span>
                     <input
                         type="range"
                         className="wf-slider"
@@ -612,14 +614,14 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                         max="100"
                         value={zoomSliderValue}
                         onChange={handleZoomSlider}
-                        title="Масштаб по частоте (или колесико мыши)"
+                        title={t('viz.waterfall.freqScale')}
                     />
                 </div>
 
                 {/* Pan */}
                 {visibleRange < nyquist && (
                     <div className="wf-toolbar-section">
-                        <span className="wf-label">Сдвиг</span>
+                        <span className="wf-label">{t('viz.waterfall.pan')}</span>
                         <input
                             type="range"
                             className="wf-slider"
@@ -628,7 +630,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                             step={Math.max(1, Math.round(maxPan / 200))}
                             value={Math.round(startFreq)}
                             onChange={handlePanSlider}
-                            title="Прокрутка по частоте"
+                            title={t('viz.waterfall.freqScroll')}
                         />
                     </div>
                 )}
@@ -636,7 +638,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                 <div className="wf-toolbar-divider" />
 
                 <div className="wf-toolbar-section">
-                    <span className="wf-label">Уровень</span>
+                    <span className="wf-label">{t('viz.waterfall.level')}</span>
                     <input
                         type="range"
                         className="wf-slider wf-slider-short"
@@ -644,7 +646,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                         max="-20"
                         value={minDb}
                         onChange={handleDbSlider}
-                        title="Мин. уровень"
+                        title={t('viz.waterfall.minLevel')}
                     />
                     <input
                         type="number"
@@ -654,9 +656,9 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                         min="-160"
                         max="-20"
                         step="10"
-                        title="Мин. уровень (дБ)"
+                        title={t('viz.waterfall.minLevelDb')}
                     />
-                    <span className="wf-unit">дБ</span>
+                    <span className="wf-unit">{t('viz.units.db')}</span>
                 </div>
             </div>
 
@@ -669,7 +671,7 @@ function WaterfallView({ data, sampleRate = 48000, width = 380, height = 260, ff
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
-                aria-label="Спектрограмма (водопад)"
+                aria-label={t('viz.waterfall.ariaLabel')}
             />
         </div>
     );

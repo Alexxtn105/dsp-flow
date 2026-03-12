@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { setupCanvasDPR } from '../_shared/canvasUtils';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './SpectrumView.css';
@@ -61,6 +62,7 @@ function calcDbGridStep(plotHeight, dbRange) {
  */
 function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fftSize, onFftSizeChange }) {
     const { isDarkTheme } = useThemeContext();
+    const { t } = useTranslation();
     const canvasRef = useRef(null);
     const [accumulate, setAccumulate] = useState(false);
     const [accumulatedData, setAccumulatedData] = useState(null);
@@ -293,7 +295,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                 ctx.fillStyle = c.peakMarker;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
-                const peakLabel = `${Math.round(peakFreq)} Гц  ${peakVal.toFixed(1)} дБ`;
+                const peakLabel = `${Math.round(peakFreq)} ${t('viz.units.hz')}  ${peakVal.toFixed(1)} ${t('viz.units.db')}`;
                 ctx.fillText(peakLabel, peakX, peakY - 13);
 
                 ctx.restore();
@@ -360,13 +362,13 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
         ctx.rotate(-Math.PI / 2);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('дБ', 0, 0);
+        ctx.fillText(t('viz.units.db'), 0, 0);
         ctx.restore();
 
         // X-axis title
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText('Гц', px + pw - 2, py + ph + 14);
+        ctx.fillText(t('viz.units.hz'), px + pw - 2, py + ph + 14);
 
         // --- Frequency measurement overlay ---
         if (measureStartFreq !== null && measureEndFreq !== null) {
@@ -389,7 +391,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
 
             const deltaFreq = f1 - f0;
             if (deltaFreq > 0) {
-                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} Гц | ${Math.round(deltaFreq)} Гц`;
+                const label = `\u0394: ${Math.round(f0)} \u2013 ${Math.round(f1)} ${t('viz.units.hz')} | ${Math.round(deltaFreq)} ${t('viz.units.hz')}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 14;
                 const boxH = 20;
@@ -450,7 +452,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
 
             // Cursor label
             if (hoverFreq !== null && hoverDb !== null) {
-                const label = `${Math.round(hoverFreq)} Гц  ${hoverDb.toFixed(1)} дБ`;
+                const label = `${Math.round(hoverFreq)} ${t('viz.units.hz')}  ${hoverDb.toFixed(1)} ${t('viz.units.db')}`;
                 ctx.font = '10px "Segoe UI Mono", "SF Mono", "Consolas", monospace';
                 const textW = ctx.measureText(label).width + 12;
                 const boxH = 20;
@@ -483,7 +485,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
     }, [data, accumulatedData, accumulate, sampleRate, isDarkTheme, width, height,
         cursorX, cursorY, hoverFreq, hoverDb, startFreq, visibleRange, minDb, showPeak,
         plotWidth, plotHeight, dbRange, nyquist, actualRange, endFreq,
-        measureStartFreq, measureEndFreq]);
+        measureStartFreq, measureEndFreq, t]);
 
     useEffect(() => {
         drawSpectrum();
@@ -604,14 +606,14 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                     <button
                         className={`sa-btn ${accumulate ? 'active' : ''}`}
                         onClick={() => setAccumulate(!accumulate)}
-                        title="Накопление максимумов (Max Hold)"
+                        title={t('viz.spectrum.maxHold')}
                     >
                         MAX
                     </button>
                     <button
                         className={`sa-btn ${showPeak ? 'active' : ''}`}
                         onClick={() => setShowPeak(!showPeak)}
-                        title="Показать пиковую частоту"
+                        title={t('viz.spectrum.showPeak')}
                     >
                         PEAK
                     </button>
@@ -626,7 +628,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                                 className="sa-select"
                                 value={fftSize}
                                 onChange={(e) => onFftSizeChange(parseInt(e.target.value))}
-                                title="Размер FFT"
+                                title={t('viz.spectrum.fftSize')}
                             >
                                 {FFT_SIZES.map(size => (
                                     <option key={size} value={size}>{size}</option>
@@ -640,7 +642,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
 
                 {/* Zoom */}
                 <div className="sa-toolbar-section">
-                    <span className="sa-label">Масштаб</span>
+                    <span className="sa-label">{t('viz.spectrum.scale')}</span>
                     <input
                         type="range"
                         className="sa-slider"
@@ -648,14 +650,14 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                         max="100"
                         value={zoomSliderValue}
                         onChange={handleZoomSlider}
-                        title="Масштаб по частоте (или колесико мыши)"
+                        title={t('viz.spectrum.freqScale')}
                     />
                 </div>
 
                 {/* Pan */}
                 {visibleRange < nyquist && (
                     <div className="sa-toolbar-section">
-                        <span className="sa-label">Сдвиг</span>
+                        <span className="sa-label">{t('viz.spectrum.pan')}</span>
                         <input
                             type="range"
                             className="sa-slider"
@@ -664,7 +666,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                             step={Math.max(1, Math.round(maxPan / 200))}
                             value={Math.round(startFreq)}
                             onChange={handlePanSlider}
-                            title="Прокрутка по частоте"
+                            title={t('viz.spectrum.freqScroll')}
                         />
                     </div>
                 )}
@@ -673,7 +675,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
 
                 {/* Vertical zoom */}
                 <div className="sa-toolbar-section">
-                    <span className="sa-label">Уровень</span>
+                    <span className="sa-label">{t('viz.spectrum.level')}</span>
                     <input
                         type="range"
                         className="sa-slider"
@@ -681,7 +683,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                         max="-20"
                         value={minDb}
                         onChange={handleDbSlider}
-                        title="Масштаб по уровню"
+                        title={t('viz.spectrum.levelScale')}
                     />
                     <input
                         type="number"
@@ -691,9 +693,9 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                         min="-160"
                         max="-20"
                         step="10"
-                        title="Мин. уровень (дБ)"
+                        title={t('viz.spectrum.minLevel')}
                     />
-                    <span className="sa-unit">дБ</span>
+                    <span className="sa-unit">{t('viz.units.db')}</span>
                 </div>
             </div>
 
@@ -707,7 +709,7 @@ function SpectrumView({ data, sampleRate = 48000, width = 380, height = 260, fft
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
                 role="img"
-                aria-label="Спектроанализатор"
+                aria-label={t('viz.spectrum.ariaLabel')}
             />
         </div>
     );
