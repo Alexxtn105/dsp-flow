@@ -4,10 +4,10 @@
 
 /**
  * In-place Cooley-Tukey FFT
- * @param {Float32Array} real - действительная часть (длина должна быть степенью двойки)
- * @param {Float32Array} imag - мнимая часть
+ * @param real - действительная часть (длина должна быть степенью двойки)
+ * @param imag - мнимая часть
  */
-export function fft(real, imag) {
+export function fft(real: Float32Array, imag: Float32Array): void {
     const n = real.length;
     if (n <= 1) return;
 
@@ -52,7 +52,7 @@ export function fft(real, imag) {
 /**
  * Вычисляет магнитуду в дБ (половина спектра)
  */
-export function computeMagnitudeDB(real, imag) {
+export function computeMagnitudeDB(real: Float32Array, imag: Float32Array): Float32Array {
     const n = real.length;
     const half = n / 2;
     const magnitude = new Float32Array(half);

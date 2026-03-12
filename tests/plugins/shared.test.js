@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import WindowFunctions from '../../src/engine/plugins/_shared/WindowFunctions.js';
-import { sinc, designWindowedSinc, designRemez } from '../../src/engine/plugins/_shared/FilterDesign.js';
-import { fft, computeMagnitudeDB } from '../../src/engine/plugins/_shared/FFTUtils.js';
+import WindowFunctions from '../../src/engine/plugins/_shared/WindowFunctions';
+import { sinc, designWindowedSinc, designRemez } from '../../src/engine/plugins/_shared/FilterDesign';
+import { fft, computeMagnitudeDB } from '../../src/engine/plugins/_shared/FFTUtils';
 
 describe('WindowFunctions', () => {
     it('rectangular всегда 1', () => {

@@ -41,8 +41,8 @@
  *   - Фильтрация выполняется через кольцевой буфер (circular buffer)
  *     для минимизации копирования данных.
  */
-import WindowFunctions from '../_shared/WindowFunctions.js';
-import { sinc, designWindowedSinc } from '../_shared/FilterDesign.js';
+import WindowFunctions from '../_shared/WindowFunctions';
+import { sinc, designWindowedSinc } from '../_shared/FilterDesign';
 
 export function createFIRProcessor(fixedFilterType) {
     return {

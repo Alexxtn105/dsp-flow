@@ -53,7 +53,7 @@
  *      → ComplexMagnitude → LowpassFIR(100Hz) → Oscilloscope
  *      Модуль аналитического сигнала = мгновенная амплитуда (огибающая).
  */
-import WindowFunctions from '../_shared/WindowFunctions.js';
+import WindowFunctions from '../_shared/WindowFunctions';
 
 export default {
     type: 'Преобразователь Гильберта',

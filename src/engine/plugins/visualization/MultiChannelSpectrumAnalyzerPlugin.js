@@ -52,8 +52,8 @@
  *      Filter1 → Filter2 → MultiChannelSpectrumAnalyzer (Канал 2)
  *      Позволяет оценить вклад каждого фильтра в общую обработку.
  */
-import WindowFunctions from '../_shared/WindowFunctions.js';
-import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
+import WindowFunctions from '../_shared/WindowFunctions';
+import { fft, computeMagnitudeDB } from '../_shared/FFTUtils';
 
 export default {
     type: 'Многоканальный спектроанализатор',

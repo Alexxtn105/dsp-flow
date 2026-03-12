@@ -59,8 +59,8 @@
  *      Увеличенный размер БПФ и усреднение позволяют увидеть тонкую структуру
  *      спектра: основной тон, обертона, призвуки.
  */
-import WindowFunctions from '../_shared/WindowFunctions.js';
-import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
+import WindowFunctions from '../_shared/WindowFunctions';
+import { fft, computeMagnitudeDB } from '../_shared/FFTUtils';
 
 export default {
     type: 'Спектроанализатор',

@@ -54,7 +54,7 @@
  *      Оптимальный фильтр максимально подавляет шум за пределами
  *      речевого диапазона.
  */
-import { designRemezBandpass } from '../_shared/FilterDesign.js';
+import { designRemezBandpass } from '../_shared/FilterDesign';
 
 function createRemezProcessor() {
     return {

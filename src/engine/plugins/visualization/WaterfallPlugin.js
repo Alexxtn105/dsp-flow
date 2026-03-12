@@ -57,8 +57,8 @@
  *      Кратковременная помеха видна как горизонтальная яркая полоса
  *      на определённой частоте в определённый момент времени.
  */
-import WindowFunctions from '../_shared/WindowFunctions.js';
-import { fft, computeMagnitudeDB } from '../_shared/FFTUtils.js';
+import WindowFunctions from '../_shared/WindowFunctions';
+import { fft, computeMagnitudeDB } from '../_shared/FFTUtils';
 
 export default {
     type: 'Водопад',

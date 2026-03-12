@@ -2,12 +2,15 @@
  * Алгоритмы проектирования фильтров
  */
 
-import WindowFunctions from './WindowFunctions.js';
+import WindowFunctions from './WindowFunctions';
+import type { WindowFunctionName } from './WindowFunctions';
+
+type FilterType = 'lowpass' | 'highpass';
 
 /**
  * Sinc function
  */
-export const sinc = (x) => {
+export const sinc = (x: number): number => {
     if (x === 0) return 1;
     const piX = Math.PI * x;
     return Math.sin(piX) / piX;
@@ -16,7 +19,13 @@ export const sinc = (x) => {
 /**
  * Filter Design: Windowed Sinc
  */
-export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) => {
+export const designWindowedSinc = (
+    type: FilterType,
+    cutoff: number,
+    sampleRate: number,
+    order: number,
+    windowName: WindowFunctionName,
+): Float32Array => {
     const M = order - 1;
     const fc = cutoff / sampleRate;
     const coeffs = new Float32Array(order);
@@ -62,14 +71,13 @@ export const designWindowedSinc = (type, cutoff, sampleRate, order, windowName) 
 
 /**
  * Parks-McClellan (Remez exchange) algorithm for optimal equiripple FIR filter design.
- *
- * @param {string} type - 'lowpass' or 'highpass'
- * @param {number} cutoff - cutoff frequency in Hz
- * @param {number} sampleRate - sample rate in Hz
- * @param {number} order - filter order (number of taps)
- * @returns {Float32Array} filter coefficients
  */
-export const designRemez = (type, cutoff, sampleRate, order) => {
+export const designRemez = (
+    type: FilterType,
+    cutoff: number,
+    sampleRate: number,
+    order: number,
+): Float32Array => {
     // For highpass: design lowpass then apply spectral inversion
     if (type === 'highpass') {
         const lpCoeffs = designRemez('lowpass', cutoff, sampleRate, order);
@@ -97,9 +105,9 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
     // Build dense frequency grid (exclude transition band)
     const gridDensity = 16;
     const gridSize = gridDensity * numTaps;
-    const grid = [];
-    const desiredOnGrid = [];
-    const weightOnGrid = [];
+    const grid: number[] = [];
+    const desiredOnGrid: number[] = [];
+    const weightOnGrid: number[] = [];
 
     const numBands = bands.length / 2;
     for (let b = 0; b < numBands; b++) {
@@ -126,7 +134,7 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
     }
 
     // Initialize extremal frequencies: uniformly spaced indices into grid
-    let extremalIndices = new Array(numExtrema);
+    let extremalIndices: number[] = new Array(numExtrema);
     for (let i = 0; i < numExtrema; i++) {
         extremalIndices[i] = Math.round(i * (G - 1) / (numExtrema - 1));
     }
@@ -141,7 +149,7 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
     const CONVERGE_EPS = 1e-6;
     let prevDelta = 0;
     let converged = false;
-    let A = new Float64Array(G); // computed response on grid
+    const A = new Float64Array(G); // computed response on grid
 
     for (let iter = 0; iter < MAX_ITER; iter++) {
         // Step 1: Compute delta using Lagrange interpolation at extremal points
@@ -219,7 +227,7 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
         }
 
         // Find local extrema of |error|
-        const newExtrema = [];
+        const newExtrema: number[] = [];
 
         // Check endpoints
         if (G > 1 && Math.abs(error[0]) >= Math.abs(error[1])) {
@@ -243,7 +251,7 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
         }
 
         // Build alternating-sign sequence in frequency order
-        const alt = [newExtrema[0]];
+        const alt: number[] = [newExtrema[0]];
         for (let i = 1; i < newExtrema.length; i++) {
             const ci = newExtrema[i];
             const pi = alt[alt.length - 1];
@@ -292,7 +300,6 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
     }
 
     // IDFT: a[k] = (2/N) * sum(A[i] * cos(2*pi*k*f_i)) for k > 0, (1/N) for k=0
-    // f goes from 0 to 0.5, so ω = 2πf goes from 0 to π
     for (let k = 0; k <= L; k++) {
         let sum = 0;
         for (let i = 0; i < uniformN; i++) {
@@ -328,14 +335,13 @@ export const designRemez = (type, cutoff, sampleRate, order) => {
 
 /**
  * Parks-McClellan (Remez) for bandpass FIR filter design.
- *
- * @param {number} lowCutoff - lower cutoff frequency in Hz
- * @param {number} highCutoff - upper cutoff frequency in Hz
- * @param {number} sampleRate - sample rate in Hz
- * @param {number} order - filter order (number of taps)
- * @returns {Float32Array} filter coefficients
  */
-export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) => {
+export const designRemezBandpass = (
+    lowCutoff: number,
+    highCutoff: number,
+    sampleRate: number,
+    order: number,
+): Float32Array => {
     const numTaps = order;
     const L = Math.floor((numTaps - 1) / 2);
     const numExtrema = L + 2;
@@ -358,9 +364,9 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
     // Build dense frequency grid
     const gridDensity = 16;
     const gridSize = gridDensity * numTaps;
-    const grid = [];
-    const desiredOnGrid = [];
-    const weightOnGrid = [];
+    const grid: number[] = [];
+    const desiredOnGrid: number[] = [];
+    const weightOnGrid: number[] = [];
 
     const numBands = bands.length / 2;
     for (let b = 0; b < numBands; b++) {
@@ -389,7 +395,7 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
         return result;
     }
 
-    let extremalIndices = new Array(numExtrema);
+    let extremalIndices: number[] = new Array(numExtrema);
     for (let i = 0; i < numExtrema; i++) {
         extremalIndices[i] = Math.round(i * (G - 1) / (numExtrema - 1));
     }
@@ -403,7 +409,7 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
     const CONVERGE_EPS = 1e-6;
     let prevDelta = 0;
     let converged = false;
-    let A = new Float64Array(G);
+    const A = new Float64Array(G);
 
     for (let iter = 0; iter < MAX_ITER; iter++) {
         const x = new Float64Array(numExtrema);
@@ -470,7 +476,7 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
             error[i] = weightOnGrid[i] * (desiredOnGrid[i] - A[i]);
         }
 
-        const newExtrema = [];
+        const newExtrema: number[] = [];
         if (G > 1 && Math.abs(error[0]) >= Math.abs(error[1])) {
             newExtrema.push(0);
         }
@@ -487,7 +493,7 @@ export const designRemezBandpass = (lowCutoff, highCutoff, sampleRate, order) =>
         if (newExtrema.length < numExtrema) break;
 
         // Build alternating-sign sequence in frequency order
-        const alt = [newExtrema[0]];
+        const alt: number[] = [newExtrema[0]];
         for (let i = 1; i < newExtrema.length; i++) {
             const ci = newExtrema[i];
             const pi = alt[alt.length - 1];

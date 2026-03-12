@@ -56,8 +56,8 @@
  *      Signal → NotchFIR(1000Hz) → NotchFIR(2000Hz) → NotchFIR(3000Hz) → Oscilloscope
  *      Последовательное удаление нескольких дискретных помех.
  */
-import WindowFunctions from '../_shared/WindowFunctions.js';
-import { sinc } from '../_shared/FilterDesign.js';
+import WindowFunctions from '../_shared/WindowFunctions';
+import { sinc } from '../_shared/FilterDesign';
 
 /**
  * Коэффициенты компенсации переходных полос для каждой оконной функции.

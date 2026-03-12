@@ -1,7 +1,19 @@
 /**
  * Оконные функции для DSP
  */
-const WindowFunctions = {
+
+export type WindowFunctionName =
+  | 'rectangular'
+  | 'hamming'
+  | 'hanning'
+  | 'blackman'
+  | 'blackman-harris'
+  | 'nuttall'
+  | 'flattop';
+
+type WindowFunction = (n: number, N: number) => number;
+
+const WindowFunctions: Record<WindowFunctionName, WindowFunction> = {
     rectangular: () => 1,
     hamming: (n, N) => 0.54 - 0.46 * Math.cos((2 * Math.PI * n) / (N - 1)),
     hanning: (n, N) => 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1))),
