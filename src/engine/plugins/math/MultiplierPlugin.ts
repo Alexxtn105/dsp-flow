@@ -54,10 +54,10 @@ export default {
         scaleFactor: 1.0,
     },
     processor: {
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const output = new Float32Array(chunkSize);
-            const scale = params.scaleFactor ?? 1.0;
-            const operation = params.operation || 'multiply';
+            const scale = (params.scaleFactor ?? 1.0) as number;
+            const operation = (params.operation || 'multiply') as string;
 
             if (inputs.length === 0 || !inputs[0]) {
                 return output;

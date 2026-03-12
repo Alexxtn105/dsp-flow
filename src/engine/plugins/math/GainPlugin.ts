@@ -66,19 +66,19 @@ const GainPlugin = {
     },
 
     processor: {
-        states: new Map(),
+        states: new Map<string, Record<string, never>>(),
 
         clearStates() {
             this.states.clear();
         },
 
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 
-            const gainValue = params.gain ?? 1.0;
-            const mode = params.gainMode ?? 'linear';
-            const invert = params.invert ?? false;
+            const gainValue = (params.gain ?? 1.0) as number;
+            const mode = (params.gainMode ?? 'linear') as string;
+            const invert = (params.invert ?? false) as boolean;
 
             let linearGain;
             if (mode === 'dB') {

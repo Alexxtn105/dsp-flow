@@ -47,6 +47,10 @@
  *      Определяет моменты, когда сигнал превышает заданный уровень.
  */
 
+interface ThresholdState {
+    currentState: boolean;
+}
+
 const ThresholdPlugin = {
     type: 'Компаратор',
     id: 'threshold',
@@ -67,26 +71,26 @@ const ThresholdPlugin = {
     },
 
     processor: {
-        states: new Map(),
+        states: new Map<string, ThresholdState>(),
 
         clearStates() {
             this.states.clear();
         },
 
-        process(inputs, params, chunkSize, nodeId) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number, nodeId?: string): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 
-            const threshold = params.threshold ?? 0;
-            const high = params.outputHigh ?? 1;
-            const low = params.outputLow ?? 0;
-            const hyst = params.hysteresis ?? 0;
+            const threshold = (params.threshold ?? 0) as number;
+            const high = (params.outputHigh ?? 1) as number;
+            const low = (params.outputLow ?? 0) as number;
+            const hyst = (params.hysteresis ?? 0) as number;
             const output = new Float32Array(chunkSize);
 
-            if (!this.states.has(nodeId)) {
-                this.states.set(nodeId, { currentState: false });
+            if (!this.states.has(nodeId!)) {
+                this.states.set(nodeId!, { currentState: false });
             }
-            const state = this.states.get(nodeId);
+            const state = this.states.get(nodeId!)!;
 
             const upperThreshold = threshold + hyst / 2;
             const lowerThreshold = threshold - hyst / 2;

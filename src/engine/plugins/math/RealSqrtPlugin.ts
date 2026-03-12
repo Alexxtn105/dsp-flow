@@ -36,7 +36,7 @@ export default {
     signals: { input: 'real', output: 'real' },
     defaultParams: {},
     processor: {
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 

@@ -56,10 +56,10 @@ export default {
         normalization: 'none',
     },
     processor: {
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const output = new Float32Array(chunkSize);
-            const weights = params.weights || [];
-            const normalization = params.normalization || 'none';
+            const weights = (params.weights || []) as number[];
+            const normalization = (params.normalization || 'none') as string;
 
             let activeInputs = 0;
             for (let idx = 0; idx < inputs.length; idx++) {

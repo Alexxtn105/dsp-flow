@@ -49,6 +49,12 @@
  *      Быстрая атака ограничивает пики, медленный release сохраняет
  *      естественность звучания.
  */
+
+interface AGCState {
+    gain: number;
+    envelope: number;
+}
+
 export default {
     type: 'АРУ',
     id: 'agc',
@@ -63,23 +69,23 @@ export default {
         maxGain: 100,
     },
     processor: {
-        states: new Map(),
+        states: new Map<string, AGCState>(),
         clearStates() { this.states.clear(); },
 
-        process(inputs, params, chunkSize, nodeId) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number, nodeId?: string): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 
-            const targetLevel = params.targetLevel ?? 1.0;
-            const attackMs = params.attackTime ?? 5;
-            const releaseMs = params.releaseTime ?? 50;
-            const maxGain = params.maxGain ?? 100;
-            const sampleRate = params.sampleRate ?? 48000;
+            const targetLevel = (params.targetLevel ?? 1.0) as number;
+            const attackMs = (params.attackTime ?? 5) as number;
+            const releaseMs = (params.releaseTime ?? 50) as number;
+            const maxGain = (params.maxGain ?? 100) as number;
+            const sampleRate = (params.sampleRate ?? 48000) as number;
 
-            if (!this.states.has(nodeId)) {
-                this.states.set(nodeId, { gain: 1.0, envelope: 0 });
+            if (!this.states.has(nodeId!)) {
+                this.states.set(nodeId!, { gain: 1.0, envelope: 0 });
             }
-            const state = this.states.get(nodeId);
+            const state = this.states.get(nodeId!)!;
 
             // Коэффициенты сглаживания огибающей
             const attackCoeff = attackMs > 0

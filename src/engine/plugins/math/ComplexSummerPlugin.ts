@@ -44,7 +44,7 @@ export default {
     signals: { input: 'complex', output: 'complex', inputsCount: 2 },
     defaultParams: {},
     processor: {
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const a = inputs[0];
             const b = inputs[1];
 

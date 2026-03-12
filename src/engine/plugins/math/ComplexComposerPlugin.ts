@@ -49,7 +49,7 @@ export default {
     signals: { input: 'real', output: 'complex', inputsCount: 2 },
     defaultParams: {},
     processor: {
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const re = inputs[0];
             const im = inputs[1];
 

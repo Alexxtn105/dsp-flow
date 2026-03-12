@@ -42,6 +42,12 @@
  *      Шумовой сигнал → Integrator(maxValue: 10) → Oscilloscope
  *      Интегрирование подавляет высокочастотный шум (действует как ФНЧ).
  */
+
+interface IntegratorState {
+    prevInput: number;
+    accumulator: number;
+}
+
 export default {
     type: 'Интегратор',
     id: 'integrator',
@@ -54,22 +60,22 @@ export default {
         maxValue: 1000,
     },
     processor: {
-        states: new Map(),
+        states: new Map<string, IntegratorState>(),
         clearStates() { this.states.clear(); },
 
-        process(inputs, params, chunkSize, nodeId) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number, nodeId?: string): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 
-            if (!this.states.has(nodeId)) {
-                this.states.set(nodeId, { prevInput: 0, accumulator: 0 });
+            if (!this.states.has(nodeId!)) {
+                this.states.set(nodeId!, { prevInput: 0, accumulator: 0 });
             }
-            const state = this.states.get(nodeId);
+            const state = this.states.get(nodeId!)!;
 
-            const sampleRate = params.sampleRate ?? 48000;
+            const sampleRate = (params.sampleRate ?? 48000) as number;
             const dt = 1.0 / sampleRate;
-            const resetOnOverflow = params.resetOnOverflow ?? true;
-            const maxValue = params.maxValue ?? 1000;
+            const resetOnOverflow = (params.resetOnOverflow ?? true) as boolean;
+            const maxValue = (params.maxValue ?? 1000) as number;
 
             const output = new Float32Array(input.length);
 

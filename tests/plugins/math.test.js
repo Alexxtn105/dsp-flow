@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import SummerPlugin from '../../src/engine/plugins/math/SummerPlugin.js';
-import MultiplierPlugin from '../../src/engine/plugins/math/MultiplierPlugin.js';
-import IntegratorPlugin from '../../src/engine/plugins/math/IntegratorPlugin.js';
-import RealPartPlugin from '../../src/engine/plugins/math/RealPartPlugin.js';
-import ImagPartPlugin from '../../src/engine/plugins/math/ImagPartPlugin.js';
-import ComplexComposerPlugin from '../../src/engine/plugins/math/ComplexComposerPlugin.js';
-import ComplexConjugatePlugin from '../../src/engine/plugins/math/ComplexConjugatePlugin.js';
-import Atan2Plugin from '../../src/engine/plugins/math/Atan2Plugin.js';
+import SummerPlugin from '../../src/engine/plugins/math/SummerPlugin';
+import MultiplierPlugin from '../../src/engine/plugins/math/MultiplierPlugin';
+import IntegratorPlugin from '../../src/engine/plugins/math/IntegratorPlugin';
+import RealPartPlugin from '../../src/engine/plugins/math/RealPartPlugin';
+import ImagPartPlugin from '../../src/engine/plugins/math/ImagPartPlugin';
+import ComplexComposerPlugin from '../../src/engine/plugins/math/ComplexComposerPlugin';
+import ComplexConjugatePlugin from '../../src/engine/plugins/math/ComplexConjugatePlugin';
+import Atan2Plugin from '../../src/engine/plugins/math/Atan2Plugin';
 
 describe('SummerPlugin', () => {
     it('суммирует два входа', () => {

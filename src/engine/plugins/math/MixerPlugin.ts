@@ -42,6 +42,10 @@
  *      даёт действительный сигнал с верхней боковой полосой.
  */
 
+interface MixerState {
+    phase: number;
+}
+
 const MixerPlugin = {
     type: 'Смеситель',
     id: 'mixer',
@@ -59,23 +63,23 @@ const MixerPlugin = {
     },
 
     processor: {
-        states: new Map(),
+        states: new Map<string, MixerState>(),
 
         clearStates() {
             this.states.clear();
         },
 
-        process(inputs, params, chunkSize, nodeId) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number, nodeId?: string): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize * 2);
 
-            const sampleRate = params.sampleRate ?? 48000;
-            const fShift = params.shiftFrequency ?? 1000;
+            const sampleRate = (params.sampleRate ?? 48000) as number;
+            const fShift = (params.shiftFrequency ?? 1000) as number;
 
-            if (!this.states.has(nodeId)) {
-                this.states.set(nodeId, { phase: 0 });
+            if (!this.states.has(nodeId!)) {
+                this.states.set(nodeId!, { phase: 0 });
             }
-            const state = this.states.get(nodeId);
+            const state = this.states.get(nodeId!)!;
 
             const output = new Float32Array(chunkSize * 2);
             const phaseInc = (2 * Math.PI * fShift) / sampleRate;

@@ -69,18 +69,18 @@ const LogExpPlugin = {
     },
 
     processor: {
-        states: new Map(),
+        states: new Map<string, Record<string, never>>(),
 
         clearStates() {
             this.states.clear();
         },
 
-        process(inputs, params, chunkSize) {
+        process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
             const input = inputs[0];
             if (!input) return new Float32Array(chunkSize);
 
-            const func = params.function ?? 'ln';
-            const eps = params.epsilon ?? 1e-10;
+            const func = (params.function ?? 'ln') as string;
+            const eps = (params.epsilon ?? 1e-10) as number;
             const output = new Float32Array(chunkSize);
 
             for (let i = 0; i < chunkSize; i++) {
