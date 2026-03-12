@@ -1085,6 +1085,23 @@
             }
         ]
     },
+    "real-sqrt": {
+        "title": "Square Root (Real)",
+        "purpose": "Extracts the square root of each sample of a real signal: y[n] = √|x[n]|. Negative values are handled via absolute value to avoid NaN. Square root compresses the dynamic range of a signal, making quiet parts more visible. It is the inverse of squaring: the chain x² → √x yields |x|.",
+        "algorithm": "y[n] = Math.sqrt(Math.abs(x[n])) No parameters, no state.",
+        "inputDescription": "real (Float32Array)",
+        "outputDescription": "real (Float32Array)",
+        "examples": [
+            {
+                "title": "Amplitude from power",
+                "description": "Signal → RealSquare → RealSqrt → NumericIndicator The chain x² → √x returns |x| (signal magnitude)."
+            },
+            {
+                "title": "Dynamic range compression",
+                "description": "Signal → RealSqrt → Oscilloscope Square root reduces amplitude spread, making quiet sections more distinguishable."
+            }
+        ]
+    },
     "real-power4": {
         "title": "Power of 4 (Real)",
         "purpose": "Raises each sample of a real signal to the fourth power: y[n] = x[n]⁴. This nonlinear operation is widely used in spectral line methods for carrier frequency recovery from phase-modulated signals. If the input signal has M-PSK modulation with M=4 (QPSK), raising to the 4th power eliminates the phase modulation (all constellation points 'collapse' into one), and a spectral line appears at frequency 4·fc.",

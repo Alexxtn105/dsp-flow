@@ -40,6 +40,7 @@ import ComplexMagnitudePlugin from './math/ComplexMagnitudePlugin.js';
 import ComplexComposerPlugin from './math/ComplexComposerPlugin.js';
 import ComplexConjugatePlugin from './math/ComplexConjugatePlugin.js';
 import RealSquarePlugin from './math/RealSquarePlugin.js';
+import RealSqrtPlugin from './math/RealSqrtPlugin.js';
 import RealPower4Plugin from './math/RealPower4Plugin.js';
 import Atan2Plugin from './math/Atan2Plugin.js';
 import AGCPlugin from './math/AGCPlugin.js';
@@ -122,6 +123,7 @@ export default [
     ComplexComposerPlugin,
     ComplexConjugatePlugin,
     RealSquarePlugin,
+    RealSqrtPlugin,
     RealPower4Plugin,
     Atan2Plugin,
     AGCPlugin,
