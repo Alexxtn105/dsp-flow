@@ -11,10 +11,14 @@ export const ProcessorState = {
 
 export type ProcessorStateValue = typeof ProcessorState[keyof typeof ProcessorState];
 
+/** Результат выполнения блока: одиночный или множественный выход */
+export type BlockOutput = Float32Array | { outputs: Float32Array[] };
+
 /** Состояние выходного буфера блока */
 export interface BlockState {
-  output: Float32Array | null;
+  output: BlockOutput | null;
   initialized: boolean;
+  cachedParams?: Record<string, unknown>;
 }
 
 /** Информация о прогрессе обработки */

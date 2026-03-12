@@ -5,7 +5,7 @@
 /** Группа блоков для UI (Toolbar) */
 export interface PluginGroup {
   id: string;
-  name: string;
+  name?: string;
   collapsed: boolean;
 }
 
@@ -25,5 +25,6 @@ export interface PluginGroupWithBlocks extends PluginGroup {
 /** Опция выпадающего списка параметра */
 export interface ParamOption {
   value: string | number;
-  label: string;
+  label?: string;
+  labelKey?: string;
 }

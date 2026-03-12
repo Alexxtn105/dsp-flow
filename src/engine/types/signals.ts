@@ -12,4 +12,8 @@ export interface PluginSignals {
   input: SignalType | null;
   output: SignalType | null;
   inputsCount?: number;
+  outputsCount?: number;
+  inputLabels?: string[];
+  outputLabels?: string[];
+  outputTypes?: SignalType[];
 }

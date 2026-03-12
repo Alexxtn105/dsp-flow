@@ -33,17 +33,24 @@ export interface InputConnection {
   targetHandle?: string;
 }
 
+/** Конфигурация сигналов блока (результат getSignalConfig) */
+export interface SignalConfig {
+  input: PluginSignals['input'];
+  output: PluginSignals['output'];
+  inputsCount: number;
+  outputsCount: number;
+  inputLabels?: string[];
+  outputLabels?: string[];
+  outputTypes?: PluginSignals['outputTypes'];
+}
+
 /** Блок в последовательности выполнения */
 export interface ExecutionBlock {
   nodeId: string;
   blockType: string;
   params: Record<string, unknown>;
   inputs: InputConnection[];
-  signalConfig: {
-    input: PluginSignals['input'];
-    output: PluginSignals['output'];
-    inputsCount: number;
-  };
+  signalConfig: SignalConfig;
 }
 
 /** Известные типы сообщений компиляции */

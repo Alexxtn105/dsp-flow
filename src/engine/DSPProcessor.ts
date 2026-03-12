@@ -9,49 +9,55 @@ import GraphCompiler from './GraphCompiler';
 import WavFileService from './WavFileService';
 import registry from './PluginRegistry';
 import i18n from '../locales/i18n';
+import type {
+    DSPNode,
+    DSPEdge,
+    ExecutionBlock,
+    BlockOutput,
+    BlockState,
+    CompilationResult,
+    ProcessingProgress,
+} from './types';
+import { ProcessorState } from './types';
+import type { ProcessorStateValue } from './types';
 
-const t = (key, options) => i18n.t(key, { ns: 'validation', ...options });
+const t = (key: string, options?: Record<string, unknown>): string =>
+    i18n.t(key, { ns: 'validation', ...options }) as string;
 
-const ProcessorState = Object.freeze({
-    IDLE: 'IDLE',
-    RUNNING_REALTIME: 'RUNNING_REALTIME',
-    RUNNING_MANUAL: 'RUNNING_MANUAL',
-    RUNNING_FILE: 'RUNNING_FILE',
-});
+/** Проверяет, является ли выход множественным */
+function isMultiOutput(output: BlockOutput): output is { outputs: Float32Array[] } {
+    return output !== null && typeof output === 'object' && 'outputs' in output;
+}
 
 class DSPProcessor {
-    constructor() {
-        this.state = ProcessorState.IDLE;
-        this._manualMode = false;
-        this._fileMode = false;
-        this.currentSample = 0;
-        this.chunkSize = 1024; // Размер обрабатываемого чанка
-        this.processingInterval = null;
-        this.compiledGraph = null;
-        this.blockStates = new Map(); // Состояния блоков (выходные буферы)
-        this._nodeTypeMap = new Map(); // Отслеживание типов блоков для обнаружения смены типа (M1)
-        this.onProgress = null;
-        this.onBlockOutput = null;
-        this.onComplete = null;
-        this.onError = null;
-        this.sampleRate = 48000;
+    state: ProcessorStateValue = ProcessorState.IDLE;
+    private _manualMode = false;
+    private _fileMode = false;
+    currentSample = 0;
+    chunkSize = 1024;
+    processingInterval: ReturnType<typeof setInterval> | null = null;
+    compiledGraph: ExecutionBlock[] | null = null;
+    blockStates: Map<string, BlockState> = new Map();
+    private _nodeTypeMap: Map<string, string> = new Map();
+    onProgress: ((progress: ProcessingProgress) => void) | null = null;
+    onBlockOutput: ((nodeId: string, output: Float32Array) => void) | null = null;
+    onComplete: (() => void) | null = null;
+    onError: ((error: Error) => void) | null = null;
+    sampleRate = 48000;
 
-        // Audio playback context
-        this.audioContext = null;
-        this.nextAudioStartTime = 0;
-    }
+    // Audio playback context
+    audioContext: AudioContext | null = null;
+    private nextAudioStartTime = 0;
 
     /** Обратная совместимость: геттер/сеттер isRunning */
-    get isRunning() {
+    get isRunning(): boolean {
         return this.state !== ProcessorState.IDLE;
     }
 
-    set isRunning(value) {
+    set isRunning(value: boolean) {
         if (!value) {
             this.state = ProcessorState.IDLE;
         } else if (this.state === ProcessorState.IDLE) {
-            // Определяем состояние на основе текущих конфигурационных флагов
-            // Ручной режим имеет приоритет
             if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
             else if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
             else this.state = ProcessorState.RUNNING_REALTIME;
@@ -59,39 +65,37 @@ class DSPProcessor {
     }
 
     /** Обратная совместимость: геттер/сеттер isManualMode */
-    get isManualMode() {
+    get isManualMode(): boolean {
         return this._manualMode;
     }
 
-    set isManualMode(value) {
+    set isManualMode(value: boolean) {
         this._manualMode = !!value;
     }
 
     /** Обратная совместимость: геттер/сеттер isFileMode */
-    get isFileMode() {
+    get isFileMode(): boolean {
         return this._fileMode;
     }
 
-    set isFileMode(value) {
+    set isFileMode(value: boolean) {
         this._fileMode = !!value;
     }
 
     /**
      * Toggles manual mode
      */
-    setManualMode(enabled) {
+    setManualMode(enabled: boolean): void {
         this._manualMode = !!enabled;
         if (enabled && this.state === ProcessorState.RUNNING_REALTIME) {
-            this.stop(); // Stop real-time interval if switching to manual
+            this.stop();
         }
     }
 
     /**
      * Инициализирует процессор с графом
-     * @param {Array} nodes - узлы графа
-     * @param {Array} edges - рёбра графа
      */
-    initialize(nodes, edges) {
+    initialize(nodes: DSPNode[], edges: DSPEdge[]): CompilationResult {
         // Компилируем граф
         const result = GraphCompiler.compile(nodes, edges);
 
@@ -104,7 +108,7 @@ class DSPProcessor {
         this.currentSample = 0;
 
         // Удаляем состояния для узлов, которых нет в новом графе
-        const currentNodeIds = new Set(this.compiledGraph.map(b => b.nodeId));
+        const currentNodeIds = new Set(this.compiledGraph!.map(b => b.nodeId));
         for (const nodeId of this.blockStates.keys()) {
             if (!currentNodeIds.has(nodeId)) {
                 this.blockStates.delete(nodeId);
@@ -114,12 +118,11 @@ class DSPProcessor {
         registry.clearStatesForRemovedNodes(currentNodeIds);
 
         // M1: Очищаем состояния при смене типа блока
-        for (const block of this.compiledGraph) {
+        for (const block of this.compiledGraph!) {
             const prevType = this._nodeTypeMap.get(block.nodeId);
             if (prevType && prevType !== block.blockType) {
-                // Тип блока изменился — удаляем старое состояние процессора
                 const oldProcessor = registry.getProcessor(prevType);
-                if (oldProcessor && oldProcessor.states) {
+                if (oldProcessor && 'states' in oldProcessor && oldProcessor.states instanceof Map) {
                     oldProcessor.states.delete(block.nodeId);
                 }
                 this.blockStates.delete(block.nodeId);
@@ -134,7 +137,7 @@ class DSPProcessor {
         }
 
         // Инициализируем состояния для каждого блока
-        for (const block of this.compiledGraph) {
+        for (const block of this.compiledGraph!) {
             const cachedParams = { ...block.params, sampleRate: this.sampleRate };
             this.blockStates.set(block.nodeId, {
                 output: null,
@@ -142,17 +145,17 @@ class DSPProcessor {
                 cachedParams
             });
 
-            // Если у блока есть метод init, вызываем его для предварительного расчета (например, коэффициентов фильтра)
             const BlockProcessor = registry.getProcessor(block.blockType);
-            if (BlockProcessor && typeof BlockProcessor.init === 'function') {
+            if (BlockProcessor && 'init' in BlockProcessor && typeof BlockProcessor.init === 'function') {
                 try {
-                    BlockProcessor.init(block.nodeId, cachedParams, this.sampleRate);
+                    (BlockProcessor as { init: (nodeId: string, params: Record<string, unknown>, sampleRate: number) => void })
+                        .init(block.nodeId, cachedParams, this.sampleRate);
                 } catch (error) {
                     return {
                         success: false,
                         errors: [{
                             type: 'init_error',
-                            message: t('processor.initError', { blockType: block.blockType, message: error.message }),
+                            message: t('processor.initError', { blockType: block.blockType, message: (error as Error).message }),
                             nodeId: block.nodeId
                         }],
                         warnings: result.warnings || [],
@@ -167,16 +170,14 @@ class DSPProcessor {
 
     /**
      * Запускает обработку
-     * @param {number} processingSpeed - скорость обработки (отсчётов в секунду)
      */
-    async start(processingSpeed = null) {
+    async start(processingSpeed: number | null = null): Promise<void> {
         if (this.isRunning) return;
         if (!this.compiledGraph) {
             console.error(t('processor.graphNotCompiled'));
             return;
         }
 
-        // В режиме файла берём sample rate из файла, иначе используем установленный
         const sampleRate = this._fileMode ? WavFileService.getSampleRate() : this.sampleRate;
 
         if (!sampleRate || sampleRate <= 0) {
@@ -189,25 +190,20 @@ class DSPProcessor {
             return;
         }
 
-        // Определяем состояние на основе конфигурационных флагов
-        // Ручной режим имеет приоритет — даже в режиме файла не создаём интервал
         if (this._manualMode) this.state = ProcessorState.RUNNING_MANUAL;
         else if (this._fileMode) this.state = ProcessorState.RUNNING_FILE;
         else this.state = ProcessorState.RUNNING_REALTIME;
 
-        // Рассчитываем интервал обработки
-        // По умолчанию обрабатываем в реальном времени
         const effectiveSpeed = processingSpeed || sampleRate;
         const intervalMs = (this.chunkSize / effectiveSpeed) * 1000;
 
-        // Инициализируем AudioContext для воспроизведения (один на всё приложение)
+        // Инициализируем AudioContext для воспроизведения
         if (!this.audioContext || this.audioContext.state === 'closed') {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
         }
         if (this.audioContext.state === 'suspended') {
             await this.audioContext.resume();
         }
-        // Переиспользуем контекст в WavFileService
         WavFileService.init(this.audioContext);
         this.nextAudioStartTime = this.audioContext.currentTime;
 
@@ -220,12 +216,10 @@ class DSPProcessor {
 
     /**
      * Выполняет один шаг обработки (только для ручного режима)
-     * @param {number} numSamples - количество отсчетов
      */
-    step(numSamples) {
+    step(numSamples: number): void {
         if (!this.compiledGraph) return;
 
-        // Temporarily set chunkSize to the requested step size
         const originalChunkSize = this.chunkSize;
         this.chunkSize = numSamples;
 
@@ -234,17 +228,13 @@ class DSPProcessor {
         }
         this.processNextChunk();
 
-        // If it was stopped by processNextChunk (e.g. End of File), keep it false
-        // Otherwise, in manual mode we usually consider it "running" while waiting for next step?
-        // Actually, we'll keep isRunning=true if simulation is active.
-
         this.chunkSize = originalChunkSize;
     }
 
     /**
      * Останавливает обработку (пауза)
      */
-    stop() {
+    stop(): void {
         this.state = ProcessorState.IDLE;
         if (this.processingInterval) {
             clearInterval(this.processingInterval);
@@ -259,7 +249,7 @@ class DSPProcessor {
     /**
      * Перемотка в начало (сохраняет скомпилированный граф)
      */
-    rewind() {
+    rewind(): void {
         this.stop();
         this.currentSample = 0;
         if (this.audioContext) {
@@ -275,7 +265,7 @@ class DSPProcessor {
     /**
      * Сброс к началу
      */
-    reset() {
+    reset(): void {
         this.stop();
         this._manualMode = false;
         this._fileMode = false;
@@ -299,15 +289,13 @@ class DSPProcessor {
             this.audioContext = null;
         }
 
-        // Очищаем внутренние состояния всех процессоров через реестр
         registry.clearAllStates();
     }
 
     /**
      * Обрабатывает следующий чанк данных
      */
-    processNextChunk() {
-        // Проверяем, не достигнут ли конец файла (только в режиме файла)
+    processNextChunk(): void {
         if (this._fileMode && WavFileService.isEndOfFile(this.currentSample)) {
             this.stop();
             if (this.onComplete) {
@@ -317,28 +305,26 @@ class DSPProcessor {
         }
 
         try {
-            // Обрабатываем каждый блок в порядке топологической сортировки
-            for (const block of this.compiledGraph) {
+            for (const block of this.compiledGraph!) {
                 const output = this.executeBlock(block);
-                const blockState = this.blockStates.get(block.nodeId);
+                const blockState = this.blockStates.get(block.nodeId)!;
                 blockState.output = output;
                 blockState.initialized = true;
 
-                // NaN/Infinity guard: обнуляем «плохие» значения, чтобы они не распространялись по графу
+                // NaN/Infinity guard
                 if (output instanceof Float32Array) {
                     for (let i = 0; i < output.length; i++) {
                         if (!isFinite(output[i])) output[i] = 0;
                     }
                 }
                 if (output && this.onBlockOutput) {
-                    // Для множественных выходов передаём primary (первый) для совместимости
-                    const primaryOutput = output?.outputs ? output.outputs[0] : output;
+                    const primaryOutput = isMultiOutput(output) ? output.outputs[0] : output;
                     this.onBlockOutput(block.nodeId, primaryOutput);
                 }
 
-                // Если это Speaker — воспроизводим (muted обрабатывается в SpeakerPlugin.process)
+                // Если это Speaker — воспроизводим
                 if (block.blockType === 'speaker' && output && this.audioContext) {
-                    const speakerData = output?.outputs ? output.outputs[0] : output;
+                    const speakerData = isMultiOutput(output) ? output.outputs[0] : output;
                     let hasSignal = false;
                     for (let i = 0; i < speakerData.length; i++) {
                         if (speakerData[i] !== 0) { hasSignal = true; break; }
@@ -349,53 +335,42 @@ class DSPProcessor {
                 }
             }
 
-            // Обновляем позицию
             this.currentSample += this.chunkSize;
 
-            // Уведомляем о прогрессе
             if (this.onProgress) {
                 const totalSamples = this._fileMode ? WavFileService.getTotalSamples() : 0;
                 const progress = totalSamples > 0 ? this.currentSample / totalSamples : 0;
 
                 this.onProgress({
                     currentSample: this.currentSample,
-                    totalSamples: totalSamples,
-                    progress: progress
+                    totalSamples,
+                    progress
                 });
             }
         } catch (error) {
             console.error(t('processor.processingError'), error);
             this.stop();
             if (this.onError) {
-                this.onError(error);
+                this.onError(error as Error);
             }
         }
     }
 
     /**
      * Выполняет один блок
-     * @param {Object} block - описание блока из compiledGraph
-     * @returns {Float32Array} выходные данные
      */
-    executeBlock(block) {
-        // Входы уже отсортированы при компиляции графа (GraphCompiler)
-        // Для блоков с несколькими входами сохраняем позиционную привязку:
-        // input-0 → inputs[0], input-1 → inputs[1] и т.д.
-        const inputs = [];
+    executeBlock(block: ExecutionBlock): BlockOutput {
+        const inputs: (Float32Array | null)[] = [];
         for (const input of block.inputs) {
             const sourceState = this.blockStates.get(input.sourceNodeId);
-            // Определяем данные источника с учётом множественных выходов
-            let sourceData = null;
+            let sourceData: Float32Array | null = null;
             if (sourceState?.output) {
                 const srcHandleMatch = input.sourceHandle?.match(/^output-(\d+)$/);
-                if (srcHandleMatch && sourceState.output.outputs) {
-                    // Множественный выход — выбираем нужный
+                if (srcHandleMatch && isMultiOutput(sourceState.output)) {
                     sourceData = sourceState.output.outputs[parseInt(srcHandleMatch[1], 10)] ?? null;
-                } else if (sourceState.output.outputs) {
-                    // Множественный выход, но sourceHandle = "output" — берём первый
+                } else if (isMultiOutput(sourceState.output)) {
                     sourceData = sourceState.output.outputs[0] ?? null;
                 } else {
-                    // Одиночный выход (обычный Float32Array)
                     sourceData = sourceState.output;
                 }
             }
@@ -412,12 +387,10 @@ class DSPProcessor {
             }
         }
 
-        // Получаем процессор для типа блока
         const BlockProcessor = registry.getProcessor(block.blockType);
 
         if (!BlockProcessor) {
-            // Для неизвестных блоков просто пропускаем данные
-            return inputs[0] || new Float32Array(this.chunkSize);
+            return (inputs[0] as Float32Array) || new Float32Array(this.chunkSize);
         }
 
         // Для генераторов (Входной сигнал) - читаем из WAV
@@ -425,7 +398,7 @@ class DSPProcessor {
             return WavFileService.readChunk(this.currentSample, this.chunkSize);
         }
 
-        // Используем кешированные params (с sampleRate), обновляем при изменении параметров блока
+        // Используем кешированные params (с sampleRate)
         const blockState = this.blockStates.get(block.nodeId);
         let paramsWithSampleRate = blockState?.cachedParams;
         if (!paramsWithSampleRate || paramsWithSampleRate.sampleRate !== this.sampleRate) {
@@ -433,21 +406,14 @@ class DSPProcessor {
             if (blockState) blockState.cachedParams = paramsWithSampleRate;
         }
 
-        // Выполняем блок
-        return BlockProcessor.process(inputs, paramsWithSampleRate, this.chunkSize, block.nodeId);
+        return BlockProcessor.process(inputs as Float32Array[], paramsWithSampleRate, this.chunkSize, block.nodeId);
     }
 
-    /**
-     * Устанавливает размер чанка
-     */
-    setChunkSize(size) {
+    setChunkSize(size: number): void {
         this.chunkSize = size;
     }
 
-    /**
-     * Переход к определённой позиции
-     */
-    seekTo(sample) {
+    seekTo(sample: number): void {
         if (!this._fileMode) return;
         this.currentSample = Math.max(0, Math.min(sample, WavFileService.getTotalSamples()));
         if (this.audioContext) {
@@ -455,19 +421,13 @@ class DSPProcessor {
         }
     }
 
-    /**
-     * Переход к определённому проценту
-     */
-    seekToPercent(percent) {
+    seekToPercent(percent: number): void {
         if (!this._fileMode) return;
         const sample = Math.floor(WavFileService.getTotalSamples() * percent);
         this.seekTo(sample);
     }
 
-    /**
-     * Устанавливает частоту дискретизации
-     */
-    setSampleRate(rate) {
+    setSampleRate(rate: number): void {
         if (!rate || rate <= 0) {
             console.error(t('processor.invalidSampleRate', { rate }));
             return;
@@ -475,39 +435,31 @@ class DSPProcessor {
         this.sampleRate = rate;
     }
 
-    /**
-     * Устанавливает режим работы (файл или генератор)
-     */
-    setFileMode(isFile) {
+    setFileMode(isFile: boolean): void {
         this._fileMode = !!isFile;
     }
 
     /**
      * Воспроизводит чанк аудио через Web Audio API
      */
-    playAudioChunk(chunkData) {
+    playAudioChunk(chunkData: Float32Array): void {
         if (!this.audioContext) return;
         if (!this.sampleRate || this.sampleRate <= 0) return;
 
-        // Создаем буфер
         const buffer = this.audioContext.createBuffer(1, chunkData.length, this.sampleRate);
         const channelData = buffer.getChannelData(0);
 
-        // Копируем данные
         for (let i = 0; i < chunkData.length; i++) {
             channelData[i] = chunkData[i];
         }
 
-        // Создаем источник
         const source = this.audioContext.createBufferSource();
         source.buffer = buffer;
         source.connect(this.audioContext.destination);
 
-        // Планируем воспроизведение без разрывов
         const startTime = Math.max(this.audioContext.currentTime, this.nextAudioStartTime);
         source.start(startTime);
 
-        // Обновляем время следующего чанка
         this.nextAudioStartTime = startTime + buffer.duration;
     }
 }

@@ -5,10 +5,11 @@
  * Вызывается один раз при старте приложения (до render).
  */
 
-import registry from './PluginRegistry.js';
+import registry from './PluginRegistry';
 import allPlugins from './plugins/index.js';
+import type { PluginDefinition } from './types';
 
-export default function initPlugins() {
+export default function initPlugins(): void {
     // Регистрация групп (порядок определяет отображение в Toolbar)
     // Display names are in locales/*/groups.json
     registry.registerGroup({ id: 'filters', collapsed: false });
@@ -135,7 +136,8 @@ export default function initPlugins() {
     ]);
 
     // Регистрация всех плагинов
-    registry.registerAll(allPlugins);
+    // JS-плагины типизированы неточно (signals.input: string вместо SignalType | null)
+    registry.registerAll(allPlugins as unknown as PluginDefinition[]);
 
     // Замораживаем реестр
     registry.freeze();

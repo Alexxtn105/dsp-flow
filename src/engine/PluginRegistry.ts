@@ -5,32 +5,30 @@
  * со всеми метаданными и процессором.
  */
 
-const REQUIRED_FIELDS = ['type', 'id', 'icon', 'description', 'group', 'signals', 'defaultParams', 'processor'];
+import type {
+    PluginDefinition,
+    Processor,
+    PluginGroup,
+    PluginGroupWithBlocks,
+    ParamOption,
+    SignalConfig,
+} from './types';
+
+const REQUIRED_FIELDS: (keyof PluginDefinition)[] = ['type', 'id', 'icon', 'description', 'group', 'signals', 'defaultParams', 'processor'];
 
 class PluginRegistry {
-    /** @type {Map<string, object>} id → plugin */
-    #plugins = new Map();
-
-    /** @type {Array<{id: string, name: string, collapsed: boolean}>} */
-    #groups = [];
-
-    /** @type {Record<string, Array<{value: any, label: string}>>} */
-    #paramOptions = {};
-
-    /** @type {boolean} */
+    #plugins: Map<string, PluginDefinition> = new Map();
+    #groups: PluginGroup[] = [];
+    #paramOptions: Record<string, ParamOption[]> = {};
     #frozen = false;
 
     // ─── Регистрация ───
 
-    /**
-     * Регистрирует один плагин
-     */
-    register(plugin) {
+    register(plugin: PluginDefinition): void {
         if (this.#frozen) {
             throw new Error(`PluginRegistry заморожен, невозможно зарегистрировать "${plugin?.id}"`);
         }
 
-        // Валидация обязательных полей
         for (const field of REQUIRED_FIELDS) {
             if (plugin[field] === undefined) {
                 throw new Error(`Плагин "${plugin?.id || '?'}" не содержит обязательное поле "${field}"`);
@@ -48,29 +46,20 @@ class PluginRegistry {
         this.#plugins.set(plugin.id, plugin);
     }
 
-    /**
-     * Регистрирует массив плагинов
-     */
-    registerAll(plugins) {
+    registerAll(plugins: PluginDefinition[]): void {
         for (const plugin of plugins) {
             this.register(plugin);
         }
     }
 
-    /**
-     * Регистрирует группу для UI (категория блоков)
-     */
-    registerGroup(group) {
+    registerGroup(group: PluginGroup): void {
         if (this.#frozen) {
             throw new Error('PluginRegistry заморожен');
         }
         this.#groups.push(group);
     }
 
-    /**
-     * Регистрирует опции для выпадающего списка параметра
-     */
-    registerParamOptions(name, options) {
+    registerParamOptions(name: string, options: ParamOption[]): void {
         if (this.#frozen) {
             throw new Error('PluginRegistry заморожен');
         }
@@ -79,22 +68,16 @@ class PluginRegistry {
 
     // ─── Доступ к данным ───
 
-    /**
-     * Возвращает процессор для типа блока
-     */
-    getProcessor(type) {
+    getProcessor(type: string): Processor | null {
         return this.#plugins.get(type)?.processor || null;
     }
 
-    /**
-     * Возвращает конфигурацию сигналов для типа блока
-     */
-    getSignalConfig(type) {
+    getSignalConfig(type: string): SignalConfig {
         const plugin = this.#plugins.get(type);
         if (!plugin) {
             return { input: 'real', output: 'real', inputsCount: 1, outputsCount: 1 };
         }
-        const config = {
+        const config: SignalConfig = {
             input: plugin.signals.input,
             output: plugin.signals.output,
             inputsCount: plugin.signals.inputsCount || 1,
@@ -112,49 +95,31 @@ class PluginRegistry {
         return config;
     }
 
-    /**
-     * Возвращает параметры по умолчанию для типа блока
-     */
-    getDefaultParams(type) {
+    getDefaultParams(type: string): Record<string, unknown> {
         return this.#plugins.get(type)?.defaultParams || {};
     }
 
-    /**
-     * Возвращает иконку для типа блока
-     */
-    getIcon(type) {
+    getIcon(type: string): string {
         return this.#plugins.get(type)?.icon || 'widgets';
     }
 
-    /**
-     * Возвращает описание типа блока
-     */
-    getDescription(type) {
+    getDescription(type: string): string {
         return this.#plugins.get(type)?.description || type;
     }
 
     // ─── Запросы ───
 
-    /**
-     * Является ли блок генератором (нет входов)
-     */
-    isGenerator(type) {
+    isGenerator(type: string): boolean {
         const plugin = this.#plugins.get(type);
         return plugin ? plugin.signals.input === null : false;
     }
 
-    /**
-     * Является ли блок визуализацией (нет выходов)
-     */
-    isVisualization(type) {
+    isVisualization(type: string): boolean {
         const plugin = this.#plugins.get(type);
         return plugin ? plugin.signals.output === null : false;
     }
 
-    /**
-     * Возвращает группы с блоками для UI (Toolbar)
-     */
-    getGroups() {
+    getGroups(): PluginGroupWithBlocks[] {
         return this.#groups.map(group => ({
             ...group,
             blocks: [...this.#plugins.values()]
@@ -168,30 +133,22 @@ class PluginRegistry {
         }));
     }
 
-    /**
-     * Возвращает опции параметра для выпадающего списка
-     */
-    getParamOptions(key) {
+    getParamOptions(key: string): ParamOption[] | null {
         return this.#paramOptions[key] || null;
     }
 
-    /**
-     * Проверяет, зарегистрирован ли плагин
-     */
-    has(type) {
+    has(type: string): boolean {
         return this.#plugins.has(type);
     }
 
     // ─── Управление состоянием ───
 
-    /**
-     * Сбрасывает состояния всех процессоров
-     */
-    clearAllStates() {
+    clearAllStates(): void {
         for (const plugin of this.#plugins.values()) {
-            if (typeof plugin.processor.clearStates === 'function') {
+            const proc = plugin.processor as unknown as Record<string, unknown>;
+            if (typeof proc.clearStates === 'function') {
                 try {
-                    plugin.processor.clearStates();
+                    (proc.clearStates as () => void)();
                 } catch {
                     // Продолжаем очистку остальных плагинов
                 }
@@ -199,13 +156,9 @@ class PluginRegistry {
         }
     }
 
-    /**
-     * Удаляет состояния процессоров для узлов, которых нет в activeNodeIds
-     * @param {Set<string>} activeNodeIds - множество активных nodeId
-     */
-    clearStatesForRemovedNodes(activeNodeIds) {
+    clearStatesForRemovedNodes(activeNodeIds: Set<string>): void {
         for (const plugin of this.#plugins.values()) {
-            if (plugin.processor.states instanceof Map) {
+            if ('states' in plugin.processor && plugin.processor.states instanceof Map) {
                 for (const nodeId of plugin.processor.states.keys()) {
                     if (!activeNodeIds.has(nodeId)) {
                         plugin.processor.states.delete(nodeId);
@@ -215,17 +168,11 @@ class PluginRegistry {
         }
     }
 
-    /**
-     * Замораживает реестр (запрещает дальнейшую регистрацию)
-     */
-    freeze() {
+    freeze(): void {
         this.#frozen = true;
     }
 
-    /**
-     * Полный сброс реестра (для тестов)
-     */
-    reset() {
+    reset(): void {
         this.#plugins.clear();
         this.#groups = [];
         this.#paramOptions = {};

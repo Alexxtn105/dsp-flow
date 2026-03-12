@@ -10,19 +10,25 @@
 
 import { getBlockSignalConfig, areSignalsCompatible } from '../utils/helpers';
 import i18n from '../locales/i18n';
+import type {
+    DSPNode,
+    DSPEdge,
+    CompilationMessage,
+    CompilationResult,
+    ExecutionBlock,
+    TopologicalSortResult,
+} from './types';
 
-const t = (key, options) => i18n.t(key, { ns: 'validation', ...options });
+const t = (key: string, options?: Record<string, unknown>): string =>
+    i18n.t(key, { ns: 'validation', ...options }) as string;
 
 class GraphCompiler {
     /**
      * Компилирует граф и возвращает последовательность выполнения
-     * @param {Array} nodes - узлы графа
-     * @param {Array} edges - рёбра графа
-     * @returns {Object} результат компиляции
      */
-    compile(nodes, edges) {
-        const errors = [];
-        const warnings = [];
+    compile(nodes: DSPNode[], edges: DSPEdge[]): CompilationResult {
+        const errors: CompilationMessage[] = [];
+        const warnings: CompilationMessage[] = [];
 
         // Шаг 1: Проверка типов соединений
         const connectionValidation = this.validateConnections(nodes, edges);
@@ -75,9 +81,9 @@ class GraphCompiler {
     /**
      * Проверяет совместимость типов соединений
      */
-    validateConnections(nodes, edges) {
-        const errors = [];
-        const warnings = [];
+    validateConnections(nodes: DSPNode[], edges: DSPEdge[]): { errors: CompilationMessage[]; warnings: CompilationMessage[] } {
+        const errors: CompilationMessage[] = [];
+        const warnings: CompilationMessage[] = [];
         const nodeMap = new Map(nodes.map(n => [n.id, n]));
 
         for (const edge of edges) {
@@ -132,11 +138,10 @@ class GraphCompiler {
 
     /**
      * Выполняет топологическую сортировку и обнаружение циклов (алгоритм Кана)
-     * @returns {{ order: string[], hasCycle: boolean, cycleNodes: string[] }}
      */
-    topologicalSort(nodes, edges) {
-        const inDegree = new Map();
-        const adjacencyList = new Map();
+    topologicalSort(nodes: DSPNode[], edges: DSPEdge[]): TopologicalSortResult {
+        const inDegree = new Map<string, number>();
+        const adjacencyList = new Map<string, string[]>();
 
         // Инициализация
         for (const node of nodes) {
@@ -151,20 +156,20 @@ class GraphCompiler {
         }
 
         // Очередь узлов с нулевой входящей степенью
-        const queue = [];
+        const queue: string[] = [];
         for (const [nodeId, degree] of inDegree) {
             if (degree === 0) {
                 queue.push(nodeId);
             }
         }
 
-        const order = [];
+        const order: string[] = [];
         while (queue.length > 0) {
-            const current = queue.shift();
+            const current = queue.shift()!;
             order.push(current);
 
             for (const neighbor of adjacencyList.get(current) || []) {
-                inDegree.set(neighbor, inDegree.get(neighbor) - 1);
+                inDegree.set(neighbor, inDegree.get(neighbor)! - 1);
                 if (inDegree.get(neighbor) === 0) {
                     queue.push(neighbor);
                 }
@@ -182,18 +187,18 @@ class GraphCompiler {
     /**
      * Находит несвязные компоненты графа (без учёта направления рёбер)
      */
-    findConnectedComponents(nodes, edges) {
-        const parent = new Map();
+    findConnectedComponents(nodes: DSPNode[], edges: DSPEdge[]): string[][] {
+        const parent = new Map<string, string>();
         for (const node of nodes) parent.set(node.id, node.id);
 
-        const find = (x) => {
+        const find = (x: string): string => {
             while (parent.get(x) !== x) {
-                parent.set(x, parent.get(parent.get(x)));
-                x = parent.get(x);
+                parent.set(x, parent.get(parent.get(x)!)!);
+                x = parent.get(x)!;
             }
             return x;
         };
-        const union = (a, b) => {
+        const union = (a: string, b: string): void => {
             const ra = find(a), rb = find(b);
             if (ra !== rb) parent.set(ra, rb);
         };
@@ -202,11 +207,11 @@ class GraphCompiler {
             union(edge.source, edge.target);
         }
 
-        const groups = new Map();
+        const groups = new Map<string, string[]>();
         for (const node of nodes) {
             const root = find(node.id);
             if (!groups.has(root)) groups.set(root, []);
-            groups.get(root).push(node.id);
+            groups.get(root)!.push(node.id);
         }
 
         return [...groups.values()];
@@ -215,20 +220,20 @@ class GraphCompiler {
     /**
      * Генерирует последовательность выполнения с метаданными
      */
-    generateExecutionSequence(orderIds, nodes, edges) {
+    generateExecutionSequence(orderIds: string[], nodes: DSPNode[], edges: DSPEdge[]): ExecutionBlock[] {
         const nodeMap = new Map(nodes.map(n => [n.id, n]));
-        const edgeMap = new Map();
+        const edgeMap = new Map<string, DSPEdge[]>();
 
         // Группируем входящие рёбра по целевому узлу
         for (const edge of edges) {
             if (!edgeMap.has(edge.target)) {
                 edgeMap.set(edge.target, []);
             }
-            edgeMap.get(edge.target).push(edge);
+            edgeMap.get(edge.target)!.push(edge);
         }
 
         return orderIds.map(nodeId => {
-            const node = nodeMap.get(nodeId);
+            const node = nodeMap.get(nodeId)!;
             const inputEdges = edgeMap.get(nodeId) || [];
 
             // Сортируем входы по targetHandle один раз при компиляции (H4)

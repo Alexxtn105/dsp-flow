@@ -7,39 +7,37 @@
  * - Чтения чанков аудио данных
  */
 
+import type { WavFileMetadata } from './types';
+
 class WavFileService {
-    constructor() {
-        this.audioContext = null;
-        this.audioBuffer = null;
-        this.file = null;
-    }
+    audioContext: AudioContext | null = null;
+    audioBuffer: AudioBuffer | null = null;
+    file: File | null = null;
+    private _ownsContext = false;
 
     /**
      * Инициализирует AudioContext (или переиспользует внешний)
-     * @param {AudioContext} [externalContext] - внешний AudioContext для переиспользования
      */
-    init(externalContext) {
+    init(externalContext?: AudioContext): AudioContext {
         if (externalContext && externalContext.state !== 'closed') {
             this.audioContext = externalContext;
             this._ownsContext = false;
         } else if (!this.audioContext || this.audioContext.state === 'closed') {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
             this._ownsContext = true;
         }
-        return this.audioContext;
+        return this.audioContext!;
     }
 
     /**
      * Загружает WAV файл
-     * @param {File} file - объект File
-     * @returns {Promise<Object>} метаданные файла
      */
-    async loadFile(file) {
+    async loadFile(file: File): Promise<WavFileMetadata> {
         this.init();
         this.file = file;
 
         const arrayBuffer = await file.arrayBuffer();
-        this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+        this.audioBuffer = await this.audioContext!.decodeAudioData(arrayBuffer);
 
         return {
             sampleRate: this.audioBuffer.sampleRate,
@@ -53,32 +51,28 @@ class WavFileService {
     /**
      * Возвращает sample rate текущего файла
      */
-    getSampleRate() {
+    getSampleRate(): number {
         return this.audioBuffer?.sampleRate || 48000;
     }
 
     /**
      * Возвращает общее количество отсчётов
      */
-    getTotalSamples() {
+    getTotalSamples(): number {
         return this.audioBuffer?.length || 0;
     }
 
     /**
      * Возвращает длительность в секундах
      */
-    getDuration() {
+    getDuration(): number {
         return this.audioBuffer?.duration || 0;
     }
 
     /**
      * Читает чанк аудио данных
-     * @param {number} startSample - начальный отсчёт
-     * @param {number} chunkSize - размер чанка в отсчётах
-     * @param {number} channel - номер канала (по умолчанию 0)
-     * @returns {Float32Array} данные чанка
      */
-    readChunk(startSample, chunkSize, channel = 0) {
+    readChunk(startSample: number, chunkSize: number, channel = 0): Float32Array {
         if (!this.audioBuffer) {
             return new Float32Array(chunkSize);
         }
@@ -103,16 +97,13 @@ class WavFileService {
 
     /**
      * Читает все каналы для чанка
-     * @param {number} startSample - начальный отсчёт
-     * @param {number} chunkSize - размер чанка
-     * @returns {Array<Float32Array>} массив данных по каналам
      */
-    readChunkAllChannels(startSample, chunkSize) {
+    readChunkAllChannels(startSample: number, chunkSize: number): Float32Array[] {
         if (!this.audioBuffer) {
             return [new Float32Array(chunkSize)];
         }
 
-        const channels = [];
+        const channels: Float32Array[] = [];
         for (let i = 0; i < this.audioBuffer.numberOfChannels; i++) {
             channels.push(this.readChunk(startSample, chunkSize, i));
         }
@@ -122,14 +113,14 @@ class WavFileService {
     /**
      * Проверяет, достигнут ли конец файла
      */
-    isEndOfFile(currentSample) {
+    isEndOfFile(currentSample: number): boolean {
         return currentSample >= this.getTotalSamples();
     }
 
     /**
      * Сброс состояния
      */
-    reset() {
+    reset(): void {
         this.audioBuffer = null;
         this.file = null;
     }
@@ -137,7 +128,7 @@ class WavFileService {
     /**
      * Закрытие AudioContext (только если WavFileService его создал)
      */
-    close() {
+    close(): void {
         if (this.audioContext && this._ownsContext) {
             this.audioContext.close();
         }

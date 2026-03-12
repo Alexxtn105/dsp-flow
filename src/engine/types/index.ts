@@ -13,6 +13,7 @@ export type {
   DSPNode,
   DSPEdge,
   InputConnection,
+  SignalConfig,
   ExecutionBlock,
   CompilationMessageType,
   CompilationMessage,
@@ -26,6 +27,7 @@ export {
 
 export type {
   ProcessorStateValue,
+  BlockOutput,
   BlockState,
   ProcessingProgress,
   ProcessorCallbacks,
