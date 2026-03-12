@@ -38,11 +38,14 @@ function App() {
         connectionsCount: 0
     });
 
-    // Отслеживание выделения (для touch delete)
+    // Отслеживание выделения (для touch delete) и undo
     const [hasSelection, setHasSelection] = useState(false);
+    const [hasUndoHistory, setHasUndoHistory] = useState(false);
 
     // Undo-стек (snapshot нод и рёбер перед деструктивной операцией)
     const undoStackRef = useRef([]);
+    const currentSchemeRef = useRef(currentScheme);
+    useEffect(() => { currentSchemeRef.current = currentScheme; }, [currentScheme]);
 
     // Диалоги
     const dialogs = useDialogManager();
@@ -85,6 +88,7 @@ function App() {
 
         setCurrentScheme({ name: 'not_saved', isSaved: true });
         simulation.setNodes([]);
+        undoStackRef.current = [];
     }, [reactFlowInstance, simulation]);
 
     const handleNewScheme = useCallback(() => {
@@ -116,6 +120,7 @@ function App() {
     const handleLoadSuccess = useCallback((schemeName) => {
         handleSchemeUpdate(schemeName, true);
         dialogs.setShowLoadDialog(false);
+        undoStackRef.current = [];
     }, [handleSchemeUpdate, dialogs]);
 
     const handleSampleRateChange = useCallback((newRate) => {
@@ -139,12 +144,20 @@ function App() {
     const pushUndoSnapshot = useCallback(() => {
         if (!reactFlowInstance) return;
         const snapshot = {
-            nodes: reactFlowInstance.getNodes().map(n => ({ ...n, data: { ...n.data } })),
+            nodes: reactFlowInstance.getNodes().map(n => ({
+                ...n,
+                data: {
+                    ...n.data,
+                    params: n.data.params ? { ...n.data.params } : undefined,
+                    signalConfig: n.data.signalConfig ? { ...n.data.signalConfig } : undefined,
+                },
+            })),
             edges: reactFlowInstance.getEdges().map(e => ({ ...e })),
-            scheme: { ...currentScheme },
+            scheme: { ...currentSchemeRef.current },
         };
         undoStackRef.current = [...undoStackRef.current.slice(-9), snapshot];
-    }, [reactFlowInstance, currentScheme]);
+        setHasUndoHistory(true);
+    }, [reactFlowInstance]);
 
     // Delete selected elements (for touch)
     const handleDeleteSelected = useCallback(() => {
@@ -164,6 +177,7 @@ function App() {
         reactFlowInstance.setNodes(snapshot.nodes);
         reactFlowInstance.setEdges(snapshot.edges);
         setCurrentScheme(snapshot.scheme);
+        setHasUndoHistory(undoStackRef.current.length > 0);
     }, [reactFlowInstance]);
 
     const handleOpenVisualization = useCallback((nodeId) => {
@@ -197,6 +211,7 @@ function App() {
                         onDeleteSelected={handleDeleteSelected}
                         onUndo={handleUndo}
                         hasSelection={hasSelection}
+                        hasUndoHistory={hasUndoHistory}
                     />
 
                     <ErrorBoundary fallbackMessage={t('app.editorError')}>

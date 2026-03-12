@@ -18,7 +18,8 @@ function ControlToolbar({
     isRunning,
     onDeleteSelected,
     onUndo,
-    hasSelection
+    hasSelection,
+    hasUndoHistory
 }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
@@ -93,6 +94,7 @@ function ControlToolbar({
                                 className="ct-btn ct-btn-undo"
                                 onClick={onUndo}
                                 title={t('controlToolbar.undo')}
+                                disabled={!hasUndoHistory}
                             >
                                 <Icon name="undo" size="large" className="ct-icon" />
                             </button>
@@ -129,7 +131,8 @@ ControlToolbar.propTypes = {
     isRunning: PropTypes.bool.isRequired,
     onDeleteSelected: PropTypes.func,
     onUndo: PropTypes.func,
-    hasSelection: PropTypes.bool
+    hasSelection: PropTypes.bool,
+    hasUndoHistory: PropTypes.bool
 };
 
 export default ControlToolbar;
