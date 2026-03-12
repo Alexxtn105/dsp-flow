@@ -520,6 +520,7 @@ function DSPEditor({
                     onInit={handleInit}
                     onDrop={onDrop}
                     onDragOver={onDragOver}
+                    onNodeDoubleClick={(_, node) => handleOpenParams(node.id)}
                     nodeTypes={nodeTypes}
                     edgeTypes={edgeTypes}
                     isValidConnection={isValidConnection}
