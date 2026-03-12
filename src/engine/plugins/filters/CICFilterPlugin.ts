@@ -169,7 +169,7 @@ const CICFilterPlugin = {
                 let outIdx = 0;
 
                 for (let i = 0; i < chunkSize; i++) {
-                    let val = (input[i] * CIC_INT_SCALE) | 0;
+                    const val = (input[i] * CIC_INT_SCALE) | 0;
 
                     // Каскад гребёнок (comb): y = x - x_prev, задержка M=1
                     let combVal = val;

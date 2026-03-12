@@ -57,7 +57,7 @@ export default {
         timeWindow: 10,
     },
     processor: {
-        process(inputs: (Float32Array | null)[], _params: Record<string, unknown>, _chunkSize: number) {
+        process(inputs: (Float32Array | null)[]) {
             const channels: (Float32Array | null)[] = [];
             for (let i = 0; i < 4; i++) {
                 channels.push(inputs[i] || null);

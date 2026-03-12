@@ -84,7 +84,7 @@ export default {
                 if (state) {
                     const old = state.buf;
                     const oldLen = old.length;
-                    let oldPos = state.pos;
+                    const oldPos = state.pos;
                     const copyLen = Math.min(oldLen, N);
                     // Читаем последние copyLen отсчётов из старого буфера
                     for (let i = N - copyLen; i < N; i++) {

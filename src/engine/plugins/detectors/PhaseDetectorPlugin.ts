@@ -120,7 +120,7 @@ const PhaseDetectorPlugin = {
                     continue;
                 }
 
-                let phase = Math.atan2(Q, I);
+                const phase = Math.atan2(Q, I);
 
                 // Phase unwrapping
                 const delta = unwrapPhaseDelta(phase - state.prevPhase);

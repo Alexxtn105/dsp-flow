@@ -42,9 +42,7 @@
 
 import type { PluginDefinition } from '../../types';
 
-interface ConstantState {
-    // Пустое состояние для совместимости с интерфейсом плагина
-}
+type ConstantState = object;
 
 export default {
     type: 'Константа',
