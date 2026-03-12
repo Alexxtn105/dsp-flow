@@ -72,11 +72,10 @@ function App() {
     }, []);
 
     const doCreateNewScheme = useCallback(() => {
-        if (simulation.isRunning || simulation.isPaused) {
-            DSPProcessor.reset();
-            simulation.setIsRunning(false);
-            simulation.setIsPaused(false);
-        }
+        DSPProcessor.reset();
+        simulation.setIsRunning(false);
+        simulation.setIsPaused(false);
+        simulation.resetProgress();
 
         if (reactFlowInstance) {
             reactFlowInstance.setNodes([]);

@@ -185,6 +185,10 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         };
     }, []);
 
+    const resetProgress = useCallback(() => {
+        setProcessingProgress({ currentSample: 0, totalSamples: 0, progress: 0 });
+    }, []);
+
     return {
         isRunning, setIsRunning,
         isPaused, setIsPaused,
@@ -198,5 +202,6 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         handleManualStep,
         handleRewind,
         handleSeek,
+        resetProgress,
     };
 }
