@@ -89,6 +89,7 @@ function App() {
         setCurrentScheme({ name: 'not_saved', isSaved: true });
         simulation.setNodes([]);
         undoStackRef.current = [];
+        setHasUndoHistory(false);
     }, [reactFlowInstance, simulation]);
 
     const handleNewScheme = useCallback(() => {
@@ -121,6 +122,7 @@ function App() {
         handleSchemeUpdate(schemeName, true);
         dialogs.setShowLoadDialog(false);
         undoStackRef.current = [];
+        setHasUndoHistory(false);
     }, [handleSchemeUpdate, dialogs]);
 
     const handleSampleRateChange = useCallback((newRate) => {
