@@ -585,6 +585,7 @@ function DSPEditor({
                     edgeTypes={edgeTypes}
                     isValidConnection={isValidConnection}
                     fitView
+                    proOptions={{ hideAttribution: true }}
                 >
                     <Background
                         color={isDarkTheme ? '#374151' : '#e5e7eb'}
