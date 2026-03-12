@@ -15,7 +15,8 @@
     "stepLabel": "Шаг",
     "stepSizeTitle": "Количество отсчётов за шаг",
     "executeStep": "Выполнить шаг",
-    "stepButton": "Шаг"
+    "stepButton": "Шаг",
+    "feedback": "Сообщить об ошибке или предложить идею"
   },
   "toolbar": {
     "blocks": "Блоки",

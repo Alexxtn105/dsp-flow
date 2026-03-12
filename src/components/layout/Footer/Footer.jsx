@@ -181,7 +181,16 @@ function Footer({
                         <span className="ft-nodes-icon">●</span> {nodesCount}
                     </span>
                     <span className="ft-divider" />
-                    <span className="ft-version">v1.0.0 · AlexxTN105</span>
+                    <a
+                        className="ft-version ft-version-link"
+                        href="https://github.com/Alexxtn105/dsp-flow/issues/new"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t('footer.feedback', 'Report a bug or suggest a feature')}
+                    >
+                        <span className="material-icons ft-feedback-icon">bug_report</span>
+                        <span>v1.0.0 · AlexxTN105</span>
+                    </a>
                     <a
                         className="ft-sponsor"
                         href="https://github.com/sponsors/Alexxtn105"

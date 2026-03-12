@@ -346,6 +346,30 @@
     letter-spacing: 0.3px;
 }
 
+.ft-version-link {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--panel-text-6);
+    transition: color 0.15s;
+    cursor: pointer;
+}
+
+.ft-version-link:hover {
+    color: var(--panel-accent);
+}
+
+.ft-feedback-icon {
+    font-size: 12px;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+}
+
+.ft-version-link:hover .ft-feedback-icon {
+    opacity: 1;
+}
+
 .ft-sponsor {
     display: flex;
     align-items: center;
