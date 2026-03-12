@@ -5,6 +5,9 @@
  * со всеми метаданными и процессором.
  */
 
+import {
+    isStatefulProcessor,
+} from './types';
 import type {
     PluginDefinition,
     Processor,
@@ -145,10 +148,12 @@ class PluginRegistry {
 
     clearAllStates(): void {
         for (const plugin of this.#plugins.values()) {
-            const proc = plugin.processor as unknown as Record<string, unknown>;
-            if (typeof proc.clearStates === 'function') {
+            // Проверяем наличие метода clearStates напрямую:
+            // не все процессоры с clearStates имеют states: Map (duck typing)
+            const proc = plugin.processor;
+            if ('clearStates' in proc && typeof proc.clearStates === 'function') {
                 try {
-                    (proc.clearStates as () => void)();
+                    proc.clearStates();
                 } catch {
                     // Продолжаем очистку остальных плагинов
                 }
@@ -158,7 +163,7 @@ class PluginRegistry {
 
     clearStatesForRemovedNodes(activeNodeIds: Set<string>): void {
         for (const plugin of this.#plugins.values()) {
-            if ('states' in plugin.processor && plugin.processor.states instanceof Map) {
+            if (isStatefulProcessor(plugin.processor)) {
                 for (const nodeId of plugin.processor.states.keys()) {
                     if (!activeNodeIds.has(nodeId)) {
                         plugin.processor.states.delete(nodeId);

@@ -9,6 +9,10 @@ import GraphCompiler from './GraphCompiler';
 import WavFileService from './WavFileService';
 import registry from './PluginRegistry';
 import i18n from '../locales/i18n';
+import {
+    ProcessorState,
+    isStatefulProcessor,
+} from './types';
 import type {
     DSPNode,
     DSPEdge,
@@ -17,9 +21,8 @@ import type {
     BlockState,
     CompilationResult,
     ProcessingProgress,
+    ProcessorStateValue,
 } from './types';
-import { ProcessorState } from './types';
-import type { ProcessorStateValue } from './types';
 
 const t = (key: string, options?: Record<string, unknown>): string =>
     i18n.t(key, { ns: 'validation', ...options }) as string;
@@ -122,7 +125,7 @@ class DSPProcessor {
             const prevType = this._nodeTypeMap.get(block.nodeId);
             if (prevType && prevType !== block.blockType) {
                 const oldProcessor = registry.getProcessor(prevType);
-                if (oldProcessor && 'states' in oldProcessor && oldProcessor.states instanceof Map) {
+                if (oldProcessor && isStatefulProcessor(oldProcessor)) {
                     oldProcessor.states.delete(block.nodeId);
                 }
                 this.blockStates.delete(block.nodeId);
@@ -390,7 +393,7 @@ class DSPProcessor {
         const BlockProcessor = registry.getProcessor(block.blockType);
 
         if (!BlockProcessor) {
-            return (inputs[0] as Float32Array) || new Float32Array(this.chunkSize);
+            return inputs[0] ?? new Float32Array(this.chunkSize);
         }
 
         // Для генераторов (Входной сигнал) - читаем из WAV
@@ -406,7 +409,7 @@ class DSPProcessor {
             if (blockState) blockState.cachedParams = paramsWithSampleRate;
         }
 
-        return BlockProcessor.process(inputs as Float32Array[], paramsWithSampleRate, this.chunkSize, block.nodeId);
+        return BlockProcessor.process(inputs, paramsWithSampleRate, this.chunkSize, block.nodeId);
     }
 
     setChunkSize(size: number): void {
