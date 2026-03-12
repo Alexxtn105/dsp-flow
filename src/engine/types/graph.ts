@@ -46,12 +46,22 @@ export interface ExecutionBlock {
   };
 }
 
+/** Известные типы сообщений компиляции */
+export type CompilationMessageType =
+  | 'cycle'
+  | 'disconnected_components'
+  | 'invalid_connection'
+  | 'type_mismatch'
+  | 'disconnected_input'
+  | 'init_error';
+
 /** Ошибка/предупреждение компиляции */
 export interface CompilationMessage {
-  type: string;
+  type: CompilationMessageType;
   message: string;
   edge?: string;
   node?: string;
+  nodeId?: string;
   sourceNode?: string;
   targetNode?: string;
   nodes?: string[];

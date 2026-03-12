@@ -7,12 +7,14 @@ export type {
   Processor,
   PluginDefinition,
 } from './plugin';
+export { isStatefulProcessor } from './plugin';
 
 export type {
   DSPNode,
   DSPEdge,
   InputConnection,
   ExecutionBlock,
+  CompilationMessageType,
   CompilationMessage,
   CompilationResult,
   TopologicalSortResult,
@@ -28,8 +30,11 @@ export type {
   ProcessingProgress,
   ProcessorCallbacks,
   WavFileMetadata,
+} from './processor';
+
+export type {
   PluginGroup,
   PluginGroupBlock,
   PluginGroupWithBlocks,
   ParamOption,
-} from './processor';
+} from './registry';
