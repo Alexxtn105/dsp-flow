@@ -633,3 +633,51 @@
         touch-action: manipulation;
     }
 }
+
+/* Landscape on smartphones: compact footer */
+@media (pointer: coarse) and (max-height: 500px) and (orientation: landscape) {
+    .ft-transport {
+        padding: 2px 8px 1px;
+    }
+
+    .ft-transport-group {
+        padding: 1px 3px;
+        gap: 1px;
+    }
+
+    .ft-tr-btn {
+        width: 32px;
+        height: 28px;
+    }
+
+    .ft-tr-play {
+        width: 36px;
+        height: 30px;
+    }
+
+    .ft-bar {
+        padding: 1px 8px 2px;
+        min-height: 20px;
+        gap: 6px;
+    }
+
+    .ft-timeline {
+        padding: 0 8px;
+    }
+
+    .ft-timeline-markers {
+        height: 10px;
+    }
+
+    .ft-counter {
+        font-size: 9px;
+    }
+
+    .ft-status-text {
+        font-size: 9px;
+    }
+
+    .ft-status {
+        padding: 1px 6px 1px 4px;
+    }
+}
