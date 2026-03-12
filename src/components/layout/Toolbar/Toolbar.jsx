@@ -1,14 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import BlockHelpDialog from '../../dialogs/BlockHelpDialog/BlockHelpDialog.jsx';
 import registry from '../../../engine/PluginRegistry';
 import { useThemeContext } from '../../../contexts/ThemeContext';
+import useTouchDetect from '../../../hooks/useTouchDetect';
 import './Toolbar.css';
 
 function Toolbar() {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
+    const isTouch = useTouchDetect();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [legendOpen, setLegendOpen] = useState(false);
     const legendRef = useRef(null);
@@ -79,6 +81,16 @@ function Toolbar() {
         const draggingElements = document.querySelectorAll('.dragging');
         draggingElements.forEach(el => el.classList.remove('dragging'));
     };
+
+    // Touch: tap-to-add block to canvas center
+    const handleTouchAdd = useCallback((event, blockId) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const el = event.currentTarget;
+        el.classList.add('touch-added');
+        setTimeout(() => el.classList.remove('touch-added'), 300);
+        window.dispatchEvent(new CustomEvent('dsp-add-block', { detail: { blockType: blockId } }));
+    }, []);
 
     const toggleGroup = (groupId) => {
         setCollapsedGroups(prev => ({
@@ -205,9 +217,10 @@ function Toolbar() {
                                             <div
                                                 key={block.id}
                                                 className="tb-block"
-                                                draggable
-                                                onDragStart={(e) => onDragStart(e, block.name)}
-                                                onDragEnd={onDragEnd}
+                                                draggable={!isTouch}
+                                                onDragStart={isTouch ? undefined : (e) => onDragStart(e, block.name)}
+                                                onDragEnd={isTouch ? undefined : onDragEnd}
+                                                onClick={isTouch ? (e) => handleTouchAdd(e, block.name) : undefined}
                                                 title={displayName}
                                                 role="button"
                                                 tabIndex={0}
@@ -248,9 +261,10 @@ function Toolbar() {
                         <div
                             key={block.id}
                             className="tb-block-mini"
-                            draggable
-                            onDragStart={(e) => onDragStart(e, block.name)}
-                            onDragEnd={onDragEnd}
+                            draggable={!isTouch}
+                            onDragStart={isTouch ? undefined : (e) => onDragStart(e, block.name)}
+                            onDragEnd={isTouch ? undefined : onDragEnd}
+                            onClick={isTouch ? (e) => handleTouchAdd(e, block.name) : undefined}
                             title={blockDisplayName(block.name)}
                             role="button"
                             tabIndex={0}

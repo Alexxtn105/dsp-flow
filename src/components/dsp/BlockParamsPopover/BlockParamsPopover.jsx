@@ -110,15 +110,15 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
         };
     }, []);
 
-    // Click-outside закрытие
+    // Click-outside закрытие (pointerdown — кроссплатформенно)
     useEffect(() => {
-        const handleMouseDown = (e) => {
+        const handlePointerDown = (e) => {
             if (popoverRef.current && !popoverRef.current.contains(e.target)) {
                 onClose();
             }
         };
-        document.addEventListener('mousedown', handleMouseDown);
-        return () => document.removeEventListener('mousedown', handleMouseDown);
+        document.addEventListener('pointerdown', handlePointerDown);
+        return () => document.removeEventListener('pointerdown', handlePointerDown);
     }, [onClose]);
 
     // Escape закрытие
@@ -247,6 +247,9 @@ function BlockParamsPopover({ onClose, node, onSave, onSampleRateChange }) {
             style={{ left: position.x, top: position.y }}
             onKeyDown={handlePopoverKeyDown}
         >
+            <div className="popover-drag-handle">
+                <div className="popover-drag-handle-bar" />
+            </div>
             <div className="popover-header">
                 <span className="popover-title">{getBlockDescription(blockType)}</span>
                 <button className="popover-close-btn" onClick={onClose} type="button">&times;</button>

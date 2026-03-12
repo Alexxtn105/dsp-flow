@@ -439,3 +439,41 @@
         padding: 1px 3px;
     }
 }
+
+/* ---- Touch devices ---- */
+@media (hover: none) {
+    .block-actions {
+        opacity: 1;
+    }
+
+    .param-value-editable {
+        border-bottom-color: color-mix(in srgb, var(--accent-primary) 40%, transparent);
+    }
+}
+
+@media (pointer: coarse) {
+    .block-action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        touch-action: manipulation;
+    }
+
+    .block-handle {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .block-handle.signal-complex::after {
+        width: 22px;
+        height: 22px;
+    }
+
+    .param-value-editable {
+        touch-action: manipulation;
+    }
+
+    .block-param-more {
+        touch-action: manipulation;
+    }
+}

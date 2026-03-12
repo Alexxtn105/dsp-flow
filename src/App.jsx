@@ -38,6 +38,9 @@ function App() {
         connectionsCount: 0
     });
 
+    // Отслеживание выделения (для touch delete)
+    const [hasSelection, setHasSelection] = useState(false);
+
     // Диалоги
     const dialogs = useDialogManager();
 
@@ -56,7 +59,13 @@ function App() {
 
     const handleStatsUpdate = useCallback((newStats) => {
         setStats(newStats);
-    }, []);
+        // Check selection state for touch delete button
+        if (reactFlowInstance) {
+            const selected = reactFlowInstance.getNodes().some(n => n.selected) ||
+                             reactFlowInstance.getEdges().some(e => e.selected);
+            setHasSelection(selected);
+        }
+    }, [reactFlowInstance]);
 
     const doCreateNewScheme = useCallback(() => {
         if (simulation.isRunning || simulation.isPaused) {
@@ -123,6 +132,23 @@ function App() {
         setCurrentScheme(prev => ({ ...prev, isSaved: false }));
     }, [reactFlowInstance]);
 
+    // Delete selected elements (for touch)
+    const handleDeleteSelected = useCallback(() => {
+        if (!reactFlowInstance) return;
+        const selectedNodes = reactFlowInstance.getNodes().filter(n => n.selected);
+        const selectedEdges = reactFlowInstance.getEdges().filter(e => e.selected);
+        if (selectedNodes.length === 0 && selectedEdges.length === 0) return;
+        reactFlowInstance.deleteElements({ nodes: selectedNodes, edges: selectedEdges });
+        setCurrentScheme(prev => prev.isSaved ? { ...prev, isSaved: false } : prev);
+    }, [reactFlowInstance]);
+
+    // Undo (simulate Ctrl+Z for touch)
+    const handleUndo = useCallback(() => {
+        document.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'z', code: 'KeyZ', ctrlKey: true, bubbles: true
+        }));
+    }, []);
+
     const handleOpenVisualization = useCallback((nodeId) => {
         if (visualizationManagerRef.current && reactFlowInstance) {
             const currentNodes = reactFlowInstance.getNodes();
@@ -151,6 +177,9 @@ function App() {
                         isSaveEnabled
                         isSaveAsEnabled
                         isRunning={simulation.isRunning}
+                        onDeleteSelected={handleDeleteSelected}
+                        onUndo={handleUndo}
+                        hasSelection={hasSelection}
                     />
 
                     <ErrorBoundary fallbackMessage={t('app.editorError')}>

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import CanvasHelpDialog from '../../dialogs/CanvasHelpDialog/CanvasHelpDialog.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
+import useTouchDetect from '../../../hooks/useTouchDetect';
 import './ControlToolbar.css';
 
 function ControlToolbar({
@@ -14,10 +15,14 @@ function ControlToolbar({
     onSettings,
     isSaveEnabled,
     isSaveAsEnabled,
-    isRunning
+    isRunning,
+    onDeleteSelected,
+    onUndo,
+    hasSelection
 }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
+    const isTouch = useTouchDetect();
     const [showHelp, setShowHelp] = useState(false);
 
     return (
@@ -72,6 +77,30 @@ function ControlToolbar({
 
                 <div className="ct-sep" />
 
+                {/* Touch edit group — delete & undo */}
+                {isTouch && (
+                    <>
+                        <div className="ct-group">
+                            <button
+                                className="ct-btn ct-btn-delete"
+                                onClick={onDeleteSelected}
+                                title={t('controlToolbar.deleteSelected')}
+                                disabled={!hasSelection}
+                            >
+                                <Icon name="delete" size="large" className="ct-icon" />
+                            </button>
+                            <button
+                                className="ct-btn ct-btn-undo"
+                                onClick={onUndo}
+                                title={t('controlToolbar.undo')}
+                            >
+                                <Icon name="undo" size="large" className="ct-icon" />
+                            </button>
+                        </div>
+                        <div className="ct-sep" />
+                    </>
+                )}
+
                 {/* Help group */}
                 <div className="ct-group">
                     <button
@@ -97,7 +126,10 @@ ControlToolbar.propTypes = {
     onSettings: PropTypes.func.isRequired,
     isSaveEnabled: PropTypes.bool.isRequired,
     isSaveAsEnabled: PropTypes.bool.isRequired,
-    isRunning: PropTypes.bool.isRequired
+    isRunning: PropTypes.bool.isRequired,
+    onDeleteSelected: PropTypes.func,
+    onUndo: PropTypes.func,
+    hasSelection: PropTypes.bool
 };
 
 export default ControlToolbar;

@@ -189,3 +189,24 @@
         padding: 4px 0;
     }
 }
+
+/* Delete */
+.ct-btn-delete:hover:not(:disabled) { color: var(--panel-accent-orange); }
+
+/* Undo */
+.ct-btn-undo:hover:not(:disabled) { color: var(--panel-accent-cyan); }
+
+/* ---- Touch devices ---- */
+@media (hover: none) {
+    .ct-btn:hover:not(:disabled)::after {
+        display: none;
+    }
+}
+
+@media (pointer: coarse) {
+    .ct-btn {
+        width: 40px;
+        height: 40px;
+        touch-action: manipulation;
+    }
+}

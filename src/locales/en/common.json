@@ -45,7 +45,15 @@
     "settings": "Scheme settings",
     "lightTheme": "Light theme",
     "darkTheme": "Dark theme",
-    "canvasHelp": "Keyboard shortcuts"
+    "canvasHelp": "Keyboard shortcuts",
+    "deleteSelected": "Delete selected",
+    "undo": "Undo"
+  },
+  "touchMenu": {
+    "settings": "Settings",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "visualize": "Visualize"
   },
   "canvasHelp": {
     "title": "Keyboard shortcuts & controls",
@@ -87,7 +95,20 @@
     "complexSignal": "Complex signal",
     "complexSignalDesc": "Purple line — complex signal (interleaved Re/Im)",
     "typeRule": "Type compatibility",
-    "typeRuleDesc": "Only same-type ports can be connected (real→real, complex→complex)"
+    "typeRuleDesc": "Only same-type ports can be connected (real→real, complex→complex)",
+    "sectionTouch": "Touch controls",
+    "tapToAdd": "Add block",
+    "tapToAddDesc": "Tap a block in the left panel to add it to the canvas center",
+    "tapSelect": "Select block",
+    "tapSelectDesc": "Tap on a block to select it and show the action menu",
+    "touchMove": "Move block",
+    "touchMoveDesc": "Touch and drag a selected block",
+    "touchConnect": "Create connection",
+    "touchConnectDesc": "Touch and drag from an output port to an input port",
+    "pinchZoom": "Zoom",
+    "pinchZoomDesc": "Pinch with two fingers to zoom in/out",
+    "touchPan": "Pan canvas",
+    "touchPanDesc": "Drag on empty area with one finger"
   },
   "saveDialog": {
     "editorNotReady": "Editor not ready",

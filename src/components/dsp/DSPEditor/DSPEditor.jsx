@@ -14,9 +14,10 @@ import Toolbar from '../../layout/Toolbar/Toolbar.jsx';
 import BlockNode from '../BlockNode';
 import RealSignalEdge from '../edges/RealSignalEdge';
 import ComplexSignalEdge from '../edges/ComplexSignalEdge';
+import TouchContextMenu from '../TouchContextMenu';
 
 import BlockParamsPopover from '../BlockParamsPopover';
-import { useAutoSave } from '../../../hooks/index.js';
+import { useAutoSave, useTouchDetect } from '../../../hooks/index.js';
 import {
     generateNodeId,
     getDefaultParams,
@@ -116,6 +117,7 @@ function DSPEditor({
     onSampleRateChange
 }) {
     const { isDarkTheme } = useThemeContext();
+    const isTouch = useTouchDetect();
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -128,6 +130,10 @@ function DSPEditor({
 
     // Состояние диалога параметров
     const [paramsDialogNode, setParamsDialogNode] = useState(null);
+
+    // Touch context menu state
+    const [touchMenuNode, setTouchMenuNode] = useState(null);
+    const [touchMenuElement, setTouchMenuElement] = useState(null);
 
     // Получаем контекст
     const { loadedSchemeData, setLoadedSchemeData } = useDSPEditor();
@@ -444,6 +450,34 @@ function DSPEditor({
         [setEdges, currentScheme, onSchemeUpdate, nodes, isRunning, edges]
     );
 
+    // Общая функция создания ноды на канвасе
+    const addBlockToCanvas = useCallback((blockType, position) => {
+        const signalConfig = getBlockSignalConfig(blockType);
+        const nodeId = generateNodeId();
+
+        const newNode = {
+            id: nodeId,
+            type: 'block',
+            position,
+            data: {
+                label: blockType,
+                blockType,
+                params: getDefaultParams(blockType),
+                signalConfig: signalConfig,
+                nodeId: nodeId,
+                onOpenParams: stableCallbacks.current.onOpenParams,
+                onOpenVisualization: stableCallbacks.current.onOpenVisualization,
+                onParamUpdate: stableCallbacks.current.onParamUpdate
+            },
+        };
+
+        setNodes((nds) => nds.concat(newNode));
+
+        if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
+            onSchemeUpdate(currentScheme.name, false);
+        }
+    }, [setNodes, currentScheme, onSchemeUpdate]);
+
     const onDragOver = useCallback((event) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
@@ -458,7 +492,6 @@ function DSPEditor({
 
             if (!reactFlowInstance) return;
 
-            // screenToFlowPosition принимает экранные координаты (clientX/clientY)
             const position = reactFlowInstance.screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY,
@@ -466,34 +499,61 @@ function DSPEditor({
 
             if (!position) return;
 
-            const signalConfig = getBlockSignalConfig(blockType);
-            const nodeId = generateNodeId();
-
-            const newNode = {
-                id: nodeId,
-                type: 'block',
-                position,
-                data: {
-                    label: blockType,
-                    blockType,
-                    params: getDefaultParams(blockType),
-                    signalConfig: signalConfig,
-                    nodeId: nodeId,
-                    onOpenParams: stableCallbacks.current.onOpenParams,
-                    onOpenVisualization: stableCallbacks.current.onOpenVisualization,
-                    onParamUpdate: stableCallbacks.current.onParamUpdate
-                },
-            };
-
-            setNodes((nds) => nds.concat(newNode));
-
-            // Помечаем схему как несохранённую при добавлении узла
-            if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
-                onSchemeUpdate(currentScheme.name, false);
-            }
+            addBlockToCanvas(blockType, position);
         },
-        [reactFlowInstance, setNodes, currentScheme, onSchemeUpdate]
+        [reactFlowInstance, addBlockToCanvas]
     );
+
+    // Touch: слушатель tap-to-add из тулбара
+    useEffect(() => {
+        const handler = (e) => {
+            const { blockType } = e.detail;
+            if (!blockType || !reactFlowInstance) return;
+
+            const wrapper = reactFlowWrapper.current;
+            if (!wrapper) return;
+
+            const rect = wrapper.getBoundingClientRect();
+            const position = reactFlowInstance.screenToFlowPosition({
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+            });
+
+            addBlockToCanvas(blockType, position);
+        };
+
+        window.addEventListener('dsp-add-block', handler);
+        return () => window.removeEventListener('dsp-add-block', handler);
+    }, [reactFlowInstance, addBlockToCanvas]);
+
+    // Touch: показ контекстного меню при выборе ноды
+    const handleNodeClick = useCallback((event, node) => {
+        if (!isTouch) return;
+        const el = document.querySelector(`[data-id="${node.id}"]`);
+        setTouchMenuNode(node);
+        setTouchMenuElement(el);
+    }, [isTouch]);
+
+    // Touch: удаление ноды
+    const handleDeleteNode = useCallback((nodeId) => {
+        setNodes(nds => nds.filter(n => n.id !== nodeId));
+        setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
+        setTouchMenuNode(null);
+        if (currentScheme.isSaved && currentScheme.name !== 'not_saved') {
+            onSchemeUpdate(currentScheme.name, false);
+        }
+    }, [setNodes, setEdges, currentScheme, onSchemeUpdate]);
+
+    // Touch: дублирование ноды
+    const handleDuplicateNode = useCallback((nodeId) => {
+        const sourceNode = nodes.find(n => n.id === nodeId);
+        if (!sourceNode) return;
+        const newPosition = {
+            x: sourceNode.position.x + 30,
+            y: sourceNode.position.y + 30,
+        };
+        addBlockToCanvas(sourceNode.data.blockType, newPosition);
+    }, [nodes, addBlockToCanvas]);
 
     // Обновляем анимацию существующих соединений при изменении состояния симуляции
     useEffect(() => {
@@ -520,7 +580,9 @@ function DSPEditor({
                     onInit={handleInit}
                     onDrop={onDrop}
                     onDragOver={onDragOver}
+                    onNodeClick={handleNodeClick}
                     onNodeDoubleClick={(_, node) => handleOpenParams(node.id)}
+                    onPaneClick={() => setTouchMenuNode(null)}
                     nodeTypes={nodeTypes}
                     edgeTypes={edgeTypes}
                     isValidConnection={isValidConnection}
@@ -538,6 +600,19 @@ function DSPEditor({
                 </ReactFlow>
 
             </div>
+
+            {/* Touch context menu */}
+            {isTouch && touchMenuNode && touchMenuElement && (
+                <TouchContextMenu
+                    node={touchMenuNode}
+                    nodeElement={touchMenuElement}
+                    onOpenParams={handleOpenParams}
+                    onDelete={handleDeleteNode}
+                    onDuplicate={handleDuplicateNode}
+                    onOpenVisualization={handleOpenVisualization}
+                    onClose={() => setTouchMenuNode(null)}
+                />
+            )}
 
             {/* Поповер редактирования параметров блока */}
             {paramsDialogNode && (

@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../../../contexts/ThemeContext';
+import useTouchDetect from '../../../hooks/useTouchDetect';
 import './CanvasHelpDialog.css';
 
 function CanvasHelpDialog({ onClose }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
+    const isTouch = useTouchDetect();
     const h = (key) => t(`canvasHelp.${key}`);
 
     useEffect(() => {
@@ -21,7 +23,19 @@ function CanvasHelpDialog({ onClose }) {
         if (e.target === e.currentTarget) onClose();
     };
 
-    const shortcuts = [
+    const touchSection = {
+        section: h('sectionTouch'),
+        items: [
+            { label: h('tapToAdd'), kbd: 'Tap', desc: h('tapToAddDesc') },
+            { label: h('tapSelect'), kbd: 'Tap', desc: h('tapSelectDesc') },
+            { label: h('touchMove'), kbd: 'Drag', desc: h('touchMoveDesc') },
+            { label: h('touchConnect'), kbd: 'Drag', desc: h('touchConnectDesc') },
+            { label: h('pinchZoom'), kbd: 'Pinch', desc: h('pinchZoomDesc') },
+            { label: h('touchPan'), kbd: 'Drag', desc: h('touchPanDesc') },
+        ]
+    };
+
+    const keyboardSections = [
         {
             section: h('sectionCanvas'),
             items: [
@@ -51,15 +65,20 @@ function CanvasHelpDialog({ onClose }) {
                 { label: h('deleteConnection'), kbd: 'Click + Delete', desc: h('deleteConnectionDesc') },
             ]
         },
-        {
-            section: h('sectionSignals'),
-            items: [
-                { label: h('realSignal'), kbd: null, desc: h('realSignalDesc'), signal: 'real' },
-                { label: h('complexSignal'), kbd: null, desc: h('complexSignalDesc'), signal: 'complex' },
-                { label: h('typeRule'), kbd: null, desc: h('typeRuleDesc') },
-            ]
-        },
     ];
+
+    const signalSection = {
+        section: h('sectionSignals'),
+        items: [
+            { label: h('realSignal'), kbd: null, desc: h('realSignalDesc'), signal: 'real' },
+            { label: h('complexSignal'), kbd: null, desc: h('complexSignalDesc'), signal: 'complex' },
+            { label: h('typeRule'), kbd: null, desc: h('typeRuleDesc') },
+        ]
+    };
+
+    const shortcuts = isTouch
+        ? [touchSection, signalSection]
+        : [...keyboardSections, signalSection];
 
     return createPortal(
         <div

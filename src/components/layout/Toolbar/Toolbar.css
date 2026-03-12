@@ -586,3 +586,55 @@
         justify-content: center;
     }
 }
+
+/* ---- Touch devices ---- */
+@media (hover: none) {
+    .tb-block-help-btn {
+        opacity: 1;
+    }
+
+    .tb-block-mini:hover::after {
+        display: none;
+    }
+}
+
+@media (pointer: coarse) {
+    .tb-block {
+        min-height: 44px;
+        padding: 10px 8px;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .tb-block:active {
+        cursor: pointer;
+    }
+
+    .tb-block-mini {
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .tb-block-mini:active {
+        cursor: pointer;
+    }
+
+    .tb-block-help-btn {
+        width: 36px;
+        height: 36px;
+        touch-action: manipulation;
+    }
+
+    .tb-block.touch-added {
+        background: rgba(0, 229, 160, 0.12);
+        border-color: rgba(0, 229, 160, 0.3);
+        transition: all 300ms ease;
+    }
+
+    .tb-block-mini.touch-added {
+        background: rgba(0, 229, 160, 0.12);
+        transition: all 300ms ease;
+    }
+}

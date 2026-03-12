@@ -1,0 +1,72 @@
+/* ===== Touch Context Menu ===== */
+
+.touch-context-menu {
+    position: absolute;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    animation: touchMenuAppear 0.15s ease-out;
+    touch-action: manipulation;
+}
+
+@keyframes touchMenuAppear {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(4px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+.touch-context-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 120ms ease;
+    padding: 0;
+    touch-action: manipulation;
+}
+
+.touch-context-menu-btn:active {
+    transform: scale(0.9);
+}
+
+.touch-context-menu-btn-settings:active {
+    background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    color: var(--accent-primary);
+}
+
+.touch-context-menu-btn-visualize:active {
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+}
+
+.touch-context-menu-btn-duplicate:active {
+    background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    color: var(--accent-primary);
+}
+
+.touch-context-menu-btn-delete:active {
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    color: var(--danger);
+}
+
+/* Dark theme */
+.dark-theme .touch-context-menu {
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
+}

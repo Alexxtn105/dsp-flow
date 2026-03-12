@@ -612,3 +612,24 @@
         font-size: 9px;
     }
 }
+
+/* ---- Touch devices ---- */
+@media (hover: none) {
+    .ft-tr-btn:hover:not(:disabled)::after {
+        display: none;
+    }
+}
+
+@media (pointer: coarse) {
+    .ft-tr-btn {
+        width: 40px;
+        height: 36px;
+        touch-action: manipulation;
+    }
+
+    .ft-tr-play {
+        width: 46px;
+        height: 38px;
+        touch-action: manipulation;
+    }
+}

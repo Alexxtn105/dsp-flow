@@ -291,3 +291,73 @@
 .block-params-popover.dark-theme .popover-body::-webkit-scrollbar-thumb {
     background: var(--border-secondary);
 }
+
+/* ---- Bottom-sheet drag handle ---- */
+.popover-drag-handle {
+    display: none;
+}
+
+/* ---- Mobile bottom-sheet ---- */
+@media (max-width: 480px) {
+    .block-params-popover {
+        position: fixed;
+        bottom: 0;
+        left: 0 !important;
+        right: 0;
+        top: auto !important;
+        width: 100%;
+        max-height: 70dvh;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        animation: popoverSlideUp 0.2s ease-out;
+    }
+
+    .popover-drag-handle {
+        display: flex;
+        justify-content: center;
+        padding: 8px 0 4px;
+        flex-shrink: 0;
+    }
+
+    .popover-drag-handle-bar {
+        width: 36px;
+        height: 4px;
+        background: var(--border-secondary);
+        border-radius: 2px;
+    }
+
+    .popover-close-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .popover-btn {
+        padding: 12px 16px;
+    }
+
+    .block-params-popover .param-input {
+        height: 40px;
+        font-size: 14px;
+    }
+}
+
+@keyframes popoverSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (pointer: coarse) {
+    .popover-close-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .popover-btn {
+        padding: 10px 16px;
+    }
+}

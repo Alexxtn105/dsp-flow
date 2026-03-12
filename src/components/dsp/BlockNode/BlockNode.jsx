@@ -5,6 +5,7 @@ import { Handle, Position } from '@xyflow/react';
 import Icon from '../../common/Icons/Icon.jsx';
 import registry from '../../../engine/PluginRegistry';
 import { HIDDEN_PARAMS } from '../../../utils/constants';
+import useTouchDetect from '../../../hooks/useTouchDetect';
 
 import {
     getBlockIcon,
@@ -34,6 +35,7 @@ function getParamType(key, value) {
 
 function BlockNode({ data, selected }) {
     const { t } = useTranslation(['params', 'blocks']);
+    const isTouch = useTouchDetect();
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);
@@ -200,10 +202,14 @@ function BlockNode({ data, selected }) {
             );
         }
 
+        const editHandler = isTouch
+            ? { onClick: (e) => enterEditMode(e, key, value) }
+            : { onDoubleClick: (e) => enterEditMode(e, key, value) };
+
         return (
             <span
                 className="param-value param-value-editable"
-                onDoubleClick={(e) => enterEditMode(e, key, value)}
+                {...editHandler}
                 title={tp('blockNode.editHint')}
             >
                 {formatParamValue(value)}
