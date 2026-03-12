@@ -42,7 +42,7 @@ export default {
     icon: 'dsp-power4',
     description: 'Возведение действительного сигнала в 4-ю степень',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

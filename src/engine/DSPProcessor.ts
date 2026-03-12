@@ -32,6 +32,13 @@ function isMultiOutput(output: BlockOutput): output is { outputs: Float32Array[]
     return output !== null && typeof output === 'object' && 'outputs' in output;
 }
 
+/** Извлекает primary Float32Array из любого BlockOutput */
+function getPrimaryOutput(output: BlockOutput): Float32Array | null {
+    if (output instanceof Float32Array) return output;
+    if (isMultiOutput(output)) return output.outputs[0] ?? null;
+    return null; // { channels } — visualization, нет primary
+}
+
 class DSPProcessor {
     state: ProcessorStateValue = ProcessorState.IDLE;
     private _manualMode = false;
@@ -43,7 +50,7 @@ class DSPProcessor {
     blockStates: Map<string, BlockState> = new Map();
     private _nodeTypeMap: Map<string, string> = new Map();
     onProgress: ((progress: ProcessingProgress) => void) | null = null;
-    onBlockOutput: ((nodeId: string, output: Float32Array) => void) | null = null;
+    onBlockOutput: ((nodeId: string, output: BlockOutput) => void) | null = null;
     onComplete: (() => void) | null = null;
     onError: ((error: Error) => void) | null = null;
     sampleRate = 48000;
@@ -321,19 +328,20 @@ class DSPProcessor {
                     }
                 }
                 if (output && this.onBlockOutput) {
-                    const primaryOutput = isMultiOutput(output) ? output.outputs[0] : output;
-                    this.onBlockOutput(block.nodeId, primaryOutput);
+                    this.onBlockOutput(block.nodeId, output);
                 }
 
                 // Если это Speaker — воспроизводим
                 if (block.blockType === 'speaker' && output && this.audioContext) {
-                    const speakerData = isMultiOutput(output) ? output.outputs[0] : output;
-                    let hasSignal = false;
-                    for (let i = 0; i < speakerData.length; i++) {
-                        if (speakerData[i] !== 0) { hasSignal = true; break; }
-                    }
-                    if (hasSignal) {
-                        this.playAudioChunk(speakerData);
+                    const speakerData = getPrimaryOutput(output);
+                    if (speakerData) {
+                        let hasSignal = false;
+                        for (let i = 0; i < speakerData.length; i++) {
+                            if (speakerData[i] !== 0) { hasSignal = true; break; }
+                        }
+                        if (hasSignal) {
+                            this.playAudioChunk(speakerData);
+                        }
                     }
                 }
             }
@@ -373,7 +381,7 @@ class DSPProcessor {
                     sourceData = sourceState.output.outputs[parseInt(srcHandleMatch[1], 10)] ?? null;
                 } else if (isMultiOutput(sourceState.output)) {
                     sourceData = sourceState.output.outputs[0] ?? null;
-                } else {
+                } else if (sourceState.output instanceof Float32Array) {
                     sourceData = sourceState.output;
                 }
             }

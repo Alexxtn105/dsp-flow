@@ -43,7 +43,7 @@ export default {
     icon: 'dsp-phase',
     description: 'Извлечение фазы комплексного сигнала (atan2)',
     group: 'math-blocks',
-    signals: { input: 'complex', output: 'real' },
+    signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

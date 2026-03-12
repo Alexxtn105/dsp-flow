@@ -42,7 +42,7 @@ export default {
     icon: 'dsp-multiply',
     description: 'Перемножение двух комплексных сигналов',
     group: 'math-blocks',
-    signals: { input: 'complex', output: 'complex', inputsCount: 2 },
+    signals: { input: 'complex', output: 'complex', inputsCount: 2 } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

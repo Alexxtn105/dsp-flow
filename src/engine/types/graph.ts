@@ -39,8 +39,8 @@ export interface SignalConfig {
   output: PluginSignals['output'];
   inputsCount: number;
   outputsCount: number;
-  inputLabels?: string[];
-  outputLabels?: string[];
+  inputLabels?: readonly string[];
+  outputLabels?: readonly string[];
   outputTypes?: PluginSignals['outputTypes'];
 }
 

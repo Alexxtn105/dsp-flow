@@ -13,7 +13,7 @@ export interface PluginSignals {
   output: SignalType | null;
   inputsCount?: number;
   outputsCount?: number;
-  inputLabels?: string[];
-  outputLabels?: string[];
-  outputTypes?: SignalType[];
+  inputLabels?: readonly string[];
+  outputLabels?: readonly string[];
+  outputTypes?: readonly SignalType[];
 }

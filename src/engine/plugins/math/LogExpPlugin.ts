@@ -61,7 +61,7 @@ const LogExpPlugin = {
     signals: {
         input: 'real',
         output: 'real'
-    },
+    } as const,
 
     defaultParams: {
         function: 'ln',

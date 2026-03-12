@@ -40,7 +40,7 @@ export default {
     icon: 'dsp-magnitude',
     description: 'Извлечение амплитуды комплексного сигнала (модуль)',
     group: 'math-blocks',
-    signals: { input: 'complex', output: 'real' },
+    signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

@@ -57,7 +57,7 @@ const GainPlugin = {
     signals: {
         input: 'real',
         output: 'real'
-    },
+    } as const,
 
     defaultParams: {
         gain: 1.0,

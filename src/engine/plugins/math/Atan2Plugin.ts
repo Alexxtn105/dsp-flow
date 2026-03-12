@@ -46,7 +46,7 @@ export default {
     icon: 'dsp-atan2',
     description: 'Арктангенс (atan2). Верхний вход — Y, нижний — X. Выход в радианах [−π, π]',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real', inputsCount: 2 },
+    signals: { input: 'real', output: 'real', inputsCount: 2 } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

@@ -43,7 +43,7 @@ export default {
     icon: 'dsp-real',
     description: 'Извлечение действительной части комплексного сигнала',
     group: 'math-blocks',
-    signals: { input: 'complex', output: 'real' },
+    signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

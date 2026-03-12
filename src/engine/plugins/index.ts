@@ -1,29 +1,30 @@
 // Генераторы
-import SineGeneratorPlugin from './generators/SineGeneratorPlugin.js';
-import CosineGeneratorPlugin from './generators/CosineGeneratorPlugin.js';
-import RefSineGeneratorPlugin from './generators/RefSineGeneratorPlugin.js';
-import RefCosineGeneratorPlugin from './generators/RefCosineGeneratorPlugin.js';
-import AudioFilePlugin from './generators/AudioFilePlugin.js';
-import ConstantPlugin from './generators/ConstantPlugin.js';
-import NoiseGeneratorPlugin from './generators/NoiseGeneratorPlugin.js';
-import AMFMPMModulatorPlugin from './generators/AMFMPMModulatorPlugin.js';
-import PSKModulatorPlugin from './generators/PSKModulatorPlugin.js';
+import SineGeneratorPlugin from './generators/SineGeneratorPlugin';
+import CosineGeneratorPlugin from './generators/CosineGeneratorPlugin';
+import RefSineGeneratorPlugin from './generators/RefSineGeneratorPlugin';
+import RefCosineGeneratorPlugin from './generators/RefCosineGeneratorPlugin';
+import AudioFilePlugin from './generators/AudioFilePlugin';
+import ConstantPlugin from './generators/ConstantPlugin';
+import NoiseGeneratorPlugin from './generators/NoiseGeneratorPlugin';
+import AMFMPMModulatorPlugin from './generators/AMFMPMModulatorPlugin';
+import PSKModulatorPlugin from './generators/PSKModulatorPlugin';
 
 // Фильтры
-import NotchFIRPlugin from './filters/NotchFIRPlugin.js';
-import BandpassFIRPlugin from './filters/BandpassFIRPlugin.js';
-import HighpassFIRPlugin from './filters/HighpassFIRPlugin.js';
-import LowpassFIRPlugin from './filters/LowpassFIRPlugin.js';
-import HilbertTransformerPlugin from './filters/HilbertTransformerPlugin.js';
-import GoertzelFilterPlugin from './filters/GoertzelFilterPlugin.js';
-import RemezFilterPlugin from './filters/RemezFilterPlugin.js';
-import DelayLinePlugin from './filters/DelayLinePlugin.js';
-import DecimatorInterpolatorPlugin from './filters/DecimatorInterpolatorPlugin.js';
-import IIRFilterPlugin from './filters/IIRFilterPlugin.js';
-import CICFilterPlugin from './filters/CICFilterPlugin.js';
+import NotchFIRPlugin from './filters/NotchFIRPlugin';
+import BandpassFIRPlugin from './filters/BandpassFIRPlugin';
+import HighpassFIRPlugin from './filters/HighpassFIRPlugin';
+import LowpassFIRPlugin from './filters/LowpassFIRPlugin';
+import HilbertTransformerPlugin from './filters/HilbertTransformerPlugin';
+import GoertzelFilterPlugin from './filters/GoertzelFilterPlugin';
+import RemezFilterPlugin from './filters/RemezFilterPlugin';
+import DelayLinePlugin from './filters/DelayLinePlugin';
+import DecimatorInterpolatorPlugin from './filters/DecimatorInterpolatorPlugin';
+import IIRFilterPlugin from './filters/IIRFilterPlugin';
+import CICFilterPlugin from './filters/CICFilterPlugin';
 
 // Анализ
-import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin.js';
+import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin';
+import CorrelatorPlugin from './analysis/CorrelatorPlugin';
 
 // Математические
 import SummerPlugin from './math/SummerPlugin';
@@ -49,29 +50,30 @@ import MixerPlugin from './math/MixerPlugin';
 import ThresholdPlugin from './math/ThresholdPlugin';
 import GainPlugin from './math/GainPlugin';
 import LogExpPlugin from './math/LogExpPlugin';
-import CorrelatorPlugin from './analysis/CorrelatorPlugin.js';
 
 // Детекторы
-import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin.js';
-import FrequencyDetectorPlugin from './detectors/FrequencyDetectorPlugin.js';
-import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin.js';
-import PLLPlugin from './detectors/PLLPlugin.js';
-import FrequencyDiscriminatorPlugin from './detectors/FrequencyDiscriminatorPlugin.js';
-import AMFMPMDemodulatorPlugin from './detectors/AMFMPMDemodulatorPlugin.js';
-import TimingRecoveryPlugin from './detectors/TimingRecoveryPlugin.js';
+import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin';
+import FrequencyDetectorPlugin from './detectors/FrequencyDetectorPlugin';
+import AmplitudeDetectorPlugin from './detectors/AmplitudeDetectorPlugin';
+import PLLPlugin from './detectors/PLLPlugin';
+import FrequencyDiscriminatorPlugin from './detectors/FrequencyDiscriminatorPlugin';
+import AMFMPMDemodulatorPlugin from './detectors/AMFMPMDemodulatorPlugin';
+import TimingRecoveryPlugin from './detectors/TimingRecoveryPlugin';
 
 // Визуализация
-import OscilloscopePlugin from './visualization/OscilloscopePlugin.js';
-import ConstellationPlugin from './visualization/ConstellationPlugin.js';
-import WaterfallPlugin from './visualization/WaterfallPlugin.js';
-import NumericIndicatorPlugin from './visualization/NumericIndicatorPlugin.js';
-import ComplexNumericIndicatorPlugin from './visualization/ComplexNumericIndicatorPlugin.js';
-import MultiChannelSpectrumAnalyzerPlugin from './visualization/MultiChannelSpectrumAnalyzerPlugin.js';
+import OscilloscopePlugin from './visualization/OscilloscopePlugin';
+import ConstellationPlugin from './visualization/ConstellationPlugin';
+import WaterfallPlugin from './visualization/WaterfallPlugin';
+import NumericIndicatorPlugin from './visualization/NumericIndicatorPlugin';
+import ComplexNumericIndicatorPlugin from './visualization/ComplexNumericIndicatorPlugin';
+import MultiChannelSpectrumAnalyzerPlugin from './visualization/MultiChannelSpectrumAnalyzerPlugin';
 
 // Вывод
-import SpeakerPlugin from './output/SpeakerPlugin.js';
+import SpeakerPlugin from './output/SpeakerPlugin';
 
-export default [
+import type { PluginDefinition } from '../types';
+
+const allPlugins: PluginDefinition[] = [
     // Фильтры
     NotchFIRPlugin,
     BandpassFIRPlugin,
@@ -145,3 +147,5 @@ export default [
     // Вывод
     SpeakerPlugin,
 ];
+
+export default allPlugins;

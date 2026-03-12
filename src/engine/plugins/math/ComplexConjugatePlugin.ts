@@ -43,7 +43,7 @@ export default {
     icon: 'dsp-conjugate',
     description: 'Вычисляет комплексно-сопряжённый сигнал (инвертирует мнимую часть: a+jb → a−jb)',
     group: 'math-blocks',
-    signals: { input: 'complex', output: 'complex' },
+    signals: { input: 'complex', output: 'complex' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

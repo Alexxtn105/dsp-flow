@@ -46,7 +46,7 @@ export default {
     icon: 'dsp-complex-compose',
     description: 'Формирует комплексный сигнал из двух действительных (Re + jIm). Верхний вход — действительная часть, нижний — мнимая',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'complex', inputsCount: 2 },
+    signals: { input: 'real', output: 'complex', inputsCount: 2 } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

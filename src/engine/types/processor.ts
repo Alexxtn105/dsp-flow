@@ -11,8 +11,11 @@ export const ProcessorState = {
 
 export type ProcessorStateValue = typeof ProcessorState[keyof typeof ProcessorState];
 
-/** Результат выполнения блока: одиночный или множественный выход */
-export type BlockOutput = Float32Array | { outputs: Float32Array[] };
+/** Результат выполнения блока: одиночный, множественный или визуализация */
+export type BlockOutput =
+  | Float32Array
+  | { outputs: Float32Array[] }
+  | { channels: (Float32Array | null)[] };
 
 /** Состояние выходного буфера блока */
 export interface BlockState {
@@ -31,7 +34,7 @@ export interface ProcessingProgress {
 /** Callbacks процессора */
 export interface ProcessorCallbacks {
   onProgress: ((progress: ProcessingProgress) => void) | null;
-  onBlockOutput: ((nodeId: string, output: Float32Array) => void) | null;
+  onBlockOutput: ((nodeId: string, output: BlockOutput) => void) | null;
   onComplete: (() => void) | null;
   onError: ((error: Error) => void) | null;
 }

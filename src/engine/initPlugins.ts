@@ -6,8 +6,7 @@
  */
 
 import registry from './PluginRegistry';
-import allPlugins from './plugins/index.js';
-import type { PluginDefinition } from './types';
+import allPlugins from './plugins';
 
 export default function initPlugins(): void {
     // Регистрация групп (порядок определяет отображение в Toolbar)
@@ -136,8 +135,7 @@ export default function initPlugins(): void {
     ]);
 
     // Регистрация всех плагинов
-    // JS-плагины типизированы неточно (signals.input: string вместо SignalType | null)
-    registry.registerAll(allPlugins as unknown as PluginDefinition[]);
+    registry.registerAll(allPlugins);
 
     // Замораживаем реестр
     registry.freeze();

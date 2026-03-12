@@ -49,7 +49,7 @@ export default {
     icon: 'dsp-sum',
     description: 'Сумматор',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real', inputsCount: 2 },
+    signals: { input: 'real', output: 'real', inputsCount: 2 } as const,
     defaultParams: {
         numInputs: 2,
         weights: [1.0, 1.0],

@@ -33,7 +33,7 @@ export default {
     icon: 'dsp-sqrt',
     description: 'Квадратный корень действительного сигнала',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

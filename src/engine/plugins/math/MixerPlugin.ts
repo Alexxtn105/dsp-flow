@@ -56,7 +56,7 @@ const MixerPlugin = {
     signals: {
         input: 'real',
         output: 'complex'
-    },
+    } as const,
 
     defaultParams: {
         shiftFrequency: 1000

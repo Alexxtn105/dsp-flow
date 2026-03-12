@@ -44,7 +44,7 @@ export default {
     icon: 'dsp-square',
     description: 'Возведение комплексного сигнала в квадрат',
     group: 'math-blocks',
-    signals: { input: 'complex', output: 'complex' },
+    signals: { input: 'complex', output: 'complex' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

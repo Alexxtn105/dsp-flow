@@ -61,7 +61,7 @@ const ThresholdPlugin = {
     signals: {
         input: 'real',
         output: 'real'
-    },
+    } as const,
 
     defaultParams: {
         threshold: 0,

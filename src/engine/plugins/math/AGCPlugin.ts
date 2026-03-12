@@ -61,7 +61,7 @@ export default {
     icon: 'dsp-agc',
     description: 'Автоматическая регулировка усиления (АРУ)',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real' } as const,
     defaultParams: {
         targetLevel: 1.0,
         attackTime: 5,

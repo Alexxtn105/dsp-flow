@@ -41,7 +41,7 @@ export default {
     icon: 'dsp-square',
     description: 'Возведение действительного сигнала в квадрат',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {

@@ -41,7 +41,7 @@ export default {
     icon: 'dsp-abs',
     description: 'Модуль (абсолютное значение) сигнала',
     group: 'math-blocks',
-    signals: { input: 'real', output: 'real' },
+    signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {
         process(inputs: Float32Array[], params: Record<string, unknown>, chunkSize: number): Float32Array {
