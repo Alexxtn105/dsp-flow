@@ -41,16 +41,24 @@ function TouchContextMenu({ node, nodeElement, onOpenParams, onDelete, onDuplica
     useEffect(() => {
         updatePosition();
 
-        // Reposition on scroll/resize
+        // Reposition on scroll/resize (RAF-throttled)
         const viewport = document.querySelector('.react-flow__viewport');
         let observer;
+        let rafId = null;
         if (viewport) {
-            observer = new MutationObserver(() => updatePosition());
+            observer = new MutationObserver(() => {
+                if (rafId !== null) return;
+                rafId = requestAnimationFrame(() => {
+                    updatePosition();
+                    rafId = null;
+                });
+            });
             observer.observe(viewport, { attributes: true, attributeFilter: ['style'] });
         }
 
         return () => {
             if (observer) observer.disconnect();
+            if (rafId !== null) cancelAnimationFrame(rafId);
         };
     }, [updatePosition]);
 

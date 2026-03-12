@@ -17,7 +17,8 @@ import ComplexSignalEdge from '../edges/ComplexSignalEdge';
 import TouchContextMenu from '../TouchContextMenu';
 
 import BlockParamsPopover from '../BlockParamsPopover';
-import { useAutoSave, useTouchDetect } from '../../../hooks/index.js';
+import { useAutoSave } from '../../../hooks/index.js';
+import { useTouchContext } from '../../../contexts/TouchContext';
 import {
     generateNodeId,
     getDefaultParams,
@@ -111,6 +112,7 @@ function DSPEditor({
     currentScheme,
     onSchemeUpdate,
     onStatsUpdate,
+    onSelectionChange,
     onReactFlowInit,
     isRunning,
     onOpenVisualization,
@@ -118,7 +120,7 @@ function DSPEditor({
     onBeforeDelete
 }) {
     const { isDarkTheme } = useThemeContext();
-    const isTouch = useTouchDetect();
+    const isTouch = useTouchContext();
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -505,34 +507,26 @@ function DSPEditor({
         [reactFlowInstance, addBlockToCanvas]
     );
 
-    // Touch: слушатель tap-to-add из тулбара
-    useEffect(() => {
-        const handler = (e) => {
-            const { blockType } = e.detail;
-            if (!blockType || !reactFlowInstance) return;
+    // Touch: добавление блока по тапу из тулбара (в центр канваса)
+    const handleAddBlockFromToolbar = useCallback((blockType) => {
+        if (!blockType || !reactFlowInstance) return;
+        const wrapper = reactFlowWrapper.current;
+        if (!wrapper) return;
 
-            const wrapper = reactFlowWrapper.current;
-            if (!wrapper) return;
+        const rect = wrapper.getBoundingClientRect();
+        const position = reactFlowInstance.screenToFlowPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+        });
 
-            const rect = wrapper.getBoundingClientRect();
-            const position = reactFlowInstance.screenToFlowPosition({
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-            });
-
-            addBlockToCanvas(blockType, position);
-        };
-
-        window.addEventListener('dsp-add-block', handler);
-        return () => window.removeEventListener('dsp-add-block', handler);
+        addBlockToCanvas(blockType, position);
     }, [reactFlowInstance, addBlockToCanvas]);
 
     // Touch: показ контекстного меню при выборе ноды
     const handleNodeClick = useCallback((event, node) => {
         if (!isTouch) return;
-        const el = document.querySelector(`[data-id="${node.id}"]`);
         setTouchMenuNode(node);
-        setTouchMenuElement(el);
+        setTouchMenuElement(event.currentTarget);
     }, [isTouch]);
 
     // Touch: удаление ноды (через deleteElements API React Flow)
@@ -573,7 +567,7 @@ function DSPEditor({
 
     return (
         <div className={`dsp-editor ${isDarkTheme ? 'dark-theme' : ''}`}>
-            <Toolbar />
+            <Toolbar onAddBlock={handleAddBlockFromToolbar} />
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <ReactFlow
                     nodes={nodes}
@@ -584,9 +578,9 @@ function DSPEditor({
                     onInit={handleInit}
                     onDrop={onDrop}
                     onDragOver={onDragOver}
+                    onSelectionChange={onSelectionChange}
                     onNodeClick={handleNodeClick}
                     onNodeDoubleClick={(_, node) => handleOpenParams(node.id)}
-                    onPaneClick={() => setTouchMenuNode(null)}
                     nodeTypes={nodeTypes}
                     edgeTypes={edgeTypes}
                     isValidConnection={isValidConnection}
@@ -637,6 +631,7 @@ DSPEditor.propTypes = {
     onStatsUpdate: PropTypes.func.isRequired,
     onReactFlowInit: PropTypes.func,
     isRunning: PropTypes.bool.isRequired,
+    onSelectionChange: PropTypes.func,
     onOpenVisualization: PropTypes.func,
     onSampleRateChange: PropTypes.func,
     onBeforeDelete: PropTypes.func

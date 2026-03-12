@@ -5,7 +5,7 @@ import { Handle, Position } from '@xyflow/react';
 import Icon from '../../common/Icons/Icon.jsx';
 import registry from '../../../engine/PluginRegistry';
 import { HIDDEN_PARAMS } from '../../../utils/constants';
-import useTouchDetect from '../../../hooks/useTouchDetect';
+import { useTouchContext } from '../../../contexts/TouchContext';
 
 import {
     getBlockIcon,
@@ -35,7 +35,7 @@ function getParamType(key, value) {
 
 function BlockNode({ data, selected }) {
     const { t } = useTranslation(['params', 'blocks']);
-    const isTouch = useTouchDetect();
+    const isTouch = useTouchContext();
     const signalConfig = getBlockSignalConfig(data.blockType);
     const hasInput = !isGeneratorBlock(data.blockType);
     const hasOutput = !isVisualizationBlock(data.blockType);

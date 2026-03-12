@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../../../contexts/ThemeContext';
-import useTouchDetect from '../../../hooks/useTouchDetect';
+import { useTouchContext } from '../../../contexts/TouchContext';
 import './CanvasHelpDialog.css';
 
 function CanvasHelpDialog({ onClose }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
-    const isTouch = useTouchDetect();
+    const isTouch = useTouchContext();
     const h = (key) => t(`canvasHelp.${key}`);
 
     useEffect(() => {

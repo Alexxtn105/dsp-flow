@@ -65,13 +65,11 @@ function App() {
 
     const handleStatsUpdate = useCallback((newStats) => {
         setStats(newStats);
-        // Check selection state for touch delete button
-        if (reactFlowInstance) {
-            const selected = reactFlowInstance.getNodes().some(n => n.selected) ||
-                             reactFlowInstance.getEdges().some(e => e.selected);
-            setHasSelection(selected);
-        }
-    }, [reactFlowInstance]);
+    }, []);
+
+    const handleSelectionChange = useCallback(({ nodes: selNodes, edges: selEdges }) => {
+        setHasSelection(selNodes.length > 0 || selEdges.length > 0);
+    }, []);
 
     const doCreateNewScheme = useCallback(() => {
         if (simulation.isRunning || simulation.isPaused) {
@@ -221,6 +219,7 @@ function App() {
                             currentScheme={currentScheme}
                             onSchemeUpdate={handleSchemeUpdate}
                             onStatsUpdate={handleStatsUpdate}
+                            onSelectionChange={handleSelectionChange}
                             onReactFlowInit={setReactFlowInstance}
                             isRunning={simulation.isRunning}
                             onOpenVisualization={handleOpenVisualization}

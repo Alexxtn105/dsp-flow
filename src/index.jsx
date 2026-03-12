@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import initPlugins from './engine/initPlugins.js';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { TouchProvider } from './contexts/TouchContext';
 import App from './App';
 
 import './locales/i18n.js';
@@ -20,6 +21,8 @@ const root = createRoot(container);
 
 root.render(
     <ThemeProvider>
-        <App />
+        <TouchProvider>
+            <App />
+        </TouchProvider>
     </ThemeProvider>
 );

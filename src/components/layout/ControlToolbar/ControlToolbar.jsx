@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import CanvasHelpDialog from '../../dialogs/CanvasHelpDialog/CanvasHelpDialog.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
-import useTouchDetect from '../../../hooks/useTouchDetect';
+import { useTouchContext } from '../../../contexts/TouchContext';
 import './ControlToolbar.css';
 
 function ControlToolbar({
@@ -23,7 +23,7 @@ function ControlToolbar({
 }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
-    const isTouch = useTouchDetect();
+    const isTouch = useTouchContext();
     const [showHelp, setShowHelp] = useState(false);
 
     return (

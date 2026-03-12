@@ -1,16 +1,17 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
 import BlockHelpDialog from '../../dialogs/BlockHelpDialog/BlockHelpDialog.jsx';
 import registry from '../../../engine/PluginRegistry';
 import { useThemeContext } from '../../../contexts/ThemeContext';
-import useTouchDetect from '../../../hooks/useTouchDetect';
+import { useTouchContext } from '../../../contexts/TouchContext';
 import './Toolbar.css';
 
-function Toolbar() {
+function Toolbar({ onAddBlock }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
-    const isTouch = useTouchDetect();
+    const isTouch = useTouchContext();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [legendOpen, setLegendOpen] = useState(false);
     const legendRef = useRef(null);
@@ -87,10 +88,13 @@ function Toolbar() {
         event.preventDefault();
         event.stopPropagation();
         const el = event.currentTarget;
+        el.classList.remove('touch-added');
+        // Force reflow to restart animation
+        void el.offsetWidth;
         el.classList.add('touch-added');
-        setTimeout(() => el.classList.remove('touch-added'), 300);
-        window.dispatchEvent(new CustomEvent('dsp-add-block', { detail: { blockType: blockId } }));
-    }, []);
+        el.addEventListener('animationend', () => el.classList.remove('touch-added'), { once: true });
+        if (onAddBlock) onAddBlock(blockId);
+    }, [onAddBlock]);
 
     const toggleGroup = (groupId) => {
         setCollapsedGroups(prev => ({
@@ -319,5 +323,9 @@ function Toolbar() {
         </div>
     );
 }
+
+Toolbar.propTypes = {
+    onAddBlock: PropTypes.func,
+};
 
 export default Toolbar;
