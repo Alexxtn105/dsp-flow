@@ -587,49 +587,6 @@
     }
 }
 
-/* Touch portrait: wider toolbar with block names visible */
-@media (pointer: coarse) and (max-width: 480px) and (orientation: portrait) {
-    .tb {
-        width: 160px;
-    }
-
-    .tb.tb-collapsed {
-        width: 44px;
-    }
-
-    .tb-header-label,
-    .tb-block-name {
-        display: block;
-    }
-
-    .tb-search {
-        display: flex;
-    }
-
-    .tb-group-header span {
-        display: inline;
-    }
-
-    .tb-block {
-        padding: 8px 6px;
-        justify-content: flex-start;
-    }
-
-    .tb-group-header {
-        padding: 6px 8px;
-        justify-content: space-between;
-    }
-
-    .tb-header {
-        padding: 6px 8px;
-        justify-content: space-between;
-    }
-
-    .tb-block-name {
-        font-size: 11px;
-    }
-}
-
 /* ---- Touch devices ---- */
 @media (hover: none) {
     .tb-block-help-btn {
@@ -685,6 +642,49 @@
         100% {
             background: transparent;
         }
+    }
+}
+
+/* Touch portrait: wider toolbar with block names visible */
+@media (pointer: coarse) and (max-width: 480px) and (orientation: portrait) {
+    .tb {
+        width: 160px;
+    }
+
+    .tb.tb-collapsed {
+        width: 44px;
+    }
+
+    .tb-header-label,
+    .tb-block-name {
+        display: block;
+    }
+
+    .tb-search {
+        display: flex;
+    }
+
+    .tb-group-header span {
+        display: inline;
+    }
+
+    .tb-block {
+        padding: 8px 6px;
+        justify-content: flex-start;
+    }
+
+    .tb-group-header {
+        padding: 6px 8px;
+        justify-content: space-between;
+    }
+
+    .tb-header {
+        padding: 6px 8px;
+        justify-content: space-between;
+    }
+
+    .tb-block-name {
+        font-size: 11px;
     }
 }
 
