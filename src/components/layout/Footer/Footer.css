@@ -525,3 +525,90 @@
         flex-wrap: wrap;
     }
 }
+
+@media (max-width: 480px) {
+    .ft-transport {
+        padding: 3px 8px 2px;
+    }
+
+    .ft-transport-group {
+        padding: 2px 3px;
+    }
+
+    .ft-tr-btn {
+        width: 28px;
+        height: 24px;
+    }
+
+    .ft-tr-btn .material-icons {
+        font-size: 18px;
+    }
+
+    .ft-tr-play {
+        width: 32px;
+        height: 26px;
+    }
+
+    .ft-tr-play .material-icons {
+        font-size: 20px;
+    }
+
+    .ft-bar {
+        padding: 2px 6px 3px;
+        gap: 6px;
+        min-height: 24px;
+    }
+
+    .ft-counter {
+        font-size: 9px;
+    }
+
+    .ft-status-text {
+        font-size: 9px;
+    }
+
+    .ft-pct {
+        font-size: 9px;
+    }
+
+    .ft-timeline {
+        padding: 0 8px;
+    }
+
+    .ft-timeline-markers {
+        height: 12px;
+    }
+
+    .ft-time-current,
+    .ft-time-total {
+        font-size: 9px;
+    }
+
+    .ft-manual-toggle {
+        gap: 4px;
+    }
+
+    .ft-manual-label {
+        font-size: 9px;
+    }
+
+    .ft-step-group {
+        padding: 1px 3px 1px 6px;
+    }
+
+    .ft-step-label {
+        font-size: 9px;
+    }
+
+    .ft-step-input {
+        width: 44px;
+        height: 18px;
+        font-size: 9px;
+    }
+
+    .ft-step-btn {
+        height: 18px;
+        padding: 0 6px 0 3px;
+        font-size: 9px;
+    }
+}

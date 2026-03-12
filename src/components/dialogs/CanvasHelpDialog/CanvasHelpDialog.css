@@ -1,0 +1,202 @@
+/* ===== Canvas Help Dialog ===== */
+
+.canvas-help-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: canvas-help-fade-in 150ms ease-out;
+}
+
+@keyframes canvas-help-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.canvas-help-dialog {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+    width: 520px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    animation: canvas-help-slide-in 150ms ease-out;
+}
+
+@keyframes canvas-help-slide-in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.canvas-help-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--panel-border);
+    flex-shrink: 0;
+}
+
+.canvas-help-title {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    color: var(--panel-text-1);
+    letter-spacing: 0.3px;
+}
+
+.canvas-help-close {
+    background: none;
+    border: none;
+    color: var(--panel-text-4);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    border-radius: 3px;
+    transition: all 100ms ease;
+}
+
+.canvas-help-close:hover {
+    background: var(--panel-hover-bg);
+    color: var(--panel-text-2);
+}
+
+.canvas-help-body {
+    padding: 12px 16px 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.canvas-help-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    color: var(--panel-accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.canvas-help-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 2px 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--panel-hover-bg);
+}
+
+.canvas-help-row:last-child {
+    border-bottom: none;
+}
+
+.canvas-help-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.canvas-help-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--panel-text-2);
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+}
+
+.canvas-help-kbd {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    font-size: 10px;
+    font-family: 'Segoe UI Mono', 'SF Mono', 'Consolas', monospace;
+    font-weight: 600;
+    color: var(--panel-text-3);
+    background: var(--panel-subtle-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    padding: 1px 6px;
+    white-space: nowrap;
+}
+
+.canvas-help-desc {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 11px;
+    color: var(--panel-text-4);
+    font-family: 'Segoe UI', 'SF Pro', system-ui, sans-serif;
+    line-height: 1.4;
+}
+
+.canvas-help-signal-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.canvas-help-signal-dot.signal-real {
+    background: var(--signal-real);
+    box-shadow: 0 0 4px var(--signal-real);
+}
+
+.canvas-help-signal-dot.signal-complex {
+    background: var(--signal-complex);
+    box-shadow: 0 0 4px var(--signal-complex);
+}
+
+/* ---- Scrollbar ---- */
+.canvas-help-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.canvas-help-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.canvas-help-body::-webkit-scrollbar-thumb {
+    background: var(--panel-scrollbar);
+    border-radius: 2px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .canvas-help-dialog {
+        width: calc(100vw - 16px);
+        max-height: calc(100vh - 32px);
+    }
+
+    .canvas-help-header {
+        padding: 10px 12px;
+    }
+
+    .canvas-help-body {
+        padding: 10px 12px 14px;
+    }
+
+    .canvas-help-row {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+    .canvas-help-kbd {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: start;
+        margin: 2px 0;
+    }
+
+    .canvas-help-desc {
+        grid-row: 3;
+    }
+}

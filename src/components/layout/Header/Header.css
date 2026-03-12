@@ -267,6 +267,7 @@
     .hdr {
         padding: 0 8px;
         gap: 8px;
+        height: 36px;
     }
 
     .hdr-title {
@@ -275,5 +276,45 @@
 
     .hdr-scheme {
         max-width: 180px;
+    }
+
+    .hdr-sponsor {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .hdr {
+        height: 32px;
+        padding: 0 6px;
+        gap: 4px;
+    }
+
+    .hdr-logo {
+        font-size: 12px;
+    }
+
+    .hdr-scheme {
+        max-width: 120px;
+        padding: 2px 8px;
+    }
+
+    .hdr-scheme-name {
+        font-size: 10px;
+    }
+
+    .hdr-scheme-badge {
+        font-size: 8px;
+    }
+
+    .hdr-lang-btn {
+        height: 22px;
+        padding: 0 6px;
+        font-size: 9px;
+    }
+
+    .hdr-theme-btn {
+        width: 22px;
+        height: 22px;
     }
 }

@@ -125,6 +125,9 @@
 /* Settings */
 .ct-btn-settings:hover:not(:disabled) { color: var(--panel-text-2); }
 
+/* Help */
+.ct-btn-help:hover:not(:disabled) { color: var(--panel-accent-cyan); }
+
 /* ---- Scrollbar ---- */
 .ct-content::-webkit-scrollbar {
     width: 3px;
@@ -158,5 +161,31 @@
         width: 18px;
         height: 18px;
         font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ct {
+        width: 32px;
+    }
+
+    .ct-btn {
+        width: 26px;
+        height: 26px;
+    }
+
+    .ct-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+    }
+
+    .ct-sep {
+        width: 18px;
+        margin: 2px 0;
+    }
+
+    .ct-content {
+        padding: 4px 0;
     }
 }

@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
+import CanvasHelpDialog from '../../dialogs/CanvasHelpDialog/CanvasHelpDialog.jsx';
 import { useThemeContext } from '../../../contexts/ThemeContext';
 import './ControlToolbar.css';
 
@@ -16,6 +18,7 @@ function ControlToolbar({
 }) {
     const { isDarkTheme } = useThemeContext();
     const { t } = useTranslation();
+    const [showHelp, setShowHelp] = useState(false);
 
     return (
         <div className={`ct ${isDarkTheme ? 'dark-theme' : ''}`}>
@@ -66,7 +69,22 @@ function ControlToolbar({
                         <Icon name="tune" size="large" className="ct-icon" />
                     </button>
                 </div>
+
+                <div className="ct-sep" />
+
+                {/* Help group */}
+                <div className="ct-group">
+                    <button
+                        className="ct-btn ct-btn-help"
+                        onClick={() => setShowHelp(true)}
+                        title={t('controlToolbar.canvasHelp')}
+                    >
+                        <Icon name="keyboard" size="large" className="ct-icon" />
+                    </button>
+                </div>
             </div>
+
+            {showHelp && <CanvasHelpDialog onClose={() => setShowHelp(false)} />}
         </div>
     );
 }
