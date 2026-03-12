@@ -631,7 +631,7 @@ DSPEditor.propTypes = {
     onStatsUpdate: PropTypes.func.isRequired,
     onReactFlowInit: PropTypes.func,
     isRunning: PropTypes.bool.isRequired,
-    onSelectionChange: PropTypes.func,
+    onSelectionChange: PropTypes.func.isRequired,
     onOpenVisualization: PropTypes.func,
     onSampleRateChange: PropTypes.func,
     onBeforeDelete: PropTypes.func

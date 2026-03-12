@@ -634,14 +634,14 @@
     .tb-block-mini.touch-added {
         animation: touchAddFlash 300ms ease forwards;
     }
-}
 
-@keyframes touchAddFlash {
-    0% {
-        background: rgba(0, 229, 160, 0.25);
-    }
-    100% {
-        background: transparent;
+    @keyframes touchAddFlash {
+        0% {
+            background: rgba(0, 229, 160, 0.25);
+        }
+        100% {
+            background: transparent;
+        }
     }
 }
 
