@@ -29,72 +29,82 @@ function VisualizationWindow({
     const [isResizing, setIsResizing] = useState(false);
     const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
-    // Drag handlers
-    const handleMouseDown = useCallback((e) => {
-        if (e.target === headerRef.current || headerRef.current?.contains(e.target)) {
-            // Prevent dragging if clicking close button
-            if (e.target.closest('.viz-window-close')) return;
+    // Extract clientX/clientY from mouse or touch event
+    const getPointer = useCallback((e) => {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }, []);
 
+    // Drag handlers
+    const handleDragStart = useCallback((e) => {
+        const target = e.target;
+        if (target === headerRef.current || headerRef.current?.contains(target)) {
+            if (target.closest('.viz-window-close')) return;
+
+            const pointer = getPointer(e);
             setIsDragging(true);
             setDragOffset({
-                x: e.clientX - position.x,
-                y: e.clientY - position.y
+                x: pointer.x - position.x,
+                y: pointer.y - position.y
             });
-            e.preventDefault(); // Prevent text selection
+            e.preventDefault();
         }
-    }, [position]);
+    }, [position, getPointer]);
 
-    const handleMouseMove = useCallback((e) => {
+    const handlePointerMove = useCallback((e) => {
+        const pointer = getPointer(e);
         if (isDragging) {
             setPosition({
-                x: e.clientX - dragOffset.x,
-                y: e.clientY - dragOffset.y
+                x: pointer.x - dragOffset.x,
+                y: pointer.y - dragOffset.y
             });
         } else if (isResizing) {
-            const deltaX = e.clientX - resizeStart.x;
-            const deltaY = e.clientY - resizeStart.y;
-
-            // Calculate new size
+            const deltaX = pointer.x - resizeStart.x;
+            const deltaY = pointer.y - resizeStart.y;
             const newWidth = resizeStart.width + deltaX;
             const newHeight = resizeStart.height + deltaY;
-
-            // Constraints handled by VisualizationManager callback, but good to have local feedback?
-            // Actually, we should call onResize here
             if (onResize) {
                 onResize(nodeId, newWidth, newHeight);
             }
         }
-    }, [isDragging, dragOffset, isResizing, resizeStart, onResize, nodeId]);
+    }, [isDragging, dragOffset, isResizing, resizeStart, onResize, nodeId, getPointer]);
 
-    const handleMouseUp = useCallback(() => {
+    const handlePointerUp = useCallback(() => {
         setIsDragging(false);
         setIsResizing(false);
     }, []);
 
     // Resize handlers
-    const handleResizeMouseDown = useCallback((e) => {
+    const handleResizeStart = useCallback((e) => {
         e.stopPropagation();
+        const pointer = getPointer(e);
         setIsResizing(true);
         setResizeStart({
-            x: e.clientX,
-            y: e.clientY,
+            x: pointer.x,
+            y: pointer.y,
             width: width,
             height: height
         });
         e.preventDefault();
-    }, [width, height]);
+    }, [width, height, getPointer]);
 
     useEffect(() => {
         if (isDragging || isResizing) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
+            window.addEventListener('mousemove', handlePointerMove);
+            window.addEventListener('mouseup', handlePointerUp);
+            window.addEventListener('touchmove', handlePointerMove, { passive: false });
+            window.addEventListener('touchend', handlePointerUp);
         }
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mousemove', handlePointerMove);
+            window.removeEventListener('mouseup', handlePointerUp);
+            window.removeEventListener('touchmove', handlePointerMove);
+            window.removeEventListener('touchend', handlePointerUp);
         };
-    }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
+    }, [isDragging, isResizing, handlePointerMove, handlePointerUp]);
 
     return (
         <div
@@ -106,7 +116,8 @@ function VisualizationWindow({
                 width,
                 height
             }}
-            onMouseDown={handleMouseDown}
+            onMouseDown={handleDragStart}
+            onTouchStart={handleDragStart}
         >
             <div className="viz-window-header" ref={headerRef}>
                 <span className="viz-window-title">{title}</span>
@@ -125,7 +136,8 @@ function VisualizationWindow({
             {/* Resize Handle */}
             <div
                 className="viz-window-resize-handle"
-                onMouseDown={handleResizeMouseDown}
+                onMouseDown={handleResizeStart}
+                onTouchStart={handleResizeStart}
                 role="separator"
                 aria-label={t('viz.resizeWindow')}
                 tabIndex={0}
