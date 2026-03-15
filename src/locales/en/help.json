@@ -476,6 +476,24 @@
             }
         ]
     },
+    "complex-delay-line": {
+        "title": "Complex Delay Line",
+        "purpose": "Delays a complex (IQ) signal by a specified number of samples. Uses two independent circular buffers for Re and Im components. Used in complex comb filters, IQ path delay compensation, and complex signal correlation.",
+        "algorithm": "Two circular buffers of size N for Re and Im. At each sample: delayed values are read from the current position, new values are written, and the pointer advances. O(1) per sample. When delay length changes, buffers are recreated with old data preserved.",
+        "inputDescription": "complex (Float32Array — interleaved Re/Im)",
+        "outputDescription": "complex (Float32Array — interleaved Re/Im) — delayed copy of the input signal",
+        "params": {
+            "delaySamples": {
+                "description": "number of delay samples. Delay in seconds = delaySamples / sampleRate. For example, at sampleRate=48000: 100 samples ≈ 2.08 ms, 48000 samples = 1 second. Valid range: 0 .. ∞ (at 0 the signal passes unchanged)."
+            }
+        },
+        "examples": [
+            {
+                "title": "IQ path delay compensation",
+                "description": "ComplexSignal ─┬─→ Filter → ComplexSummer → Oscilloscope └─→ ComplexDelayLine(N)    ──↗ Compensates group delay of a filter in the complex signal path."
+            }
+        ]
+    },
     "decimator-interpolator": {
         "title": "Decimation/Interpolation",
         "purpose": "Changes the signal's sample rate: decreases (decimation) or increases (interpolation) the number of samples. This is necessary when different parts of the system operate at different sample rates, or when computational load needs to be reduced by processing fewer samples per second. Decimation: reducing the sample rate by a factor (e.g., 48000 Hz → 12000 Hz at factor=4). An anti-aliasing LPF is applied before downsampling to prevent spectral folding. Interpolation: increasing the sample rate by a factor. Zeros are inserted between existing samples (zero-stuffing), then an anti-imaging LPF is applied for smoothing.",

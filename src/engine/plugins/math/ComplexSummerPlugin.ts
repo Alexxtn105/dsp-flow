@@ -40,7 +40,7 @@ export default {
     id: 'complex-summer',
     icon: 'dsp-sum',
     description: 'Сложение двух комплексных сигналов',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'complex', inputsCount: 2 } as const,
     defaultParams: {},
     processor: {

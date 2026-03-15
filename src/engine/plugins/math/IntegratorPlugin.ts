@@ -53,7 +53,7 @@ export default {
     id: 'integrator',
     icon: 'dsp-integrate',
     description: 'Интегратор',
-    group: 'math-blocks',
+    group: 'real-math',
     signals: { input: 'real', output: 'real' } as const,
     defaultParams: {
         resetOnOverflow: true,

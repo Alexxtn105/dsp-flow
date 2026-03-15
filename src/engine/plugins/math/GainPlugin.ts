@@ -52,7 +52,7 @@ const GainPlugin = {
     id: 'gain',
     icon: 'dsp-gain',
     description: 'Усилитель / аттенюатор',
-    group: 'math-blocks',
+    group: 'real-math',
 
     signals: {
         input: 'real',

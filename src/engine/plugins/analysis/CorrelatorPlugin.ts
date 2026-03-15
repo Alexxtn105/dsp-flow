@@ -120,7 +120,7 @@ const CorrelatorPlugin = {
     id: 'correlator',
     icon: 'dsp-correlator',
     description: 'Взаимная корреляция двух сигналов',
-    group: 'math-blocks',
+    group: 'real-math',
 
     signals: {
         input: 'real' as const,

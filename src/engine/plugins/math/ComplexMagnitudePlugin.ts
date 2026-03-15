@@ -39,7 +39,7 @@ export default {
     id: 'complex-magnitude',
     icon: 'dsp-magnitude',
     description: 'Извлечение амплитуды комплексного сигнала (модуль)',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {

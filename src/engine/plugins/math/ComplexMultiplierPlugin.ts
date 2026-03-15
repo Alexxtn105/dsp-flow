@@ -41,7 +41,7 @@ export default {
     id: 'complex-multiplier',
     icon: 'dsp-multiply',
     description: 'Перемножение двух комплексных сигналов',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'complex', inputsCount: 2 } as const,
     defaultParams: {},
     processor: {

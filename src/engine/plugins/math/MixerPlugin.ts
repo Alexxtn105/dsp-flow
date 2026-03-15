@@ -51,7 +51,7 @@ const MixerPlugin = {
     id: 'mixer',
     icon: 'dsp-mixer',
     description: 'Перенос спектра (умножение на exp(j·2π·f·t))',
-    group: 'math-blocks',
+    group: 'complex-math',
 
     signals: {
         input: 'real',

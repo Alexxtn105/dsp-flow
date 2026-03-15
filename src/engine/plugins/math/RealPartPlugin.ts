@@ -42,7 +42,7 @@ export default {
     id: 'real-part',
     icon: 'dsp-real',
     description: 'Извлечение действительной части комплексного сигнала',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {

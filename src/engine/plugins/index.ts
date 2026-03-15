@@ -18,6 +18,7 @@ import HilbertTransformerPlugin from './filters/HilbertTransformerPlugin';
 import GoertzelFilterPlugin from './filters/GoertzelFilterPlugin';
 import RemezFilterPlugin from './filters/RemezFilterPlugin';
 import DelayLinePlugin from './filters/DelayLinePlugin';
+import ComplexDelayLinePlugin from './filters/ComplexDelayLinePlugin';
 import DecimatorInterpolatorPlugin from './filters/DecimatorInterpolatorPlugin';
 import IIRFilterPlugin from './filters/IIRFilterPlugin';
 import CICFilterPlugin from './filters/CICFilterPlugin';
@@ -83,6 +84,7 @@ const allPlugins: PluginDefinition[] = [
     GoertzelFilterPlugin,
     RemezFilterPlugin,
     DelayLinePlugin,
+    ComplexDelayLinePlugin,
     DecimatorInterpolatorPlugin,
     IIRFilterPlugin,
     CICFilterPlugin,

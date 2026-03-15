@@ -46,7 +46,7 @@ export default {
     id: 'multiplier',
     icon: 'dsp-multiply',
     description: 'Перемножитель',
-    group: 'math-blocks',
+    group: 'real-math',
     signals: { input: 'real', output: 'real', inputsCount: 2 } as const,
     defaultParams: {
         numInputs: 2,

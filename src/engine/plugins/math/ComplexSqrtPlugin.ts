@@ -43,7 +43,7 @@ export default {
     id: 'complex-sqrt',
     icon: 'dsp-sqrt',
     description: 'Извлечение квадратного корня из комплексного сигнала',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'complex' } as const,
     defaultParams: {},
     processor: {

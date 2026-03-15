@@ -43,7 +43,7 @@ export default {
     id: 'complex-square',
     icon: 'dsp-square',
     description: 'Возведение комплексного сигнала в квадрат',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'complex' } as const,
     defaultParams: {},
     processor: {

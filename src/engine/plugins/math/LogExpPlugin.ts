@@ -56,7 +56,7 @@ const LogExpPlugin = {
     id: 'log-exp',
     icon: 'dsp-log',
     description: 'Логарифмические и экспоненциальные функции',
-    group: 'math-blocks',
+    group: 'real-math',
 
     signals: {
         input: 'real',

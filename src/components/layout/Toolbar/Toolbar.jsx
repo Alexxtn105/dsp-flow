@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../common/Icons/Icon.jsx';
@@ -42,9 +42,17 @@ function Toolbar({ onAddBlock }) {
     const blockDisplayName = (blockId) => t(blockId, { ns: 'blocks' });
     const groupDisplayName = (groupId) => t(groupId, { ns: 'groups' });
 
+    // Sort blocks within each group alphabetically by localized name
+    const sortedGroups = useMemo(() => groups.map(group => ({
+        ...group,
+        blocks: [...group.blocks].sort((a, b) =>
+            t(a.name, { ns: 'blocks' }).localeCompare(t(b.name, { ns: 'blocks' }))
+        )
+    })), [groups, t]);
+
     const query = searchQuery.trim().toLowerCase();
     const filteredGroups = query
-        ? groups
+        ? sortedGroups
             .map(group => ({
                 ...group,
                 blocks: group.blocks.filter(block =>
@@ -53,7 +61,7 @@ function Toolbar({ onAddBlock }) {
                 )
             }))
             .filter(group => group.blocks.length > 0)
-        : groups;
+        : sortedGroups;
 
     const totalBlocks = groups.reduce((sum, g) => sum + g.blocks.length, 0);
     const allGroupIds = groups.map(g => g.id);
@@ -261,7 +269,7 @@ function Toolbar({ onAddBlock }) {
             {/* Collapsed: icon-only blocks */}
             {isCollapsed && (
                 <div className="tb-content tb-content-icons">
-                    {groups.flatMap(group => group.blocks).map((block) => (
+                    {sortedGroups.flatMap(group => group.blocks).map((block) => (
                         <div
                             key={block.id}
                             className="tb-block-mini"

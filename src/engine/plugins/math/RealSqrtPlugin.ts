@@ -32,7 +32,7 @@ export default {
     id: 'real-sqrt',
     icon: 'dsp-sqrt',
     description: 'Квадратный корень действительного сигнала',
-    group: 'math-blocks',
+    group: 'real-math',
     signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {

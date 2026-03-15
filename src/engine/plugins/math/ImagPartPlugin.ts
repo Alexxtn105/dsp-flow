@@ -42,7 +42,7 @@ export default {
     id: 'imag-part',
     icon: 'dsp-imag',
     description: 'Извлечение мнимой части комплексного сигнала',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {

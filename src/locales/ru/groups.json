@@ -1,8 +1,9 @@
 {
-  "filters": "Фильтры",
   "generators": "Генераторы",
+  "filters": "Фильтры",
   "detectors": "Детекторы",
-  "math-blocks": "Математические",
+  "complex-math": "Комплексная математика",
+  "real-math": "Действительная математика",
   "visualization": "Визуализация",
   "output": "Вывод"
 }

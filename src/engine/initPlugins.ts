@@ -11,10 +11,11 @@ import allPlugins from './plugins';
 export default function initPlugins(): void {
     // Регистрация групп (порядок определяет отображение в Toolbar)
     // Display names are in locales/*/groups.json
-    registry.registerGroup({ id: 'filters', collapsed: false });
     registry.registerGroup({ id: 'generators', collapsed: false });
+    registry.registerGroup({ id: 'filters', collapsed: false });
     registry.registerGroup({ id: 'detectors', collapsed: false });
-    registry.registerGroup({ id: 'math-blocks', collapsed: false });
+    registry.registerGroup({ id: 'complex-math', collapsed: false });
+    registry.registerGroup({ id: 'real-math', collapsed: false });
     registry.registerGroup({ id: 'visualization', collapsed: false });
     registry.registerGroup({ id: 'output', collapsed: false });
 

@@ -42,7 +42,7 @@ export default {
     id: 'complex-conjugate',
     icon: 'dsp-conjugate',
     description: 'Вычисляет комплексно-сопряжённый сигнал (инвертирует мнимую часть: a+jb → a−jb)',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'complex' } as const,
     defaultParams: {},
     processor: {

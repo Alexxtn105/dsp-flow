@@ -40,7 +40,7 @@ export default {
     id: 'real-square',
     icon: 'dsp-square',
     description: 'Возведение действительного сигнала в квадрат',
-    group: 'math-blocks',
+    group: 'real-math',
     signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {

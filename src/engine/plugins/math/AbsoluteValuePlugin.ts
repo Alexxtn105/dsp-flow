@@ -40,7 +40,7 @@ export default {
     id: 'absolute-value',
     icon: 'dsp-abs',
     description: 'Модуль (абсолютное значение) сигнала',
-    group: 'math-blocks',
+    group: 'real-math',
     signals: { input: 'real', output: 'real' } as const,
     defaultParams: {},
     processor: {

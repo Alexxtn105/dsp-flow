@@ -1,8 +1,9 @@
 {
-  "filters": "Filters",
   "generators": "Generators",
+  "filters": "Filters",
   "detectors": "Detectors",
-  "math-blocks": "Math",
+  "complex-math": "Complex Math",
+  "real-math": "Real Math",
   "visualization": "Visualization",
   "output": "Output"
 }

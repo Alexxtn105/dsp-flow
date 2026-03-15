@@ -42,7 +42,7 @@ export default {
     id: 'complex-phase',
     icon: 'dsp-phase',
     description: 'Извлечение фазы комплексного сигнала (atan2)',
-    group: 'math-blocks',
+    group: 'complex-math',
     signals: { input: 'complex', output: 'real' } as const,
     defaultParams: {},
     processor: {

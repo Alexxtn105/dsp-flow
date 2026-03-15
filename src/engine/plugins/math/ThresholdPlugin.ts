@@ -56,7 +56,7 @@ const ThresholdPlugin = {
     id: 'threshold',
     icon: 'dsp-threshold',
     description: 'Пороговый компаратор с гистерезисом',
-    group: 'math-blocks',
+    group: 'real-math',
 
     signals: {
         input: 'real',

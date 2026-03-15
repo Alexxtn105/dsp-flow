@@ -48,7 +48,7 @@ export default {
     id: 'summer',
     icon: 'dsp-sum',
     description: 'Сумматор',
-    group: 'math-blocks',
+    group: 'real-math',
     signals: { input: 'real', output: 'real', inputsCount: 2 } as const,
     defaultParams: {
         numInputs: 2,
