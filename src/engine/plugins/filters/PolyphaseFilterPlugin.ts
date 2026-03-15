@@ -110,7 +110,8 @@ const PolyphaseFilterPlugin = {
                 const tapsPerPhase = polyCoeffs[0].length;
                 // Upsample needs tapsPerPhase history; downsample needs numTaps
                 // to index h[current - p - k*factor] across all branches
-                const histLen = mode === 'downsample' ? numTaps : tapsPerPhase;
+                // Max offset: (factor-1) + (tapsPerPhase-1)*factor = tapsPerPhase*factor - 1
+                const histLen = mode === 'downsample' ? tapsPerPhase * factor : tapsPerPhase;
                 this.states.set(nodeId, {
                     history: new Float32Array(histLen),
                     histPos: 0,
@@ -125,7 +126,7 @@ const PolyphaseFilterPlugin = {
             if (state.cachedKey !== key) {
                 state.polyCoeffs = designPolyphaseCoeffs(factor, numTaps);
                 const tph = state.polyCoeffs[0].length;
-                const histLen = mode === 'downsample' ? numTaps : tph;
+                const histLen = mode === 'downsample' ? tph * factor : tph;
                 state.history = new Float32Array(histLen);
                 state.histPos = 0;
                 state.cachedKey = key;
