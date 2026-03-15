@@ -75,7 +75,39 @@
     "bandEdges": "Границы полос",
     "desiredGains": "Желаемые усиления",
     "weights": "Весовые коэффициенты",
-    "channels": "Каналы"
+    "channels": "Каналы",
+    "dutyCycle": "Скважность",
+    "symmetry": "Симметрия",
+    "period": "Период",
+    "startFrequency": "Начальная частота",
+    "endFrequency": "Конечная частота",
+    "duration": "Длительность",
+    "sweepType": "Тип развёртки",
+    "stepTime": "Время скачка",
+    "snr": "ОСШ (дБ)",
+    "bits": "Разрядность",
+    "quantizerType": "Тип квантователя",
+    "holdPeriod": "Период удержания",
+    "normalize": "Нормализация",
+    "bins": "Столбцы",
+    "qamOrder": "Порядок QAM",
+    "decisionType": "Тип решения",
+    "pulseType": "Тип импульса",
+    "adaptiveAlgorithm": "Алгоритм",
+    "stepSize": "Шаг адаптации (μ)",
+    "forgettingFactor": "Фактор забывания (λ)",
+    "templateType": "Тип шаблона",
+    "regularization": "Регуляризация (ε)",
+    "estimateChannel": "Оценка канала",
+    "fadingType": "Тип замираний",
+    "dopplerFrequency": "Доплеровская частота",
+    "kFactor": "K-фактор (дБ)",
+    "delays": "Задержки (отсчёты)",
+    "gains": "Усиления",
+    "kp": "Kp (пропорц.)",
+    "ki": "Ki (интеграл.)",
+    "kd": "Kd (дифференц.)",
+    "outputLimit": "Ограничение выхода"
   },
   "booleanTrue": "Да",
   "booleanFalse": "Нет",
@@ -166,6 +198,32 @@
   "gainMode": {
     "linear": "Линейный",
     "dB": "Децибелы (дБ)"
+  },
+  "sweepType": {
+    "linear": "Линейная (Linear)",
+    "exponential": "Экспоненциальная (Exponential)"
+  },
+  "quantizerType": {
+    "mid-tread": "Mid-tread (с нулём)",
+    "mid-rise": "Mid-rise (без нуля)"
+  },
+  "decisionType": {
+    "hard": "Жёсткое решение (Hard)",
+    "soft": "Мягкое решение (LLR)"
+  },
+  "pulseType": {
+    "rrc": "Корень приподнятого косинуса (RRC)",
+    "rc": "Приподнятый косинус (RC)",
+    "gaussian": "Гауссов (Gaussian)"
+  },
+  "fadingType": {
+    "rayleigh": "Рэлея (Rayleigh)",
+    "rician": "Райса (Rician)"
+  },
+  "templateType": {
+    "rectangular": "Прямоугольный",
+    "triangular": "Треугольный",
+    "sinusoidal": "Синусоидальный"
   },
   "logFunction": {
     "ln": "ln (натуральный)",

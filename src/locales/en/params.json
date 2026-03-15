@@ -75,7 +75,39 @@
     "bandEdges": "Band edges",
     "desiredGains": "Desired gains",
     "weights": "Weights",
-    "channels": "Channels"
+    "channels": "Channels",
+    "dutyCycle": "Duty cycle",
+    "symmetry": "Symmetry",
+    "period": "Period",
+    "startFrequency": "Start frequency",
+    "endFrequency": "End frequency",
+    "duration": "Duration",
+    "sweepType": "Sweep type",
+    "stepTime": "Step time",
+    "snr": "SNR (dB)",
+    "bits": "Bits",
+    "quantizerType": "Quantizer type",
+    "holdPeriod": "Hold period",
+    "normalize": "Normalize",
+    "bins": "Bins",
+    "qamOrder": "QAM order",
+    "decisionType": "Decision type",
+    "pulseType": "Pulse type",
+    "adaptiveAlgorithm": "Algorithm",
+    "stepSize": "Step size (μ)",
+    "forgettingFactor": "Forgetting factor (λ)",
+    "templateType": "Template type",
+    "regularization": "Regularization (ε)",
+    "estimateChannel": "Estimate channel",
+    "fadingType": "Fading type",
+    "dopplerFrequency": "Doppler frequency",
+    "kFactor": "K-factor (dB)",
+    "delays": "Delays (samples)",
+    "gains": "Gains",
+    "kp": "Kp (proportional)",
+    "ki": "Ki (integral)",
+    "kd": "Kd (derivative)",
+    "outputLimit": "Output limit"
   },
   "booleanTrue": "Yes",
   "booleanFalse": "No",
@@ -166,6 +198,32 @@
   "gainMode": {
     "linear": "Linear",
     "dB": "Decibels (dB)"
+  },
+  "sweepType": {
+    "linear": "Linear",
+    "exponential": "Exponential"
+  },
+  "quantizerType": {
+    "mid-tread": "Mid-tread",
+    "mid-rise": "Mid-rise"
+  },
+  "decisionType": {
+    "hard": "Hard decision",
+    "soft": "Soft decision (LLR)"
+  },
+  "pulseType": {
+    "rrc": "Root Raised Cosine (RRC)",
+    "rc": "Raised Cosine (RC)",
+    "gaussian": "Gaussian"
+  },
+  "fadingType": {
+    "rayleigh": "Rayleigh",
+    "rician": "Rician"
+  },
+  "templateType": {
+    "rectangular": "Rectangular",
+    "triangular": "Triangular",
+    "sinusoidal": "Sinusoidal"
   },
   "logFunction": {
     "ln": "ln (natural)",

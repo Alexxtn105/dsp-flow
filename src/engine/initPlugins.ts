@@ -13,6 +13,7 @@ export default function initPlugins(): void {
     // Display names are in locales/*/groups.json
     registry.registerGroup({ id: 'generators', collapsed: false });
     registry.registerGroup({ id: 'filters', collapsed: false });
+    registry.registerGroup({ id: 'channels', collapsed: false });
     registry.registerGroup({ id: 'detectors', collapsed: false });
     registry.registerGroup({ id: 'complex-math', collapsed: false });
     registry.registerGroup({ id: 'real-math', collapsed: false });
@@ -127,6 +128,49 @@ export default function initPlugins(): void {
         { value: 'dB', labelKey: 'logFunction.dB' },
         { value: 'exp', labelKey: 'logFunction.exp' },
         { value: 'pow10', labelKey: 'logFunction.pow10' }
+    ]);
+
+    registry.registerParamOptions('sweepType', [
+        { value: 'linear', labelKey: 'sweepType.linear' },
+        { value: 'exponential', labelKey: 'sweepType.exponential' }
+    ]);
+
+    registry.registerParamOptions('quantizerType', [
+        { value: 'mid-tread', labelKey: 'quantizerType.mid-tread' },
+        { value: 'mid-rise', labelKey: 'quantizerType.mid-rise' }
+    ]);
+
+    registry.registerParamOptions('qamOrder', [
+        { value: '16QAM', label: '16-QAM' },
+        { value: '64QAM', label: '64-QAM' },
+        { value: '256QAM', label: '256-QAM' }
+    ]);
+
+    registry.registerParamOptions('decisionType', [
+        { value: 'hard', labelKey: 'decisionType.hard' },
+        { value: 'soft', labelKey: 'decisionType.soft' }
+    ]);
+
+    registry.registerParamOptions('pulseType', [
+        { value: 'rrc', labelKey: 'pulseType.rrc' },
+        { value: 'rc', labelKey: 'pulseType.rc' },
+        { value: 'gaussian', labelKey: 'pulseType.gaussian' }
+    ]);
+
+    registry.registerParamOptions('adaptiveAlgorithm', [
+        { value: 'lms', label: 'LMS' },
+        { value: 'nlms', label: 'NLMS' }
+    ]);
+
+    registry.registerParamOptions('fadingType', [
+        { value: 'rayleigh', labelKey: 'fadingType.rayleigh' },
+        { value: 'rician', labelKey: 'fadingType.rician' }
+    ]);
+
+    registry.registerParamOptions('templateType', [
+        { value: 'rectangular', labelKey: 'templateType.rectangular' },
+        { value: 'triangular', labelKey: 'templateType.triangular' },
+        { value: 'sinusoidal', labelKey: 'templateType.sinusoidal' }
     ]);
 
     registry.registerParamOptions('pskConstellation', [

@@ -8,6 +8,9 @@ import WaterfallView from '../WaterfallView';
 import ConstellationView from '../ConstellationView';
 import NumericIndicatorView from '../NumericIndicatorView';
 import MultiChannelSpectrumView from '../MultiChannelSpectrumView';
+import MeasurementView from '../MeasurementView';
+import HistogramView from '../HistogramView';
+import EyeDiagramView from '../EyeDiagramView';
 import { ErrorBoundary } from '../../common';
 
 /**
@@ -38,7 +41,12 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             'constellation': 'constellation',
             'numeric-indicator': 'numeric-indicator',
             'complex-numeric-indicator': 'complex-numeric-indicator',
-            'multi-channel-spectrum-analyzer': 'multi-spectrum'
+            'multi-channel-spectrum-analyzer': 'multi-spectrum',
+            'power-meter': 'power-meter',
+            'snr-meter': 'snr-meter',
+            'ber-counter': 'ber-counter',
+            'histogram': 'histogram',
+            'eye-diagram': 'eye-diagram'
         };
         const vizType = vizTypeMap[blockType] || 'oscilloscope';
 
@@ -233,6 +241,39 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                                 height={config.height - 70}
                                 fftSize={nodeFftSize}
                                 onFftSizeChange={onUpdateNodeParams ? (size) => handleFftSizeChange(config.nodeId, size) : undefined}
+                            />
+                        ) : config.vizType === 'power-meter' ? (
+                            <MeasurementView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                                metricType="power"
+                            />
+                        ) : config.vizType === 'snr-meter' ? (
+                            <MeasurementView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                                metricType="snr"
+                            />
+                        ) : config.vizType === 'ber-counter' ? (
+                            <MeasurementView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                                metricType="ber"
+                            />
+                        ) : config.vizType === 'histogram' ? (
+                            <HistogramView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'eye-diagram' ? (
+                            <EyeDiagramView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
                             />
                         ) : (
                             <OscilloscopeView

@@ -1,5 +1,6 @@
 {
   "generators": "Generators",
+  "channels": "Channels",
   "filters": "Filters",
   "detectors": "Detectors",
   "complex-math": "Complex Math",

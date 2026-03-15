@@ -8,6 +8,17 @@ import ConstantPlugin from './generators/ConstantPlugin';
 import NoiseGeneratorPlugin from './generators/NoiseGeneratorPlugin';
 import AMFMPMModulatorPlugin from './generators/AMFMPMModulatorPlugin';
 import PSKModulatorPlugin from './generators/PSKModulatorPlugin';
+import QAMModulatorPlugin from './generators/QAMModulatorPlugin';
+import SquareWavePlugin from './generators/SquareWavePlugin';
+import TriangleWavePlugin from './generators/TriangleWavePlugin';
+import ImpulsePlugin from './generators/ImpulsePlugin';
+import ChirpPlugin from './generators/ChirpPlugin';
+import StepPlugin from './generators/StepPlugin';
+
+// Каналы
+import AWGNChannelPlugin from './channels/AWGNChannelPlugin';
+import FadingChannelPlugin from './channels/FadingChannelPlugin';
+import MultipathChannelPlugin from './channels/MultipathChannelPlugin';
 
 // Фильтры
 import NotchFIRPlugin from './filters/NotchFIRPlugin';
@@ -22,6 +33,12 @@ import ComplexDelayLinePlugin from './filters/ComplexDelayLinePlugin';
 import DecimatorInterpolatorPlugin from './filters/DecimatorInterpolatorPlugin';
 import IIRFilterPlugin from './filters/IIRFilterPlugin';
 import CICFilterPlugin from './filters/CICFilterPlugin';
+import PulseShaperPlugin from './filters/PulseShaperPlugin';
+import LMSFilterPlugin from './filters/LMSFilterPlugin';
+import RLSFilterPlugin from './filters/RLSFilterPlugin';
+import MatchedFilterPlugin from './filters/MatchedFilterPlugin';
+import ZFEqualizerPlugin from './filters/ZFEqualizerPlugin';
+import PIDControllerPlugin from './filters/PIDControllerPlugin';
 
 // Анализ
 import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin';
@@ -51,6 +68,9 @@ import MixerPlugin from './math/MixerPlugin';
 import ThresholdPlugin from './math/ThresholdPlugin';
 import GainPlugin from './math/GainPlugin';
 import LogExpPlugin from './math/LogExpPlugin';
+import QuantizerPlugin from './math/QuantizerPlugin';
+import SampleHoldPlugin from './math/SampleHoldPlugin';
+import ConvolutionPlugin from './math/ConvolutionPlugin';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin';
@@ -60,6 +80,7 @@ import PLLPlugin from './detectors/PLLPlugin';
 import FrequencyDiscriminatorPlugin from './detectors/FrequencyDiscriminatorPlugin';
 import AMFMPMDemodulatorPlugin from './detectors/AMFMPMDemodulatorPlugin';
 import TimingRecoveryPlugin from './detectors/TimingRecoveryPlugin';
+import QAMDemodulatorPlugin from './detectors/QAMDemodulatorPlugin';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin';
@@ -68,6 +89,11 @@ import WaterfallPlugin from './visualization/WaterfallPlugin';
 import NumericIndicatorPlugin from './visualization/NumericIndicatorPlugin';
 import ComplexNumericIndicatorPlugin from './visualization/ComplexNumericIndicatorPlugin';
 import MultiChannelSpectrumAnalyzerPlugin from './visualization/MultiChannelSpectrumAnalyzerPlugin';
+import PowerMeterPlugin from './visualization/PowerMeterPlugin';
+import SNRMeterPlugin from './visualization/SNRMeterPlugin';
+import BERCounterPlugin from './visualization/BERCounterPlugin';
+import HistogramPlugin from './visualization/HistogramPlugin';
+import EyeDiagramPlugin from './visualization/EyeDiagramPlugin';
 
 // Вывод
 import SpeakerPlugin from './output/SpeakerPlugin';
@@ -88,6 +114,12 @@ const allPlugins: PluginDefinition[] = [
     DecimatorInterpolatorPlugin,
     IIRFilterPlugin,
     CICFilterPlugin,
+    PulseShaperPlugin,
+    LMSFilterPlugin,
+    RLSFilterPlugin,
+    MatchedFilterPlugin,
+    ZFEqualizerPlugin,
+    PIDControllerPlugin,
 
     // Генераторы
     AudioFilePlugin,
@@ -99,6 +131,17 @@ const allPlugins: PluginDefinition[] = [
     NoiseGeneratorPlugin,
     AMFMPMModulatorPlugin,
     PSKModulatorPlugin,
+    QAMModulatorPlugin,
+    SquareWavePlugin,
+    TriangleWavePlugin,
+    ImpulsePlugin,
+    ChirpPlugin,
+    StepPlugin,
+
+    // Каналы
+    AWGNChannelPlugin,
+    FadingChannelPlugin,
+    MultipathChannelPlugin,
 
     // Анализ
     SpectrumAnalyzerPlugin,
@@ -111,6 +154,7 @@ const allPlugins: PluginDefinition[] = [
     FrequencyDiscriminatorPlugin,
     AMFMPMDemodulatorPlugin,
     TimingRecoveryPlugin,
+    QAMDemodulatorPlugin,
 
     // Математические
     IntegratorPlugin,
@@ -137,6 +181,9 @@ const allPlugins: PluginDefinition[] = [
     GainPlugin,
     LogExpPlugin,
     CorrelatorPlugin,
+    QuantizerPlugin,
+    SampleHoldPlugin,
+    ConvolutionPlugin,
 
     // Визуализация
     OscilloscopePlugin,
@@ -145,6 +192,11 @@ const allPlugins: PluginDefinition[] = [
     NumericIndicatorPlugin,
     ComplexNumericIndicatorPlugin,
     MultiChannelSpectrumAnalyzerPlugin,
+    PowerMeterPlugin,
+    SNRMeterPlugin,
+    BERCounterPlugin,
+    HistogramPlugin,
+    EyeDiagramPlugin,
 
     // Вывод
     SpeakerPlugin,

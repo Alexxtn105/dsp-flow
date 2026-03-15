@@ -8,6 +8,16 @@
   "noise-generator": "Генератор шума",
   "amfmpm-modulator": "АМ/ЧМ/ФМ модулятор",
   "psk-modulator": "PSK модулятор",
+  "qam-modulator": "QAM модулятор",
+  "square-wave": "Меандр",
+  "triangle-wave": "Треугольный сигнал",
+  "impulse": "Импульс",
+  "chirp": "ЛЧМ-сигнал",
+  "step": "Ступенчатая функция",
+
+  "awgn-channel": "AWGN-канал",
+  "fading-channel": "Канал с замираниями",
+  "multipath-channel": "Многолучевой канал",
 
   "lowpass-fir-filter": "ФНЧ КИХ-фильтр",
   "highpass-fir-filter": "ФВЧ КИХ-фильтр",
@@ -21,6 +31,12 @@
   "decimator-interpolator": "Децимация/Интерполяция",
   "iir-filter": "БИХ-фильтр",
   "cic-filter": "CIC-фильтр",
+  "pulse-shaper": "Формирователь импульсов",
+  "lms-filter": "LMS-фильтр",
+  "rls-filter": "RLS-фильтр",
+  "matched-filter": "Согласованный фильтр",
+  "zf-equalizer": "ZF-эквалайзер",
+  "pid-controller": "ПИД-регулятор",
   "fir-filter": "КИХ-фильтр",
 
   "spectrum-analyzer": "Спектроанализатор",
@@ -33,6 +49,7 @@
   "frequency-discriminator": "Частотный дискриминатор",
   "amfmpm-demodulator": "АМ/ЧМ/ФМ демодулятор",
   "timing-recovery": "Символьная синхронизация",
+  "qam-demodulator": "QAM демодулятор",
 
   "summer": "Сумматор",
   "multiplier": "Перемножитель",
@@ -57,6 +74,9 @@
   "threshold": "Компаратор",
   "gain": "Усилитель",
   "log-exp": "Логарифм/Экспонента",
+  "quantizer": "Квантователь",
+  "sample-hold": "Выборка-хранение",
+  "convolution": "Свёртка",
 
   "oscilloscope": "Осциллограф",
   "constellation": "Фазовое созвездие",
@@ -64,6 +84,11 @@
   "numeric-indicator": "Числовой индикатор",
   "complex-numeric-indicator": "Комплексный числовой индикатор",
   "multi-channel-spectrum-analyzer": "Многоканальный спектроанализатор",
+  "power-meter": "Измеритель мощности",
+  "snr-meter": "Измеритель ОСШ",
+  "ber-counter": "Счётчик BER",
+  "histogram": "Гистограмма",
+  "eye-diagram": "Глазковая диаграмма",
   "speaker": "Динамик",
 
   "desc": {
@@ -76,6 +101,16 @@
     "noise-generator": "Генератор белого/розового/красного шума",
     "amfmpm-modulator": "Модулятор (АМ, ЧМ, ФМ)",
     "psk-modulator": "Модулятор BPSK/QPSK/8PSK",
+    "qam-modulator": "Модулятор 16/64/256-QAM с Gray-кодированием",
+    "square-wave": "Прямоугольный сигнал с настраиваемой скважностью",
+    "triangle-wave": "Генератор треугольного/пилообразного сигнала",
+    "impulse": "Единичный импульс (δ) или периодическая последовательность",
+    "chirp": "ЛЧМ-сигнал: линейная/экспоненциальная развёртка частоты",
+    "step": "Ступенчатая функция Хевисайда (единичный скачок)",
+
+    "awgn-channel": "Аддитивный белый гауссов шум (ОСШ в дБ)",
+    "fading-channel": "Канал с Рэлеевским/Райсовским замиранием и доплеровским сдвигом",
+    "multipath-channel": "Многолучевой канал с настраиваемыми задержками и усилениями",
 
     "lowpass-fir-filter": "ФНЧ КИХ-фильтр",
     "highpass-fir-filter": "ФВЧ КИХ-фильтр",
@@ -89,6 +124,12 @@
     "decimator-interpolator": "Изменение частоты дискретизации (децимация и интерполяция)",
     "iir-filter": "IIR-фильтр (Баттерворт / Чебышев I)",
     "cic-filter": "Каскадный интегратор-гребёнка (CIC)",
+    "pulse-shaper": "Формирование импульсов (RRC/RC/Гауссов)",
+    "lms-filter": "Адаптивный фильтр LMS/NLMS",
+    "rls-filter": "Адаптивный фильтр RLS (рекурсивные наименьшие квадраты)",
+    "matched-filter": "Согласованный фильтр для обнаружения сигнала",
+    "zf-equalizer": "Zero-Forcing эквалайзер (обращение канала)",
+    "pid-controller": "ПИД-регулятор с anti-windup",
     "fir-filter": "КИХ-фильтр",
 
     "spectrum-analyzer": "Спектральный анализ",
@@ -101,6 +142,7 @@
     "frequency-discriminator": "Мгновенная частота из производной фазы (без фильтрации и масштабирования)",
     "amfmpm-demodulator": "Демодулятор (АМ, ЧМ, ФМ)",
     "timing-recovery": "Timing Recovery (алгоритм Gardner)",
+    "qam-demodulator": "Демодулятор QAM (hard/soft decision)",
 
     "summer": "Сумматор",
     "multiplier": "Перемножитель",
@@ -125,6 +167,9 @@
     "threshold": "Пороговый компаратор с гистерезисом",
     "gain": "Усилитель / аттенюатор",
     "log-exp": "Логарифмические и экспоненциальные функции",
+    "quantizer": "Квантователь (эмуляция АЦП, N бит, mid-rise/mid-tread)",
+    "sample-hold": "Схема выборки-хранения",
+    "convolution": "Линейная свёртка двух сигналов",
 
     "oscilloscope": "Визуализация сигнала (4 канала)",
     "constellation": "Фазовое созвездие",
@@ -132,6 +177,11 @@
     "numeric-indicator": "Отображает мгновенное значение действительного сигнала",
     "complex-numeric-indicator": "Отображает мгновенное значение комплексного сигнала (Re + jIm)",
     "multi-channel-spectrum-analyzer": "Спектральный анализ (4 канала)",
+    "power-meter": "Измеритель мощности (RMS, пиковая, средняя)",
+    "snr-meter": "Измеритель отношения сигнал/шум (ОСШ в дБ)",
+    "ber-counter": "Счётчик битовых ошибок (BER)",
+    "histogram": "Гистограмма распределения амплитуд",
+    "eye-diagram": "Глазковая диаграмма (анализ межсимвольной интерференции)",
     "speaker": "Аудио выход"
   }
 }

@@ -21,15 +21,16 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 
 Центральный паттерн — `PluginRegistry` (синглтон в `src/engine/PluginRegistry.js`). Каждый DSP-блок — плагин с метаданными и процессором. Реестр «замораживается» после инициализации (`initPlugins.js`), новые плагины в рантайме не добавляются.
 
-**60 плагинов** в `src/engine/plugins/` по категориям:
-- **generators/** (9) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator
-- **filters/** (13) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter
+**84 плагина** в `src/engine/plugins/` по категориям:
+- **generators/** (15) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator, QAMModulator, SquareWave, TriangleWave, Impulse, Chirp, Step
+- **channels/** (3) — AWGNChannel, FadingChannel, MultipathChannel
+- **filters/** (19) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter, PulseShaper, LMSFilter, RLSFilter, MatchedFilter, ZFEqualizer, PIDController
 - **analysis/** (2 файла, входят в другие группы) — SpectrumAnalyzer (группа visualization), Correlator (группа real-math)
-- **detectors/** (7) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery
+- **detectors/** (8) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery, QAMDemodulator
 - **math/** (22 файла) — разделены на две группы в toolbar:
   - *complex-math* (11): ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealPart, ImagPart, Mixer
-  - *real-math* (11 + Correlator из analysis/): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator
-- **visualization/** (6) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer
+  - *real-math* (14 + Correlator из analysis/): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator, Quantizer, SampleHold, Convolution
+- **visualization/** (11) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer, PowerMeter, SNRMeter, BERCounter, Histogram, EyeDiagram
 - **output/** (1) — Speaker
 
 Общие утилиты в `_shared/`: FFTUtils, FilterDesign, WindowFunctions.
@@ -81,7 +82,7 @@ GitHub Actions (`.github/workflows/deploy.yml`):
 
 ## Тесты
 
-213 тестов в 14 файлах (Vitest):
+300 тестов в 21 файле (Vitest):
 - `tests/engine/` — PluginRegistry, GraphCompiler, DSPProcessor, WavFileService
 - `tests/plugins/` — generators, filters, analysis, detectors, math, visualization, shared
 - `tests/integration/` — signal-pipeline, helpers-compat

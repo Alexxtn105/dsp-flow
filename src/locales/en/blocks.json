@@ -8,6 +8,16 @@
   "noise-generator": "Noise Generator",
   "amfmpm-modulator": "AM/FM/PM Modulator",
   "psk-modulator": "PSK Modulator",
+  "qam-modulator": "QAM Modulator",
+  "square-wave": "Square Wave",
+  "triangle-wave": "Triangle Wave",
+  "impulse": "Impulse",
+  "chirp": "Chirp",
+  "step": "Step",
+
+  "awgn-channel": "AWGN Channel",
+  "fading-channel": "Fading Channel",
+  "multipath-channel": "Multipath Channel",
 
   "lowpass-fir-filter": "Lowpass FIR Filter",
   "highpass-fir-filter": "Highpass FIR Filter",
@@ -21,6 +31,12 @@
   "decimator-interpolator": "Decimator/Interpolator",
   "iir-filter": "IIR Filter",
   "cic-filter": "CIC Filter",
+  "pulse-shaper": "Pulse Shaper",
+  "lms-filter": "LMS Filter",
+  "rls-filter": "RLS Filter",
+  "matched-filter": "Matched Filter",
+  "zf-equalizer": "ZF Equalizer",
+  "pid-controller": "PID Controller",
   "fir-filter": "FIR Filter",
 
   "spectrum-analyzer": "Spectrum Analyzer",
@@ -33,6 +49,7 @@
   "frequency-discriminator": "Frequency Discriminator",
   "amfmpm-demodulator": "AM/FM/PM Demodulator",
   "timing-recovery": "Timing Recovery",
+  "qam-demodulator": "QAM Demodulator",
 
   "summer": "Summer",
   "multiplier": "Multiplier",
@@ -57,6 +74,9 @@
   "threshold": "Threshold",
   "gain": "Gain",
   "log-exp": "Log/Exp",
+  "quantizer": "Quantizer",
+  "sample-hold": "Sample & Hold",
+  "convolution": "Convolution",
 
   "oscilloscope": "Oscilloscope",
   "constellation": "Constellation",
@@ -64,6 +84,11 @@
   "numeric-indicator": "Numeric Indicator",
   "complex-numeric-indicator": "Complex Numeric Indicator",
   "multi-channel-spectrum-analyzer": "Multi-Channel Spectrum Analyzer",
+  "power-meter": "Power Meter",
+  "snr-meter": "SNR Meter",
+  "ber-counter": "BER Counter",
+  "histogram": "Histogram",
+  "eye-diagram": "Eye Diagram",
   "speaker": "Speaker",
 
   "desc": {
@@ -76,6 +101,16 @@
     "noise-generator": "White/pink/brown noise generator",
     "amfmpm-modulator": "Modulator (AM, FM, PM)",
     "psk-modulator": "BPSK/QPSK/8PSK modulator",
+    "qam-modulator": "16/64/256-QAM modulator with Gray coding",
+    "square-wave": "Square wave generator with adjustable duty cycle",
+    "triangle-wave": "Triangle/sawtooth wave generator",
+    "impulse": "Unit impulse or periodic impulse train",
+    "chirp": "Linear/exponential frequency sweep (chirp signal)",
+    "step": "Unit step function (Heaviside)",
+
+    "awgn-channel": "Additive white Gaussian noise channel (SNR in dB)",
+    "fading-channel": "Rayleigh/Rician fading channel with Doppler spread",
+    "multipath-channel": "Multipath channel with configurable delays and gains",
 
     "lowpass-fir-filter": "Lowpass FIR filter",
     "highpass-fir-filter": "Highpass FIR filter",
@@ -89,6 +124,12 @@
     "decimator-interpolator": "Sample rate conversion (decimation and interpolation)",
     "iir-filter": "IIR filter (Butterworth / Chebyshev I)",
     "cic-filter": "Cascaded integrator-comb (CIC)",
+    "pulse-shaper": "Pulse shaping filter (RRC/RC/Gaussian)",
+    "lms-filter": "LMS/NLMS adaptive filter",
+    "rls-filter": "RLS adaptive filter (recursive least squares)",
+    "matched-filter": "Matched filter for signal detection",
+    "zf-equalizer": "Zero-Forcing equalizer (channel inversion)",
+    "pid-controller": "PID controller with anti-windup",
     "fir-filter": "FIR filter",
 
     "spectrum-analyzer": "Spectral analysis",
@@ -101,6 +142,7 @@
     "frequency-discriminator": "Instantaneous frequency from phase derivative (no filtering or scaling)",
     "amfmpm-demodulator": "Demodulator (AM, FM, PM)",
     "timing-recovery": "Timing Recovery (Gardner algorithm)",
+    "qam-demodulator": "QAM demodulator (hard/soft decision)",
 
     "summer": "Adder",
     "multiplier": "Multiplier",
@@ -125,6 +167,9 @@
     "threshold": "Threshold comparator with hysteresis",
     "gain": "Amplifier / attenuator",
     "log-exp": "Logarithmic and exponential functions",
+    "quantizer": "Quantizer (ADC emulation, N bits, mid-rise/mid-tread)",
+    "sample-hold": "Sample and hold circuit emulation",
+    "convolution": "Linear convolution of two signals",
 
     "oscilloscope": "Signal visualization (4 channels)",
     "constellation": "Phase constellation",
@@ -132,6 +177,11 @@
     "numeric-indicator": "Displays instantaneous value of real signal",
     "complex-numeric-indicator": "Displays instantaneous value of complex signal (Re + jIm)",
     "multi-channel-spectrum-analyzer": "Spectral analysis (4 channels)",
+    "power-meter": "Power measurement (RMS, peak, average)",
+    "snr-meter": "Signal-to-noise ratio measurement (SNR in dB)",
+    "ber-counter": "Bit error rate counter (BER)",
+    "histogram": "Amplitude distribution histogram",
+    "eye-diagram": "Eye diagram for ISI analysis",
     "speaker": "Audio output"
   }
 }

@@ -1,0 +1,9 @@
+.eye-diagram-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eye-diagram-view canvas {
+    display: block;
+}

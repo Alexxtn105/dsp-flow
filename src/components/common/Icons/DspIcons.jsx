@@ -64,6 +64,54 @@ const DSP_ICONS = {
               strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     ),
 
+    // Прямоугольный сигнал (меандр) — ступенчатая волна
+    'dsp-square-wave': (
+        <path d="M2 16 L2 8 L7 8 L7 16 L12 16 L12 8 L17 8 L17 16 L22 16"
+              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+
+    // Треугольный сигнал — зигзаг
+    'dsp-triangle-wave': (
+        <path d="M2 12 L6 4 L12 20 L18 4 L22 12"
+              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+
+    // Импульс (дельта-функция) — вертикальная стрелка
+    'dsp-impulse': (
+        <>
+            <line x1="2" y1="18" x2="22" y2="18" strokeWidth="1" opacity="0.3" />
+            <line x1="12" y1="18" x2="12" y2="4" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M9 7 L12 4 L15 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // ЛЧМ (Chirp) — волна с нарастающей частотой
+    'dsp-chirp': (
+        <path d="M2 12 C3 8, 4 8, 5 12 C5.7 16, 6.4 16, 7 12 C7.5 8, 8 8, 8.5 12 C8.8 15, 9.2 15, 9.5 12 C9.7 9, 10 9, 10.2 12 C10.4 14, 10.6 14, 10.8 12 L12 10 L13 14 L14 9 L15 15 L16 8 L17 16 L18 7 L19 17 L20 6 L21 18 L22 5"
+              strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+
+    // Ступенчатая функция — скачок
+    'dsp-step': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 16 L11 16 L11 7 L21 7"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    /* ===================== CHANNELS ===================== */
+
+    // AWGN-канал — сигнал + шум
+    'dsp-awgn': (
+        <>
+            <path d="M2 12 C4 8, 6 8, 8 12 C10 16, 12 16, 14 12 C16 8, 18 8, 20 12"
+                  strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+            <path d="M2 12 L4 9 L5 15 L7 7 L9 16 L11 8 L13 15 L15 6 L17 17 L19 9 L21 14 L22 12"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+    ),
+
     /* ===================== FILTERS ===================== */
 
     // ФНЧ — плоский слева, спад справа
@@ -558,6 +606,232 @@ const DSP_ICONS = {
             <text x="12" y="16" fontSize="9" fontWeight="700" fontStyle="italic"
                   fontFamily="'Segoe UI Mono','SF Mono','Consolas',monospace"
                   fill="currentColor" stroke="none" textAnchor="middle">a+jb</text>
+        </>
+    ),
+
+    // Измеритель мощности — VU-метр
+    'dsp-power-meter': (
+        <>
+            <path d="M4 18 C4 10, 10 5, 12 5 C14 5, 20 10, 20 18"
+                  strokeWidth="1.5" fill="none" />
+            <line x1="12" y1="17" x2="16" y2="8" strokeWidth="2" strokeLinecap="round" />
+            <text x="8" y="22" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">dB</text>
+        </>
+    ),
+
+    // Измеритель SNR — S/N
+    'dsp-snr-meter': (
+        <>
+            <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" />
+            <text x="12" y="15" fontSize="10" fontWeight="800"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">S/N</text>
+        </>
+    ),
+
+    // BER Counter — числовой дисплей с "BER"
+    'dsp-ber-counter': (
+        <>
+            <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" />
+            <text x="12" y="14" fontSize="8" fontWeight="800"
+                  fontFamily="'Segoe UI Mono','SF Mono','Consolas',monospace"
+                  fill="currentColor" stroke="none" textAnchor="middle">BER</text>
+            <text x="12" y="20" fontSize="5" fontWeight="600"
+                  fontFamily="'Segoe UI Mono','SF Mono','Consolas',monospace"
+                  fill="currentColor" stroke="none" textAnchor="middle">10⁻³</text>
+        </>
+    ),
+
+    // Гистограмма — столбцы
+    'dsp-histogram': (
+        <>
+            <line x1="3" y1="20" x2="21" y2="20" strokeWidth="1.5" strokeLinecap="round" />
+            <rect x="4" y="14" width="3" height="6" fill="currentColor" stroke="none" rx="0.5" />
+            <rect x="8" y="8" width="3" height="12" fill="currentColor" stroke="none" rx="0.5" />
+            <rect x="12" y="5" width="3" height="15" fill="currentColor" stroke="none" rx="0.5" />
+            <rect x="16" y="10" width="3" height="10" fill="currentColor" stroke="none" rx="0.5" />
+        </>
+    ),
+
+    // Глазковая диаграмма — пересекающиеся кривые (глаз)
+    'dsp-eye-diagram': (
+        <>
+            <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" />
+            <path d="M5 12 C8 5, 14 5, 19 12" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            <path d="M5 12 C8 19, 14 19, 19 12" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            <path d="M5 12 C8 6, 14 6, 19 12" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.4" />
+            <path d="M5 12 C8 18, 14 18, 19 12" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.4" />
+        </>
+    ),
+
+    // Квантователь — ступенчатая характеристика
+    'dsp-quantizer': (
+        <>
+            <line x1="3" y1="20" x2="21" y2="20" strokeWidth="1" opacity="0.3" />
+            <line x1="3" y1="3" x2="3" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 18 L7 18 L7 14 L11 14 L11 10 L15 10 L15 6 L19 6 L19 3"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Sample & Hold — ступенчатый сигнал
+    'dsp-sample-hold': (
+        <>
+            <path d="M2 14 L5 14 L5 8 L9 8 L9 16 L13 16 L13 6 L17 6 L17 12 L21 12"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <circle cx="5" cy="14" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="8" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="13" cy="16" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="17" cy="6" r="1.5" fill="currentColor" stroke="none" />
+        </>
+    ),
+
+    // Свёртка — символ ∗ (конволюция)
+    'dsp-convolution': (
+        <>
+            <circle cx="12" cy="12" r="9" strokeWidth="1.5" fill="none" />
+            <text x="12" y="17" fontSize="18" fontWeight="800"
+                  fontFamily="'Times New Roman',Georgia,serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">∗</text>
+        </>
+    ),
+
+    /* ===================== DIGITAL MODULATIONS ===================== */
+
+    // QAM модулятор — сетка точек созвездия 4×4
+    'dsp-qam-mod': (
+        <>
+            <line x1="12" y1="2" x2="12" y2="22" strokeWidth="0.8" opacity="0.2" />
+            <line x1="2" y1="12" x2="22" y2="12" strokeWidth="0.8" opacity="0.2" />
+            <circle cx="6" cy="6" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="6" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="14" cy="6" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="18" cy="6" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="6" cy="10" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="10" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="14" cy="10" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="18" cy="10" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="6" cy="14" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="14" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="14" cy="14" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="18" cy="14" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="6" cy="18" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="18" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="14" cy="18" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="18" cy="18" r="1.5" fill="currentColor" stroke="none" />
+        </>
+    ),
+
+    // QAM демодулятор — сетка с перекрестьем-мишенью
+    'dsp-qam-demod': (
+        <>
+            <line x1="12" y1="2" x2="12" y2="22" strokeWidth="0.8" opacity="0.2" />
+            <line x1="2" y1="12" x2="22" y2="12" strokeWidth="0.8" opacity="0.2" />
+            <circle cx="7" cy="7" r="1.3" fill="currentColor" stroke="none" opacity="0.3" />
+            <circle cx="17" cy="7" r="1.3" fill="currentColor" stroke="none" opacity="0.3" />
+            <circle cx="7" cy="17" r="1.3" fill="currentColor" stroke="none" opacity="0.3" />
+            <circle cx="17" cy="17" r="1.3" fill="currentColor" stroke="none" opacity="0.3" />
+            <circle cx="14" cy="8" r="2.5" strokeWidth="1.5" fill="none" />
+            <line x1="14" y1="5" x2="14" y2="11" strokeWidth="1" />
+            <line x1="11" y1="8" x2="17" y2="8" strokeWidth="1" />
+        </>
+    ),
+
+    // Формирователь импульсов — RRC форма импульса
+    'dsp-pulse-shaper': (
+        <>
+            <line x1="2" y1="16" x2="22" y2="16" strokeWidth="1" opacity="0.3" />
+            <path d="M2 16 C4 16, 5 15, 6 14 C7 12, 8 7, 10 5 L12 4 L14 5 C16 7, 17 12, 18 14 C19 15, 20 16, 22 16"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M2 15 C3 14, 3 16, 4 16" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.4" />
+            <path d="M20 16 C21 16, 21 14, 22 15" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.4" />
+        </>
+    ),
+
+    // LMS — адаптивный фильтр с петлёй обратной связи и μ
+    'dsp-lms': (
+        <>
+            <polygon points="4,6 4,18 16,12" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
+            <path d="M16 12 L20 12 L20 20 L8 20 L8 18"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <text x="7" y="14" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">μ</text>
+        </>
+    ),
+
+    // RLS — адаптивный фильтр с λ
+    'dsp-rls': (
+        <>
+            <polygon points="4,6 4,18 16,12" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
+            <path d="M16 12 L20 12 L20 20 L8 20 L8 18"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <text x="7" y="14" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">λ</text>
+        </>
+    ),
+
+    // Согласованный фильтр — перевёрнутый шаблон + корреляционный пик
+    'dsp-matched': (
+        <>
+            <line x1="2" y1="18" x2="22" y2="18" strokeWidth="1" opacity="0.3" />
+            <path d="M3 12 L6 12 L8 16 L10 8 L12 4 L14 8 L16 16 L18 12 L21 12"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <text x="15" y="8" fontSize="6" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">MF</text>
+        </>
+    ),
+
+    // ZF Equalizer — обращённая АЧХ (1/H)
+    'dsp-zf-eq': (
+        <>
+            <line x1="3" y1="20" x2="21" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 14 C5 14, 7 16, 9 18 L12 14 L15 18 C17 16, 19 14, 21 14"
+                  strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.3" />
+            <path d="M3 10 C5 10, 7 8, 9 6 L12 10 L15 6 C17 8, 19 10, 21 10"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <text x="8" y="17" fontSize="6" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">1/H</text>
+        </>
+    ),
+
+    // PID — блок-схема ПИД с P, I, D
+    'dsp-pid': (
+        <>
+            <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="1.5" fill="none" />
+            <text x="12" y="15" fontSize="10" fontWeight="800"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">PID</text>
+        </>
+    ),
+
+    // Канал с замираниями — волна с переменной амплитудой
+    'dsp-fading': (
+        <>
+            <path d="M2 12 C4 6, 6 6, 8 12 C10 18, 12 18, 14 12 C16 6, 18 6, 20 12"
+                  strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+            <path d="M2 12 C4 9, 6 9, 8 12 C10 15, 11 16, 12 14 C13 11, 14 6, 16 8 C18 10, 19 15, 20 12"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M18 4 L21 4" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+            <path d="M19 6 L22 6" strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+        </>
+    ),
+
+    // Многолучевой канал — несколько стрелок-лучей
+    'dsp-multipath': (
+        <>
+            <circle cx="4" cy="12" r="2" fill="currentColor" stroke="none" />
+            <path d="M6 12 L20 6" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M6 12 L20 12" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M6 12 L20 18" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="20" cy="6" r="1.5" fill="currentColor" stroke="none" opacity="0.5" />
+            <circle cx="20" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="20" cy="18" r="1.5" fill="currentColor" stroke="none" opacity="0.5" />
         </>
     ),
 

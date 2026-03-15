@@ -6,3 +6,6 @@ export { default as WaterfallView } from './WaterfallView';
 export { default as ConstellationView } from './ConstellationView';
 export { default as NumericIndicatorView } from './NumericIndicatorView';
 export { default as MultiChannelSpectrumView } from './MultiChannelSpectrumView';
+export { default as MeasurementView } from './MeasurementView';
+export { default as HistogramView } from './HistogramView';
+export { default as EyeDiagramView } from './EyeDiagramView';

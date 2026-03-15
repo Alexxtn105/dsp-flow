@@ -25,6 +25,12 @@ export const DSP_BLOCK_TYPES = {
     DECIMATOR_INTERPOLATOR: 'decimator-interpolator',
     IIR_FILTER: 'iir-filter',
     CIC_FILTER: 'cic-filter',
+    PULSE_SHAPER: 'pulse-shaper',
+    LMS_FILTER: 'lms-filter',
+    RLS_FILTER: 'rls-filter',
+    MATCHED_FILTER: 'matched-filter',
+    ZF_EQUALIZER: 'zf-equalizer',
+    PID_CONTROLLER: 'pid-controller',
 
     // Генераторы
     CONSTANT: 'constant',
@@ -36,6 +42,17 @@ export const DSP_BLOCK_TYPES = {
     NOISE_GENERATOR: 'noise-generator',
     AMFMPM_MODULATOR: 'amfmpm-modulator',
     PSK_MODULATOR: 'psk-modulator',
+    QAM_MODULATOR: 'qam-modulator',
+    SQUARE_WAVE: 'square-wave',
+    TRIANGLE_WAVE: 'triangle-wave',
+    IMPULSE: 'impulse',
+    CHIRP: 'chirp',
+    STEP: 'step',
+
+    // Каналы
+    AWGN_CHANNEL: 'awgn-channel',
+    FADING_CHANNEL: 'fading-channel',
+    MULTIPATH_CHANNEL: 'multipath-channel',
 
     // Детекторы
     PHASE_DETECTOR: 'phase-detector',
@@ -44,6 +61,7 @@ export const DSP_BLOCK_TYPES = {
     FREQUENCY_DISCRIMINATOR: 'frequency-discriminator',
     AMFMPM_DEMODULATOR: 'amfmpm-demodulator',
     TIMING_RECOVERY: 'timing-recovery',
+    QAM_DEMODULATOR: 'qam-demodulator',
 
     // Математические
     INTEGRATOR: 'integrator',
@@ -68,6 +86,9 @@ export const DSP_BLOCK_TYPES = {
     GAIN: 'gain',
     LOG_EXP: 'log-exp',
     CORRELATOR: 'correlator',
+    QUANTIZER: 'quantizer',
+    SAMPLE_HOLD: 'sample-hold',
+    CONVOLUTION: 'convolution',
 
     PLL: 'pll',
 
@@ -79,6 +100,11 @@ export const DSP_BLOCK_TYPES = {
     NUMERIC_INDICATOR: 'numeric-indicator',
     COMPLEX_NUMERIC_INDICATOR: 'complex-numeric-indicator',
     MULTI_SPECTRUM_ANALYZER: 'multi-channel-spectrum-analyzer',
+    POWER_METER: 'power-meter',
+    SNR_METER: 'snr-meter',
+    BER_COUNTER: 'ber-counter',
+    HISTOGRAM: 'histogram',
+    EYE_DIAGRAM: 'eye-diagram',
     SPEAKER: 'speaker'
 };
 
@@ -151,7 +177,21 @@ export const LEGACY_TYPE_TO_ID = {
     'Пороговый детектор': 'threshold',
     'Диаграмма созвездия': 'constellation',
     'Спектрограмма': 'waterfall',
-    'Speaker': 'speaker'
+    'Speaker': 'speaker',
+    'Генератор меандра': 'square-wave',
+    'Генератор треугольного сигнала': 'triangle-wave',
+    'Импульс': 'impulse',
+    'ЛЧМ-сигнал': 'chirp',
+    'Ступенчатая функция': 'step',
+    'AWGN-канал': 'awgn-channel',
+    'Квантователь': 'quantizer',
+    'Выборка-хранение': 'sample-hold',
+    'Свёртка': 'convolution',
+    'Измеритель мощности': 'power-meter',
+    'Измеритель ОСШ': 'snr-meter',
+    'Счётчик BER': 'ber-counter',
+    'Гистограмма': 'histogram',
+    'Глазковая диаграмма': 'eye-diagram'
 };
 
 // Конфигурация хранилища

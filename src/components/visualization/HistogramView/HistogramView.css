@@ -1,0 +1,9 @@
+.histogram-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.histogram-view canvas {
+    display: block;
+}

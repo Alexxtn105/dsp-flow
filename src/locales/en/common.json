@@ -249,6 +249,19 @@
       "min": "Min",
       "max": "Max"
     },
+    "measurement": {
+      "rms": "RMS",
+      "peak": "Peak",
+      "average": "Average",
+      "dbfs": "dBFS",
+      "db": "dB",
+      "snr": "SNR",
+      "signalPower": "Signal Power",
+      "noisePower": "Noise Power",
+      "ber": "BER",
+      "totalBits": "Total Bits",
+      "errorBits": "Error Bits"
+    },
     "multiSpectrum": {
       "channel": "Channel {{n}}",
       "fftSize": "FFT size",

@@ -1,0 +1,86 @@
+.measurement-view {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--viz-bg, #f8f9fa);
+    overflow: hidden;
+}
+
+.measurement-view.dark-theme {
+    background: var(--viz-bg-dark, #1a1a2e);
+    color: #e0e0e0;
+}
+
+.mv-main-value {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    margin-bottom: 12px;
+}
+
+.dark-theme .mv-main-value {
+    border-bottom-color: #333;
+}
+
+.mv-main-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dark-theme .mv-main-label {
+    color: #999;
+}
+
+.mv-value {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: 'Segoe UI Mono', 'SF Mono', Consolas, monospace;
+    color: #2196f3;
+}
+
+.dark-theme .mv-value {
+    color: #64b5f6;
+}
+
+.mv-unit {
+    font-size: 0.6em;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+.mv-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.mv-stat {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    background: var(--stat-bg, rgba(0,0,0,0.03));
+    border-radius: 6px;
+}
+
+.dark-theme .mv-stat {
+    background: rgba(255,255,255,0.05);
+}
+
+.mv-stat-label {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 2px;
+}
+
+.mv-stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Segoe UI Mono', 'SF Mono', Consolas, monospace;
+}

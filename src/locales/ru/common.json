@@ -249,6 +249,19 @@
       "min": "Мин",
       "max": "Макс"
     },
+    "measurement": {
+      "rms": "СКЗ",
+      "peak": "Пиковое",
+      "average": "Среднее",
+      "dbfs": "дБ FS",
+      "db": "дБ",
+      "snr": "ОСШ",
+      "signalPower": "Мощность сигнала",
+      "noisePower": "Мощность шума",
+      "ber": "BER",
+      "totalBits": "Всего бит",
+      "errorBits": "Ошибочных бит"
+    },
     "multiSpectrum": {
       "channel": "Канал {{n}}",
       "fftSize": "Размер FFT",
