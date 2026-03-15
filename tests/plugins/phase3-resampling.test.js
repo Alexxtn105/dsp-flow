@@ -35,15 +35,35 @@ describe('Polyphase Filter', () => {
     expect(hasNonZero).toBe(true);
   });
 
-  it('downsample mode produces non-zero output', () => {
+  it('downsample mode produces non-zero, non-NaN output', () => {
     PolyphaseFilterPlugin.processor.clearStates();
     const input = new Float32Array(CHUNK);
     for (let i = 0; i < CHUNK; i++) input[i] = Math.sin(2 * Math.PI * 100 * i / SR);
     const output = PolyphaseFilterPlugin.processor.process([input], {
       sampleRate: SR, resampleMode: 'downsample', factor: 2, numTaps: 64
     }, CHUNK, 'test-poly-down');
+    // No NaN values
+    for (let i = 0; i < output.length; i++) {
+      expect(Number.isFinite(output[i])).toBe(true);
+    }
     const hasNonZero = output.some((v) => v !== 0);
     expect(hasNonZero).toBe(true);
+  });
+
+  it('DC input with downsample preserves DC', () => {
+    PolyphaseFilterPlugin.processor.clearStates();
+    const factor = 2;
+    const input = new Float32Array(CHUNK).fill(1.0);
+    const params = { sampleRate: SR, resampleMode: 'downsample', factor, numTaps: 64 };
+    // Two chunks to settle past transient
+    PolyphaseFilterPlugin.processor.process([input], params, CHUNK, 'test-poly-dc-down');
+    const output = PolyphaseFilterPlugin.processor.process([input], params, CHUNK, 'test-poly-dc-down');
+    // Downsample by factor produces CHUNK/factor valid output samples
+    const validLen = Math.floor(CHUNK / factor);
+    const checkFrom = Math.floor(validLen / 2);
+    const region = output.slice(checkFrom, validLen);
+    const avgValue = region.reduce((s, v) => s + v, 0) / region.length;
+    expect(avgValue).toBeCloseTo(1.0, 0);
   });
 
   it('DC input with upsample preserves DC (values close to 1.0)', () => {

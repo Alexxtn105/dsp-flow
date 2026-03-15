@@ -134,7 +134,7 @@ const PolyphaseFilterPlugin = {
 
             const output = new Float32Array(chunkSize);
             const hist = state.history;
-            const tapsPerPhase = hist.length;
+            const tapsPerPhase = state.polyCoeffs[0].length;
 
             if (mode === 'upsample') {
                 // For each input sample, produce 'factor' output samples
