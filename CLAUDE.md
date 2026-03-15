@@ -21,12 +21,14 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 
 Центральный паттерн — `PluginRegistry` (синглтон в `src/engine/PluginRegistry.js`). Каждый DSP-блок — плагин с метаданными и процессором. Реестр «замораживается» после инициализации (`initPlugins.js`), новые плагины в рантайме не добавляются.
 
-**59 плагинов** в `src/engine/plugins/` по категориям:
+**60 плагинов** в `src/engine/plugins/` по категориям:
 - **generators/** (9) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator
-- **filters/** (12) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter
+- **filters/** (13) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter
 - **analysis/** (2) — SpectrumAnalyzer, Correlator
 - **detectors/** (7) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery
-- **math/** (22) — Summer, Multiplier, Integrator, RealPart, ImagPart, ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealSquare, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Mixer, Threshold
+- **math/** (22) — разделены на две группы в toolbar:
+  - *complex-math* (11): ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealPart, ImagPart, Mixer
+  - *real-math* (12): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator
 - **visualization/** (6) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer
 - **output/** (1) — Speaker
 

@@ -10,7 +10,7 @@ import './Toolbar.css';
 
 function Toolbar({ onAddBlock }) {
     const { isDarkTheme } = useThemeContext();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const isTouch = useTouchContext();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [legendOpen, setLegendOpen] = useState(false);
@@ -36,19 +36,22 @@ function Toolbar({ onAddBlock }) {
         return () => document.removeEventListener('mousedown', handleClick);
     }, [legendOpen]);
 
-    const groups = registry.getGroups();
-
     // Translate block/group names for display and search
     const blockDisplayName = (blockId) => t(blockId, { ns: 'blocks' });
     const groupDisplayName = (groupId) => t(groupId, { ns: 'groups' });
 
     // Sort blocks within each group alphabetically by localized name
-    const sortedGroups = useMemo(() => groups.map(group => ({
-        ...group,
-        blocks: [...group.blocks].sort((a, b) =>
-            t(a.name, { ns: 'blocks' }).localeCompare(t(b.name, { ns: 'blocks' }))
-        )
-    })), [groups, t]);
+    // Registry is frozen after init, so getGroups() data is stable — only language changes matter
+    const sortedGroups = useMemo(() => {
+        const groups = registry.getGroups();
+        return groups.map(group => ({
+            ...group,
+            blocks: [...group.blocks].sort((a, b) =>
+                t(a.name, { ns: 'blocks' }).localeCompare(t(b.name, { ns: 'blocks' }), i18n.language)
+            )
+        }));
+    }, [t, i18n.language]);
+    const groups = sortedGroups;
 
     const query = searchQuery.trim().toLowerCase();
     const filteredGroups = query
