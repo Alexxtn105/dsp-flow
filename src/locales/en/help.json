@@ -1475,5 +1475,1193 @@
                 "description": "AMFMPMModulator(FM) → FrequencyDiscriminator → Speaker Recovers and plays the modulating signal from an FM signal. Warning: Signal amplitude must be within [-1, +1]. Values outside this range will cause clipping (distortion). If necessary, use the Gain block to scale the signal before feeding it to Speaker."
             }
         ]
+    },
+    "qam-modulator": {
+        "title": "QAM Modulator",
+        "purpose": "Generates a QAM (Quadrature Amplitude Modulation) signal using 16-QAM, 64-QAM, or 256-QAM constellations. QAM encodes information simultaneously in the amplitude and phase of the carrier and is the dominant modulation scheme in modern digital communications (Wi-Fi, LTE, DVB). The block uses an internal PRBS source, so no external data input is required.",
+        "algorithm": "A 32-bit LFSR (polynomial 0x80000057) generates pseudo-random bits. Groups of log₂(M) bits form a symbol index that selects an I/Q point from a pre-built Gray-coded constellation table. Each symbol lasts samplesPerSymbol = sampleRate / symbolRate samples. The constellation is normalised so that average power E[|s|²] = 1 before the amplitude scaling is applied.",
+        "inputDescription": "none (standalone source — data is generated internally by PRBS)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2, [I0, Q0, I1, Q1, ...])",
+        "params": {
+            "qamOrder": {
+                "description": "Constellation order: '16QAM' (4 bits/symbol), '64QAM' (6 bits/symbol), or '256QAM' (8 bits/symbol). Higher order increases spectral efficiency but requires a higher SNR."
+            },
+            "symbolRate": {
+                "description": "Symbol rate in baud (symbols per second). Typical values: 100–10000. The number of samples per symbol is sampleRate / symbolRate, so symbolRate must be less than sampleRate."
+            },
+            "amplitude": {
+                "description": "Constellation scale factor. Range: 0.0–1.0. At 1.0 the normalised constellation spans roughly ±1."
+            }
+        },
+        "examples": [
+            {
+                "title": "Modulation and constellation display",
+                "description": "QAMModulator(16QAM, 1000 baud) → Constellation The 16 points of the QAM constellation are visible on the diagram."
+            },
+            {
+                "title": "Channel performance test",
+                "description": "QAMModulator(64QAM) → AWGNChannel(SNR=20 dB) → QAMDemodulator → BERCounter Connect the modulator output and demodulator output to BERCounter to measure bit-error rate vs. SNR."
+            }
+        ]
+    },
+    "square-wave": {
+        "title": "Square Wave Generator",
+        "purpose": "Generates a rectangular (square) wave with a configurable duty cycle. At duty cycle 0.5 this is a classic 50% square wave (meander). Square waves are used as clock signals in digital electronics and as test inputs to observe the transient response of filters.",
+        "algorithm": "A normalised phase accumulator increments by frequency / sampleRate each sample, wrapping at 1.0. The output is +amplitude when the current phase is less than dutyCycle, and −amplitude otherwise. This produces an exact step function with no Gibbs artefacts; the harmonic content follows the Fourier series of a rectangular wave.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize)",
+        "params": {
+            "frequency": {
+                "description": "Fundamental frequency in Hz. Range: 0 to sampleRate/2. Typical values: 100–5000 Hz."
+            },
+            "amplitude": {
+                "description": "Peak amplitude of the wave. The signal alternates between +amplitude and −amplitude. Range: 0.0–1.0 (values above 1.0 are allowed but may clip on output)."
+            },
+            "dutyCycle": {
+                "description": "Ratio of the high period to the full period. Range: 0.0–1.0. 0.5 = symmetric square wave, 0.1 = short pulses, 0.9 = wide pulses."
+            }
+        },
+        "examples": [
+            {
+                "title": "Filter step-response observation",
+                "description": "SquareWave(100 Hz, duty=0.5) → LowpassFIR(cutoff 500 Hz) → Oscilloscope The filter rounds the square wave edges, revealing its transient response."
+            },
+            {
+                "title": "Spectral content analysis",
+                "description": "SquareWave(1000 Hz) → SpectrumAnalyzer Odd harmonics (1 kHz, 3 kHz, 5 kHz, ...) are visible with amplitudes decreasing as 1/n."
+            }
+        ]
+    },
+    "triangle-wave": {
+        "title": "Triangle Wave Generator",
+        "purpose": "Generates a triangle or sawtooth wave with a configurable symmetry between the rising and falling slopes. At symmetry 0.5 the output is a symmetric triangle; at 0 it is a falling sawtooth and at 1 a rising sawtooth. Triangle waves contain only odd harmonics whose amplitudes decrease as 1/n², giving them a softer spectrum than square waves.",
+        "algorithm": "A normalised phase accumulator increments by frequency / sampleRate each sample. On the rising segment [0, symmetry) the output is linearly interpolated from −amplitude to +amplitude. On the falling segment [symmetry, 1.0) it falls back from +amplitude to −amplitude. Both the symmetry value is clamped to [0.001, 0.999] to avoid division by zero.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize)",
+        "params": {
+            "frequency": {
+                "description": "Fundamental frequency in Hz. Range: 0 to sampleRate/2."
+            },
+            "amplitude": {
+                "description": "Peak amplitude of the wave. The signal ranges from −amplitude to +amplitude. Range: 0.0–1.0."
+            },
+            "symmetry": {
+                "description": "Shape parameter. 0.0 = falling sawtooth (instant rise, slow fall), 0.5 = symmetric triangle, 1.0 = rising sawtooth (slow rise, instant fall). Range: 0.0–1.0."
+            }
+        },
+        "examples": [
+            {
+                "title": "Harmonic content comparison",
+                "description": "TriangleWave(1000 Hz, symmetry=0.5) → SpectrumAnalyzer Odd harmonics visible with amplitudes falling as 1/n² — compare with SquareWave which falls as 1/n."
+            },
+            {
+                "title": "LFO modulation source",
+                "description": "TriangleWave(2 Hz, amplitude=500) → RefSine(frequency input) → Oscilloscope A slow triangle wave is used as an LFO to create a frequency sweep effect."
+            }
+        ]
+    },
+    "impulse": {
+        "title": "Impulse Generator",
+        "purpose": "Generates a unit impulse (Dirac delta approximation δ[n]) or a periodic impulse train. Applying an impulse to the input of any LTI filter yields the filter's impulse response h[n] at the output, making this block the standard tool for measuring filter characteristics.",
+        "algorithm": "An internal sample counter drives the output. With period = 0, a single sample of the specified amplitude is produced at the very first sample of the simulation and all subsequent samples are zero (the fired flag prevents re-triggering). With period > 0, the counter wraps at the given period value and a single high sample appears every period samples.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize, one non-zero sample per period)",
+        "params": {
+            "period": {
+                "description": "Repetition period in samples. 0 = single one-shot impulse at t=0. A positive integer N causes a pulse every N samples, producing a periodic impulse train. At 48000 Hz, period=48000 gives one pulse per second."
+            },
+            "amplitude": {
+                "description": "Height of each impulse sample. Range: any positive float. Typically 1.0 for a unit impulse."
+            }
+        },
+        "examples": [
+            {
+                "title": "Measuring filter impulse response",
+                "description": "Impulse(period=0) → LowpassFIR(cutoff 2000 Hz) → Oscilloscope The oscilloscope shows the sinc-like impulse response of the FIR filter."
+            },
+            {
+                "title": "Periodic sync pulses",
+                "description": "Impulse(period=480) → FrameSync → Oscilloscope A periodic impulse train simulates timing markers for a frame synchroniser test."
+            }
+        ]
+    },
+    "chirp": {
+        "title": "Chirp Generator (LFM)",
+        "purpose": "Generates a linear or exponential frequency-modulated sweep signal (LFM chirp) whose instantaneous frequency changes from f₁ to f₂ over duration T. Chirp signals are fundamental in radar pulse compression, filter frequency-response testing (as a broadband excitation), and spread-spectrum communications.",
+        "algorithm": "Two sweep modes are supported. Linear sweep: the instantaneous frequency f(t) = f₁ + (f₂ − f₁) · t/T increases linearly and the phase is its integral. Exponential sweep: f(t) = f₁ · (f₂/f₁)^(t/T) covers equal numbers of octaves per unit time. The phase accumulator is updated each sample and normalised modulo 2π. After T seconds the chirp loops back to the start sample, resetting the phase continuously for glitch-free cycling.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize)",
+        "params": {
+            "startFrequency": {
+                "description": "Starting frequency f₁ in Hz. Typical value: 20–1000 Hz. Must be positive for exponential sweep mode."
+            },
+            "endFrequency": {
+                "description": "Ending frequency f₂ in Hz at time T. Typical value: 100–24000 Hz. May be lower than startFrequency for a downward sweep."
+            },
+            "duration": {
+                "description": "Sweep duration T in seconds before the chirp loops. Typical values: 0.1–5.0 s."
+            },
+            "amplitude": {
+                "description": "Signal amplitude. Range: 0.0–1.0."
+            },
+            "sweepType": {
+                "description": "Sweep law: 'linear' (constant rate of frequency change in Hz/s) or 'exponential' (constant rate of change in octaves/s, also called logarithmic sweep)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Filter frequency-response measurement",
+                "description": "Chirp(20 Hz → 20000 Hz, 1 s, linear) → BandpassFIR(500–2000 Hz) → Oscilloscope The bandpass filter passes only the portion of the sweep within its passband."
+            },
+            {
+                "title": "Radar pulse-compression demo",
+                "description": "Chirp(100 Hz → 5000 Hz, 0.1 s) → MatchedFilter → Oscilloscope The matched filter compresses the chirp to a narrow pulse, demonstrating pulse-compression gain."
+            }
+        ]
+    },
+    "step": {
+        "title": "Step Function Generator",
+        "purpose": "Generates a Heaviside unit-step function: the output is 0 before the specified step time and equals amplitude afterwards. Applying a step function to a filter yields its step response, which is the integral of the impulse response and reveals overshoot, settling time, and steady-state gain.",
+        "algorithm": "An internal sample counter increments every sample. The step sample index is computed as floor(stepTime × sampleRate). Output is 0 for all samples with index less than this threshold and amplitude for all samples at or beyond it. The counter is clamped after the step fires to prevent integer overflow in long simulations.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize)",
+        "params": {
+            "stepTime": {
+                "description": "Time at which the step occurs, in seconds. Before this moment the output is 0; at and after it the output equals amplitude. Default: 0.01 s (10 ms)."
+            },
+            "amplitude": {
+                "description": "Amplitude of the step after t = stepTime. Typical value: 1.0 for a unit step."
+            }
+        },
+        "examples": [
+            {
+                "title": "Filter step-response measurement",
+                "description": "Step(stepTime=0.01 s) → LowpassFIR(cutoff 1000 Hz) → Oscilloscope The oscilloscope shows the step response, including any overshoot and the rise time of the filter."
+            },
+            {
+                "title": "PID controller test",
+                "description": "Step(stepTime=0.005 s) → PIDController(Kp=2, Ki=0.5, Kd=0.1) → Oscilloscope Apply a step setpoint change to observe how the PID controller reaches the target."
+            }
+        ]
+    },
+    "ofdm-modulator": {
+        "title": "OFDM Modulator",
+        "purpose": "Generates an OFDM (Orthogonal Frequency Division Multiplexing) signal: the building block of Wi-Fi, LTE, DVB-T, and 5G waveforms. An internal PRBS drives QAM-mapped subcarriers that are transformed to the time domain by an IFFT and then prepended with a cyclic prefix to eliminate inter-symbol interference caused by multipath channels.",
+        "algorithm": "1. A 32-bit LFSR generates pseudo-random bits. 2. Groups of bitsPerSymbol bits select I/Q points from a Gray-coded QAM constellation. 3. QAM symbols are placed on subcarriers 1 … N−1 (DC and Nyquist bins are zeroed). 4. An IFFT converts the frequency-domain frame to the time domain. 5. The last cpLength samples of the IFFT output are prepended as the cyclic prefix. The output buffer is streamed sample-by-sample into the chunk output.",
+        "inputDescription": "none (standalone source — data is generated internally by PRBS)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2)",
+        "params": {
+            "numSubcarriers": {
+                "description": "Number of OFDM subcarriers, also the IFFT size. Options: 64, 128, or 256. Larger values increase bandwidth efficiency but require a longer cyclic prefix for the same relative guard interval."
+            },
+            "cpLength": {
+                "description": "Cyclic prefix length in samples. Must be ≤ numSubcarriers/2. Typical ratio: 1/4 of numSubcarriers (e.g., 16 for 64 subcarriers). The CP must be longer than the channel impulse response to avoid ISI."
+            },
+            "ofdmQamOrder": {
+                "description": "Modulation order on each subcarrier: '4QAM' (QPSK, 2 bits/subcarrier), '16QAM' (4 bits), or '64QAM' (6 bits)."
+            }
+        },
+        "examples": [
+            {
+                "title": "OFDM spectrum visualisation",
+                "description": "OFDMModulator(64 SC, CP=16, 4QAM) → SpectrumAnalyzer The flat-top spectrum characteristic of OFDM with 64 occupied subcarriers is visible."
+            },
+            {
+                "title": "OFDM link simulation",
+                "description": "OFDMModulator → MultipathChannel(delays='0,5', gains='1.0,0.3') → OFDMDemodulator → Constellation The cyclic prefix absorbs the multipath delay and the constellation remains clean."
+            }
+        ]
+    },
+    "fsk-modulator": {
+        "title": "FSK Modulator",
+        "purpose": "Generates a Continuous-Phase FSK (CPFSK) signal encoding data as frequency shifts between discrete tone frequencies. Binary FSK (BFSK) uses two frequencies (mark and space); 4FSK uses four. FSK is robust in noisy environments and is widely used in amateur radio (AFSK), paging, and RFID systems.",
+        "algorithm": "A 32-bit LFSR generates bits. Each log₂(M) bits select one of M symbols, which maps to a frequency offset f_offset = (2·k − M + 1) · deviation, where k is the symbol index. A phase accumulator is updated by 2π·f_offset / sampleRate each sample, maintaining phase continuity between symbol transitions (CPFSK). Output is a complex exponential: I = cos(phase), Q = sin(phase).",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2)",
+        "params": {
+            "symbolRate": {
+                "description": "Symbol rate in baud. Typical values: 300–9600. The number of samples per symbol is sampleRate / symbolRate."
+            },
+            "deviation": {
+                "description": "Frequency deviation in Hz — the spacing between adjacent tone frequencies. For 2FSK, the two tones are at ±deviation. For 4FSK, tones are at ±deviation and ±3·deviation. Typical values: 100–2000 Hz."
+            },
+            "fskOrder": {
+                "description": "Modulation order: '2FSK' (binary, 1 bit/symbol) or '4FSK' (4-ary, 2 bits/symbol)."
+            },
+            "amplitude": {
+                "description": "Output amplitude. Range: 0.0–1.0."
+            }
+        },
+        "examples": [
+            {
+                "title": "FSK demodulation chain",
+                "description": "FSKModulator(2FSK, symbolRate=1000, deviation=500) → AWGNChannel(SNR=15 dB) → FSKDemodulator → Oscilloscope The demodulated ±1 symbols are visible at the oscilloscope output."
+            },
+            {
+                "title": "CPFSK phase continuity check",
+                "description": "FSKModulator(2FSK, symbolRate=500) → Oscilloscope Zoom in on symbol transitions to confirm that the phase does not jump (continuous-phase property)."
+            }
+        ]
+    },
+    "awgn-channel": {
+        "title": "AWGN Channel",
+        "purpose": "Models a communication channel that adds Additive White Gaussian Noise (AWGN) to the signal at a specified signal-to-noise ratio. This is the standard channel model for evaluating the error performance of digital modulation schemes and the effectiveness of channel coding.",
+        "algorithm": "1. Signal power P_signal is estimated as the mean square of the input chunk: P_signal = (1/N) Σ x²[n]. 2. Required noise power is derived: P_noise = P_signal / 10^(SNR/10). 3. Independent Gaussian samples are generated using the Box-Muller transform: z = √(−2·ln(u₁)) · cos(2π·u₂). 4. Each noise sample is scaled by √P_noise and added to the corresponding input sample. If input power is below 1e-20 the signal is passed through unchanged.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array of length chunkSize, signal + Gaussian noise)",
+        "params": {
+            "snr": {
+                "description": "Signal-to-noise ratio in dB. Typical values: 0 dB (strong noise, heavy distortion), 10 dB (moderate noise), 20 dB (light noise), 40 dB (nearly clean). The noise power is computed per-chunk from the actual signal power."
+            }
+        },
+        "examples": [
+            {
+                "title": "BER vs SNR curve",
+                "description": "QAMModulator(16QAM) → AWGNChannel(SNR=15 dB) → QAMDemodulator → BERCounter Vary SNR from 5 to 30 dB and observe the resulting BER to trace the performance curve."
+            },
+            {
+                "title": "Noisy sine wave visualisation",
+                "description": "Sine(1000 Hz) → AWGNChannel(SNR=10 dB) → Oscilloscope Shows the sine wave corrupted by Gaussian noise."
+            }
+        ]
+    },
+    "fading-channel": {
+        "title": "Fading Channel",
+        "purpose": "Models a wireless channel with multipath fading using either Rayleigh (no line-of-sight) or Rician (with line-of-sight) statistics. Fading channels are essential for evaluating receiver performance in mobile and indoor wireless environments where signal amplitude varies randomly over time.",
+        "algorithm": "At each sample two independent Gaussian processes are generated and shaped by a first-order IIR filter a = exp(−2π·f_d/f_s) that approximates the Jakes Doppler spectrum. For Rayleigh fading, the complex channel coefficient is h = (g₁ + j·g₂)/√2. For Rician fading, h = √(K/(K+1)) + √(1/(K+1)) · (g₁ + j·g₂)/√2, where the first term is the deterministic LOS component. The output is y = h · x (complex multiplication).",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2, signal multiplied by fading envelope)",
+        "params": {
+            "fadingType": {
+                "description": "Fading model: 'rayleigh' (no line-of-sight, envelope is Rayleigh-distributed) or 'rician' (with line-of-sight, controlled by kFactor)."
+            },
+            "dopplerFrequency": {
+                "description": "Maximum Doppler frequency f_d in Hz, determined by the relative velocity between transmitter and receiver: f_d = v·f_c/c. Typical values: 1 Hz (pedestrian), 10 Hz (vehicle at low speed), 100 Hz (highway)."
+            },
+            "kFactor": {
+                "description": "Rician K-factor in dB — ratio of the LOS power to the scattered-component power. Only used when fadingType = 'rician'. 0 dB means equal LOS and scattered power; 10 dB means LOS is 10× stronger."
+            }
+        },
+        "examples": [
+            {
+                "title": "Rayleigh fading effect on QPSK",
+                "description": "PSKModulator(QPSK) → FadingChannel(rayleigh, fd=10 Hz) → Constellation The constellation points are spread into rings showing the amplitude variation caused by fading."
+            },
+            {
+                "title": "Doppler frequency sweep",
+                "description": "Sine(1000 Hz) → ComplexComposer → FadingChannel(rayleigh, fd=100 Hz) → Oscilloscope At high Doppler the amplitude fades rapidly, simulating a fast-moving receiver."
+            }
+        ]
+    },
+    "multipath-channel": {
+        "title": "Multipath Channel",
+        "purpose": "Models multipath signal propagation where copies of the transmitted signal arrive at the receiver with different delays and attenuations. This creates inter-symbol interference (ISI) and frequency-selective fading, which are the primary impairments in OFDM system design.",
+        "algorithm": "The channel is a sparse FIR filter: y[n] = Σ g_k · x[n − d_k], where d_k and g_k are the delay (in samples) and gain of each path. A circular buffer stores the signal history; for each output sample the buffer is read at multiple offsets and the weighted sum is computed. Delays and gains are parsed from comma-separated strings at runtime; the buffer is resized when the parameters change.",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2, sum of delayed path copies)",
+        "params": {
+            "delays": {
+                "description": "Comma-separated list of path delays in samples. Example: '0,5,12' means a direct path (delay 0), a path arriving 5 samples later, and a path arriving 12 samples later. The largest value determines the memory buffer size."
+            },
+            "gains": {
+                "description": "Comma-separated list of path gains (linear, not dB). Example: '1.0,0.5,0.3'. The number of gains must match the number of delays. The first path gain is typically 1.0 (direct path)."
+            }
+        },
+        "examples": [
+            {
+                "title": "ISI effect on OFDM",
+                "description": "OFDMModulator(CP=16) → MultipathChannel(delays='0,10', gains='1.0,0.5') → OFDMDemodulator If CP length exceeds the channel delay spread (10 samples < 16), the constellation remains clean."
+            },
+            {
+                "title": "Frequency-selective fading spectrum",
+                "description": "NoiseGenerator(white) → MultipathChannel(delays='0,20,40', gains='1.0,0.6,0.3') → SpectrumAnalyzer The spectrum shows notches at frequencies where the multipath paths cancel destructively."
+            }
+        ]
+    },
+    "pulse-shaper": {
+        "title": "Pulse Shaper",
+        "purpose": "Limits the bandwidth of a digital signal by filtering each I and Q channel through a pulse-shaping FIR filter. The Root Raised Cosine (RRC) filter is the standard transmit-side filter in communications systems (DVB, LTE, 5G). A matched pair of RRC filters (one at Tx, one at Rx) realises the Raised Cosine response that achieves zero inter-symbol interference (ISI) at the symbol sampling instants.",
+        "algorithm": "On each parameter change the filter coefficients are recomputed and cached. Three filter designs are available: RRC uses the standard analytic formula with roll-off α; RC uses the sinc × cos formula; Gaussian uses exp(−a²t²) with bandwidth-time product BT. All designs normalise to unit energy. FIR convolution is applied separately to the I and Q channels using a circular delay-line buffer.",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2 — I/Q symbol stream at samplesPerSymbol oversampling rate)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2, bandwidth-limited I/Q stream)",
+        "params": {
+            "pulseType": {
+                "description": "Filter type: 'rrc' (Root Raised Cosine, standard for communications), 'rc' (Raised Cosine, for receive-only or educational use), 'gaussian' (GMSK-style, uses rolloffFactor as BT product)."
+            },
+            "rolloffFactor": {
+                "description": "Roll-off factor α for RRC/RC, or BT product for Gaussian. Range: 0.1–1.0. Smaller values give narrower bandwidth but require more taps to implement. Typical: 0.35 (LTE), 0.25 (DVB-S2)."
+            },
+            "samplesPerSymbol": {
+                "description": "Oversampling factor — the number of input samples per modulation symbol. Range: 2–32. Must match the QAM modulator symbol rate and sampling rate."
+            },
+            "numTaps": {
+                "description": "FIR filter length in taps. Longer filters give better stopband attenuation. Typical: 4–8 symbols × samplesPerSymbol (e.g., 33 for 8 symbols × sps=4 + 1)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Transmit filtering of QAM",
+                "description": "QAMModulator(16QAM, symbolRate=1000) → PulseShaper(RRC, α=0.35, sps=4) → SpectrumAnalyzer The spectrum is band-limited to approximately symbolRate·(1+α)/2 on each side of DC."
+            },
+            {
+                "title": "Matched-filter pair",
+                "description": "QAMModulator → PulseShaper(RRC, Tx) → AWGNChannel → PulseShaper(RRC, Rx) → EyeDiagram The eye diagram opens wide at the correct sampling instant after both RRC filters."
+            }
+        ]
+    },
+    "lms-filter": {
+        "title": "LMS / NLMS Adaptive Filter",
+        "purpose": "An adaptive FIR filter that adjusts its coefficients in real time using the Least Mean Squares (LMS) or Normalised LMS (NLMS) algorithm. LMS is the most widely used adaptive algorithm due to its simplicity and robust convergence. Applications include noise cancellation, echo suppression, system identification, and adaptive equalisation.",
+        "algorithm": "Input 0 provides the reference signal x[n]; input 1 provides the desired response d[n]. At each sample the filter computes y[n] = wᵀ·x[n] (convolution), forms the error e[n] = d[n] − y[n], and updates the weight vector: LMS: w[n+1] = w[n] + 2μ·e[n]·x[n]; NLMS: w[n+1] = w[n] + (μ / (‖x[n]‖² + ε))·e[n]·x[n]. The output is the error signal e[n], which approaches zero as the filter converges. NLMS has a signal-independent convergence rate, making it better for signals with varying power.",
+        "inputDescription": "- Input 0: real — reference signal x[n] to be filtered. - Input 1: real — desired response d[n] (target output for weight adaptation).",
+        "outputDescription": "real (Float32Array — error signal e[n] = d[n] − y[n]; approaches zero after convergence)",
+        "params": {
+            "adaptiveAlgorithm": {
+                "description": "Algorithm variant: 'lms' (standard LMS, step size μ is constant) or 'nlms' (normalised LMS, effective step size is μ / (‖x‖² + ε), independent of input power)."
+            },
+            "numTaps": {
+                "description": "Number of FIR filter taps. Range: 4–256. More taps improve the filter's ability to model complex systems but slow convergence. Start with 16–32 for typical applications."
+            },
+            "stepSize": {
+                "description": "Step size μ controlling the adaptation speed and steady-state misadjustment. For LMS: stability requires μ < 1/(N·Px) where Px is signal power. For NLMS: μ is typically 0.01–0.5. Smaller μ gives smoother convergence but slower tracking."
+            }
+        },
+        "examples": [
+            {
+                "title": "Noise cancellation",
+                "description": "Sine(1000 Hz) → Summer(with noise) → [LMS input 0]; Sine(1000 Hz) → [LMS desired input 1]; LMS error output → Oscilloscope. The LMS filter learns to subtract the reference and the error converges to near zero."
+            },
+            {
+                "title": "Echo cancellation",
+                "description": "Transmit signal → [desired input]; Received signal (echo + near-end) → [reference input]; LMS → error signal. The adaptive filter models the echo path and cancels it."
+            }
+        ]
+    },
+    "rls-filter": {
+        "title": "RLS Adaptive Filter",
+        "purpose": "An adaptive filter using the Recursive Least Squares algorithm. RLS minimises a weighted least-squares cost function and converges much faster than LMS — typically in about N samples rather than N/μ. The trade-off is O(N²) complexity per sample due to the inverse-correlation matrix update. Best for non-stationary signals and applications where fast convergence is critical.",
+        "algorithm": "At each sample: 1. The Kalman gain vector is computed: k[n] = P[n−1]·x[n] / (λ + xᵀ[n]·P[n−1]·x[n]). 2. The error is formed: e[n] = d[n] − wᵀ[n−1]·x[n]. 3. Weights are updated: w[n] = w[n−1] + k[n]·e[n]. 4. The inverse-correlation matrix is updated: P[n] = (P[n−1] − k[n]·xᵀ[n]·P[n−1]) / λ. The matrix P is initialised to δ·I with δ=100 (large initial uncertainty). The forgetting factor λ < 1 gives less weight to older data, enabling tracking of time-varying systems.",
+        "inputDescription": "- Input 0: real — reference signal x[n]. - Input 1: real — desired response d[n].",
+        "outputDescription": "real (Float32Array — error signal e[n] = d[n] − wᵀ·x[n])",
+        "params": {
+            "numTaps": {
+                "description": "Number of filter taps. Range: 4–64 (capped at 64 due to the N×N matrix cost). Use fewer taps than LMS to keep complexity manageable."
+            },
+            "forgettingFactor": {
+                "description": "Exponential forgetting factor λ. Range: 0.9–1.0. λ = 1.0 means all past data is weighted equally (best for stationary signals). λ = 0.99 means recent samples are weighted ≈100× more than samples 460 steps in the past (enables tracking of slow changes)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Fast-converging channel identification",
+                "description": "Noise → [unknown system] → [RLS desired input]; Noise → [RLS reference input]; RLS error → Oscilloscope. Compare convergence speed with LMS — RLS identifies the system in roughly N = numTaps samples."
+            }
+        ]
+    },
+    "matched-filter": {
+        "title": "Matched Filter",
+        "purpose": "The matched filter is the optimal linear filter for detecting a known signal in white Gaussian noise. It maximises the output SNR at the moment of detection. Its impulse response is the time-reversed and normalised template of the signal being detected.",
+        "algorithm": "1. A template waveform is constructed according to templateType and numTaps. 2. The template is time-reversed: h[n] = template[N−1−n]. 3. The filter is normalised to unit energy: h[n] /= √(Σ h²). 4. FIR convolution y[n] = Σ h[k]·x[n−k] is applied using a circular delay buffer. The output peaks at the correlation maximum when the template is present in the input signal.",
+        "inputDescription": "real (Float32Array of length chunkSize — received signal to be searched for the template)",
+        "outputDescription": "real (Float32Array — correlation output; peaks indicate the presence of the template)",
+        "params": {
+            "templateType": {
+                "description": "Template waveform shape: 'rectangular' (constant pulse), 'triangular' (linearly tapered pulse), or 'sinusoidal' (half-sine shaped pulse). Choose the shape that best matches the transmitted pulse."
+            },
+            "numTaps": {
+                "description": "Template length in samples, equal to the expected pulse duration in samples. Range: 4–256. Should match the pulse width of the signal being detected."
+            }
+        },
+        "examples": [
+            {
+                "title": "Pulse detection in noise",
+                "description": "Impulse(period=200) → AWGNChannel(SNR=0 dB) → MatchedFilter(rectangular, 32 taps) → Oscilloscope Correlation peaks appear at the impulse positions even at very low SNR."
+            },
+            {
+                "title": "Chirp pulse compression",
+                "description": "Chirp(100 Hz, 5000 Hz, 0.05 s) → MatchedFilter(sinusoidal, numTaps=64) → Oscilloscope The matched filter compresses the long chirp to a narrow peak."
+            }
+        ]
+    },
+    "zf-equalizer": {
+        "title": "Zero-Forcing Equalizer",
+        "purpose": "Compensates inter-symbol interference (ISI) by inverting the estimated frequency response of the channel. ZF equalisation is a simple frequency-domain technique used in OFDM receivers and as a baseline equaliser. The regularisation parameter prevents noise amplification at frequencies where the channel response is small.",
+        "algorithm": "1. The input chunk is zero-padded to the next power of 2 and FFT-transformed. 2. On the first block (when estimateChannel = true) the FFT spectrum is stored as the channel estimate H(f). 3. Subsequent blocks are equalised: Y_eq(f) = Y(f) · conj(H(f)) / (|H(f)|² + ε). 4. IFFT transforms the equalised spectrum back to the time domain. The conjugate-matched numerator (rather than plain division 1/H) provides a modest noise-whitening benefit similar to MMSE at SNR → ∞.",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2 — received signal after the channel)",
+        "outputDescription": "complex (interleaved Float32Array of length chunkSize × 2 — equalised signal)",
+        "params": {
+            "regularization": {
+                "description": "Regularisation parameter ε added to the channel power denominator |H(f)|² + ε. Prevents division by zero and limits noise amplification at deep channel nulls. Typical values: 1e-6 (very clean channel) to 0.01 (noisy channel)."
+            },
+            "estimateChannel": {
+                "description": "When true, the first received block is used as the channel estimate (pilot block). Set to false if the channel estimate is provided externally or the channel is known to be flat."
+            }
+        },
+        "examples": [
+            {
+                "title": "OFDM channel compensation",
+                "description": "OFDMModulator → MultipathChannel(delays='0,8', gains='1.0,0.4') → ZFEqualizer → OFDMDemodulator → Constellation The equaliser restores the clean constellation after the multipath channel."
+            }
+        ]
+    },
+    "pid-controller": {
+        "title": "PID Controller",
+        "purpose": "A proportional-integral-derivative (PID) controller — the most widely used feedback control algorithm in engineering. In DSP it appears in phase-locked loops (PLL), automatic gain control (AGC), timing recovery, and any closed-loop regulation task where an error signal drives a controlled output.",
+        "algorithm": "Discrete-time Euler implementation. At each sample: P[n] = Kp·e[n]; I[n] = I[n−1] + Ki·e[n]·Ts (with anti-windup); D[n] = Kd·(e[n] − e[n−1]) / Ts; u[n] = P[n] + I[n] + D[n], clamped to ±outputLimit. Anti-windup uses conditional integration: the integral term is only updated when the output is within the limits or when integration would reduce the output magnitude.",
+        "inputDescription": "real (Float32Array — error signal e[n] = setpoint − measured value)",
+        "outputDescription": "real (Float32Array — control signal u[n], clamped to ±outputLimit)",
+        "params": {
+            "kp": {
+                "description": "Proportional gain. Increases the response speed. Too high causes oscillation. Typical starting value: 1.0."
+            },
+            "ki": {
+                "description": "Integral gain. Eliminates steady-state offset. Too high causes integrator wind-up (prevented by the anti-windup mechanism). Typical value: 0.01–0.5."
+            },
+            "kd": {
+                "description": "Derivative gain. Damps oscillations and improves transient response. Sensitive to noise. Typical value: 0.001–0.1."
+            },
+            "outputLimit": {
+                "description": "Symmetric saturation limit for the controller output ±outputLimit. Acts as both output clamp and anti-windup boundary. Default: 10.0."
+            }
+        },
+        "examples": [
+            {
+                "title": "PLL loop filter",
+                "description": "PhaseDetector → PIDController(Kp=0.1, Ki=0.01, Kd=0) → RefSine(frequency input) → feedback The PI controller drives the VCO frequency to eliminate the phase error."
+            },
+            {
+                "title": "Step-response tuning",
+                "description": "Step(stepTime=0.01) → PIDController → Oscilloscope Adjust Kp, Ki, Kd and observe rise time, overshoot, and settling on the oscilloscope."
+            }
+        ]
+    },
+    "polyphase-filter": {
+        "title": "Polyphase Filter (Resampler)",
+        "purpose": "Performs efficient integer-ratio sample-rate conversion (upsampling or downsampling) using polyphase filter decomposition. Compared to the naive insert-zeros-then-filter approach, the polyphase structure reduces computation by a factor equal to the resampling factor because only one polyphase branch is evaluated per output sample.",
+        "algorithm": "A windowed-sinc lowpass prototype filter with cutoff 1/(2·factor) and Blackman window is designed and normalised. The prototype is decomposed into 'factor' polyphase sub-filters, each containing ceil(numTaps / factor) taps. Upsampling: for each input sample, 'factor' output samples are produced by evaluating each polyphase branch in sequence. Downsampling: every input sample is stored in the history buffer; after 'factor' input samples an output is produced by summing all polyphase branch outputs.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array of length chunkSize — same-length chunk regardless of resampling ratio)",
+        "params": {
+            "resampleMode": {
+                "description": "Direction of rate conversion: 'upsample' (increase sample rate by factor) or 'downsample' (decrease sample rate by factor)."
+            },
+            "factor": {
+                "description": "Integer resampling factor. Range: 1–16. A factor of 2 doubles (upsample) or halves (downsample) the effective sample rate."
+            },
+            "numTaps": {
+                "description": "Length of the lowpass prototype FIR filter. Longer filters provide sharper cutoff and better alias rejection. Default: 64. Typical good values: 32–128."
+            }
+        },
+        "examples": [
+            {
+                "title": "Audio upsampling by 4×",
+                "description": "AudioFile → PolyphaseFilter(upsample, factor=4) → SpectrumAnalyzer The spectrum of the upsampled signal shows the signal confined to the original bandwidth with the high-frequency region filled with zeros."
+            },
+            {
+                "title": "Decimation after bandpass filtering",
+                "description": "Sine(1000 Hz) → BandpassFIR(500–2000 Hz) → PolyphaseFilter(downsample, factor=4) → Oscilloscope Downsampling by 4 reduces the effective sample rate without aliasing the in-band content."
+            }
+        ]
+    },
+    "fractional-delay": {
+        "title": "Fractional Delay",
+        "purpose": "Delays a signal by a non-integer (fractional) number of samples using 3rd-order Lagrange polynomial interpolation. Integer delays are trivial with a buffer; fractional delays are required in applications such as beamforming, chorus/flanger audio effects, synchronisation loops, and sample-rate conversion with arbitrary ratios.",
+        "algorithm": "A circular buffer holds the last BUFFER_SIZE = 104 samples of the input. The total delay is split into integer part intDelay and fractional part d = delay − intDelay. Third-order Lagrange coefficients for d are computed once per chunk: L₀ = −d(d−1)(d−2)/6, L₁ = (d+1)(d−1)(d−2)/2, L₂ = −(d+1)d(d−2)/2, L₃ = (d+1)d(d−1)/6. For each output sample, four consecutive buffer values at the integer read position are combined with these weights.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array of length chunkSize, input delayed by 'delay' samples using interpolation)",
+        "params": {
+            "delay": {
+                "description": "Delay in samples including the fractional part. Range: 0.0–100.0. The integer part selects the buffer read position; the fractional part is interpolated. Example: 10.5 delays by ten and a half samples."
+            }
+        },
+        "examples": [
+            {
+                "title": "Chorus / flanger effect",
+                "description": "AudioFile → Summer(dry + wet) ← FractionalDelay(delay=25.7) → Speaker The fractional delay creates the comb-filter effect characteristic of a chorus."
+            },
+            {
+                "title": "Beamforming delay compensation",
+                "description": "Two sensor signals at fractional sample offsets are time-aligned using FractionalDelay before summing, sharpening the beamformed output."
+            }
+        ]
+    },
+    "qam-demodulator": {
+        "title": "QAM Demodulator",
+        "purpose": "Demodulates a QAM signal by mapping received I/Q samples back to the nearest constellation point (hard decision) or computing log-likelihood ratios for each bit (soft decision). Soft-decision output is compatible with forward error correction decoders that exploit reliability information.",
+        "algorithm": "The same Gray-coded and power-normalised constellation as the QAM Modulator is used. Hard decision: for each symbol interval, the Euclidean distance to every constellation point is computed and the nearest is selected; the output is the normalised symbol index in [0, 1]. Soft decision (LLR approximation): for each bit position, the minimum distance to all constellation points with that bit equal to 0 and to 1 is found; LLR ≈ min_dist₀ − min_dist₁. The output is the average LLR across all bits of the symbol.",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2 — received I/Q samples)",
+        "outputDescription": "real (Float32Array — hard: normalised symbol index [0,1]; soft: average LLR per symbol)",
+        "params": {
+            "qamOrder": {
+                "description": "Constellation order, must match the transmitter: '16QAM', '64QAM', or '256QAM'."
+            },
+            "decisionType": {
+                "description": "'hard' — output is the index of the nearest constellation point normalised to [0, 1]. 'soft' — output is the average per-bit LLR; positive values indicate a '0' bit, negative indicate a '1' bit."
+            },
+            "symbolRate": {
+                "description": "Symbol rate in baud, must match the modulator. Used to determine the number of samples per symbol for the symbol-clock alignment."
+            }
+        },
+        "examples": [
+            {
+                "title": "End-to-end QAM link",
+                "description": "QAMModulator(16QAM, 1000 baud) → AWGNChannel(SNR=20 dB) → QAMDemodulator(hard) → BERCounter Measures the bit-error rate of 16-QAM at 20 dB SNR."
+            }
+        ]
+    },
+    "ofdm-demodulator": {
+        "title": "OFDM Demodulator",
+        "purpose": "Receives an OFDM signal, strips the cyclic prefix, and performs an FFT to recover the complex QAM symbols on each subcarrier. The block is the complementary receiver for the OFDM Modulator and must be configured with identical numSubcarriers and cpLength parameters.",
+        "algorithm": "Incoming complex samples are accumulated in an input buffer of size (numSubcarriers + cpLength) × 2 (interleaved I/Q). Once a full OFDM symbol has been accumulated: 1. The first cpLength samples (the cyclic prefix) are discarded. 2. An FFT of the remaining numSubcarriers samples is computed. 3. The frequency-domain subcarrier values are placed into the output buffer and streamed to the output port. The output buffer drains sample-by-sample while new input is simultaneously collected.",
+        "inputDescription": "complex (interleaved Float32Array — received OFDM time-domain signal, including cyclic prefix)",
+        "outputDescription": "complex (interleaved Float32Array — frequency-domain subcarrier values, one complex number per subcarrier per OFDM symbol)",
+        "params": {
+            "numSubcarriers": {
+                "description": "Number of OFDM subcarriers / FFT size. Must match the modulator: 64, 128, or 256."
+            },
+            "cpLength": {
+                "description": "Cyclic prefix length in samples. Must match the modulator setting exactly."
+            }
+        },
+        "examples": [
+            {
+                "title": "OFDM loopback test",
+                "description": "OFDMModulator(64 SC, CP=16, 4QAM) → OFDMDemodulator(64 SC, CP=16) → Constellation The demodulated 4-QAM constellation should show four clean clusters at ±1±j."
+            }
+        ]
+    },
+    "fsk-demodulator": {
+        "title": "FSK Demodulator",
+        "purpose": "Non-coherently demodulates a binary or 4-ary FSK signal by comparing the power in each frequency band. Non-coherent detection does not require phase synchronisation, making it simpler and more robust to phase offsets than coherent FSK receivers, at the cost of about 3 dB SNR penalty.",
+        "algorithm": "Two quadrature mixers downconvert the input to ±deviation Hz respectively. For BFSK: one mixer uses phase accumulator at −deviation, the other at +deviation. The instantaneous power after each mixer is estimated using an exponential envelope detector with time constant determined by symbolRate. The decision is: output = +1 if envelope(+deviation) > envelope(−deviation), else −1. The envelope smoothing coefficient is α = 1 − exp(−2π·symbolRate / sampleRate).",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2 — received CPFSK signal)",
+        "outputDescription": "real (Float32Array — demodulated symbols: +1 or −1 for BFSK)",
+        "params": {
+            "deviation": {
+                "description": "Frequency deviation in Hz — must match the FSK Modulator setting exactly. The two detection frequencies are +deviation and −deviation."
+            },
+            "symbolRate": {
+                "description": "Symbol rate in baud — used to set the envelope detector bandwidth. Should match the modulator symbol rate."
+            }
+        },
+        "examples": [
+            {
+                "title": "BFSK demodulation",
+                "description": "FSKModulator(2FSK, symbolRate=1000, deviation=500) → AWGNChannel(SNR=10 dB) → FSKDemodulator(deviation=500, symbolRate=1000) → Oscilloscope Output shows ±1 symbols with occasional errors at 10 dB SNR."
+            }
+        ]
+    },
+    "peak-detector": {
+        "title": "Peak Detector",
+        "purpose": "Tracks and holds the peak amplitude of a signal with adjustable attack, release, and hold times. Used in audio metering, dynamic range limiters, signal monitoring, and automatic gain control where the instantaneous peak level must be tracked smoothly.",
+        "algorithm": "An envelope follower uses separate attack (fast) and release (slow) first-order IIR coefficients to track |x[n]|. When the current |x[n]| reaches or exceeds the stored peak value, the peak is updated and a hold counter is reset to holdSamples. During the hold period the peak is frozen. After the hold period expires, the peak follows the envelope downward at the release rate: peak += releaseCoeff · (envelope − peak).",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — current peak hold value, one value per sample)",
+        "params": {
+            "attackTime": {
+                "description": "Attack time in milliseconds — how quickly the peak detector responds to an increase in signal level. Typical value: 0.1–5 ms. Shorter attack times catch transients; longer ones smooth rapid fluctuations."
+            },
+            "releaseTime": {
+                "description": "Release time in milliseconds — how quickly the peak level falls after the hold period. Typical value: 50–500 ms. Short release causes pumping; long release can mask brief level drops."
+            },
+            "holdTime": {
+                "description": "Hold time in milliseconds — duration for which the peak is frozen after being set. Typical value: 100–1000 ms. Mimics the behaviour of analogue peak-hold meters."
+            }
+        },
+        "examples": [
+            {
+                "title": "Audio level meter",
+                "description": "AudioFile → PeakDetector(attack=1 ms, release=200 ms, hold=500 ms) → NumericIndicator Displays the peak level of the audio file, holding for half a second after each transient."
+            },
+            {
+                "title": "Envelope visualisation",
+                "description": "AMFMPMModulator(AM, carrier=5000 Hz) → PeakDetector(attack=0.1 ms, release=50 ms) → Oscilloscope The peak detector traces the AM envelope."
+            }
+        ]
+    },
+    "pitch-detector": {
+        "title": "Pitch Detector",
+        "purpose": "Estimates the fundamental frequency (pitch) of a periodic signal using normalised autocorrelation. Suitable for monophonic audio signals in the range 50–2000 Hz. Applications include musical tuner applications, voice pitch analysis, and harmonic signal characterisation.",
+        "algorithm": "Input samples are accumulated in a circular buffer of windowSize samples. When the buffer fills: 1. The total energy is computed for normalisation. 2. Normalised autocorrelation R(τ) = Σ x[n]·x[n+τ] / Σ x²[n] is computed for lags in [minLag, maxLag] = [sampleRate/maxFreq, sampleRate/minFreq]. 3. The algorithm waits for R(τ) to cross zero (to skip the main lobe), then searches for the first significant peak exceeding the confidence threshold. 4. Pitch = sampleRate / τ_peak. Output is 0 if no sufficiently strong peak is found.",
+        "inputDescription": "real (Float32Array of length chunkSize — monophonic audio or periodic signal)",
+        "outputDescription": "real (Float32Array — estimated pitch frequency in Hz, 0 when undetected; value is held constant between window updates)",
+        "params": {
+            "windowSize": {
+                "description": "Analysis window length in samples. Range: 256–4096. Larger windows give better frequency resolution but increase latency. At 48000 Hz, windowSize=2048 gives about 43 ms resolution."
+            },
+            "minFreq": {
+                "description": "Minimum detectable pitch in Hz. Setting this too low increases computation (longer lag range). Default: 50 Hz."
+            },
+            "maxFreq": {
+                "description": "Maximum detectable pitch in Hz. Must be below sampleRate/2. Default: 2000 Hz."
+            },
+            "confidenceThreshold": {
+                "description": "Minimum normalised autocorrelation peak height required to report a pitch. Range: 0.0–1.0. Higher values reduce false detections but miss weak periodic signals. Default: 0.3."
+            }
+        },
+        "examples": [
+            {
+                "title": "Musical tuner",
+                "description": "AudioFile(instrument.wav) → PitchDetector(windowSize=2048, 80–2000 Hz) → NumericIndicator Displays the fundamental frequency of the instrument note."
+            },
+            {
+                "title": "Synthetic pitch tracking",
+                "description": "Sine(440 Hz) → PitchDetector → Oscilloscope The output should be a constant value of approximately 440 Hz with confidenceThreshold=0.3."
+            }
+        ]
+    },
+    "zero-crossing": {
+        "title": "Zero Crossing Detector",
+        "purpose": "Estimates the frequency of a signal by counting zero crossings in a sliding window. This is one of the simplest frequency estimation methods — computationally very cheap and suitable for signals dominated by a single frequency component. Accuracy degrades for multi-tone or noisy signals.",
+        "algorithm": "For each sample a sign change from positive to negative or vice versa is counted as one crossing. When the internal window counter reaches windowSize, the estimated frequency is updated: freq = (crossings / (2 · windowSize)) · sampleRate. This formula comes from the fact that a sinusoid at frequency f produces 2f zero crossings per second. The count and counter are reset for the next window. The last frequency estimate is held between window updates.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — frequency estimate in Hz, held constant within each window of windowSize samples)",
+        "params": {
+            "windowSize": {
+                "description": "Number of samples per estimation window. Larger windows give more stable but slower-updating estimates. Default: 1024 samples (about 21 ms at 48000 Hz)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Frequency sweep tracking",
+                "description": "Chirp(200 Hz → 4000 Hz, 2 s) → ZeroCrossing(windowSize=2048) → Oscilloscope The output ramps up as the chirp frequency increases."
+            },
+            {
+                "title": "Comparison with PitchDetector",
+                "description": "Sine(880 Hz) → ZeroCrossing → NumericIndicator Compare with PitchDetector on the same signal — ZeroCrossing is faster but less accurate on noisy signals."
+            }
+        ]
+    },
+    "carrier-recovery": {
+        "title": "Carrier Recovery (Costas Loop)",
+        "purpose": "Implements a Costas phase-locked loop for coherent carrier frequency and phase recovery in BPSK and QPSK receivers. Without carrier recovery, phase rotation in the channel causes the received constellation to spin, preventing correct symbol decisions. The Costas loop tracks and corrects this rotation in real time.",
+        "algorithm": "Each sample: 1. The input I/Q is multiplied by the conjugate of the NCO output (downconversion to baseband). 2. A decision-directed phase error is computed: for BPSK e = sign(I)·Q; for QPSK e = sign(I)·Q − sign(Q)·I. 3. A PI loop filter (Gardner coefficients Kp = 2ζωn/fs, Ki = ωn²/fs²) integrates the error to drive the NCO frequency. 4. The NCO phase accumulates at basePhaseIncrement + loopOutput. Output 0: NCO complex output (recovered carrier). Output 1: phase error signal.",
+        "inputDescription": "complex (interleaved Float32Array — received modulated signal)",
+        "outputDescription": "- Output 0: complex — NCO output (recovered carrier I/Q, used for coherent downconversion). - Output 1: real — phase error signal (drives to zero when the loop is locked).",
+        "params": {
+            "centerFrequency": {
+                "description": "Initial NCO frequency in Hz — should be set close to the carrier frequency of the received signal. The loop will pull in from a small frequency offset determined by the bandwidth parameter."
+            },
+            "bandwidth": {
+                "description": "Loop bandwidth in Hz, determining the capture range and noise sensitivity. Larger bandwidth captures larger frequency offsets faster but is more susceptible to noise. Typical: 10–100 Hz."
+            },
+            "damping": {
+                "description": "Loop damping factor ζ. ζ = 0.707 (1/√2) gives the Butterworth optimum — balanced between fast response and minimum overshoot. Range: 0.3–2.0."
+            },
+            "costasMode": {
+                "description": "'bpsk' — decision-directed error uses e = sign(I)·Q, suitable for BPSK. 'qpsk' — error uses e = sign(I)·Q − sign(Q)·I, handles the 4-fold phase ambiguity of QPSK."
+            }
+        },
+        "examples": [
+            {
+                "title": "BPSK carrier recovery",
+                "description": "PSKModulator(BPSK, fc=1000 Hz) → CarrierRecovery(fc=1000, BW=50, bpsk) → [output 0] → Constellation After lock-in, the constellation shows two stable clusters on the I axis."
+            },
+            {
+                "title": "Lock-in transient analysis",
+                "description": "PSKModulator(BPSK, fc=1050 Hz) → CarrierRecovery(fc=1000, BW=100, bpsk) → [output 1: phase error] → Oscilloscope The phase error decays to zero as the loop acquires the 50 Hz frequency offset."
+            }
+        ]
+    },
+    "frame-sync": {
+        "title": "Frame Synchroniser",
+        "purpose": "Detects the beginning of a data frame in a received bitstream by correlating the input with a known Barker sequence preamble. Frame synchronisation is a prerequisite for any digital communication receiver that needs to align its symbol clock and frame boundaries before decoding data.",
+        "algorithm": "A circular buffer of length N (preamble length) stores the most recent input samples. At each sample the sliding cross-correlation of the buffer contents with the Barker preamble is computed: corr = Σ history[k] · preamble[k]. When |corr| > threshold · N, the correlation value is output; otherwise 0 is output. Barker-13 has optimal auto-correlation sidelobe suppression (≤ 1/13) among all 13-chip binary sequences.",
+        "inputDescription": "real (Float32Array — received signal or demodulated bit stream)",
+        "outputDescription": "real (Float32Array — correlation value when preamble is detected above threshold, 0 otherwise; peaks mark frame boundaries)",
+        "params": {
+            "preambleType": {
+                "description": "'barker13' — 13-chip Barker sequence [+1,+1,+1,+1,+1,−1,−1,+1,+1,−1,+1,−1,+1]; best sidelobe suppression. 'barker7' — 7-chip Barker sequence; shorter, lower detection latency."
+            },
+            "threshold": {
+                "description": "Detection threshold as a fraction of the preamble length. Range: 0.0–1.0. Threshold = 0.7 means a correlation of at least 0.7·N is required to declare detection. Lower values increase the false alarm rate; higher values increase miss probability."
+            }
+        },
+        "examples": [
+            {
+                "title": "Frame detection in BPSK",
+                "description": "PSKModulator(BPSK) → FrameSync(barker13, threshold=0.7) → Oscilloscope Correlation spikes appear at frame-start positions in the received stream."
+            },
+            {
+                "title": "Noisy channel frame sync",
+                "description": "PSKModulator(BPSK) → AWGNChannel(SNR=5 dB) → FrameSync(barker13, threshold=0.5) → Oscilloscope Lowering the threshold to 0.5 recovers frames at low SNR with the Barker-13 preamble."
+            }
+        ]
+    },
+    "cfar-detector": {
+        "title": "CFAR Detector (CA-CFAR)",
+        "purpose": "Cell-Averaging Constant False Alarm Rate (CA-CFAR) detector — an adaptive threshold detector that maintains a constant probability of false alarm (Pfa) regardless of the background noise level. Widely used in radar, sonar, and spectrum sensing to detect targets or signals in a non-stationary noise background.",
+        "algorithm": "For each Cell Under Test (CUT) at index i: 1. Guard cells on both sides are skipped to prevent the target's own energy from biasing the noise estimate. 2. The noise power is estimated by averaging the trainingCells cells on each side: averagePower = sum / (2·trainingCells). 3. The threshold scale factor α = N·(Pfa^(−1/N) − 1) (where N = 2·trainingCells) is derived from the exponential noise distribution assumption. 4. Detection threshold = averagePower · α. 5. If input[i] > threshold the output is 1.0 (detection), otherwise 0.0. Edge samples with insufficient training cells output 0.",
+        "inputDescription": "real (Float32Array — signal power or magnitude values, e.g., from SpectrumAnalyzer or after envelope detection)",
+        "outputDescription": "real (Float32Array — binary detection mask: 1.0 = target detected, 0.0 = noise)",
+        "params": {
+            "guardCells": {
+                "description": "Number of guard cells on each side of the CUT. Prevents the target's own energy from leaking into the noise estimate. Typical value: 2–4. Should be at least as wide as the target's extent in samples."
+            },
+            "trainingCells": {
+                "description": "Number of training (reference) cells on each side of the guard region. More cells give a more accurate noise estimate. Typical value: 8–32. Total cells used = 2 · trainingCells."
+            },
+            "pfa": {
+                "description": "Required probability of false alarm. Typical values: 1e-4 to 1e-6. The threshold scaling factor α is computed directly from this value assuming exponentially distributed noise power."
+            }
+        },
+        "examples": [
+            {
+                "title": "Spectral peak detection",
+                "description": "Sine(1000 Hz) + NoiseGenerator(white) → Summer → SpectrumAnalyzer → CFARDetector(guard=2, train=10, Pfa=1e-4) → Oscilloscope The CFAR detector marks the 1 kHz spectral peak as a detection while suppressing noise."
+            },
+            {
+                "title": "Impulse detection in noise",
+                "description": "Impulse(period=512) + NoiseGenerator → Summer → CFARDetector(guard=2, train=8, Pfa=1e-3) → Oscilloscope Detection spikes appear at the impulse positions."
+            }
+        ]
+    },
+    "compressor": {
+        "title": "Dynamic Compressor",
+        "purpose": "Reduces the dynamic range of an audio or DSP signal by applying gain reduction above a specified threshold level. Compression is fundamental in audio production, broadcasting, and speech processing to control loudness, prevent clipping, and increase subjective loudness.",
+        "algorithm": "An envelope follower with separate attack and release first-order IIR coefficients tracks |x[n]|. When the envelope exceeds the linear threshold: the excess in dB is compressed by the ratio, and the gain is computed to map the envelope to thresholdDb + excessDb/ratio. Makeup gain (linear) is applied to compensate for the average level reduction. The output is y[n] = x[n] · gain · makeupGain.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — gain-reduced signal with makeup gain applied)",
+        "params": {
+            "threshold": {
+                "description": "Level above which compression begins, in dBFS. Default: −20 dB. Signals below this level pass through unchanged; signals above are compressed."
+            },
+            "ratio": {
+                "description": "Compression ratio (N:1). For every N dB the input exceeds the threshold, the output increases by 1 dB. Typical values: 2:1 (gentle), 4:1 (moderate), 10:1 (heavy), ∞:1 (limiting)."
+            },
+            "attackTime": {
+                "description": "Attack time in milliseconds — how quickly the compressor reacts to a level increase. Typical values: 1–20 ms. Short attack prevents transients; longer attack preserves them."
+            },
+            "releaseTime": {
+                "description": "Release time in milliseconds — how quickly the gain returns to unity after the signal drops below threshold. Typical values: 20–500 ms."
+            },
+            "makeupGain": {
+                "description": "Output gain in dB applied after compression to compensate for the average level reduction. Typical: 0–12 dB."
+            }
+        },
+        "examples": [
+            {
+                "title": "Speech level control",
+                "description": "AudioFile(speech.wav) → Compressor(threshold=−18 dB, ratio=4, attack=5 ms, release=100 ms) → Speaker Peaks are tamed and quieter sections are boosted for more consistent loudness."
+            },
+            {
+                "title": "Dynamic range measurement",
+                "description": "AudioFile → Compressor(threshold=−20 dB, ratio=4) → PowerMeter Compare RMS before and after to see the reduction in crest factor."
+            }
+        ]
+    },
+    "equalizer": {
+        "title": "3-Band Parametric Equalizer",
+        "purpose": "Adjusts the frequency response of a signal in three independent bands (low, mid, high) using peaking EQ biquad filters. A parametric equaliser is the standard tool in audio production for tone shaping, resonance control, and spectral correction, but it is also useful in DSP for compensating sensor frequency responses or pre-emphasising signals.",
+        "algorithm": "Three cascaded biquad sections in Direct Form II Transposed are applied. Each section implements a peaking EQ filter from the Audio EQ Cookbook: coefficients are computed from centre frequency, gain, and Q. The cascade is processed left-to-right (low → mid → high). Coefficients are recomputed and cached whenever any parameter changes.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — frequency-shaped signal)",
+        "params": {
+            "lowFreq": {
+                "description": "Centre frequency of the low-frequency band in Hz. Default: 200 Hz. Typical range: 20–500 Hz (bass region)."
+            },
+            "lowGain": {
+                "description": "Gain of the low-frequency band in dB. Range: −24 to +24 dB. 0 dB = no effect. Positive boosts, negative cuts."
+            },
+            "lowQ": {
+                "description": "Q factor of the low-frequency band — controls the bandwidth (narrower at higher Q). Default: 0.7. Typical range: 0.3 (wide shelving-like) to 4 (narrow notch-like)."
+            },
+            "midFreq": {
+                "description": "Centre frequency of the mid-frequency band in Hz. Default: 1000 Hz."
+            },
+            "midGain": {
+                "description": "Gain of the mid-frequency band in dB."
+            },
+            "midQ": {
+                "description": "Q factor of the mid-frequency band."
+            },
+            "highFreq": {
+                "description": "Centre frequency of the high-frequency band in Hz. Default: 5000 Hz."
+            },
+            "highGain": {
+                "description": "Gain of the high-frequency band in dB."
+            },
+            "highQ": {
+                "description": "Q factor of the high-frequency band."
+            }
+        },
+        "examples": [
+            {
+                "title": "Bass boost",
+                "description": "AudioFile → Equalizer(lowFreq=100, lowGain=+6 dB, lowQ=0.7) → Speaker Boosts bass by 6 dB around 100 Hz while leaving mid and high frequencies unchanged."
+            },
+            {
+                "title": "Frequency response plot",
+                "description": "NoiseGenerator(white) → Equalizer(midFreq=1000, midGain=−10 dB, midQ=2) → SpectrumAnalyzer A narrow 10 dB notch at 1 kHz is visible in the spectrum."
+            }
+        ]
+    },
+    "reverb": {
+        "title": "Schroeder Reverberator",
+        "purpose": "Simulates the acoustic reverberation of a room by passing the signal through a Schroeder reverberator — the classic artificial reverb topology. Used to add spatial depth to audio signals, simulate room acoustics, or generate test signals with controlled reverberation characteristics.",
+        "algorithm": "The Schroeder reverberator consists of: 1. Four parallel comb filters (feedback delays at 1557, 1617, 1491, 1422 samples at 48 kHz, scaled by roomSize). Each comb filter is: y[n] = x[n − d] + feedback · y[n − d], with a first-order IIR damping filter in the feedback path controlled by the damping parameter. 2. The four comb outputs are averaged and fed into two serial allpass filters (delays 225 and 556 samples, gain 0.5): y[n] = −g·x[n] + x[n−d] + g·y[n−d]. 3. Dry/wet mixing: output = dry·(1−mix) + wet·mix.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — mix of dry and reverberated signal)",
+        "params": {
+            "roomSize": {
+                "description": "Simulated room size. Range: 0.0–1.0. Scales the comb filter delay lengths and feedback coefficient (0.7 at roomSize=0, 0.98 at roomSize=1). Larger values produce longer, more diffuse reverberation tails."
+            },
+            "damping": {
+                "description": "High-frequency damping in the comb filter feedback loops. Range: 0.0–1.0. Higher values attenuate high frequencies faster, simulating sound-absorbing room surfaces."
+            },
+            "mix": {
+                "description": "Dry/wet mix ratio. Range: 0.0–1.0. 0 = fully dry (no reverb), 0.3 = subtle room ambience, 1.0 = fully wet (100% reverb)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Room ambience",
+                "description": "AudioFile → Reverb(roomSize=0.5, damping=0.4, mix=0.25) → Speaker Adds natural room reverberation to a dry recording."
+            },
+            {
+                "title": "Large hall effect",
+                "description": "Sine(440 Hz) → Reverb(roomSize=0.9, damping=0.2, mix=0.7) → Oscilloscope Long decay tail visible on the oscilloscope after the sine is muted."
+            }
+        ]
+    },
+    "quantizer": {
+        "title": "Quantizer (ADC Emulator)",
+        "purpose": "Quantises the input signal to a finite number of levels corresponding to an N-bit ADC. Allows studying quantisation noise, staircase distortion, and the effect of bit-depth reduction on signal quality — important for fixed-point DSP design and audio dithering.",
+        "algorithm": "The number of quantisation levels is L = 2^bits. The input is clamped to [−1, 1]. Two modes: Mid-rise (no zero level): the positive and negative halves each contain L/2 levels, output = (floor(x · L/2) + 0.5) / (L/2). Mid-tread (zero level present): output = round(x · (L/2 − 1)) / (L/2 − 1), which places a quantisation level exactly at zero. The output is clamped to [−1, 1].",
+        "inputDescription": "real (Float32Array of length chunkSize, values should be in [−1, 1] for meaningful results)",
+        "outputDescription": "real (Float32Array — quantised signal with values on a uniform grid of 2^bits levels)",
+        "params": {
+            "bits": {
+                "description": "Number of quantisation bits. Range: 1–16. 1 bit = 2 levels (comparator), 8 bits = 256 levels (CD-quality at low rate), 16 bits = 65536 levels (CD audio). Each additional bit adds 6 dB of dynamic range."
+            },
+            "quantizerType": {
+                "description": "'mid-tread' — quantisation levels include zero (standard for most ADC designs). 'mid-rise' — levels are offset by half a step so zero is not representable (common in two's-complement ADCs)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Quantisation noise spectrum",
+                "description": "Sine(997 Hz) → Quantizer(bits=4, mid-tread) → SpectrumAnalyzer With 4-bit quantisation, harmonic distortion products are visible at harmonics of 997 Hz."
+            },
+            {
+                "title": "Bit-depth comparison",
+                "description": "AudioFile → Quantizer(bits=3) → Speaker Degraded 3-bit audio demonstrates the audible granular noise of low-resolution quantisation."
+            }
+        ]
+    },
+    "sample-hold": {
+        "title": "Sample and Hold",
+        "purpose": "Emulates a sample-and-hold (S&H) circuit that samples the input at regular intervals and holds the value until the next sample. Used to demonstrate aliasing and the effect of reduced effective sample rate; also models zero-order hold (ZOH) reconstruction in DAC analysis.",
+        "algorithm": "An internal counter increments each sample. When it reaches zero (at the start of each period), the current input value is latched into heldValue. The output equals heldValue for all samples in the period. The counter wraps from holdPeriod − 1 to 0.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — staircase waveform: constant within each holdPeriod-sample interval)",
+        "params": {
+            "holdPeriod": {
+                "description": "Sampling period in samples. 1 = pass-through (no effect). 10 = sample every 10th input value, creating a staircase with steps 10 samples wide. At 48000 Hz, holdPeriod=480 samples the signal at 100 Hz."
+            }
+        },
+        "examples": [
+            {
+                "title": "Aliasing demonstration",
+                "description": "Sine(1000 Hz) → SampleHold(holdPeriod=24) → SpectrumAnalyzer The effective sample rate is 48000/24 = 2000 Hz; the 1000 Hz signal is at the Nyquist limit, producing a very degraded output."
+            },
+            {
+                "title": "Staircase waveform",
+                "description": "Sine(100 Hz) → SampleHold(holdPeriod=48) → Oscilloscope A coarsely sampled staircase approximation of the sine wave is visible."
+            }
+        ]
+    },
+    "convolution": {
+        "title": "Convolution",
+        "purpose": "Computes the linear convolution of two signals: y[n] = Σ x₁[k] · x₂[n−k]. Convolution is the fundamental operation linking a system's input to its output via the impulse response. This block is used for manual FIR filtering, cross-correlation experiments, and demonstrating the convolution theorem.",
+        "algorithm": "Direct (brute-force) convolution in 'same' mode: the output length equals the input signal length. The kernel is aligned at its centre (halfKer = floor(kerLen / 2)) so the zero-delay sample is centred. For each output index n, the sum runs over all kernel taps k where the input index (n − halfKer + k) is valid. Optional energy normalisation divides each output sample by √(Σ kernel²) to make the result independent of kernel scale.",
+        "inputDescription": "- Input 0: real — signal x₁ (the primary input). - Input 1: real — kernel x₂ (typically the impulse response or matched filter template).",
+        "outputDescription": "real (Float32Array of length chunkSize — convolution result in 'same' mode)",
+        "params": {
+            "normalize": {
+                "description": "When true, the output is divided by the square root of the kernel energy, making the result independent of the kernel's absolute scale. Useful when comparing convolutions with different kernel magnitudes."
+            }
+        },
+        "examples": [
+            {
+                "title": "Manual FIR filtering",
+                "description": "Sine(2000 Hz) → Convolution ← Impulse → LowpassFIR → [as kernel input]; Convolution output → Oscilloscope. Demonstrates that convolving a signal with the FIR impulse response is equivalent to filtering."
+            },
+            {
+                "title": "Cross-correlation",
+                "description": "Signal → Convolution(input 0) ← time-reversed template (input 1) Convolution with a time-reversed template computes cross-correlation, equivalent to matched filtering."
+            }
+        ]
+    },
+    "wavelet-transform": {
+        "title": "Wavelet Transform (Haar DWT)",
+        "purpose": "Computes the Discrete Wavelet Transform (DWT) using the Haar wavelet, decomposing the signal into approximation and detail coefficients at multiple scales. Unlike the FFT which has fixed time-frequency resolution, the DWT provides good time resolution at high frequencies and good frequency resolution at low frequencies — ideal for analysing transients, detecting discontinuities, and multi-scale signal analysis.",
+        "algorithm": "1. The input is zero-padded to the next power of 2. 2. At each of the 'levels' decomposition levels, the current array is split into: cA[k] = (x[2k] + x[2k+1]) / √2 (low-pass) and cD[k] = (x[2k] − x[2k+1]) / √2 (high-pass). 3. The detail coefficients cD are saved; the approximation cA is fed to the next level. 4. The output is packed as [cA_L | cD_L | cD_{L−1} | … | cD_1], where cA_L is the coarsest approximation and cD_1 are the finest-scale details.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array of length chunkSize — DWT coefficients in standard packing: [cA_L | cD_L | … | cD_1])",
+        "params": {
+            "levels": {
+                "description": "Number of decomposition levels. Range: 1 to log₂(chunkSize). Level 1 produces 2 sub-bands; level 3 produces 4. More levels reveal lower-frequency detail but reduce time resolution for the approximation."
+            },
+            "wavelet": {
+                "description": "Wavelet basis. Currently only 'haar' is supported. The Haar wavelet is the simplest orthogonal wavelet and is equivalent to a two-tap averaging and differencing filter bank."
+            }
+        },
+        "examples": [
+            {
+                "title": "Multi-scale analysis",
+                "description": "Sine(100 Hz) → WaveletTransform(levels=3) → Oscilloscope The packed coefficients show energy concentrated in the cA_3 (approximation) region."
+            },
+            {
+                "title": "Transient detection",
+                "description": "Step(stepTime=0.01 s) → WaveletTransform(levels=4) → Oscilloscope A spike in the detail coefficients (cD bands) marks the position of the step."
+            }
+        ]
+    },
+    "cepstrum": {
+        "title": "Cepstrum",
+        "purpose": "Computes the real cepstrum of the input signal: c[n] = Re(IFFT(log(|FFT(x)|²))). The cepstrum operates in the 'quefrency' domain, where periodicities in the spectrum (caused by harmonics, echoes, or source-filter separation) appear as peaks. Applications include pitch detection, echo detection, and speech source-filter analysis.",
+        "algorithm": "1. A Hann window is applied to the input chunk to reduce spectral leakage. 2. The windowed signal is zero-padded to the next power of 2. 3. FFT is computed. 4. Log power spectrum: log(|X[k]|² + ε) is computed for each bin (ε = 1e-20 prevents log(0)). 5. IFFT of the log spectrum is computed. 6. The real part of the result is the real cepstrum. Peaks in the output at quefrency q correspond to periodicities with period q samples in the frequency domain, i.e., a fundamental frequency of sampleRate / q Hz.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array of length chunkSize — cepstral coefficients in quefrency order; quefrency index q corresponds to frequency sampleRate/q Hz)",
+        "params": {
+            "windowSize": {
+                "description": "Analysis window length in samples. The FFT is performed on min(windowSize, chunkSize) samples zero-padded to the next power of 2. Larger windows give finer quefrency resolution. Default: 1024."
+            }
+        },
+        "examples": [
+            {
+                "title": "Pitch detection via cepstrum",
+                "description": "Sine(440 Hz) → Cepstrum(windowSize=2048) → Oscilloscope A peak appears at quefrency ≈ 48000/440 ≈ 109 samples, corresponding to the 440 Hz pitch."
+            },
+            {
+                "title": "Echo delay measurement",
+                "description": "Sine(1000 Hz) + DelayLine(200 samples, gain=0.5) → Cepstrum → Oscilloscope A peak at quefrency 200 reveals the echo delay."
+            }
+        ]
+    },
+    "power-meter": {
+        "title": "Power Meter",
+        "purpose": "Measures the power of the input signal and displays RMS level, peak level, average absolute value, and dBFS (decibels relative to full scale). This is a standard measurement block for audio level metering and signal power monitoring.",
+        "algorithm": "For each chunk: RMS = √(Σ x²[n] / N); peak = max(|x[n]|); average = Σ |x[n]| / N; dBFS = 20·log₁₀(RMS). The measurements are returned as a data object for display in the visualisation panel. No state is retained between chunks — each chunk is measured independently.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "none (visualisation block — displays RMS, peak, average, and dBFS in the block panel)",
+        "params": {},
+        "examples": [
+            {
+                "title": "Signal level monitoring",
+                "description": "Sine(1000 Hz, amplitude=0.5) → PowerMeter Expected RMS ≈ 0.354 (0.5/√2), dBFS ≈ −9 dB."
+            },
+            {
+                "title": "Noise power measurement",
+                "description": "NoiseGenerator(white, amplitude=0.1) → PowerMeter Measures the actual RMS of the white noise generator output."
+            }
+        ]
+    },
+    "snr-meter": {
+        "title": "SNR Meter",
+        "purpose": "Measures the Signal-to-Noise Ratio in dB by comparing a noisy signal with a clean reference signal. The noise is estimated as the difference between the two inputs: noise = signal − reference. This block is useful for evaluating the performance of noise reduction, channel coding, or any block that modifies signal quality.",
+        "algorithm": "For each chunk, the reference power P_ref = Σ ref²[n] / N and the noise power P_noise = Σ (sig[n] − ref[n])² / N are computed. SNR = 10·log₁₀(P_ref / P_noise) dB. If P_noise < 1e-20, SNR is reported as Infinity. Both inputs must be connected for a valid measurement.",
+        "inputDescription": "- Input 0 'Signal': real — the noisy or processed signal. - Input 1 'Reference': real — the clean reference signal (ideally the same signal before degradation).",
+        "outputDescription": "none (visualisation block — displays SNR in dB, signal power, and noise power)",
+        "params": {},
+        "examples": [
+            {
+                "title": "Measuring channel SNR",
+                "description": "Sine(1000 Hz) → [SNR Input 0 (noisy)]; Sine(1000 Hz) → AWGNChannel(SNR=15 dB) → [SNR Input 0]; Sine(1000 Hz) → [SNR Reference Input 1]; SNRMeter displays the actual SNR of the AWGN channel."
+            },
+            {
+                "title": "Filter SNR improvement",
+                "description": "Sine(500 Hz) → AWGNChannel(SNR=5 dB) → LowpassFIR(cutoff 1000 Hz) → [SNRMeter signal]; Sine(500 Hz) → [SNRMeter reference]; The filter narrows the noise bandwidth and the measured SNR increases."
+            }
+        ]
+    },
+    "ber-counter": {
+        "title": "BER Counter",
+        "purpose": "Measures the Bit Error Rate (BER) by comparing transmitted and received bit streams sample by sample. BER is the primary performance metric for digital communication systems. The block accumulates bit decisions over the entire simulation run to provide a statistically reliable estimate.",
+        "algorithm": "Each input sample is thresholded to a binary decision: bit = 1 if value > threshold, else 0. The Tx (input 0) and Rx (input 1) bits are compared; any mismatch is counted as an error. Cumulative counters state.totalBits and state.errorBits are maintained across chunks. BER = errorBits / totalBits. The state is cleared when the simulation is reset.",
+        "inputDescription": "- Input 0 'Tx': real — transmitted bit stream (from modulator or reference). - Input 1 'Rx': real — received bit stream (from demodulator after the channel).",
+        "outputDescription": "none (visualisation block — displays BER, total bits counted, and error bit count)",
+        "params": {
+            "threshold": {
+                "description": "Decision threshold for binarising each sample. Samples above threshold are treated as a '1' bit, samples below as '0'. Default: 0.5 (suitable for signals normalised to [0, 1])."
+            }
+        },
+        "examples": [
+            {
+                "title": "16-QAM BER measurement",
+                "description": "QAMModulator(16QAM) → AWGNChannel(SNR=15 dB) → QAMDemodulator(hard) → [BER Rx]; QAMModulator (clean copy) → [BER Tx]; BERCounter displays the measured BER."
+            },
+            {
+                "title": "BER vs SNR sweep",
+                "description": "Change the AWGN SNR from 5 to 30 dB in steps, restarting the simulation each time, and record the BER from BERCounter to build a BER curve."
+            }
+        ]
+    },
+    "histogram": {
+        "title": "Histogram",
+        "purpose": "Displays the amplitude distribution (probability density function estimate) of the input signal. The histogram shape reveals the statistical nature of the signal: Gaussian noise produces a bell curve, uniform noise produces a flat rectangle, a pure sine produces a U-shaped arcsine distribution.",
+        "algorithm": "For each chunk the minimum and maximum values are found. The amplitude range is divided into numBins equal-width bins. Each sample is assigned to a bin: idx = floor((x − min) / binWidth). The bin counts are normalised by the chunk size to give a fraction-of-total representation. The range is expanded by ±0.5 if all samples are identical to prevent division by zero.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "none (visualisation block — displays a bar chart of amplitude distribution)",
+        "params": {
+            "bins": {
+                "description": "Number of histogram bins. Range: 4–256. More bins give finer amplitude resolution but require more data for smooth estimates. Default: 64."
+            }
+        },
+        "examples": [
+            {
+                "title": "Gaussian noise distribution",
+                "description": "NoiseGenerator(white, Gaussian via AWGN trick) → Histogram(bins=64) The histogram shows a bell curve, confirming Gaussian amplitude distribution."
+            },
+            {
+                "title": "Comparing signal distributions",
+                "description": "Sine(1000 Hz) → Histogram(bins=64) Sine wave produces the characteristic arcsine (U-shaped) distribution with peaks near ±amplitude."
+            }
+        ]
+    },
+    "eye-diagram": {
+        "title": "Eye Diagram",
+        "purpose": "Displays the eye diagram of a digital signal by overlaying consecutive symbol intervals on a single plot. An open 'eye' indicates low inter-symbol interference (ISI) and good timing margin; a closed or distorted eye indicates ISI, noise, or timing jitter. The eye diagram is the standard tool for evaluating digital communication link quality.",
+        "algorithm": "The input chunk is divided into non-overlapping segments of samplesPerSymbol length. Two symbol periods (2 × samplesPerSymbol samples) are captured per trace to show the full symbol transition pattern. Each trace is stored as a separate Float32Array and passed to the visualisation component, which overlays them on a single time axis. The number of displayed traces is floor(chunkSize / samplesPerSymbol).",
+        "inputDescription": "real (Float32Array of length chunkSize — baseband signal after the receive filter, before the decision device)",
+        "outputDescription": "none (visualisation block — displays overlaid symbol traces)",
+        "params": {
+            "samplesPerSymbol": {
+                "description": "Number of samples per modulation symbol. Must match the transmitter's oversampling rate. For a symbol rate of 1000 baud at 48000 Hz sample rate, set samplesPerSymbol = 48. Range: 2 and above."
+            }
+        },
+        "examples": [
+            {
+                "title": "Eye diagram after pulse shaping",
+                "description": "QAMModulator(symbolRate=1000) → PulseShaper(RRC, sps=4) → [real part via RealPart] → EyeDiagram(samplesPerSymbol=4) A wide-open eye confirms ISI-free transmission at the optimal sampling instant."
+            },
+            {
+                "title": "ISI effect visualisation",
+                "description": "QAMModulator(symbolRate=1000) → MultipathChannel(delays='0,2', gains='1.0,0.5') → EyeDiagram(sps=48) The eye closes due to inter-symbol interference from the multipath channel."
+            }
+        ]
+    },
+    "thd-meter": {
+        "title": "THD Meter",
+        "purpose": "Measures Total Harmonic Distortion (THD) of the input signal — the ratio of the power in all harmonic components to the power of the fundamental frequency. THD is the key metric for evaluating the linearity of amplifiers, ADCs, DACs, and nonlinear DSP systems.",
+        "algorithm": "1. The input is zero-padded or truncated to fftSize and an FFT is performed. 2. The magnitudes of all positive-frequency bins are computed. 3. The fundamental is the bin with maximum magnitude (DC excluded). 4. For each harmonic h = 2, 3, 4, … up to the Nyquist bin, the magnitude at bin h·fundBin is collected. 5. THD = √(Σ harmonic_magnitudes²) / fundamental_magnitude × 100%. 6. THD in dB = 20·log₁₀(THD/100). Output includes fundamental frequency, THD%, THD dB, and an array of harmonic frequencies and magnitudes.",
+        "inputDescription": "real (Float32Array of length chunkSize — signal whose harmonic content is to be measured)",
+        "outputDescription": "none (visualisation block — displays fundamental frequency, THD%, THD dB, and harmonic table)",
+        "params": {
+            "fftSize": {
+                "description": "FFT size for harmonic analysis. Larger values improve frequency resolution (Δf = sampleRate/fftSize) and reduce harmonic overlap. Must be a power of 2. Default: 4096 gives Δf ≈ 11.7 Hz at 48000 Hz."
+            }
+        },
+        "examples": [
+            {
+                "title": "Amplifier distortion test",
+                "description": "Sine(1000 Hz) → [nonlinear block / Compressor] → THDMeter(fftSize=4096) Measures how much harmonic distortion the nonlinear processing introduces."
+            },
+            {
+                "title": "Clean signal baseline",
+                "description": "Sine(1000 Hz, amplitude=0.5) → THDMeter The ideal sine should show THD below 0.01% (limited by floating-point precision)."
+            }
+        ]
+    },
+    "pole-zero-diagram": {
+        "title": "Pole-Zero Diagram",
+        "purpose": "A parametric visualisation block that computes and displays the poles and zeros of a discrete-time transfer function H(z) = B(z)/A(z) from user-supplied polynomial coefficients. The pole-zero plot is the primary tool for analysing filter stability, frequency response shape, and phase characteristics.",
+        "algorithm": "The numerator (zeros) and denominator (poles) coefficient strings are parsed into numeric arrays. Roots are found analytically for polynomials of degree ≤ 2 (linear equation, quadratic formula). For degree ≥ 3 the Durand-Kerner iterative method initialises N guesses on the unit circle and converges to the roots of the monic polynomial. Stability is determined by checking that all poles satisfy |p| < 1.0 (inside the unit circle).",
+        "inputDescription": "none (parametric block — no signal input)",
+        "outputDescription": "none (visualisation block — displays poles (×) and zeros (○) on the complex z-plane with the unit circle)",
+        "params": {
+            "numerator": {
+                "description": "Coefficients of the numerator polynomial B(z), comma-separated in descending power order: 'b0, b1, b2, …'. Example: '1,0,-1' represents B(z) = 1 − z⁻². The roots of B(z) are the zeros of H(z)."
+            },
+            "denominator": {
+                "description": "Coefficients of the denominator polynomial A(z), comma-separated. Example: '1,-1.5,0.7' represents A(z) = 1 − 1.5z⁻¹ + 0.7z⁻². The roots of A(z) are the poles of H(z)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Second-order IIR filter analysis",
+                "description": "PoleZeroDiagram(numerator='1,0,-1', denominator='1,-1.5,0.7') Shows two zeros on the real axis and a complex pole pair inside the unit circle (stable filter)."
+            },
+            {
+                "title": "Stability boundary check",
+                "description": "Set denominator='1,-1.8,0.95' to place poles near the unit circle. The diagram shows the poles almost touching the unit circle, indicating a highly resonant (but stable) filter."
+            }
+        ]
+    },
+    "phase-portrait": {
+        "title": "Phase Portrait",
+        "purpose": "Visualises the trajectory of a complex signal in the I-Q (state space) plane. Unlike the Constellation diagram which shows discrete symbol samples, the phase portrait shows the continuous signal path, revealing the dynamics of a modulated signal, the attractor of a nonlinear system, or the trajectory of a PLL during acquisition.",
+        "algorithm": "The block is a transparent passthrough: it receives the complex I/Q input, passes the raw interleaved Float32Array directly to the visualisation component, and returns it without modification. The visualisation component plots I (horizontal) vs Q (vertical) for the last trailLength samples, fading older points.",
+        "inputDescription": "complex (interleaved Float32Array of length chunkSize × 2 — I/Q signal to be plotted)",
+        "outputDescription": "none (visualisation block — displays I vs Q scatter/trajectory plot)",
+        "params": {
+            "trailLength": {
+                "description": "Number of most recent I/Q samples to display. Longer trails show more history but can obscure recent trajectory. Default: 2048."
+            },
+            "dotSize": {
+                "description": "Radius of each plotted point in pixels. Larger dots are easier to see for sparse constellations; smaller dots give finer trajectory detail. Default: 2."
+            }
+        },
+        "examples": [
+            {
+                "title": "QPSK signal trajectory",
+                "description": "PSKModulator(QPSK, fc=1000 Hz) → PhasePortrait The trajectory shows the four constellation points connected by the inter-symbol transition paths."
+            },
+            {
+                "title": "PLL acquisition trajectory",
+                "description": "Sine(1050 Hz) → ComplexComposer → CarrierRecovery(fc=1000, BW=100) → [NCO output] → PhasePortrait The NCO trajectory spirals inward to the unit circle as the loop acquires lock."
+            }
+        ]
+    },
+    "group-delay-plot": {
+        "title": "Group Delay Plot",
+        "purpose": "Computes and displays the group delay of the input signal as a function of frequency. Group delay τ(f) = −dφ/dω is the frequency-dependent propagation delay of a signal's envelope through a system. Non-constant group delay (group delay distortion) causes different frequency components to arrive at different times, which is audible as phase distortion and degrades digital communication eye diagrams.",
+        "algorithm": "1. The input chunk is zero-padded/truncated to fftSize and FFT-transformed. 2. The phase φ[k] = atan2(imag[k], real[k]) is computed for each positive-frequency bin. 3. Phase unwrapping corrects 2π jumps between consecutive bins. 4. Group delay is estimated by finite difference: τ[k] = −(φ[k] − φ[k−1]) / (2π/N), where 2π/N is the angular frequency step between bins. Results are returned in samples; multiply by 1/sampleRate to convert to seconds.",
+        "inputDescription": "real (Float32Array of length chunkSize — typically the output of a filter whose group delay is to be measured, driven by a broadband signal such as white noise or a chirp)",
+        "outputDescription": "none (visualisation block — displays group delay in samples vs frequency in Hz)",
+        "params": {
+            "fftSize": {
+                "description": "FFT size for analysis. Larger values give finer frequency resolution (Δf = sampleRate/fftSize) but average over a longer time window. Default: 1024."
+            }
+        },
+        "examples": [
+            {
+                "title": "Linear-phase FIR group delay",
+                "description": "NoiseGenerator(white) → LowpassFIR(cutoff 2000 Hz, 64 taps) → GroupDelayPlot(fftSize=1024) A linear-phase FIR filter shows constant group delay (flat horizontal line) in the passband."
+            },
+            {
+                "title": "IIR phase distortion",
+                "description": "NoiseGenerator(white) → IIRFilter(Butterworth lowpass) → GroupDelayPlot The Butterworth filter shows large group delay variation near the cutoff frequency."
+            }
+        ]
+    },
+    "allpass-filter": {
+        "title": "Allpass Filter",
+        "purpose": "A filter with unity magnitude response (|H(f)| = 1 for all frequencies) that modifies only the phase relationships between frequency components. Allpass filters are building blocks of phase equalisers, reverberation algorithms, phaser effects, and group delay correction. Unlike conventional filters, they do not attenuate or boost any frequency — they only shift phase.",
+        "algorithm": "A cascade of 2nd-order biquad sections is used. Each section implements an allpass design: w₀ = 2π·fc/fs; α = sin(w₀)/(2Q); b₀ = (1−α)/a₀; b₁ = −2cos(w₀)/a₀; b₂ = (1+α)/a₀ = a₂_normalised; a₁ = −2cos(w₀)/a₀; a₂ = (1−α)/a₀ (note: for allpass b0 = a2_norm and b2 = a0_norm). The number of sections is floor(order/2). Cascading sections increases the total phase swing by 360° per section near the centre frequency.",
+        "inputDescription": "real (Float32Array of length chunkSize)",
+        "outputDescription": "real (Float32Array — phase-shifted signal with identical amplitude to the input)",
+        "params": {
+            "centerFrequency": {
+                "description": "Centre frequency of the phase transition in Hz. At this frequency a single 2nd-order section produces a phase shift of −180°. Range: 1 Hz to sampleRate/2."
+            },
+            "bandwidth": {
+                "description": "Q factor controlling the sharpness of the phase transition. Higher Q gives a steeper phase transition concentrated near the centre frequency. Low Q (< 0.5) gives a very gradual phase shift spread across a wide frequency range."
+            },
+            "order": {
+                "description": "Filter order — must be even. Number of biquad sections = order/2. Each section adds 360° of total phase swing near the centre frequency. Range: 2–20. Default: 2 (one biquad section, −360° total phase range)."
+            }
+        },
+        "examples": [
+            {
+                "title": "Phaser audio effect",
+                "description": "AudioFile → AllpassFilter(fc=500 Hz, Q=1.0, order=4) → Summer(with dry signal) → Speaker Mixing the allpass output with the dry signal creates notches in the spectrum characteristic of a phaser effect."
+            },
+            {
+                "title": "Group delay correction",
+                "description": "Signal → IIRFilter(lowpass) → AllpassFilter(fc=1000 Hz, Q=0.7, order=2) → GroupDelayPlot The allpass compensates for the non-linear phase of the IIR filter, flattening the group delay."
+            }
+        ]
     }
 }
