@@ -83,11 +83,15 @@ const FSKDemodulatorPlugin = {
 
                 // Mix down to f0
                 state.phase0 += omega0;
+                if (state.phase0 > Math.PI) state.phase0 -= 2 * Math.PI;
+                else if (state.phase0 < -Math.PI) state.phase0 += 2 * Math.PI;
                 const mix0I = inI * Math.cos(state.phase0) - inQ * Math.sin(state.phase0);
                 const mix0Q = inI * Math.sin(state.phase0) + inQ * Math.cos(state.phase0);
 
                 // Mix down to f1
                 state.phase1 += omega1;
+                if (state.phase1 > Math.PI) state.phase1 -= 2 * Math.PI;
+                else if (state.phase1 < -Math.PI) state.phase1 += 2 * Math.PI;
                 const mix1I = inI * Math.cos(state.phase1) - inQ * Math.sin(state.phase1);
                 const mix1Q = inI * Math.sin(state.phase1) + inQ * Math.cos(state.phase1);
 
@@ -101,10 +105,6 @@ const FSKDemodulatorPlugin = {
                 // Decision
                 output[i] = state.env1 > state.env0 ? 1 : -1;
             }
-
-            // Wrap phases
-            if (state.phase0 > 1e6 || state.phase0 < -1e6) state.phase0 = state.phase0 % (2 * Math.PI);
-            if (state.phase1 > 1e6 || state.phase1 < -1e6) state.phase1 = state.phase1 % (2 * Math.PI);
 
             return output;
         }

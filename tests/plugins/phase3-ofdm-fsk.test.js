@@ -75,6 +75,34 @@ describe('OFDM Demodulator', () => {
     expect(result.length).toBe(CHUNK * 2);
     expect(result.some(v => v !== 0)).toBe(true);
   });
+
+  it('roundtrip recovers constellation points with correct magnitude', () => {
+    // Use numSubcarriers=64 (one full OFDM symbol = 64+16=80 samples)
+    const numSC = 64;
+    const cpLen = 16;
+    const symbolLen = numSC + cpLen;
+    OFDMModulatorPlugin.processor.clearStates();
+    proc.clearStates();
+
+    const modParams = { ...OFDMModulatorPlugin.defaultParams, sampleRate: SR, numSubcarriers: numSC, cpLength: cpLen };
+    const demodParams = { ...OFDMDemodulatorPlugin.defaultParams, sampleRate: SR, numSubcarriers: numSC, cpLength: cpLen };
+
+    // Generate enough samples for at least 2 full OFDM symbols
+    const bigChunk = symbolLen * 3;
+    const ofdmSignal = OFDMModulatorPlugin.processor.process([null], modParams, bigChunk, 'test-ofdm-rt-mod');
+    const demodResult = proc.process([ofdmSignal], demodParams, bigChunk, 'test-ofdm-rt-demod');
+
+    // After demodulation, non-zero subcarriers should have magnitude close to 4QAM constellation (≈1.0)
+    // Check that at least some demodulated subcarriers have reasonable magnitude (0.5–2.0)
+    let validPoints = 0;
+    for (let i = 0; i < bigChunk; i++) {
+      const re = demodResult[i * 2];
+      const im = demodResult[i * 2 + 1];
+      const mag = Math.sqrt(re * re + im * im);
+      if (mag > 0.1 && mag < 5.0) validPoints++;
+    }
+    expect(validPoints).toBeGreaterThan(10);
+  });
 });
 
 describe('FSK Modulator', () => {

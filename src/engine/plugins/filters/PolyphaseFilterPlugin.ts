@@ -35,6 +35,7 @@ interface PolyphaseState {
     polyCoeffs: Float32Array[]; // L phases, each with numTaps/L coefficients
     cachedKey: string;
     phase: number; // for downsample: tracks input phase
+    accumulator: number; // for downsample: sum of branch contributions
 }
 
 function designPolyphaseCoeffs(factor: number, numTaps: number): Float32Array[] {
@@ -113,7 +114,8 @@ const PolyphaseFilterPlugin = {
                     histPos: 0,
                     polyCoeffs,
                     cachedKey: key,
-                    phase: 0
+                    phase: 0,
+                    accumulator: 0
                 });
             }
             const state = this.states.get(nodeId)!;
@@ -125,6 +127,7 @@ const PolyphaseFilterPlugin = {
                 state.histPos = 0;
                 state.cachedKey = key;
                 state.phase = 0;
+                state.accumulator = 0;
             }
 
             const output = new Float32Array(chunkSize);
@@ -151,23 +154,27 @@ const PolyphaseFilterPlugin = {
                     }
                 }
             } else {
-                // Downsample: take every factor-th input, filtered
+                // Downsample: accumulate all polyphase branches, output every factor-th sample
                 let outIdx = 0;
                 for (let i = 0; i < input.length && outIdx < chunkSize; i++) {
                     hist[state.histPos] = input[i];
                     state.histPos = (state.histPos + 1) % tapsPerPhase;
-                    state.phase++;
 
+                    // Accumulate contribution from current polyphase branch
+                    const branchIdx = state.phase;
+                    const coeffs = state.polyCoeffs[branchIdx];
+                    let branchSum = 0;
+                    for (let k = 0; k < tapsPerPhase; k++) {
+                        const idx = (state.histPos + tapsPerPhase - 1 - k) % tapsPerPhase;
+                        branchSum += hist[idx] * coeffs[k];
+                    }
+                    state.accumulator += branchSum;
+
+                    state.phase++;
                     if (state.phase >= factor) {
                         state.phase = 0;
-                        // Use phase 0 for downsample filter
-                        const coeffs = state.polyCoeffs[0];
-                        let acc = 0;
-                        for (let k = 0; k < tapsPerPhase; k++) {
-                            const idx = (state.histPos + tapsPerPhase - 1 - k) % tapsPerPhase;
-                            acc += hist[idx] * coeffs[k];
-                        }
-                        output[outIdx++] = acc;
+                        output[outIdx++] = state.accumulator / factor;
+                        state.accumulator = 0;
                     }
                 }
             }

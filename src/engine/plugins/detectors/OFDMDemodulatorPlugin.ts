@@ -108,13 +108,12 @@ const OFDMDemodulatorPlugin = {
 
                     fft(real, imag);
 
-                    // Scale by 1/N for proper normalization
-                    const invN = 1 / numSC;
-                    // Output demodulated subcarriers
+                    // No 1/N scaling: modulator's IFFT already includes 1/N,
+                    // so FFT here recovers the original subcarrier values
                     state.outputBuffer = new Float32Array(numSC * 2);
                     for (let k = 0; k < numSC; k++) {
-                        state.outputBuffer[k * 2] = real[k] * invN;
-                        state.outputBuffer[k * 2 + 1] = imag[k] * invN;
+                        state.outputBuffer[k * 2] = real[k];
+                        state.outputBuffer[k * 2 + 1] = imag[k];
                     }
                     state.outputPos = 0;
                     state.inputPos = 0;

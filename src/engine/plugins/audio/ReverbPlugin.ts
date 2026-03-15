@@ -131,14 +131,15 @@ const ReverbPlugin = {
 
                 wet *= 0.25; // average of 4 combs
 
-                // 2 serial allpass filters
+                // 2 serial allpass filters: y = -g*x + buf[n-d], buf[n] = x + g*buf[n-d]
                 for (let a = 0; a < 2; a++) {
                     const buf = state.allpassBuffers[a];
                     const pos = state.allpassPositions[a];
                     const delayed = buf[pos];
 
+                    const apOut = -ALLPASS_GAIN * wet + delayed;
                     buf[pos] = wet + ALLPASS_GAIN * delayed;
-                    wet = delayed - ALLPASS_GAIN * (wet + ALLPASS_GAIN * delayed);
+                    wet = apOut;
                     state.allpassPositions[a] = (pos + 1) % buf.length;
                 }
 
