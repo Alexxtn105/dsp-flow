@@ -143,9 +143,9 @@ const PLLPlugin = {
                 // 5. NCO — обновление фазы
                 state.ncoPhase += basePhaseIncrement + loopOutput;
 
-                // Нормализация фазы
-                if (state.ncoPhase >= 2 * Math.PI) state.ncoPhase -= 2 * Math.PI;
-                else if (state.ncoPhase < 0) state.ncoPhase += 2 * Math.PI;
+                // Нормализация фазы (while для больших скачков)
+                while (state.ncoPhase >= 2 * Math.PI) state.ncoPhase -= 2 * Math.PI;
+                while (state.ncoPhase < 0) state.ncoPhase += 2 * Math.PI;
 
                 // 6. Выходы
                 ncoOutput[i * 2] = Math.cos(state.ncoPhase);

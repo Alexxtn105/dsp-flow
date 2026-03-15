@@ -27,9 +27,9 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 - **filters/** (22) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter, PulseShaper, LMSFilter, RLSFilter, MatchedFilter, ZFEqualizer, PIDController, PolyphaseFilter, FractionalDelay, AllpassFilter
 - **analysis/** (2 файла, входят в другие группы) — SpectrumAnalyzer (группа visualization), Correlator (группа real-math)
 - **detectors/** (16) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery, QAMDemodulator, OFDMDemodulator, FSKDemodulator, PeakDetector, PitchDetector, ZeroCrossing, CarrierRecovery, FrameSync, CFARDetector
-- **math/** (24 файла) — разделены на две группы в toolbar:
+- **math/** (28 файлов) — разделены на две группы в toolbar:
   - *complex-math* (11): ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealPart, ImagPart, Mixer
-  - *real-math* (16 + Correlator из analysis/): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator, Quantizer, SampleHold, Convolution, WaveletTransform, Cepstrum
+  - *real-math* (17 + Correlator из analysis/): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator, Quantizer, SampleHold, Convolution, WaveletTransform, Cepstrum
 - **visualization/** (15) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer, PowerMeter, SNRMeter, BERCounter, Histogram, EyeDiagram, THDMeter, PoleZeroDiagram, PhasePortrait, GroupDelayPlot
 - **audio/** (3) — Compressor, Equalizer, Reverb
 - **output/** (1) — Speaker
