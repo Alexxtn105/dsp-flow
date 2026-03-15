@@ -31,6 +31,8 @@ export const DSP_BLOCK_TYPES = {
     MATCHED_FILTER: 'matched-filter',
     ZF_EQUALIZER: 'zf-equalizer',
     PID_CONTROLLER: 'pid-controller',
+    POLYPHASE_FILTER: 'polyphase-filter',
+    FRACTIONAL_DELAY: 'fractional-delay',
 
     // Генераторы
     CONSTANT: 'constant',
@@ -48,6 +50,8 @@ export const DSP_BLOCK_TYPES = {
     IMPULSE: 'impulse',
     CHIRP: 'chirp',
     STEP: 'step',
+    OFDM_MODULATOR: 'ofdm-modulator',
+    FSK_MODULATOR: 'fsk-modulator',
 
     // Каналы
     AWGN_CHANNEL: 'awgn-channel',
@@ -62,6 +66,11 @@ export const DSP_BLOCK_TYPES = {
     AMFMPM_DEMODULATOR: 'amfmpm-demodulator',
     TIMING_RECOVERY: 'timing-recovery',
     QAM_DEMODULATOR: 'qam-demodulator',
+    OFDM_DEMODULATOR: 'ofdm-demodulator',
+    FSK_DEMODULATOR: 'fsk-demodulator',
+    PEAK_DETECTOR: 'peak-detector',
+    PITCH_DETECTOR: 'pitch-detector',
+    ZERO_CROSSING: 'zero-crossing',
 
     // Математические
     INTEGRATOR: 'integrator',
@@ -89,6 +98,11 @@ export const DSP_BLOCK_TYPES = {
     QUANTIZER: 'quantizer',
     SAMPLE_HOLD: 'sample-hold',
     CONVOLUTION: 'convolution',
+
+    // Аудио
+    COMPRESSOR: 'compressor',
+    EQUALIZER: 'equalizer',
+    REVERB: 'reverb',
 
     PLL: 'pll',
 

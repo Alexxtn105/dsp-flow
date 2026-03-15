@@ -9,7 +9,7 @@ npm run dev       # Запуск dev-сервера (http://localhost:5173)
 npm run build     # Продакшн-сборка в /dist
 npm run preview   # Предпросмотр продакшн-сборки
 npm run lint      # ESLint (v9, flat config)
-npm run test      # Vitest — все тесты (21 файл)
+npm run test      # Vitest — все тесты (25 файлов)
 npx vitest run tests/plugins/generators.test.js  # Запуск одного тест-файла
 ```
 
@@ -21,16 +21,17 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 
 Центральный паттерн — `PluginRegistry` (синглтон в `src/engine/PluginRegistry.js`). Каждый DSP-блок — плагин с метаданными и процессором. Реестр «замораживается» после инициализации (`initPlugins.js`), новые плагины в рантайме не добавляются.
 
-**84 плагина** в `src/engine/plugins/` по категориям:
-- **generators/** (15) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator, QAMModulator, SquareWave, TriangleWave, Impulse, Chirp, Step
+**96 плагинов** в `src/engine/plugins/` по категориям:
+- **generators/** (17) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator, QAMModulator, SquareWave, TriangleWave, Impulse, Chirp, Step, OFDMModulator, FSKModulator
 - **channels/** (3) — AWGNChannel, FadingChannel, MultipathChannel
-- **filters/** (19) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter, PulseShaper, LMSFilter, RLSFilter, MatchedFilter, ZFEqualizer, PIDController
+- **filters/** (21) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter, PulseShaper, LMSFilter, RLSFilter, MatchedFilter, ZFEqualizer, PIDController, PolyphaseFilter, FractionalDelay
 - **analysis/** (2 файла, входят в другие группы) — SpectrumAnalyzer (группа visualization), Correlator (группа real-math)
-- **detectors/** (8) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery, QAMDemodulator
+- **detectors/** (13) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery, QAMDemodulator, OFDMDemodulator, FSKDemodulator, PeakDetector, PitchDetector, ZeroCrossing
 - **math/** (22 файла) — разделены на две группы в toolbar:
   - *complex-math* (11): ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealPart, ImagPart, Mixer
   - *real-math* (14 + Correlator из analysis/): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator, Quantizer, SampleHold, Convolution
 - **visualization/** (11) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer, PowerMeter, SNRMeter, BERCounter, Histogram, EyeDiagram
+- **audio/** (3) — Compressor, Equalizer, Reverb
 - **output/** (1) — Speaker
 
 Общие утилиты в `_shared/`: FFTUtils, FilterDesign, WindowFunctions.
@@ -82,7 +83,7 @@ GitHub Actions (`.github/workflows/deploy.yml`):
 
 ## Тесты
 
-300 тестов в 21 файле (Vitest):
+Тесты в 25 файлах (Vitest):
 - `tests/engine/` — PluginRegistry, GraphCompiler, DSPProcessor, WavFileService
 - `tests/plugins/` — generators, filters, analysis, detectors, math, visualization, shared
 - `tests/integration/` — signal-pipeline, helpers-compat

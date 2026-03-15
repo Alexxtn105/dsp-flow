@@ -50,6 +50,22 @@ export function fft(real: Float32Array, imag: Float32Array): void {
 }
 
 /**
+ * Inverse FFT via conjugate trick: IFFT(x) = conj(FFT(conj(x))) / N
+ */
+export function ifft(real: Float32Array, imag: Float32Array): void {
+    const N = real.length;
+    // Conjugate
+    for (let i = 0; i < N; i++) imag[i] = -imag[i];
+    fft(real, imag);
+    // Conjugate and scale
+    const invN = 1 / N;
+    for (let i = 0; i < N; i++) {
+        real[i] *= invN;
+        imag[i] = -imag[i] * invN;
+    }
+}
+
+/**
  * Вычисляет магнитуду в дБ (половина спектра)
  */
 export function computeMagnitudeDB(real: Float32Array, imag: Float32Array): Float32Array {

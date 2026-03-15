@@ -14,6 +14,8 @@
   "impulse": "Импульс",
   "chirp": "ЛЧМ-сигнал",
   "step": "Ступенчатая функция",
+  "ofdm-modulator": "OFDM модулятор",
+  "fsk-modulator": "FSK модулятор",
 
   "awgn-channel": "AWGN-канал",
   "fading-channel": "Канал с замираниями",
@@ -37,6 +39,8 @@
   "matched-filter": "Согласованный фильтр",
   "zf-equalizer": "ZF-эквалайзер",
   "pid-controller": "ПИД-регулятор",
+  "polyphase-filter": "Полифазный фильтр",
+  "fractional-delay": "Дробная задержка",
   "fir-filter": "КИХ-фильтр",
 
   "spectrum-analyzer": "Спектроанализатор",
@@ -50,6 +54,15 @@
   "amfmpm-demodulator": "АМ/ЧМ/ФМ демодулятор",
   "timing-recovery": "Символьная синхронизация",
   "qam-demodulator": "QAM демодулятор",
+  "ofdm-demodulator": "OFDM демодулятор",
+  "fsk-demodulator": "FSK демодулятор",
+  "peak-detector": "Детектор пиков",
+  "pitch-detector": "Детектор тона",
+  "zero-crossing": "Детектор нулевых пересечений",
+
+  "compressor": "Компрессор",
+  "equalizer": "Эквалайзер",
+  "reverb": "Ревербератор",
 
   "summer": "Сумматор",
   "multiplier": "Перемножитель",
@@ -107,6 +120,8 @@
     "impulse": "Единичный импульс (δ) или периодическая последовательность",
     "chirp": "ЛЧМ-сигнал: линейная/экспоненциальная развёртка частоты",
     "step": "Ступенчатая функция Хевисайда (единичный скачок)",
+    "ofdm-modulator": "Модулятор OFDM (QAM → ОБПФ → циклический префикс)",
+    "fsk-modulator": "Модулятор BFSK/4FSK с непрерывной фазой",
 
     "awgn-channel": "Аддитивный белый гауссов шум (ОСШ в дБ)",
     "fading-channel": "Канал с Рэлеевским/Райсовским замиранием и доплеровским сдвигом",
@@ -130,6 +145,8 @@
     "matched-filter": "Согласованный фильтр для обнаружения сигнала",
     "zf-equalizer": "Zero-Forcing эквалайзер (обращение канала)",
     "pid-controller": "ПИД-регулятор с anti-windup",
+    "polyphase-filter": "Полифазный фильтр для эффективного ресемплинга",
+    "fractional-delay": "Дробная задержка (интерполяция Лагранжа 3-го порядка)",
     "fir-filter": "КИХ-фильтр",
 
     "spectrum-analyzer": "Спектральный анализ",
@@ -143,6 +160,15 @@
     "amfmpm-demodulator": "Демодулятор (АМ, ЧМ, ФМ)",
     "timing-recovery": "Timing Recovery (алгоритм Gardner)",
     "qam-demodulator": "Демодулятор QAM (hard/soft decision)",
+    "ofdm-demodulator": "Демодулятор OFDM (удаление CP → БПФ → демаппинг поднесущих)",
+    "fsk-demodulator": "Некогерентный демодулятор BFSK/4FSK",
+    "peak-detector": "Детектор пиков с удержанием (hold time)",
+    "pitch-detector": "Автокорреляционный детектор высоты тона (50–2000 Гц)",
+    "zero-crossing": "Оценка частоты по нулевым пересечениям",
+
+    "compressor": "Динамический компрессор (порог, степень сжатия, атака/восстановление)",
+    "equalizer": "3-полосный параметрический эквалайзер (biquad peaking EQ)",
+    "reverb": "Ревербератор Шрёдера (4 comb + 2 allpass)",
 
     "summer": "Сумматор",
     "multiplier": "Перемножитель",

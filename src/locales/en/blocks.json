@@ -14,6 +14,8 @@
   "impulse": "Impulse",
   "chirp": "Chirp",
   "step": "Step",
+  "ofdm-modulator": "OFDM Modulator",
+  "fsk-modulator": "FSK Modulator",
 
   "awgn-channel": "AWGN Channel",
   "fading-channel": "Fading Channel",
@@ -37,6 +39,8 @@
   "matched-filter": "Matched Filter",
   "zf-equalizer": "ZF Equalizer",
   "pid-controller": "PID Controller",
+  "polyphase-filter": "Polyphase Filter",
+  "fractional-delay": "Fractional Delay",
   "fir-filter": "FIR Filter",
 
   "spectrum-analyzer": "Spectrum Analyzer",
@@ -50,6 +54,15 @@
   "amfmpm-demodulator": "AM/FM/PM Demodulator",
   "timing-recovery": "Timing Recovery",
   "qam-demodulator": "QAM Demodulator",
+  "ofdm-demodulator": "OFDM Demodulator",
+  "fsk-demodulator": "FSK Demodulator",
+  "peak-detector": "Peak Detector",
+  "pitch-detector": "Pitch Detector",
+  "zero-crossing": "Zero Crossing Detector",
+
+  "compressor": "Compressor",
+  "equalizer": "Equalizer",
+  "reverb": "Reverb",
 
   "summer": "Summer",
   "multiplier": "Multiplier",
@@ -107,6 +120,8 @@
     "impulse": "Unit impulse or periodic impulse train",
     "chirp": "Linear/exponential frequency sweep (chirp signal)",
     "step": "Unit step function (Heaviside)",
+    "ofdm-modulator": "OFDM modulator (QAM → IFFT → cyclic prefix)",
+    "fsk-modulator": "BFSK/4FSK modulator with continuous phase",
 
     "awgn-channel": "Additive white Gaussian noise channel (SNR in dB)",
     "fading-channel": "Rayleigh/Rician fading channel with Doppler spread",
@@ -130,6 +145,8 @@
     "matched-filter": "Matched filter for signal detection",
     "zf-equalizer": "Zero-Forcing equalizer (channel inversion)",
     "pid-controller": "PID controller with anti-windup",
+    "polyphase-filter": "Polyphase filter for efficient up/down resampling",
+    "fractional-delay": "Fractional delay (3rd order Lagrange interpolation)",
     "fir-filter": "FIR filter",
 
     "spectrum-analyzer": "Spectral analysis",
@@ -143,6 +160,15 @@
     "amfmpm-demodulator": "Demodulator (AM, FM, PM)",
     "timing-recovery": "Timing Recovery (Gardner algorithm)",
     "qam-demodulator": "QAM demodulator (hard/soft decision)",
+    "ofdm-demodulator": "OFDM demodulator (remove CP → FFT → subcarrier demapping)",
+    "fsk-demodulator": "Non-coherent BFSK/4FSK demodulator",
+    "peak-detector": "Peak detector with hold time",
+    "pitch-detector": "Autocorrelation pitch detector (50–2000 Hz)",
+    "zero-crossing": "Frequency estimation via zero crossing rate",
+
+    "compressor": "Dynamic range compressor (threshold, ratio, attack/release)",
+    "equalizer": "3-band parametric equalizer (biquad peaking EQ)",
+    "reverb": "Schroeder reverberator (4 comb + 2 allpass filters)",
 
     "summer": "Adder",
     "multiplier": "Multiplier",

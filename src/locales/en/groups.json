@@ -5,6 +5,7 @@
   "detectors": "Detectors",
   "complex-math": "Complex Math",
   "real-math": "Real Math",
+  "audio": "Audio",
   "visualization": "Visualization",
   "output": "Output"
 }

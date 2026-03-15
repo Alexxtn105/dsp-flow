@@ -835,6 +835,167 @@ const DSP_ICONS = {
         </>
     ),
 
+    /* ===================== OFDM / FSK ===================== */
+
+    // OFDM модулятор — частотные столбики (поднесущие)
+    'dsp-ofdm-mod': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <rect x="3" y="8" width="2" height="12" fill="currentColor" stroke="none" opacity="0.7" />
+            <rect x="6" y="5" width="2" height="15" fill="currentColor" stroke="none" />
+            <rect x="9" y="10" width="2" height="10" fill="currentColor" stroke="none" opacity="0.7" />
+            <rect x="12" y="3" width="2" height="17" fill="currentColor" stroke="none" />
+            <rect x="15" y="7" width="2" height="13" fill="currentColor" stroke="none" opacity="0.7" />
+            <rect x="18" y="11" width="2" height="9" fill="currentColor" stroke="none" />
+        </>
+    ),
+
+    // OFDM демодулятор — поднесущие с мишенью
+    'dsp-ofdm-demod': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <rect x="3" y="10" width="2" height="10" fill="currentColor" stroke="none" opacity="0.3" />
+            <rect x="6" y="7" width="2" height="13" fill="currentColor" stroke="none" opacity="0.3" />
+            <rect x="9" y="12" width="2" height="8" fill="currentColor" stroke="none" opacity="0.3" />
+            <rect x="12" y="5" width="2" height="15" fill="currentColor" stroke="none" opacity="0.3" />
+            <rect x="15" y="9" width="2" height="11" fill="currentColor" stroke="none" opacity="0.3" />
+            <rect x="18" y="13" width="2" height="7" fill="currentColor" stroke="none" opacity="0.3" />
+            <circle cx="13" cy="8" r="3" strokeWidth="1.5" fill="none" />
+            <line x1="13" y1="5" x2="13" y2="11" strokeWidth="1" />
+            <line x1="10" y1="8" x2="16" y2="8" strokeWidth="1" />
+        </>
+    ),
+
+    // FSK модулятор — две частоты переключающиеся
+    'dsp-fsk-mod': (
+        <>
+            <path d="M2 8 C3.5 4, 4.5 4, 6 8 C7.5 12, 8.5 12, 10 8"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M10 16 C11 13, 11.5 13, 12 16 C12.5 19, 13 19, 13.5 16 C14 13, 14.5 13, 15 16 C15.5 19, 16 19, 16.5 16"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M16.5 8 C18 4, 19 4, 20.5 8 C22 12, 23 12, 24 8"
+                  strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
+        </>
+    ),
+
+    // FSK демодулятор — две частоты + стрелка решения
+    'dsp-fsk-demod': (
+        <>
+            <path d="M2 7 C3 4, 4 4, 5 7 C6 10, 7 10, 8 7"
+                  strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.4" />
+            <path d="M2 17 C2.7 15, 3 15, 3.5 17 C4 19, 4.3 19, 5 17 C5.7 15, 6 15, 6.5 17 C7 19, 7.3 19, 8 17"
+                  strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.4" />
+            <line x1="10" y1="12" x2="20" y2="12" strokeWidth="2" strokeLinecap="round" />
+            <polyline points="17,9 20,12 17,15" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    /* ===================== AUDIO ===================== */
+
+    // Компрессор — кривая сжатия (knee)
+    'dsp-compressor': (
+        <>
+            <line x1="3" y1="21" x2="21" y2="21" strokeWidth="1" opacity="0.3" />
+            <line x1="3" y1="21" x2="3" y2="3" strokeWidth="1" opacity="0.3" />
+            <line x1="3" y1="21" x2="21" y2="3" strokeWidth="1" opacity="0.15" strokeDasharray="2" />
+            <path d="M3 21 L10 14 C12 12, 14 11, 21 8"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+        </>
+    ),
+
+    // Эквалайзер — 3 полоски разной высоты (3-band EQ)
+    'dsp-equalizer': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <rect x="4" y="8" width="4" height="12" rx="1" strokeWidth="1.5" fill="none" />
+            <rect x="10" y="4" width="4" height="16" rx="1" strokeWidth="1.5" fill="none" />
+            <rect x="16" y="11" width="4" height="9" rx="1" strokeWidth="1.5" fill="none" />
+            <line x1="6" y1="11" x2="6" y2="17" strokeWidth="2" strokeLinecap="round" />
+            <line x1="12" y1="8" x2="12" y2="16" strokeWidth="2" strokeLinecap="round" />
+            <line x1="18" y1="14" x2="18" y2="18" strokeWidth="2" strokeLinecap="round" />
+        </>
+    ),
+
+    // Ревербератор — волнообразные отражения
+    'dsp-reverb': (
+        <>
+            <circle cx="5" cy="12" r="2" fill="currentColor" stroke="none" />
+            <path d="M8 12 C9 8, 10 8, 11 12 C12 16, 13 16, 14 12"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M11 12 C12 9, 13 9, 14 12 C15 15, 16 15, 17 12"
+                  strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5" />
+            <path d="M14 12 C15 10, 15.5 10, 16 12 C16.5 14, 17 14, 18 12"
+                  strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.3" />
+            <path d="M17 12 L20 12"
+                  strokeWidth="0.8" strokeLinecap="round" fill="none" opacity="0.15" />
+        </>
+    ),
+
+    /* ===================== ANALYSIS DETECTORS ===================== */
+
+    // Детектор пиков — пик с горизонтальным hold
+    'dsp-peak-detect': (
+        <>
+            <line x1="2" y1="20" x2="22" y2="20" strokeWidth="1" opacity="0.3" />
+            <path d="M3 16 L6 16 L8 10 L10 4 L12 10 L14 16 L17 16"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.4" />
+            <line x1="10" y1="4" x2="20" y2="4" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 2" />
+        </>
+    ),
+
+    // Детектор тона — нота/камертон
+    'dsp-pitch-detect': (
+        <>
+            <path d="M8 4 L8 18" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="6" cy="18" r="2.5" strokeWidth="1.5" fill="none" />
+            <path d="M8 4 C8 4, 14 3, 14 8" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <text x="16" y="18" fontSize="8" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">Hz</text>
+        </>
+    ),
+
+    // Детектор нулевых пересечений — синус с отмеченными пересечениями
+    'dsp-zero-cross': (
+        <>
+            <line x1="2" y1="12" x2="22" y2="12" strokeWidth="1" opacity="0.3" />
+            <path d="M2 12 C4 4, 6 4, 8 12 C10 20, 12 20, 14 12 C16 4, 18 4, 20 12"
+                  strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            <circle cx="2" cy="12" r="2" fill="currentColor" stroke="none" />
+            <circle cx="8" cy="12" r="2" fill="currentColor" stroke="none" />
+            <circle cx="14" cy="12" r="2" fill="currentColor" stroke="none" />
+            <circle cx="20" cy="12" r="2" fill="currentColor" stroke="none" />
+        </>
+    ),
+
+    /* ===================== RESAMPLING ===================== */
+
+    // Полифазный фильтр — ветвление на L фаз
+    'dsp-polyphase': (
+        <>
+            <line x1="2" y1="12" x2="8" y2="12" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="8" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <line x1="8" y1="12" x2="14" y2="5" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="8" y1="12" x2="14" y2="12" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="8" y1="12" x2="14" y2="19" strokeWidth="1.5" strokeLinecap="round" />
+            <rect x="14" y="3" width="6" height="4" rx="1" strokeWidth="1.5" fill="none" />
+            <rect x="14" y="10" width="6" height="4" rx="1" strokeWidth="1.5" fill="none" />
+            <rect x="14" y="17" width="6" height="4" rx="1" strokeWidth="1.5" fill="none" />
+        </>
+    ),
+
+    // Дробная задержка — задержка с десятичной дробью
+    'dsp-frac-delay': (
+        <>
+            <path d="M3 12 L8 12" strokeWidth="2" strokeLinecap="round" />
+            <rect x="8" y="6" width="8" height="12" rx="2" strokeWidth="1.5" fill="none" />
+            <text x="12" y="14" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">Δt</text>
+            <path d="M16 12 L21 12" strokeWidth="2" strokeLinecap="round" />
+        </>
+    ),
+
     /* ===================== OUTPUT ===================== */
 
     // Динамик — конус с звуковыми волнами

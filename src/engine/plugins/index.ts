@@ -14,6 +14,8 @@ import TriangleWavePlugin from './generators/TriangleWavePlugin';
 import ImpulsePlugin from './generators/ImpulsePlugin';
 import ChirpPlugin from './generators/ChirpPlugin';
 import StepPlugin from './generators/StepPlugin';
+import OFDMModulatorPlugin from './generators/OFDMModulatorPlugin';
+import FSKModulatorPlugin from './generators/FSKModulatorPlugin';
 
 // Каналы
 import AWGNChannelPlugin from './channels/AWGNChannelPlugin';
@@ -39,6 +41,13 @@ import RLSFilterPlugin from './filters/RLSFilterPlugin';
 import MatchedFilterPlugin from './filters/MatchedFilterPlugin';
 import ZFEqualizerPlugin from './filters/ZFEqualizerPlugin';
 import PIDControllerPlugin from './filters/PIDControllerPlugin';
+import PolyphaseFilterPlugin from './filters/PolyphaseFilterPlugin';
+import FractionalDelayPlugin from './filters/FractionalDelayPlugin';
+
+// Аудио
+import CompressorPlugin from './audio/CompressorPlugin';
+import EqualizerPlugin from './audio/EqualizerPlugin';
+import ReverbPlugin from './audio/ReverbPlugin';
 
 // Анализ
 import SpectrumAnalyzerPlugin from './analysis/SpectrumAnalyzerPlugin';
@@ -81,6 +90,11 @@ import FrequencyDiscriminatorPlugin from './detectors/FrequencyDiscriminatorPlug
 import AMFMPMDemodulatorPlugin from './detectors/AMFMPMDemodulatorPlugin';
 import TimingRecoveryPlugin from './detectors/TimingRecoveryPlugin';
 import QAMDemodulatorPlugin from './detectors/QAMDemodulatorPlugin';
+import OFDMDemodulatorPlugin from './detectors/OFDMDemodulatorPlugin';
+import FSKDemodulatorPlugin from './detectors/FSKDemodulatorPlugin';
+import PeakDetectorPlugin from './detectors/PeakDetectorPlugin';
+import PitchDetectorPlugin from './detectors/PitchDetectorPlugin';
+import ZeroCrossingPlugin from './detectors/ZeroCrossingPlugin';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin';
@@ -120,6 +134,8 @@ const allPlugins: PluginDefinition[] = [
     MatchedFilterPlugin,
     ZFEqualizerPlugin,
     PIDControllerPlugin,
+    PolyphaseFilterPlugin,
+    FractionalDelayPlugin,
 
     // Генераторы
     AudioFilePlugin,
@@ -137,6 +153,8 @@ const allPlugins: PluginDefinition[] = [
     ImpulsePlugin,
     ChirpPlugin,
     StepPlugin,
+    OFDMModulatorPlugin,
+    FSKModulatorPlugin,
 
     // Каналы
     AWGNChannelPlugin,
@@ -155,6 +173,16 @@ const allPlugins: PluginDefinition[] = [
     AMFMPMDemodulatorPlugin,
     TimingRecoveryPlugin,
     QAMDemodulatorPlugin,
+    OFDMDemodulatorPlugin,
+    FSKDemodulatorPlugin,
+    PeakDetectorPlugin,
+    PitchDetectorPlugin,
+    ZeroCrossingPlugin,
+
+    // Аудио
+    CompressorPlugin,
+    EqualizerPlugin,
+    ReverbPlugin,
 
     // Математические
     IntegratorPlugin,

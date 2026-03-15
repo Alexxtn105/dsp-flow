@@ -24,27 +24,13 @@
  */
 
 import type { PluginDefinition } from '../../types';
-import { fft } from '../_shared/FFTUtils';
+import { fft, ifft } from '../_shared/FFTUtils';
 
 interface ZFEqualizerState {
     channelReal: Float32Array | null;
     channelImag: Float32Array | null;
     fftSize: number;
     initialized: boolean;
-}
-
-/** Inverse FFT via conjugate trick: IFFT(x) = conj(FFT(conj(x))) / N */
-function ifft(real: Float32Array, imag: Float32Array): void {
-    const N = real.length;
-    // Conjugate
-    for (let i = 0; i < N; i++) imag[i] = -imag[i];
-    fft(real, imag);
-    // Conjugate and scale
-    const invN = 1 / N;
-    for (let i = 0; i < N; i++) {
-        real[i] *= invN;
-        imag[i] = -imag[i] * invN;
-    }
 }
 
 function nextPow2(n: number): number {

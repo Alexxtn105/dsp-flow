@@ -17,6 +17,7 @@ export default function initPlugins(): void {
     registry.registerGroup({ id: 'detectors', collapsed: false });
     registry.registerGroup({ id: 'complex-math', collapsed: false });
     registry.registerGroup({ id: 'real-math', collapsed: false });
+    registry.registerGroup({ id: 'audio', collapsed: false });
     registry.registerGroup({ id: 'visualization', collapsed: false });
     registry.registerGroup({ id: 'output', collapsed: false });
 
@@ -94,6 +95,22 @@ export default function initPlugins(): void {
     registry.registerParamOptions('mode', [
         { value: 'decimate', labelKey: 'mode.decimate' },
         { value: 'interpolate', labelKey: 'mode.interpolate' }
+    ]);
+
+    registry.registerParamOptions('fskOrder', [
+        { value: '2FSK', label: '2-FSK (BFSK)' },
+        { value: '4FSK', label: '4-FSK' }
+    ]);
+
+    registry.registerParamOptions('resampleMode', [
+        { value: 'upsample', labelKey: 'resampleMode.upsample' },
+        { value: 'downsample', labelKey: 'resampleMode.downsample' }
+    ]);
+
+    registry.registerParamOptions('ofdmQamOrder', [
+        { value: '4QAM', label: '4-QAM (QPSK)' },
+        { value: '16QAM', label: '16-QAM' },
+        { value: '64QAM', label: '64-QAM' }
     ]);
 
     registry.registerParamOptions('outputMode', [
