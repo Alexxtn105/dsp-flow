@@ -105,6 +105,16 @@ export const DSP_BLOCK_TYPES = {
     REVERB: 'reverb',
 
     PLL: 'pll',
+    CARRIER_RECOVERY: 'carrier-recovery',
+    FRAME_SYNC: 'frame-sync',
+    CFAR_DETECTOR: 'cfar-detector',
+
+    // Математические (Phase 4)
+    WAVELET_TRANSFORM: 'wavelet-transform',
+    CEPSTRUM: 'cepstrum',
+
+    // Фильтры (Phase 4)
+    ALLPASS_FILTER: 'allpass-filter',
 
     // Визуализация
     SPECTRUM_ANALYZER: 'spectrum-analyzer',
@@ -119,6 +129,10 @@ export const DSP_BLOCK_TYPES = {
     BER_COUNTER: 'ber-counter',
     HISTOGRAM: 'histogram',
     EYE_DIAGRAM: 'eye-diagram',
+    THD_METER: 'thd-meter',
+    POLE_ZERO_DIAGRAM: 'pole-zero-diagram',
+    PHASE_PORTRAIT: 'phase-portrait',
+    GROUP_DELAY_PLOT: 'group-delay-plot',
     SPEAKER: 'speaker'
 };
 

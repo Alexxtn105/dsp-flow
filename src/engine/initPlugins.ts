@@ -196,6 +196,20 @@ export default function initPlugins(): void {
         { value: '8PSK', label: '8PSK' }
     ]);
 
+    registry.registerParamOptions('costasMode', [
+        { value: 'bpsk', label: 'BPSK' },
+        { value: 'qpsk', label: 'QPSK' }
+    ]);
+
+    registry.registerParamOptions('preambleType', [
+        { value: 'barker13', label: 'Barker-13' },
+        { value: 'barker7', label: 'Barker-7' }
+    ]);
+
+    registry.registerParamOptions('wavelet', [
+        { value: 'haar', label: 'Haar' }
+    ]);
+
     // Регистрация всех плагинов
     registry.registerAll(allPlugins);
 

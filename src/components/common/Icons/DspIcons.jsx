@@ -996,6 +996,128 @@ const DSP_ICONS = {
         </>
     ),
 
+    /* ===================== PHASE 4: SPECIALIZED ===================== */
+
+    // Восстановление несущей (Costas loop) — петля обратной связи с буквой C
+    'dsp-carrier-recovery': (
+        <>
+            <path d="M4 12 C4 7, 8 4, 12 4 C16 4, 20 7, 20 12 C20 17, 16 20, 12 20"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <polygon points="12,17 9,20 12,23" fill="currentColor" stroke="none" />
+            <text x="12" y="14" fontSize="7" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">C</text>
+        </>
+    ),
+
+    // Кадровая синхронизация — преамбула (вертикальные штрихи + маркер)
+    'dsp-frame-sync': (
+        <>
+            <line x1="3" y1="8" x2="3" y2="16" strokeWidth="2" strokeLinecap="round" />
+            <line x1="6" y1="8" x2="6" y2="16" strokeWidth="2" strokeLinecap="round" />
+            <line x1="9" y1="8" x2="9" y2="16" strokeWidth="2" strokeLinecap="round" />
+            <path d="M12 12 L22 12" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2,2" />
+            <polygon points="20,9 23,12 20,15" fill="currentColor" stroke="none" />
+        </>
+    ),
+
+    // CFAR-детектор — адаптивный порог (сигнал + пороговая линия)
+    'dsp-cfar': (
+        <>
+            <path d="M2 16 L5 14 L8 17 L11 6 L14 15 L17 13 L20 16 L22 14"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 13 L22 13" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.6" />
+            <circle cx="11" cy="6" r="2" fill="currentColor" stroke="none" />
+        </>
+    ),
+
+    // Вейвлет-преобразование — многомасштабная декомпозиция
+    'dsp-wavelet': (
+        <>
+            <path d="M2 12 C4 6, 5 6, 6 12 C7 18, 8 18, 9 12"
+                  strokeWidth="2" strokeLinecap="round" />
+            <path d="M11 12 C12 8, 12.5 8, 13 12 C13.5 16, 14 16, 14.5 12"
+                  strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M16.5 12 C17 10, 17.3 10, 17.5 12 C17.8 14, 18 14, 18.5 12"
+                  strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M20 12 L22 12" strokeWidth="1" strokeLinecap="round" />
+        </>
+    ),
+
+    // Кепстр — FFT→log→IFFT (двойное преобразование)
+    'dsp-cepstrum': (
+        <>
+            <rect x="2" y="6" width="8" height="12" rx="1.5" strokeWidth="1.5" fill="none" />
+            <text x="6" y="14" fontSize="6" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">Cε</text>
+            <path d="M10 12 L14 12" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M14 8 L14 16 L16 16 L18 10 L20 14 L22 8"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+    ),
+
+    // Измеритель THD — спектральные линии с процентом
+    'dsp-thd-meter': (
+        <>
+            <line x1="4" y1="20" x2="4" y2="4" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="8" y1="20" x2="8" y2="12" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="12" y1="20" x2="12" y2="15" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="16" y1="20" x2="16" y2="17" strokeWidth="2.5" strokeLinecap="round" />
+            <text x="21" y="10" fontSize="6" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">%</text>
+        </>
+    ),
+
+    // Полюса и нули — единичная окружность с × и ○
+    'dsp-pole-zero': (
+        <>
+            <circle cx="12" cy="12" r="8" strokeWidth="1.5" fill="none" />
+            <circle cx="8" cy="10" r="2" strokeWidth="1.5" fill="none" />
+            <line x1="14" y1="7" x2="18" y2="11" strokeWidth="2" strokeLinecap="round" />
+            <line x1="18" y1="7" x2="14" y2="11" strokeWidth="2" strokeLinecap="round" />
+        </>
+    ),
+
+    // Фазовый портрет — спиральная траектория I/Q
+    'dsp-phase-portrait': (
+        <>
+            <line x1="12" y1="2" x2="12" y2="22" strokeWidth="1" opacity="0.3" />
+            <line x1="2" y1="12" x2="22" y2="12" strokeWidth="1" opacity="0.3" />
+            <path d="M12 12 C14 10, 16 8, 18 6 C16 10, 18 14, 16 18 C14 16, 10 14, 8 16 C6 14, 8 10, 12 12"
+                  strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        </>
+    ),
+
+    // Групповая задержка — кривая задержки по частоте
+    'dsp-group-delay': (
+        <>
+            <line x1="3" y1="20" x2="21" y2="20" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="3" y1="20" x2="3" y2="4" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M4 16 C6 16, 8 10, 10 10 C12 10, 14 14, 16 8 C18 4, 19 6, 20 6"
+                  strokeWidth="2" strokeLinecap="round" fill="none" />
+            <text x="18" y="19" fontSize="5" fontWeight="600"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none">τ</text>
+        </>
+    ),
+
+    // Allpass-фильтр — блок с |H|=1 и фазовым сдвигом
+    'dsp-allpass': (
+        <>
+            <path d="M3 12 L7 12" strokeWidth="2" strokeLinecap="round" />
+            <rect x="7" y="5" width="10" height="14" rx="2" strokeWidth="1.5" fill="none" />
+            <text x="12" y="11" fontSize="5" fontWeight="700"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">∠φ</text>
+            <text x="12" y="17" fontSize="4.5" fontWeight="600"
+                  fontFamily="'Segoe UI','SF Pro',system-ui,sans-serif"
+                  fill="currentColor" stroke="none" textAnchor="middle">|1|</text>
+            <path d="M17 12 L21 12" strokeWidth="2" strokeLinecap="round" />
+        </>
+    ),
+
     /* ===================== OUTPUT ===================== */
 
     // Динамик — конус с звуковыми волнами

@@ -59,6 +59,9 @@
   "peak-detector": "Peak Detector",
   "pitch-detector": "Pitch Detector",
   "zero-crossing": "Zero Crossing Detector",
+  "carrier-recovery": "Carrier Recovery",
+  "frame-sync": "Frame Sync",
+  "cfar-detector": "CFAR Detector",
 
   "compressor": "Compressor",
   "equalizer": "Equalizer",
@@ -90,6 +93,8 @@
   "quantizer": "Quantizer",
   "sample-hold": "Sample & Hold",
   "convolution": "Convolution",
+  "wavelet-transform": "Wavelet Transform",
+  "cepstrum": "Cepstrum",
 
   "oscilloscope": "Oscilloscope",
   "constellation": "Constellation",
@@ -102,7 +107,12 @@
   "ber-counter": "BER Counter",
   "histogram": "Histogram",
   "eye-diagram": "Eye Diagram",
+  "thd-meter": "THD Meter",
+  "pole-zero-diagram": "Pole-Zero Diagram",
+  "phase-portrait": "Phase Portrait",
+  "group-delay-plot": "Group Delay",
   "speaker": "Speaker",
+  "allpass-filter": "Allpass Filter",
 
   "desc": {
     "sine-generator": "Sine wave generator",
@@ -165,6 +175,9 @@
     "peak-detector": "Peak detector with hold time",
     "pitch-detector": "Autocorrelation pitch detector (50–2000 Hz)",
     "zero-crossing": "Frequency estimation via zero crossing rate",
+    "carrier-recovery": "Costas loop for carrier recovery (BPSK/QPSK)",
+    "frame-sync": "Frame synchronization via preamble correlation (Barker codes)",
+    "cfar-detector": "Cell-Averaging CFAR detector (adaptive threshold)",
 
     "compressor": "Dynamic range compressor (threshold, ratio, attack/release)",
     "equalizer": "3-band parametric equalizer (biquad peaking EQ)",
@@ -196,6 +209,8 @@
     "quantizer": "Quantizer (ADC emulation, N bits, mid-rise/mid-tread)",
     "sample-hold": "Sample and hold circuit emulation",
     "convolution": "Linear convolution of two signals",
+    "wavelet-transform": "Haar discrete wavelet transform (DWT)",
+    "cepstrum": "Real cepstrum analysis (quefrency domain)",
 
     "oscilloscope": "Signal visualization (4 channels)",
     "constellation": "Phase constellation",
@@ -208,6 +223,11 @@
     "ber-counter": "Bit error rate counter (BER)",
     "histogram": "Amplitude distribution histogram",
     "eye-diagram": "Eye diagram for ISI analysis",
+    "thd-meter": "Total harmonic distortion measurement (THD%)",
+    "pole-zero-diagram": "Pole-zero diagram for transfer function analysis",
+    "phase-portrait": "Phase portrait (I/Q state-space trajectory)",
+    "group-delay-plot": "Group delay plot (-dφ/dω)",
+    "allpass-filter": "Allpass filter (phase shift, |H|=1)",
     "speaker": "Audio output"
   }
 }

@@ -43,6 +43,7 @@ import ZFEqualizerPlugin from './filters/ZFEqualizerPlugin';
 import PIDControllerPlugin from './filters/PIDControllerPlugin';
 import PolyphaseFilterPlugin from './filters/PolyphaseFilterPlugin';
 import FractionalDelayPlugin from './filters/FractionalDelayPlugin';
+import AllpassFilterPlugin from './filters/AllpassFilterPlugin';
 
 // Аудио
 import CompressorPlugin from './audio/CompressorPlugin';
@@ -80,6 +81,8 @@ import LogExpPlugin from './math/LogExpPlugin';
 import QuantizerPlugin from './math/QuantizerPlugin';
 import SampleHoldPlugin from './math/SampleHoldPlugin';
 import ConvolutionPlugin from './math/ConvolutionPlugin';
+import WaveletTransformPlugin from './math/WaveletTransformPlugin';
+import CepstrumPlugin from './math/CepstrumPlugin';
 
 // Детекторы
 import PhaseDetectorPlugin from './detectors/PhaseDetectorPlugin';
@@ -95,6 +98,9 @@ import FSKDemodulatorPlugin from './detectors/FSKDemodulatorPlugin';
 import PeakDetectorPlugin from './detectors/PeakDetectorPlugin';
 import PitchDetectorPlugin from './detectors/PitchDetectorPlugin';
 import ZeroCrossingPlugin from './detectors/ZeroCrossingPlugin';
+import CarrierRecoveryPlugin from './detectors/CarrierRecoveryPlugin';
+import FrameSyncPlugin from './detectors/FrameSyncPlugin';
+import CFARDetectorPlugin from './detectors/CFARDetectorPlugin';
 
 // Визуализация
 import OscilloscopePlugin from './visualization/OscilloscopePlugin';
@@ -108,6 +114,10 @@ import SNRMeterPlugin from './visualization/SNRMeterPlugin';
 import BERCounterPlugin from './visualization/BERCounterPlugin';
 import HistogramPlugin from './visualization/HistogramPlugin';
 import EyeDiagramPlugin from './visualization/EyeDiagramPlugin';
+import THDMeterPlugin from './visualization/THDMeterPlugin';
+import PoleZeroDiagramPlugin from './visualization/PoleZeroDiagramPlugin';
+import PhasePortraitPlugin from './visualization/PhasePortraitPlugin';
+import GroupDelayPlotPlugin from './visualization/GroupDelayPlotPlugin';
 
 // Вывод
 import SpeakerPlugin from './output/SpeakerPlugin';
@@ -136,6 +146,7 @@ const allPlugins: PluginDefinition[] = [
     PIDControllerPlugin,
     PolyphaseFilterPlugin,
     FractionalDelayPlugin,
+    AllpassFilterPlugin,
 
     // Генераторы
     AudioFilePlugin,
@@ -178,6 +189,9 @@ const allPlugins: PluginDefinition[] = [
     PeakDetectorPlugin,
     PitchDetectorPlugin,
     ZeroCrossingPlugin,
+    CarrierRecoveryPlugin,
+    FrameSyncPlugin,
+    CFARDetectorPlugin,
 
     // Аудио
     CompressorPlugin,
@@ -212,6 +226,8 @@ const allPlugins: PluginDefinition[] = [
     QuantizerPlugin,
     SampleHoldPlugin,
     ConvolutionPlugin,
+    WaveletTransformPlugin,
+    CepstrumPlugin,
 
     // Визуализация
     OscilloscopePlugin,
@@ -225,6 +241,10 @@ const allPlugins: PluginDefinition[] = [
     BERCounterPlugin,
     HistogramPlugin,
     EyeDiagramPlugin,
+    THDMeterPlugin,
+    PoleZeroDiagramPlugin,
+    PhasePortraitPlugin,
+    GroupDelayPlotPlugin,
 
     // Вывод
     SpeakerPlugin,
