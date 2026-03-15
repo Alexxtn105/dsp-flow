@@ -74,7 +74,7 @@ const PLLPlugin = {
         output: 'complex' as const,
         outputsCount: 2,
         outputTypes: ['complex', 'real'] as SignalType[],
-        outputLabels: ['NCO (I/Q)', 'Фазовая ошибка']
+        outputLabels: ['NCO (I/Q)', 'Phase Error']
     },
     defaultParams: {
         centerFrequency: 1000,

@@ -111,7 +111,8 @@ const FrameSyncPlugin = {
 
             const detectionThreshold = threshold * preambleLen;
 
-            for (let i = 0; i < chunkSize; i++) {
+            const inputLen = Math.min(chunkSize, input.length);
+            for (let i = 0; i < inputLen; i++) {
                 // Сдвиг нового сэмпла в кольцевой буфер
                 state.history[state.historyIndex] = input[i];
                 state.historyIndex = (state.historyIndex + 1) % preambleLen;

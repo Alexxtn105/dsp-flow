@@ -77,7 +77,7 @@ const CarrierRecoveryPlugin = {
         output: 'complex' as const,
         outputsCount: 2,
         outputTypes: ['complex', 'real'] as SignalType[],
-        outputLabels: ['Восстановленная несущая', 'Фазовая ошибка']
+        outputLabels: ['NCO (I/Q)', 'Phase Error']
     },
     defaultParams: {
         centerFrequency: 1000,
@@ -156,9 +156,9 @@ const CarrierRecoveryPlugin = {
                 // 6. NCO — обновление фазы
                 state.ncoPhase += basePhaseIncrement + loopOutput;
 
-                // Нормализация фазы
-                if (state.ncoPhase >= 2 * Math.PI) state.ncoPhase -= 2 * Math.PI;
-                else if (state.ncoPhase < 0) state.ncoPhase += 2 * Math.PI;
+                // Нормализация фазы (while для больших скачков)
+                while (state.ncoPhase >= 2 * Math.PI) state.ncoPhase -= 2 * Math.PI;
+                while (state.ncoPhase < 0) state.ncoPhase += 2 * Math.PI;
 
                 // 7. Выходы
                 ncoOutput[i * 2] = Math.cos(state.ncoPhase);

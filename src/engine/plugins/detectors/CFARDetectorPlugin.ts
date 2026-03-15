@@ -87,7 +87,8 @@ const CFARDetectorPlugin = {
 
             // Масштабный коэффициент для заданной Pfa:
             //   α = N · (Pfa^(-1/N) - 1)
-            const scaleFactor = N * (Math.pow(pfa, -1 / N) - 1);
+            const safePfa = Math.max(1e-12, Math.min(pfa, 0.999));
+            const scaleFactor = N * (Math.pow(safePfa, -1 / N) - 1);
 
             // Минимальное расстояние от CUT до края для полного окна
             const windowHalf = guardCells + trainingCells;

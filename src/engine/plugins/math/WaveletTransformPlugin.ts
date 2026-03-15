@@ -70,7 +70,7 @@ export default {
     id: 'wavelet-transform',
     icon: 'dsp-wavelet',
     description: 'Дискретное вейвлет-преобразование (Хаар)',
-    group: 'complex-math',
+    group: 'real-math',
 
     signals: {
         input: 'real' as const,
@@ -125,7 +125,7 @@ export default {
                 currentLen = halfLen;
             }
 
-            // Build output in standard DWT packing: [cD_L | cD_{L-1} | ... | cD_1 | cA_L]
+            // Build output in standard DWT packing: [cA_L | cD_L | cD_{L-1} | ... | cD_1]
             // Note: details[0] = cD_1 (first level), details[L-1] = cD_L (deepest level)
             // cA_L is in data[0..currentLen-1]
             const result = new Float64Array(paddedLen);

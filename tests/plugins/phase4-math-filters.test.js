@@ -20,7 +20,7 @@ function makeSine(freq, amplitude, length) {
 describe('WaveletTransform', () => {
     it('should be registered with correct metadata', () => {
         expect(WaveletTransformPlugin.id).toBe('wavelet-transform');
-        expect(WaveletTransformPlugin.group).toBe('complex-math');
+        expect(WaveletTransformPlugin.group).toBe('real-math');
         expect(WaveletTransformPlugin.signals.input).toBe('real');
         expect(WaveletTransformPlugin.signals.output).toBe('real');
     });
