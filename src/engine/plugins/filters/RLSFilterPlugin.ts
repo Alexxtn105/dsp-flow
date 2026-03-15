@@ -71,10 +71,7 @@ const RLSFilterPlugin = {
             const lambda = (params.forgettingFactor ?? 0.99) as number;
 
             if (!this.states.has(nodeId)) {
-                const P = new Float32Array(numTaps * numTaps);
                 // Initialize P = δ·I, δ = 100
-                for (let i = 0; i < numTaps; i++) P[i * numTaps + i] = 100;
-
                 const initP = new Float32Array(numTaps * numTaps);
                 for (let i = 0; i < numTaps; i++) initP[i * numTaps + i] = 100;
                 this.states.set(nodeId, {

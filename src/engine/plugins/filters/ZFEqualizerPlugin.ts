@@ -125,19 +125,22 @@ const ZFEqualizerPlugin = {
                 return output;
             }
 
-            if (state.channelReal && state.fftSize === N) {
+            if (state.channelReal) {
                 // ZF equalization: Y_eq = Y · conj(H) / (|H|² + ε)
                 const Hr = state.channelReal;
-                const Hi = state.channelImag;
+                const Hi = state.channelImag!;
+                const Hlen = state.fftSize;
 
                 const outReal = new Float32Array(N);
                 const outImag = new Float32Array(N);
 
                 for (let i = 0; i < N; i++) {
-                    const magSq = Hr[i] * Hr[i] + Hi[i] * Hi[i] + eps;
+                    // Nearest-neighbor mapping when FFT sizes differ
+                    const hi = (Hlen === N) ? i : Math.round(i * Hlen / N) % Hlen;
+                    const magSq = Hr[hi] * Hr[hi] + Hi[hi] * Hi[hi] + eps;
                     // Y · conj(H) = (Yr + jYi)(Hr - jHi) = (YrHr + YiHi) + j(YiHr - YrHi)
-                    outReal[i] = (inReal[i] * Hr[i] + inImag[i] * Hi[i]) / magSq;
-                    outImag[i] = (inImag[i] * Hr[i] - inReal[i] * Hi[i]) / magSq;
+                    outReal[i] = (inReal[i] * Hr[hi] + inImag[i] * Hi[hi]) / magSq;
+                    outImag[i] = (inImag[i] * Hr[hi] - inReal[i] * Hi[hi]) / magSq;
                 }
 
                 // IFFT
