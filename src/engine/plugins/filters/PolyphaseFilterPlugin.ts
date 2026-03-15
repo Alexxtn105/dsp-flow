@@ -34,8 +34,7 @@ interface PolyphaseState {
     histPos: number;
     polyCoeffs: Float32Array[]; // L phases, each with numTaps/L coefficients
     cachedKey: string;
-    phase: number; // for downsample: tracks input phase
-    accumulator: number; // for downsample: sum of branch contributions
+    phase: number; // for downsample: tracks input phase within M-sample group
 }
 
 function designPolyphaseCoeffs(factor: number, numTaps: number): Float32Array[] {
@@ -109,13 +108,15 @@ const PolyphaseFilterPlugin = {
             if (!this.states.has(nodeId)) {
                 const polyCoeffs = designPolyphaseCoeffs(factor, numTaps);
                 const tapsPerPhase = polyCoeffs[0].length;
+                // Upsample needs tapsPerPhase history; downsample needs numTaps
+                // to index h[current - p - k*factor] across all branches
+                const histLen = mode === 'downsample' ? numTaps : tapsPerPhase;
                 this.states.set(nodeId, {
-                    history: new Float32Array(tapsPerPhase),
+                    history: new Float32Array(histLen),
                     histPos: 0,
                     polyCoeffs,
                     cachedKey: key,
-                    phase: 0,
-                    accumulator: 0
+                    phase: 0
                 });
             }
             const state = this.states.get(nodeId)!;
@@ -123,11 +124,12 @@ const PolyphaseFilterPlugin = {
             // Recompute if params changed
             if (state.cachedKey !== key) {
                 state.polyCoeffs = designPolyphaseCoeffs(factor, numTaps);
-                state.history = new Float32Array(state.polyCoeffs[0].length);
+                const tph = state.polyCoeffs[0].length;
+                const histLen = mode === 'downsample' ? numTaps : tph;
+                state.history = new Float32Array(histLen);
                 state.histPos = 0;
                 state.cachedKey = key;
                 state.phase = 0;
-                state.accumulator = 0;
             }
 
             const output = new Float32Array(chunkSize);
@@ -154,27 +156,27 @@ const PolyphaseFilterPlugin = {
                     }
                 }
             } else {
-                // Downsample: accumulate all polyphase branches, output every factor-th sample
+                // Downsample by M: push every sample into history buffer (size = numTaps),
+                // every M-th sample compute output by summing all M polyphase branches.
+                // Branch p uses coeffs e_p[k] applied to samples at hist[current - p - k*M].
+                const histLen = hist.length;
                 let outIdx = 0;
                 for (let i = 0; i < input.length && outIdx < chunkSize; i++) {
                     hist[state.histPos] = input[i];
-                    state.histPos = (state.histPos + 1) % tapsPerPhase;
-
-                    // Accumulate contribution from current polyphase branch
-                    const branchIdx = state.phase;
-                    const coeffs = state.polyCoeffs[branchIdx];
-                    let branchSum = 0;
-                    for (let k = 0; k < tapsPerPhase; k++) {
-                        const idx = (state.histPos + tapsPerPhase - 1 - k) % tapsPerPhase;
-                        branchSum += hist[idx] * coeffs[k];
-                    }
-                    state.accumulator += branchSum;
+                    state.histPos = (state.histPos + 1) % histLen;
 
                     state.phase++;
                     if (state.phase >= factor) {
                         state.phase = 0;
-                        output[outIdx++] = state.accumulator / factor;
-                        state.accumulator = 0;
+                        let acc = 0;
+                        for (let p = 0; p < factor; p++) {
+                            const coeffs = state.polyCoeffs[p];
+                            for (let k = 0; k < tapsPerPhase; k++) {
+                                const sampleIdx = (state.histPos + histLen - 1 - p - k * factor) % histLen;
+                                acc += hist[sampleIdx] * coeffs[k];
+                            }
+                        }
+                        output[outIdx++] = acc / factor;
                     }
                 }
             }
