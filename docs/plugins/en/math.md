@@ -6,7 +6,7 @@ Arithmetic and nonlinear operations on real and complex signals.
 
 ## Summer
 
-**ID:** `summer` | **Group:** math-blocks | **Input:** 2x real | **Output:** real
+**ID:** `summer` | **Group:** complex-math / real-math | **Input:** 2x real | **Output:** real
 
 ### Purpose
 
@@ -34,7 +34,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Normalization: averaging (divide by number of i
 
 ## Multiplier
 
-**ID:** `multiplier` | **Group:** math-blocks | **Input:** 2x real | **Output:** real
+**ID:** `multiplier` | **Group:** complex-math / real-math | **Input:** 2x real | **Output:** real
 
 ### Purpose
 
@@ -61,7 +61,7 @@ Multiplication: y[n] = x0[n] * x1[n] * scaleFactor. Division: y[n] = x0[n] / x1[
 
 ## Integrator
 
-**ID:** `integrator` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `integrator` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -87,7 +87,7 @@ Trapezoidal method: y[n] = y[n-1] + (x[n] + x[n-1]) * dt / 2. On overflow — re
 
 ## Real Part
 
-**ID:** `real-part` | **Group:** math-blocks | **Input:** complex | **Output:** real
+**ID:** `real-part` | **Group:** complex-math / real-math | **Input:** complex | **Output:** real
 
 ### Purpose
 
@@ -106,7 +106,7 @@ No parameters.
 
 ## Imaginary Part
 
-**ID:** `imag-part` | **Group:** math-blocks | **Input:** complex | **Output:** real
+**ID:** `imag-part` | **Group:** complex-math / real-math | **Input:** complex | **Output:** real
 
 ### Purpose
 
@@ -125,7 +125,7 @@ No parameters.
 
 ## Complex Multiplier
 
-**ID:** `complex-multiplier` | **Group:** math-blocks | **Input:** 2x complex | **Output:** complex
+**ID:** `complex-multiplier` | **Group:** complex-math / real-math | **Input:** 2x complex | **Output:** complex
 
 ### Purpose
 
@@ -148,7 +148,7 @@ No parameters.
 
 ## Complex Summer
 
-**ID:** `complex-summer` | **Group:** math-blocks | **Input:** 2x complex | **Output:** complex
+**ID:** `complex-summer` | **Group:** complex-math / real-math | **Input:** 2x complex | **Output:** complex
 
 ### Purpose
 
@@ -167,7 +167,7 @@ No parameters.
 
 ## Complex Square
 
-**ID:** `complex-square` | **Group:** math-blocks | **Input:** complex | **Output:** complex
+**ID:** `complex-square` | **Group:** complex-math / real-math | **Input:** complex | **Output:** complex
 
 ### Purpose
 
@@ -190,7 +190,7 @@ No parameters.
 
 ## Complex Sqrt
 
-**ID:** `complex-sqrt` | **Group:** math-blocks | **Input:** complex | **Output:** complex
+**ID:** `complex-sqrt` | **Group:** complex-math / real-math | **Input:** complex | **Output:** complex
 
 ### Purpose
 
@@ -213,7 +213,7 @@ No parameters.
 
 ## Complex Phase
 
-**ID:** `complex-phase` | **Group:** math-blocks | **Input:** complex | **Output:** real
+**ID:** `complex-phase` | **Group:** complex-math / real-math | **Input:** complex | **Output:** real
 
 ### Purpose
 
@@ -232,7 +232,7 @@ No parameters.
 
 ## Complex Magnitude
 
-**ID:** `complex-magnitude` | **Group:** math-blocks | **Input:** complex | **Output:** real
+**ID:** `complex-magnitude` | **Group:** complex-math / real-math | **Input:** complex | **Output:** real
 
 ### Purpose
 
@@ -251,7 +251,7 @@ No parameters.
 
 ## Complex Composer
 
-**ID:** `complex-composer` | **Group:** math-blocks | **Input:** 2x real | **Output:** complex
+**ID:** `complex-composer` | **Group:** complex-math / real-math | **Input:** 2x real | **Output:** complex
 
 ### Purpose
 
@@ -274,7 +274,7 @@ No parameters.
 
 ## Complex Conjugate
 
-**ID:** `complex-conjugate` | **Group:** math-blocks | **Input:** complex | **Output:** complex
+**ID:** `complex-conjugate` | **Group:** complex-math / real-math | **Input:** complex | **Output:** complex
 
 ### Purpose
 
@@ -293,7 +293,7 @@ No parameters.
 
 ## Real Square
 
-**ID:** `real-square` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `real-square` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -312,7 +312,7 @@ No parameters.
 
 ## Real Power 4
 
-**ID:** `real-power4` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `real-power4` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -335,7 +335,7 @@ No parameters.
 
 ## Atan2
 
-**ID:** `atan2` | **Group:** math-blocks | **Input:** 2x real | **Output:** real
+**ID:** `atan2` | **Group:** complex-math / real-math | **Input:** 2x real | **Output:** real
 
 ### Purpose
 
@@ -358,7 +358,7 @@ No parameters.
 
 ## AGC (Automatic Gain Control)
 
-**ID:** `agc` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `agc` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -388,7 +388,7 @@ Maintains a constant output signal level regardless of input level changes. Used
 
 ## Absolute Value
 
-**ID:** `absolute-value` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `absolute-value` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -407,7 +407,7 @@ No parameters.
 
 ## Gain
 
-**ID:** `gain` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `gain` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -434,7 +434,7 @@ Linear: y[n] = x[n] * gain * (invert ? -1 : 1). In dB: linearGain = 10^(gaindB /
 
 ## Log/Exp
 
-**ID:** `log-exp` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `log-exp` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 
@@ -464,7 +464,7 @@ Applies one of five mathematical functions: ln, log10, dB, exp, pow10.
 
 ## Mixer
 
-**ID:** `mixer` | **Group:** math-blocks | **Input:** real | **Output:** complex
+**ID:** `mixer` | **Group:** complex-math / real-math | **Input:** real | **Output:** complex
 
 ### Purpose
 
@@ -489,7 +489,7 @@ I[n] = x[n] * cos(phi[n]), Q[n] = x[n] * sin(phi[n]), phi[n] = phi[n-1] + 2*pi *
 
 ## Threshold
 
-**ID:** `threshold` | **Group:** math-blocks | **Input:** real | **Output:** real
+**ID:** `threshold` | **Group:** complex-math / real-math | **Input:** real | **Output:** real
 
 ### Purpose
 

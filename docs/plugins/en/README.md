@@ -40,7 +40,7 @@ Reference for all 59 plugins (DSP blocks) available in the DSP Flow editor. Each
 | [FIR Filter](filters.md#fir-filter) | `fir-filter` | filters | real | real |
 | [IIR Filter](filters.md#iir-filter) | `iir-filter` | filters | real | real |
 | [Spectrum Analyzer](analysis.md#spectrum-analyzer) | `spectrum-analyzer` | visualization | real | null |
-| [Correlator](analysis.md#correlator) | `correlator` | math-blocks | 2x real | real |
+| [Correlator](analysis.md#correlator) | `correlator` | complex-math / real-math | 2x real | real |
 | [Phase Detector](detectors.md#phase-detector) | `phase-detector` | detectors | complex | real |
 | [Frequency Detector](detectors.md#frequency-detector) | `frequency-detector` | detectors | complex | real |
 | [Amplitude Detector](detectors.md#amplitude-detector) | `amplitude-detector` | detectors | real | real |
@@ -48,28 +48,28 @@ Reference for all 59 plugins (DSP blocks) available in the DSP Flow editor. Each
 | [AM/FM/PM Demodulator](detectors.md#amfmpm-demodulator) | `amfmpm-demodulator` | detectors | real | real |
 | [Frequency Discriminator](detectors.md#frequency-discriminator) | `frequency-discriminator` | detectors | complex | real |
 | [Timing Recovery](detectors.md#timing-recovery) | `timing-recovery` | detectors | complex | complex |
-| [Summer](math.md#summer) | `summer` | math-blocks | 2x real | real |
-| [Multiplier](math.md#multiplier) | `multiplier` | math-blocks | 2x real | real |
-| [Integrator](math.md#integrator) | `integrator` | math-blocks | real | real |
-| [Real Part](math.md#real-part) | `real-part` | math-blocks | complex | real |
-| [Imaginary Part](math.md#imaginary-part) | `imag-part` | math-blocks | complex | real |
-| [Complex Multiplier](math.md#complex-multiplier) | `complex-multiplier` | math-blocks | 2x complex | complex |
-| [Complex Summer](math.md#complex-summer) | `complex-summer` | math-blocks | 2x complex | complex |
-| [Complex Square](math.md#complex-square) | `complex-square` | math-blocks | complex | complex |
-| [Complex Sqrt](math.md#complex-sqrt) | `complex-sqrt` | math-blocks | complex | complex |
-| [Complex Phase](math.md#complex-phase) | `complex-phase` | math-blocks | complex | real |
-| [Complex Magnitude](math.md#complex-magnitude) | `complex-magnitude` | math-blocks | complex | real |
-| [Complex Composer](math.md#complex-composer) | `complex-composer` | math-blocks | 2x real | complex |
-| [Complex Conjugate](math.md#complex-conjugate) | `complex-conjugate` | math-blocks | complex | complex |
-| [Real Square](math.md#real-square) | `real-square` | math-blocks | real | real |
-| [Real Power 4](math.md#real-power-4) | `real-power4` | math-blocks | real | real |
-| [Atan2](math.md#atan2) | `atan2` | math-blocks | 2x real | real |
-| [AGC](math.md#agc-automatic-gain-control) | `agc` | math-blocks | real | real |
-| [Absolute Value](math.md#absolute-value) | `absolute-value` | math-blocks | real | real |
-| [Gain](math.md#gain) | `gain` | math-blocks | real | real |
-| [Log/Exp](math.md#logexp) | `log-exp` | math-blocks | real | real |
-| [Mixer](math.md#mixer) | `mixer` | math-blocks | 2x real | real |
-| [Threshold](math.md#threshold) | `threshold` | math-blocks | real | real |
+| [Summer](math.md#summer) | `summer` | complex-math / real-math | 2x real | real |
+| [Multiplier](math.md#multiplier) | `multiplier` | complex-math / real-math | 2x real | real |
+| [Integrator](math.md#integrator) | `integrator` | complex-math / real-math | real | real |
+| [Real Part](math.md#real-part) | `real-part` | complex-math / real-math | complex | real |
+| [Imaginary Part](math.md#imaginary-part) | `imag-part` | complex-math / real-math | complex | real |
+| [Complex Multiplier](math.md#complex-multiplier) | `complex-multiplier` | complex-math / real-math | 2x complex | complex |
+| [Complex Summer](math.md#complex-summer) | `complex-summer` | complex-math / real-math | 2x complex | complex |
+| [Complex Square](math.md#complex-square) | `complex-square` | complex-math / real-math | complex | complex |
+| [Complex Sqrt](math.md#complex-sqrt) | `complex-sqrt` | complex-math / real-math | complex | complex |
+| [Complex Phase](math.md#complex-phase) | `complex-phase` | complex-math / real-math | complex | real |
+| [Complex Magnitude](math.md#complex-magnitude) | `complex-magnitude` | complex-math / real-math | complex | real |
+| [Complex Composer](math.md#complex-composer) | `complex-composer` | complex-math / real-math | 2x real | complex |
+| [Complex Conjugate](math.md#complex-conjugate) | `complex-conjugate` | complex-math / real-math | complex | complex |
+| [Real Square](math.md#real-square) | `real-square` | complex-math / real-math | real | real |
+| [Real Power 4](math.md#real-power-4) | `real-power4` | complex-math / real-math | real | real |
+| [Atan2](math.md#atan2) | `atan2` | complex-math / real-math | 2x real | real |
+| [AGC](math.md#agc-automatic-gain-control) | `agc` | complex-math / real-math | real | real |
+| [Absolute Value](math.md#absolute-value) | `absolute-value` | complex-math / real-math | real | real |
+| [Gain](math.md#gain) | `gain` | complex-math / real-math | real | real |
+| [Log/Exp](math.md#logexp) | `log-exp` | complex-math / real-math | real | real |
+| [Mixer](math.md#mixer) | `mixer` | complex-math / real-math | 2x real | real |
+| [Threshold](math.md#threshold) | `threshold` | complex-math / real-math | real | real |
 | [Oscilloscope](visualization.md#oscilloscope) | `oscilloscope` | visualization | 4x real | null |
 | [Constellation](visualization.md#constellation) | `constellation` | visualization | complex | null |
 | [Waterfall](visualization.md#waterfall) | `waterfall` | visualization | real | null |

@@ -40,7 +40,7 @@
 | [КИХ-фильтр](filters.md#ких-фильтр-fir-filter) | `fir-filter` | filters | real | real |
 | [БИХ-фильтр](filters.md#бих-фильтр-iir-filter) | `iir-filter` | filters | real | real |
 | [Спектроанализатор](analysis.md#спектроанализатор-spectrum-analyzer) | `spectrum-analyzer` | visualization | real | null |
-| [Коррелятор](analysis.md#коррелятор-correlator) | `correlator` | math-blocks | 2x real | real |
+| [Коррелятор](analysis.md#коррелятор-correlator) | `correlator` | complex-math / real-math | 2x real | real |
 | [Фазовый детектор](detectors.md#фазовый-детектор-phase-detector) | `phase-detector` | detectors | complex | real |
 | [Частотный детектор](detectors.md#частотный-детектор-frequency-detector) | `frequency-detector` | detectors | complex | real |
 | [Амплитудный детектор](detectors.md#амплитудный-детектор-amplitude-detector) | `amplitude-detector` | detectors | real | real |
@@ -48,28 +48,28 @@
 | [АМ/ЧМ/ФМ демодулятор](detectors.md#амчмфм-демодулятор-amfmpm-demodulator) | `amfmpm-demodulator` | detectors | real | real |
 | [Частотный дискриминатор](detectors.md#частотный-дискриминатор-frequency-discriminator) | `frequency-discriminator` | detectors | complex | real |
 | [Символьная синхронизация](detectors.md#символьная-синхронизация-timing-recovery) | `timing-recovery` | detectors | complex | complex |
-| [Сумматор](math.md#сумматор-summer) | `summer` | math-blocks | 2x real | real |
-| [Умножитель](math.md#умножитель-multiplier) | `multiplier` | math-blocks | 2x real | real |
-| [Интегратор](math.md#интегратор-integrator) | `integrator` | math-blocks | real | real |
-| [Вещественная часть](math.md#вещественная-часть-real-part) | `real-part` | math-blocks | complex | real |
-| [Мнимая часть](math.md#мнимая-часть-imaginary-part) | `imag-part` | math-blocks | complex | real |
-| [Комплексный умножитель](math.md#комплексный-умножитель-complex-multiplier) | `complex-multiplier` | math-blocks | 2x complex | complex |
-| [Комплексный сумматор](math.md#комплексный-сумматор-complex-summer) | `complex-summer` | math-blocks | 2x complex | complex |
-| [Комплексный квадрат](math.md#комплексный-квадрат-complex-square) | `complex-square` | math-blocks | complex | complex |
-| [Комплексный корень](math.md#комплексный-корень-complex-sqrt) | `complex-sqrt` | math-blocks | complex | complex |
-| [Комплексная фаза](math.md#комплексная-фаза-complex-phase) | `complex-phase` | math-blocks | complex | real |
-| [Комплексная амплитуда](math.md#комплексная-амплитуда-complex-magnitude) | `complex-magnitude` | math-blocks | complex | real |
-| [Комплексный композитор](math.md#комплексный-композитор-complex-composer) | `complex-composer` | math-blocks | 2x real | complex |
-| [Комплексное сопряжение](math.md#комплексное-сопряжение-complex-conjugate) | `complex-conjugate` | math-blocks | complex | complex |
-| [Квадрат](math.md#квадрат-real-square) | `real-square` | math-blocks | real | real |
-| [Четвёртая степень](math.md#четвёртая-степень-real-power-4) | `real-power4` | math-blocks | real | real |
-| [Арктангенс-2](math.md#арктангенс-2-atan2) | `atan2` | math-blocks | 2x real | real |
-| [АРУ](math.md#ару-agc) | `agc` | math-blocks | real | real |
-| [Модуль](math.md#модуль-absolute-value) | `absolute-value` | math-blocks | real | real |
-| [Усилитель](math.md#усилитель-gain) | `gain` | math-blocks | real | real |
-| [Логарифм / Экспонента](math.md#логарифм--экспонента-logexp) | `log-exp` | math-blocks | real | real |
-| [Микшер](math.md#микшер-mixer) | `mixer` | math-blocks | 2x real | real |
-| [Пороговый элемент](math.md#пороговый-элемент-threshold) | `threshold` | math-blocks | real | real |
+| [Сумматор](math.md#сумматор-summer) | `summer` | complex-math / real-math | 2x real | real |
+| [Умножитель](math.md#умножитель-multiplier) | `multiplier` | complex-math / real-math | 2x real | real |
+| [Интегратор](math.md#интегратор-integrator) | `integrator` | complex-math / real-math | real | real |
+| [Вещественная часть](math.md#вещественная-часть-real-part) | `real-part` | complex-math / real-math | complex | real |
+| [Мнимая часть](math.md#мнимая-часть-imaginary-part) | `imag-part` | complex-math / real-math | complex | real |
+| [Комплексный умножитель](math.md#комплексный-умножитель-complex-multiplier) | `complex-multiplier` | complex-math / real-math | 2x complex | complex |
+| [Комплексный сумматор](math.md#комплексный-сумматор-complex-summer) | `complex-summer` | complex-math / real-math | 2x complex | complex |
+| [Комплексный квадрат](math.md#комплексный-квадрат-complex-square) | `complex-square` | complex-math / real-math | complex | complex |
+| [Комплексный корень](math.md#комплексный-корень-complex-sqrt) | `complex-sqrt` | complex-math / real-math | complex | complex |
+| [Комплексная фаза](math.md#комплексная-фаза-complex-phase) | `complex-phase` | complex-math / real-math | complex | real |
+| [Комплексная амплитуда](math.md#комплексная-амплитуда-complex-magnitude) | `complex-magnitude` | complex-math / real-math | complex | real |
+| [Комплексный композитор](math.md#комплексный-композитор-complex-composer) | `complex-composer` | complex-math / real-math | 2x real | complex |
+| [Комплексное сопряжение](math.md#комплексное-сопряжение-complex-conjugate) | `complex-conjugate` | complex-math / real-math | complex | complex |
+| [Квадрат](math.md#квадрат-real-square) | `real-square` | complex-math / real-math | real | real |
+| [Четвёртая степень](math.md#четвёртая-степень-real-power-4) | `real-power4` | complex-math / real-math | real | real |
+| [Арктангенс-2](math.md#арктангенс-2-atan2) | `atan2` | complex-math / real-math | 2x real | real |
+| [АРУ](math.md#ару-agc) | `agc` | complex-math / real-math | real | real |
+| [Модуль](math.md#модуль-absolute-value) | `absolute-value` | complex-math / real-math | real | real |
+| [Усилитель](math.md#усилитель-gain) | `gain` | complex-math / real-math | real | real |
+| [Логарифм / Экспонента](math.md#логарифм--экспонента-logexp) | `log-exp` | complex-math / real-math | real | real |
+| [Микшер](math.md#микшер-mixer) | `mixer` | complex-math / real-math | 2x real | real |
+| [Пороговый элемент](math.md#пороговый-элемент-threshold) | `threshold` | complex-math / real-math | real | real |
 | [Осциллограф](visualization.md#осциллограф-oscilloscope) | `oscilloscope` | visualization | 4x real | null |
 | [Фазовое созвездие](visualization.md#фазовое-созвездие-constellation) | `constellation` | visualization | complex | null |
 | [Водопад](visualization.md#водопад-waterfall) | `waterfall` | visualization | real | null |

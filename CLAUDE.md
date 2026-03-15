@@ -24,11 +24,11 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 **60 плагинов** в `src/engine/plugins/` по категориям:
 - **generators/** (9) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator
 - **filters/** (13) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter
-- **analysis/** (2) — SpectrumAnalyzer, Correlator
+- **analysis/** (2 файла, входят в другие группы) — SpectrumAnalyzer (группа visualization), Correlator (группа real-math)
 - **detectors/** (7) — PhaseDetector, FrequencyDetector, AmplitudeDetector, PLL, AMFMPMDemodulator, FrequencyDiscriminator, TimingRecovery
-- **math/** (22) — разделены на две группы в toolbar:
+- **math/** (22 файла) — разделены на две группы в toolbar:
   - *complex-math* (11): ComplexMultiplier, ComplexSummer, ComplexSquare, ComplexSqrt, ComplexPhase, ComplexMagnitude, ComplexComposer, ComplexConjugate, RealPart, ImagPart, Mixer
-  - *real-math* (12): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator
+  - *real-math* (11 + Correlator из analysis/): Summer, Multiplier, Integrator, RealSquare, RealSqrt, RealPower4, Atan2, AGC, AbsoluteValue, Gain, LogExp, Threshold, Correlator
 - **visualization/** (6) — Oscilloscope, Constellation, Waterfall, NumericIndicator, ComplexNumericIndicator, MultiChannelSpectrumAnalyzer
 - **output/** (1) — Speaker
 

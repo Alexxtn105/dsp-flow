@@ -44,7 +44,7 @@
 
 ## Коррелятор (Correlator)
 
-**ID:** `correlator` | **Группа:** math-blocks | **Вход:** 2x real | **Выход:** real
+**ID:** `correlator` | **Группа:** real-math | **Вход:** 2x real | **Выход:** real
 
 ### Назначение
 

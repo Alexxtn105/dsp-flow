@@ -6,7 +6,7 @@
 
 ## Сумматор (Summer)
 
-**ID:** `summer` | **Группа:** math-blocks | **Вход:** 2x real | **Выход:** real
+**ID:** `summer` | **Группа:** complex-math / real-math | **Вход:** 2x real | **Выход:** real
 
 ### Назначение
 
@@ -34,7 +34,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Перемножитель (Multiplier)
 
-**ID:** `multiplier` | **Группа:** math-blocks | **Вход:** 2x real | **Выход:** real
+**ID:** `multiplier` | **Группа:** complex-math / real-math | **Вход:** 2x real | **Выход:** real
 
 ### Назначение
 
@@ -61,7 +61,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Интегратор (Integrator)
 
-**ID:** `integrator` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `integrator` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -87,7 +87,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Re (действительная часть / Real Part)
 
-**ID:** `real-part` | **Группа:** math-blocks | **Вход:** complex | **Выход:** real
+**ID:** `real-part` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** real
 
 ### Назначение
 
@@ -106,7 +106,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Im (мнимая часть / Imaginary Part)
 
-**ID:** `imag-part` | **Группа:** math-blocks | **Вход:** complex | **Выход:** real
+**ID:** `imag-part` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** real
 
 ### Назначение
 
@@ -125,7 +125,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Комплексный перемножитель (Complex Multiplier)
 
-**ID:** `complex-multiplier` | **Группа:** math-blocks | **Вход:** 2x complex | **Выход:** complex
+**ID:** `complex-multiplier` | **Группа:** complex-math / real-math | **Вход:** 2x complex | **Выход:** complex
 
 ### Назначение
 
@@ -148,7 +148,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Комплексный сумматор (Complex Summer)
 
-**ID:** `complex-summer` | **Группа:** math-blocks | **Вход:** 2x complex | **Выход:** complex
+**ID:** `complex-summer` | **Группа:** complex-math / real-math | **Вход:** 2x complex | **Выход:** complex
 
 ### Назначение
 
@@ -167,7 +167,7 @@ y[n] = w0*x0[n] + w1*x1[n] + ... Нормализация: усреднение 
 
 ## Комплексный квадрат (Complex Square)
 
-**ID:** `complex-square` | **Группа:** math-blocks | **Вход:** complex | **Выход:** complex
+**ID:** `complex-square` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** complex
 
 ### Назначение
 
@@ -190,7 +190,7 @@ Re_out = Re^2 - Im^2, Im_out = 2*Re*Im. В полярных: |z^2| = |z|^2, arg(
 
 ## Комплексный корень (Complex Sqrt)
 
-**ID:** `complex-sqrt` | **Группа:** math-blocks | **Вход:** complex | **Выход:** complex
+**ID:** `complex-sqrt` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** complex
 
 ### Назначение
 
@@ -213,7 +213,7 @@ r = sqrt(Re^2 + Im^2), θ = atan2(Im, Re), Re_out = √r * cos(θ/2), Im_out = �
 
 ## Фаза (комплексная) (Complex Phase)
 
-**ID:** `complex-phase` | **Группа:** math-blocks | **Вход:** complex | **Выход:** real
+**ID:** `complex-phase` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** real
 
 ### Назначение
 
@@ -232,7 +232,7 @@ r = sqrt(Re^2 + Im^2), θ = atan2(Im, Re), Re_out = √r * cos(θ/2), Im_out = �
 
 ## Амплитуда (комплексная) (Complex Magnitude)
 
-**ID:** `complex-magnitude` | **Группа:** math-blocks | **Вход:** complex | **Выход:** real
+**ID:** `complex-magnitude` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** real
 
 ### Назначение
 
@@ -251,7 +251,7 @@ r = sqrt(Re^2 + Im^2), θ = atan2(Im, Re), Re_out = √r * cos(θ/2), Im_out = �
 
 ## Формирователь комплексного (Complex Composer)
 
-**ID:** `complex-composer` | **Группа:** math-blocks | **Вход:** 2x real | **Выход:** complex
+**ID:** `complex-composer` | **Группа:** complex-math / real-math | **Вход:** 2x real | **Выход:** complex
 
 ### Назначение
 
@@ -274,7 +274,7 @@ r = sqrt(Re^2 + Im^2), θ = atan2(Im, Re), Re_out = √r * cos(θ/2), Im_out = �
 
 ## Комплексное сопряжение (Complex Conjugate)
 
-**ID:** `complex-conjugate` | **Группа:** math-blocks | **Вход:** complex | **Выход:** complex
+**ID:** `complex-conjugate` | **Группа:** complex-math / real-math | **Вход:** complex | **Выход:** complex
 
 ### Назначение
 
@@ -293,7 +293,7 @@ a+jb → a−jb. Инвертирует мнимую часть. Использ�
 
 ## Квадрат (действительный) (Real Square)
 
-**ID:** `real-square` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `real-square` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -312,7 +312,7 @@ y[n] = x[n]^2. Удвоение частоты и детектирование �
 
 ## Степень 4 (действительная) (Real Power 4)
 
-**ID:** `real-power4` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `real-power4` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -335,7 +335,7 @@ y[n] = (x[n]^2)^2 — два последовательных умножения
 
 ## Арктангенс (Atan2)
 
-**ID:** `atan2` | **Группа:** math-blocks | **Вход:** 2x real | **Выход:** real
+**ID:** `atan2` | **Группа:** complex-math / real-math | **Вход:** 2x real | **Выход:** real
 
 ### Назначение
 
@@ -358,7 +358,7 @@ atan2(Y, X) — угол в радианах [-π, π] по двум компо�
 
 ## АРУ (AGC — Automatic Gain Control)
 
-**ID:** `agc` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `agc` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -388,7 +388,7 @@ atan2(Y, X) — угол в радианах [-π, π] по двум компо�
 
 ## Абсолютное значение (Absolute Value)
 
-**ID:** `absolute-value` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `absolute-value` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -407,7 +407,7 @@ y[n] = |x[n]|. Двухполупериодный выпрямитель. Для
 
 ## Усилитель (Gain)
 
-**ID:** `gain` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `gain` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -434,7 +434,7 @@ y[n] = |x[n]|. Двухполупериодный выпрямитель. Для
 
 ## Логарифм/Экспонента (Log/Exp)
 
-**ID:** `log-exp` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `log-exp` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 
@@ -464,7 +464,7 @@ y[n] = |x[n]|. Двухполупериодный выпрямитель. Для
 
 ## Смеситель (Mixer)
 
-**ID:** `mixer` | **Группа:** math-blocks | **Вход:** real | **Выход:** complex
+**ID:** `mixer` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** complex
 
 ### Назначение
 
@@ -489,7 +489,7 @@ I[n] = x[n] * cos(φ[n]), Q[n] = x[n] * sin(φ[n]), φ[n] = φ[n-1] + 2π * fShi
 
 ## Компаратор (Threshold)
 
-**ID:** `threshold` | **Группа:** math-blocks | **Вход:** real | **Выход:** real
+**ID:** `threshold` | **Группа:** complex-math / real-math | **Вход:** real | **Выход:** real
 
 ### Назначение
 

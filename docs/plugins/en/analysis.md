@@ -44,7 +44,7 @@ Displays the frequency content of the input signal in real time. Decomposes the 
 
 ## Correlator
 
-**ID:** `correlator` | **Group:** math-blocks | **Input:** 2x real | **Output:** real
+**ID:** `correlator` | **Group:** real-math | **Input:** 2x real | **Output:** real
 
 ### Purpose
 
