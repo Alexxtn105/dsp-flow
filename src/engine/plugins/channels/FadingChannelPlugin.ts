@@ -79,8 +79,9 @@ const FadingChannelPlugin = {
             }
             const state = this.states.get(nodeId)!;
 
-            // IIR Doppler filter coefficient
+            // IIR Doppler filter coefficient with variance normalization
             const a = Math.exp(-2 * Math.PI * fd / sampleRate);
+            const normGain = Math.sqrt(1 - a * a);
 
             // Rician parameters
             const kLinear = Math.pow(10, kFactorDb / 10);
@@ -94,8 +95,8 @@ const FadingChannelPlugin = {
                 // Generate filtered Gaussian processes (Doppler shaping)
                 const n1 = gaussianRandom();
                 const n2 = gaussianRandom();
-                state.prevG1 = a * state.prevG1 + (1 - a) * n1;
-                state.prevG2 = a * state.prevG2 + (1 - a) * n2;
+                state.prevG1 = a * state.prevG1 + normGain * n1;
+                state.prevG2 = a * state.prevG2 + normGain * n2;
 
                 // Channel coefficient h = LOS + scatter
                 const hR = losAmp + scatterAmp * state.prevG1 * invSqrt2;

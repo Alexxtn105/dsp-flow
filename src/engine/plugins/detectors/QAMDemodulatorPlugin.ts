@@ -46,9 +46,8 @@ function buildConstellation(order: number): Float32Array {
     const normFactor = 1 / Math.sqrt(avgPower);
 
     for (let sym = 0; sym < order; sym++) {
-        const gray = binaryToGray(sym);
-        const iIdx = gray % sqrtM;
-        const qIdx = Math.floor(gray / sqrtM);
+        const iIdx = binaryToGray(sym % sqrtM);
+        const qIdx = binaryToGray(Math.floor(sym / sqrtM));
         points[sym * 2] = (2 * iIdx - (sqrtM - 1)) * normFactor;
         points[sym * 2 + 1] = (2 * qIdx - (sqrtM - 1)) * normFactor;
     }

@@ -9,7 +9,7 @@ npm run dev       # Запуск dev-сервера (http://localhost:5173)
 npm run build     # Продакшн-сборка в /dist
 npm run preview   # Предпросмотр продакшн-сборки
 npm run lint      # ESLint (v9, flat config)
-npm run test      # Vitest — все тесты (14 файлов)
+npm run test      # Vitest — все тесты (21 файл)
 npx vitest run tests/plugins/generators.test.js  # Запуск одного тест-файла
 ```
 

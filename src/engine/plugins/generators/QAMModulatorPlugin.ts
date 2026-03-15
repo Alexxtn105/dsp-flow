@@ -51,9 +51,8 @@ function buildConstellation(order: number): Float32Array {
     const normFactor = 1 / Math.sqrt(avgPower);
 
     for (let sym = 0; sym < order; sym++) {
-        const gray = binaryToGray(sym);
-        const iIdx = gray % sqrtM;
-        const qIdx = Math.floor(gray / sqrtM);
+        const iIdx = binaryToGray(sym % sqrtM);
+        const qIdx = binaryToGray(Math.floor(sym / sqrtM));
         // PAM levels: -(sqrt(M)-1), -(sqrt(M)-3), ..., +(sqrt(M)-1)
         const iVal = (2 * iIdx - (sqrtM - 1)) * normFactor;
         const qVal = (2 * qIdx - (sqrtM - 1)) * normFactor;

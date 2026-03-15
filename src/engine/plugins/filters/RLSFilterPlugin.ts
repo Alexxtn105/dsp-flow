@@ -27,6 +27,9 @@ interface RLSFilterState {
     buffer: Float32Array;
     bufferIdx: number;
     cachedTaps: number;
+    x: Float32Array;       // temp: input vector
+    Px: Float32Array;      // temp: P·x product
+    k: Float32Array;       // temp: gain vector
 }
 
 const RLSFilterPlugin = {
@@ -72,24 +75,32 @@ const RLSFilterPlugin = {
                 // Initialize P = δ·I, δ = 100
                 for (let i = 0; i < numTaps; i++) P[i * numTaps + i] = 100;
 
+                const initP = new Float32Array(numTaps * numTaps);
+                for (let i = 0; i < numTaps; i++) initP[i * numTaps + i] = 100;
                 this.states.set(nodeId, {
                     weights: new Float32Array(numTaps),
-                    P,
+                    P: initP,
                     buffer: new Float32Array(numTaps),
                     bufferIdx: 0,
-                    cachedTaps: numTaps
+                    cachedTaps: numTaps,
+                    x: new Float32Array(numTaps),
+                    Px: new Float32Array(numTaps),
+                    k: new Float32Array(numTaps)
                 });
             }
             const state = this.states.get(nodeId)!;
 
             if (state.cachedTaps !== numTaps) {
-                const P = new Float32Array(numTaps * numTaps);
-                for (let i = 0; i < numTaps; i++) P[i * numTaps + i] = 100;
+                const newP = new Float32Array(numTaps * numTaps);
+                for (let i = 0; i < numTaps; i++) newP[i * numTaps + i] = 100;
                 state.weights = new Float32Array(numTaps);
-                state.P = P;
+                state.P = newP;
                 state.buffer = new Float32Array(numTaps);
                 state.bufferIdx = 0;
                 state.cachedTaps = numTaps;
+                state.x = new Float32Array(numTaps);
+                state.Px = new Float32Array(numTaps);
+                state.k = new Float32Array(numTaps);
             }
 
             const w = state.weights;
@@ -98,10 +109,9 @@ const RLSFilterPlugin = {
             const N = numTaps;
             const invLambda = 1 / lambda;
 
-            // Temporary arrays
-            const x = new Float32Array(N);
-            const Px = new Float32Array(N);
-            const k = new Float32Array(N);
+            const x = state.x;
+            const Px = state.Px;
+            const k = state.k;
 
             for (let i = 0; i < chunkSize; i++) {
                 buf[state.bufferIdx] = signal[i];

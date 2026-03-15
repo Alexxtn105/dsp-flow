@@ -42,8 +42,8 @@ describe('QAM Modulator', () => {
             totalPower += out[i * 2] ** 2 + out[i * 2 + 1] ** 2;
         }
         const avgPower = totalPower / chunkSize;
-        expect(avgPower).toBeGreaterThan(0.5);
-        expect(avgPower).toBeLessThan(2.0);
+        expect(avgPower).toBeGreaterThan(0.8);
+        expect(avgPower).toBeLessThan(1.2);
     });
 
     it('supports 64QAM and 256QAM orders', () => {
