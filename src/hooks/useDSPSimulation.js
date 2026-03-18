@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraphCompiler, DSPProcessor, WavFileService } from '../engine';
+import { GraphCompiler, DSPProcessor, WavFileService, PluginRegistry } from '../engine';
 
 /**
  * Управление жизненным циклом DSP-симуляции:
@@ -44,7 +44,7 @@ export function useDSPSimulation({ reactFlowInstance, sampleRate, setSampleRate,
         const inputNode = currentNodes.find(n => n.data.blockType === 'audio-file');
 
         const hasGenerators = currentNodes.some(n =>
-            ['sine-generator', 'cosine-generator', 'ref-sine-generator', 'ref-cosine-generator', 'constant', 'noise-generator', 'amfmpm-modulator', 'psk-modulator', 'audio-file'].includes(n.data.blockType)
+            PluginRegistry.isGenerator(n.data.blockType)
         );
 
         if (!hasGenerators) {
