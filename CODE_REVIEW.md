@@ -1,15 +1,18 @@
 # Code Review: DSP Flow Editor
 
-**Дата:** 2026-03-08 (ревизия 3)
+**Дата:** 2026-03-08 (ревизия 3), обновлено 2026-03-18
 **Ветка:** `main`
-**Тесты:** 177/177 passed | **Линтер:** 0 ошибок
+**Тесты:** 389/389 passed | **Линтер:** 0 ошибок
 **Версия:** 1.0.0
+**Плагины:** 107 | **Язык кода:** JavaScript + TypeScript (миграция в процессе)
+
+[English version](CODE_REVIEW.en.md)
 
 ---
 
 ## Общая оценка
 
-Проект **хорошо структурирован** — 36 плагинов, чистая архитектура (PluginRegistry → GraphCompiler → DSPProcessor), 177 тестов, грамотная React-обвязка. Ниже — найденные проблемы по приоритету.
+Проект **хорошо структурирован** — 107 плагинов (17 генераторов, 3 канала, 22 фильтра, 16 детекторов, 28 math, 2 analysis, 3 audio, 15 visualization, 1 output), чистая архитектура (PluginRegistry → GraphCompiler → DSPProcessor), 389 тестов в 28 файлах, i18n на двух языках, грамотная React-обвязка. Ниже — найденные проблемы по приоритету.
 
 ---
 
@@ -21,7 +24,7 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 
 ### 2. FIR Filter — buffer overflow при смене порядка фильтра
 
-`FIRFilterPlugin.js:77-80` — при изменении order, `oldPointer` от старого буфера применяется к новому без проверки границ. Может вызвать index out of bounds.
+`FIRFilterPlugin.ts:77-80` — при изменении order, `oldPointer` от старого буфера применяется к новому без проверки границ. Может вызвать index out of bounds.
 
 ### 3. Integrator — defaultParams не совпадают с кодом
 
@@ -33,7 +36,7 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 
 ### 4. Remez алгоритм — деление без проверки нуля
 
-`FilterDesign.js:178` — `const delta = num / den` без epsilon guard. Может дать NaN при вырожденных входах.
+`FilterDesign.ts:178` — `const delta = num / den` без epsilon guard. Может дать NaN при вырожденных входах.
 
 ### 5. Состояние плагинов не очищается при rewind
 
@@ -49,7 +52,7 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 
 ### 8. NotchFIR — потеря состояния circular buffer при resize
 
-`NotchFIRPlugin.js:40` — при изменении размера буфера `pos` сбрасывается в 0, что вызывает щелчки/артефакты.
+`NotchFIRPlugin.ts:40` — при изменении размера буфера `pos` сбрасывается в 0, что вызывает щелчки/артефакты.
 
 ---
 
@@ -73,7 +76,7 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 
 ### 13. Multiplier — молчаливый ноль при делении на ноль
 
-`MultiplierPlugin.js:36` — возвращает 0 при делении на ноль, скрывая ошибки в сигнале.
+`MultiplierPlugin.ts:36` — возвращает 0 при делении на ноль, скрывая ошибки в сигнале.
 
 ### 14. DSPProcessor — неоднозначный приоритет режимов
 
@@ -97,7 +100,7 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 
 ### 18. Goertzel — Math.round вместо floor для bin
 
-`GoertzelFilterPlugin.js` — `Math.round` может привести к bin за пределами спектра.
+`GoertzelFilterPlugin.ts` — `Math.round` может привести к bin за пределами спектра.
 
 ### 19. FFTUtils — нет защиты от underflow в dB
 
@@ -114,11 +117,15 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 - **Паттерн stableCallbacks** в DSPEditor предотвращает лишние ре-рендеры BlockNode
 - **PluginRegistry.freeze()** — защита от мутации после инициализации
 - **Топологическая сортировка** (Кан) и детекция циклов в GraphCompiler
-- **177 тестов** покрывают engine, плагины и интеграцию
+- **389 тестов** покрывают engine, плагины и интеграцию
 - **ProcessorState enum** вместо boolean-флагов
 - **Рефакторенный App.jsx** — бизнес-логика в кастомных хуках (useDialogManager, useDSPSimulation)
 - **FFT (Cooley-Tukey)**, фильтры (windowed sinc + Remez), оконные функции — математически корректны
 - **IndexedDB** для персистентности аудиофайлов между сессиями
+- **107 плагинов** по 10 категориям — полноценный DSP-тулкит
+- **i18n** — полная локализация на English и Русский через i18next
+- **TypeScript-миграция** ядра и плагинов в процессе
+- **Интерактивная справка** для всех 46+ плагинов
 
 ---
 
@@ -144,7 +151,7 @@ FFTPlugin, SlidingFFTPlugin, SpectrumAnalyzerPlugin декларируют `outp
 
 ### Долгосрочные
 
-13. TypeScript миграция
+13. Завершить TypeScript-миграцию
 14. AudioWorklet / Web Worker для разгрузки main thread
 15. E2E-тесты (Playwright)
 16. Pre-commit hooks (husky + lint-staged)
