@@ -146,7 +146,7 @@
     "microphone-input": {
         "title": "Microphone Input",
         "purpose": "Captures live audio from a microphone or line-in input via the Web Audio API (getUserMedia). Enables real-time signal processing: voice spectrum analysis, live filtering, pitch detection, and other DSP tasks on a live audio stream.",
-        "algorithm": "This plugin is a placeholder. The actual audio capture is performed by MicrophoneService, which requests microphone access via navigator.mediaDevices.getUserMedia() with echo cancellation, noise suppression, and auto gain control disabled (to preserve the raw signal). Audio samples are written into a ring buffer via ScriptProcessorNode. DSPProcessor intercepts this block's processing and reads chunks from the ring buffer. If the microphone is not active, silence is returned.",
+        "algorithm": "This plugin is a placeholder. The actual audio capture is performed by MicrophoneService, which requests microphone access via navigator.mediaDevices.getUserMedia() with echo cancellation, noise suppression, and auto gain control disabled (to preserve the raw signal). Audio samples are written into a ring buffer via ScriptProcessorNode. DSPProcessor intercepts this block's processing and reads chunks from the ring buffer. If the microphone is not active, silence is returned. Note: use only one Microphone Input block per graph — multiple blocks share the same audio buffer. Warning: connecting MicrophoneInput → Speaker without headphones may cause acoustic feedback (echo loop).",
         "inputDescription": "none (standalone source)",
         "outputDescription": "real (Float32Array of length chunkSize, live audio data or silence)",
         "params": {

@@ -8,6 +8,11 @@
  * Примечание: ScriptProcessorNode deprecated, но AudioWorkletNode требует
  * отдельного файла-воркера и SharedArrayBuffer. При миграции на AudioWorklet
  * потребуется SharedArrayBuffer + Atomics для потокобезопасного кольцевого буфера.
+ *
+ * Ограничения:
+ * - Синглтон с одним кольцевым буфером. Несколько блоков microphone-input
+ *   в одном графе будут делить данные (первый читает, второй получит остаток).
+ *   Рекомендуется использовать один блок microphone-input на граф.
  */
 
 class MicrophoneServiceSingleton {
@@ -19,7 +24,8 @@ class MicrophoneServiceSingleton {
     private writePos = 0;
     private readPos = 0;
     private _isActive = false;
-    private readonly bufferSize = 65536; // кольцевой буфер ~1.4 сек при 48 кГц
+    // Кольцевой буфер хранит до bufferSize-1 отсчётов (~1.36 сек при 48 кГц)
+    private readonly bufferSize = 65536;
 
     get isActive(): boolean {
         return this._isActive;
@@ -28,9 +34,14 @@ class MicrophoneServiceSingleton {
     /**
      * Запускает захват аудио с микрофона.
      * Требует активный (не закрытый) AudioContext.
+     * При ошибке все частично выделенные ресурсы освобождаются.
      */
     async start(audioContext: AudioContext): Promise<void> {
         if (this._isActive) return;
+
+        if (audioContext.state === 'closed') {
+            throw new Error('Cannot start microphone: AudioContext is closed');
+        }
 
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({
@@ -46,39 +57,44 @@ class MicrophoneServiceSingleton {
             );
         }
 
-        this.ringBuffer = new Float32Array(this.bufferSize);
-        this.writePos = 0;
-        this.readPos = 0;
+        try {
+            this.ringBuffer = new Float32Array(this.bufferSize);
+            this.writePos = 0;
+            this.readPos = 0;
 
-        this.sourceNode = audioContext.createMediaStreamAudioSource(this.stream);
+            this.sourceNode = audioContext.createMediaStreamAudioSource(this.stream);
 
-        // ScriptProcessorNode для захвата PCM-данных в кольцевой буфер
-        this.processorNode = audioContext.createScriptProcessor(4096, 1, 1);
-        this.processorNode.onaudioprocess = (event: AudioProcessingEvent) => {
-            const input = event.inputBuffer.getChannelData(0);
-            for (let i = 0; i < input.length; i++) {
-                // Проверяем, не догнал ли writePos readPos (переполнение буфера).
-                // При переполнении отбрасываем старейший отсчёт, сдвигая readPos.
-                const nextWrite = (this.writePos + 1) % this.bufferSize;
-                if (nextWrite === this.readPos) {
-                    this.readPos = (this.readPos + 1) % this.bufferSize;
+            // ScriptProcessorNode для захвата PCM-данных в кольцевой буфер
+            this.processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+            this.processorNode.onaudioprocess = (event: AudioProcessingEvent) => {
+                const input = event.inputBuffer.getChannelData(0);
+                for (let i = 0; i < input.length; i++) {
+                    // При переполнении отбрасываем старейший отсчёт, сдвигая readPos
+                    const nextWrite = (this.writePos + 1) % this.bufferSize;
+                    if (nextWrite === this.readPos) {
+                        this.readPos = (this.readPos + 1) % this.bufferSize;
+                    }
+                    this.ringBuffer[this.writePos] = input[i];
+                    this.writePos = nextWrite;
                 }
-                this.ringBuffer[this.writePos] = input[i];
-                this.writePos = nextWrite;
-            }
-        };
+            };
 
-        this.sourceNode.connect(this.processorNode);
+            this.sourceNode.connect(this.processorNode);
 
-        // ScriptProcessorNode требует подключения к destination для работы.
-        // Используем GainNode с gain=0, чтобы микрофон НЕ воспроизводился
-        // в колонках (предотвращаем аудио-фидбек).
-        this.silentGain = audioContext.createGain();
-        this.silentGain.gain.value = 0;
-        this.processorNode.connect(this.silentGain);
-        this.silentGain.connect(audioContext.destination);
+            // ScriptProcessorNode требует подключения к destination для работы.
+            // Используем GainNode с gain=0, чтобы микрофон НЕ воспроизводился
+            // в колонках (предотвращаем аудио-фидбек).
+            this.silentGain = audioContext.createGain();
+            this.silentGain.gain.value = 0;
+            this.processorNode.connect(this.silentGain);
+            this.silentGain.connect(audioContext.destination);
 
-        this._isActive = true;
+            this._isActive = true;
+        } catch (err) {
+            // Если создание audio-нод провалилось, освобождаем уже полученный поток
+            this.stop();
+            throw err;
+        }
     }
 
     /**

@@ -222,7 +222,16 @@ class DSPProcessor {
         if (!this._fileMode) {
             const hasMicrophone = this.compiledGraph!.some(b => b.blockType === 'microphone-input');
             if (hasMicrophone) {
-                await MicrophoneService.start(this.audioContext);
+                try {
+                    await MicrophoneService.start(this.audioContext);
+                } catch (err) {
+                    this.stop();
+                    const error = err instanceof Error ? err : new Error(String(err));
+                    if (this.onError) {
+                        this.onError(error);
+                    }
+                    return;
+                }
             }
         }
 
