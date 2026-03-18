@@ -143,6 +143,32 @@
             }
         ]
     },
+    "microphone-input": {
+        "title": "Microphone Input",
+        "purpose": "Captures live audio from a microphone or line-in input via the Web Audio API (getUserMedia). Enables real-time signal processing: voice spectrum analysis, live filtering, pitch detection, and other DSP tasks on a live audio stream.",
+        "algorithm": "This plugin is a placeholder. The actual audio capture is performed by MicrophoneService, which requests microphone access via navigator.mediaDevices.getUserMedia() with echo cancellation, noise suppression, and auto gain control disabled (to preserve the raw signal). Audio samples are written into a ring buffer via ScriptProcessorNode. DSPProcessor intercepts this block's processing and reads chunks from the ring buffer. If the microphone is not active, silence is returned.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize, live audio data or silence)",
+        "params": {
+            "gain": {
+                "description": "input signal gain. Range: 0.0–10.0. A value of 1.0 means no amplification. Values > 1.0 amplify the signal, < 1.0 attenuate it. Default: 1.0."
+            }
+        },
+        "examples": [
+            {
+                "title": "Real-time spectrum analysis",
+                "description": "MicrophoneInput → SpectrumAnalyzer Displays the frequency spectrum of the live microphone signal."
+            },
+            {
+                "title": "Voice filtering and playback",
+                "description": "MicrophoneInput → LowpassFIR(3000 Hz) → Speaker The microphone signal is filtered by a lowpass filter and played back through speakers."
+            },
+            {
+                "title": "Pitch detection",
+                "description": "MicrophoneInput → PitchDetector → NumericIndicator Detects and displays the fundamental frequency of the voice signal in real time."
+            }
+        ]
+    },
     "constant": {
         "title": "Constant",
         "purpose": "Generates a signal with a constant value at every sample. Used as: - DC offset (bias) — adding a DC component to a signal via Summer; - control signal — a fixed frequency value for NCO (RefSine/RefCosine); - scaling coefficient — multiplying a signal by a constant via Multiplier; - threshold level — setting a level for the Threshold block; - test signal — checking linearity and offset in a processing chain.",

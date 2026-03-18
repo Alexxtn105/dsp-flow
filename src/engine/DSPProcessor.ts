@@ -7,6 +7,7 @@
 
 import GraphCompiler from './GraphCompiler';
 import WavFileService from './WavFileService';
+import MicrophoneService from './MicrophoneService';
 import registry from './PluginRegistry';
 import i18n from '../locales/i18n';
 import {
@@ -217,6 +218,12 @@ class DSPProcessor {
         WavFileService.init(this.audioContext);
         this.nextAudioStartTime = this.audioContext.currentTime;
 
+        // Запускаем MicrophoneService, если в графе есть microphone-input
+        const hasMicrophone = this.compiledGraph!.some(b => b.blockType === 'microphone-input');
+        if (hasMicrophone) {
+            await MicrophoneService.start(this.audioContext);
+        }
+
         if (this.state !== ProcessorState.RUNNING_MANUAL) {
             this.processingInterval = setInterval(() => {
                 this.processNextChunk();
@@ -286,6 +293,9 @@ class DSPProcessor {
         // Сбрасываем WavFileService ДО закрытия AudioContext,
         // чтобы он не хранил ссылку на закрытый контекст (N2)
         WavFileService.reset();
+
+        // Останавливаем захват микрофона
+        MicrophoneService.stop();
 
         // Закрываем AudioContext, чтобы не копить ресурсы
         if (this.audioContext) {
@@ -407,6 +417,12 @@ class DSPProcessor {
         // Для генераторов (Входной сигнал) - читаем из WAV
         if (block.blockType === 'audio-file' && this._fileMode) {
             return WavFileService.readChunk(this.currentSample, this.chunkSize);
+        }
+
+        // Микрофонный вход — читаем из кольцевого буфера MicrophoneService
+        if (block.blockType === 'microphone-input' && MicrophoneService.isActive) {
+            const gain = (block.params?.gain as number) ?? 1.0;
+            return MicrophoneService.readChunk(this.chunkSize, gain);
         }
 
         // Используем кешированные params (с sampleRate)

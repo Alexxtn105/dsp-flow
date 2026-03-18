@@ -17,6 +17,7 @@
   "ofdm-modulator": "OFDM Modulator",
   "fsk-modulator": "FSK Modulator",
   "sawtooth-wave": "Sawtooth Wave",
+  "microphone-input": "Microphone Input",
 
   "awgn-channel": "AWGN Channel",
   "fading-channel": "Fading Channel",
@@ -134,6 +135,7 @@
     "step": "Unit step function (Heaviside)",
     "ofdm-modulator": "OFDM modulator (QAM → IFFT → cyclic prefix)",
     "fsk-modulator": "BFSK/4FSK modulator with continuous phase",
+    "microphone-input": "Live audio input from microphone or line-in",
 
     "awgn-channel": "Additive white Gaussian noise channel (SNR in dB)",
     "fading-channel": "Rayleigh/Rician fading channel with Doppler spread",

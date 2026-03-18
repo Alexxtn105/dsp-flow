@@ -17,6 +17,7 @@ import StepPlugin from './generators/StepPlugin';
 import OFDMModulatorPlugin from './generators/OFDMModulatorPlugin';
 import FSKModulatorPlugin from './generators/FSKModulatorPlugin';
 import SawtoothWavePlugin from './generators/SawtoothWavePlugin';
+import MicrophoneInputPlugin from './generators/MicrophoneInputPlugin';
 
 // Каналы
 import AWGNChannelPlugin from './channels/AWGNChannelPlugin';
@@ -168,6 +169,7 @@ const allPlugins: PluginDefinition[] = [
     OFDMModulatorPlugin,
     FSKModulatorPlugin,
     SawtoothWavePlugin,
+    MicrophoneInputPlugin,
 
     // Каналы
     AWGNChannelPlugin,

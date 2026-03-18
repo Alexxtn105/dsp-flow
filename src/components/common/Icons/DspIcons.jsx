@@ -58,6 +58,17 @@ const DSP_ICONS = {
         </>
     ),
 
+    // Микрофон — капсюль с основанием
+    'dsp-microphone': (
+        <>
+            <rect x="9" y="2" width="6" height="11" rx="3" strokeWidth="1.8" />
+            <path d="M6 11 C6 15.4 8.7 18 12 18 C15.3 18 18 15.4 18 11"
+                  strokeWidth="1.8" fill="none" strokeLinecap="round" />
+            <line x1="12" y1="18" x2="12" y2="22" strokeWidth="1.8" strokeLinecap="round" />
+            <line x1="8" y1="22" x2="16" y2="22" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+    ),
+
     // Генератор шума — случайный сигнал (зигзаг)
     'dsp-noise': (
         <path d="M2 12 L4 6 L6 17 L8 8 L10 16 L12 5 L14 19 L16 9 L18 15 L20 7 L22 12"

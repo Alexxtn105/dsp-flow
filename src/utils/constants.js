@@ -53,6 +53,7 @@ export const DSP_BLOCK_TYPES = {
     OFDM_MODULATOR: 'ofdm-modulator',
     FSK_MODULATOR: 'fsk-modulator',
     SAWTOOTH_WAVE: 'sawtooth-wave',
+    MICROPHONE_INPUT: 'microphone-input',
 
     // Каналы
     AWGN_CHANNEL: 'awgn-channel',
