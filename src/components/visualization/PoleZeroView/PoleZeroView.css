@@ -1,0 +1,9 @@
+.pole-zero-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pole-zero-view canvas {
+    border-radius: 4px;
+}

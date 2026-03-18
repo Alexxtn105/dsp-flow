@@ -1,0 +1,9 @@
+.group-delay-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.group-delay-view canvas {
+    border-radius: 4px;
+}

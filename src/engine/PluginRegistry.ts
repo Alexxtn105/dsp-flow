@@ -114,12 +114,17 @@ class PluginRegistry {
 
     isGenerator(type: string): boolean {
         const plugin = this.#plugins.get(type);
-        return plugin ? plugin.signals.input === null : false;
+        return plugin ? plugin.signals.input === null && plugin.signals.output !== null : false;
     }
 
     isVisualization(type: string): boolean {
         const plugin = this.#plugins.get(type);
-        return plugin ? plugin.signals.output === null : false;
+        return plugin ? plugin.signals.output === null && plugin.signals.input !== null : false;
+    }
+
+    isParametric(type: string): boolean {
+        const plugin = this.#plugins.get(type);
+        return plugin ? plugin.signals.input === null && plugin.signals.output === null : false;
     }
 
     getGroups(): PluginGroupWithBlocks[] {

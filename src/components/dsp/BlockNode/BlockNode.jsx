@@ -15,7 +15,6 @@ import {
     getBlockSignalConfig,
     getSignalTypeClass,
     getSignalTypeDescription,
-    isGeneratorBlock,
     isVisualizationBlock,
 } from '../../../utils/helpers';
 import './BlockNode.css';
@@ -37,12 +36,12 @@ function BlockNode({ data, selected }) {
     const { t } = useTranslation(['params', 'blocks']);
     const isTouch = useTouchContext();
     const signalConfig = getBlockSignalConfig(data.blockType);
-    const hasInput = !isGeneratorBlock(data.blockType);
-    const hasOutput = !isVisualizationBlock(data.blockType);
+    const hasInput = signalConfig.input !== null;
+    const hasOutput = signalConfig.output !== null;
     const inputsCount = data.params?.numInputs || signalConfig.inputsCount || 1;
     const iconName = getBlockIcon(data.blockType);
     const description = getBlockDescription(data.blockType);
-    const canVisualize = isVisualizationBlock(data.blockType);
+    const canVisualize = isVisualizationBlock(data.blockType) || registry.isParametric(data.blockType);
     const isAudioFile = data.blockType === 'audio-file';
     const displayName = t(data.blockType, { ns: 'blocks' });
     const tp = (key, opts) => t(key, { ns: 'params', ...opts });

@@ -1,0 +1,9 @@
+.phase-portrait-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.phase-portrait-view canvas {
+    border-radius: 4px;
+}

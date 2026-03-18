@@ -11,6 +11,10 @@ import MultiChannelSpectrumView from '../MultiChannelSpectrumView';
 import MeasurementView from '../MeasurementView';
 import HistogramView from '../HistogramView';
 import EyeDiagramView from '../EyeDiagramView';
+import PoleZeroView from '../PoleZeroView';
+import THDMeterView from '../THDMeterView';
+import PhasePortraitView from '../PhasePortraitView';
+import GroupDelayView from '../GroupDelayView';
 import { ErrorBoundary } from '../../common';
 
 /**
@@ -46,7 +50,11 @@ const VisualizationManager = forwardRef(function VisualizationManager({
             'snr-meter': 'snr-meter',
             'ber-counter': 'ber-counter',
             'histogram': 'histogram',
-            'eye-diagram': 'eye-diagram'
+            'eye-diagram': 'eye-diagram',
+            'thd-meter': 'thd-meter',
+            'pole-zero-diagram': 'pole-zero-diagram',
+            'phase-portrait': 'phase-portrait',
+            'group-delay-plot': 'group-delay-plot'
         };
         const vizType = vizTypeMap[blockType] || 'oscilloscope';
 
@@ -271,6 +279,30 @@ const VisualizationManager = forwardRef(function VisualizationManager({
                             />
                         ) : config.vizType === 'eye-diagram' ? (
                             <EyeDiagramView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'thd-meter' ? (
+                            <THDMeterView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'pole-zero-diagram' ? (
+                            <PoleZeroView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'phase-portrait' ? (
+                            <PhasePortraitView
+                                data={data}
+                                width={config.width}
+                                height={config.height - 70}
+                            />
+                        ) : config.vizType === 'group-delay-plot' ? (
+                            <GroupDelayView
                                 data={data}
                                 width={config.width}
                                 height={config.height - 70}
