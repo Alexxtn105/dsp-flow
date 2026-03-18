@@ -21,8 +21,8 @@ npx vitest run tests/plugins/generators.test.js  # Запуск одного т�
 
 Центральный паттерн — `PluginRegistry` (синглтон в `src/engine/PluginRegistry.js`). Каждый DSP-блок — плагин с метаданными и процессором. Реестр «замораживается» после инициализации (`initPlugins.js`), новые плагины в рантайме не добавляются.
 
-**106 плагинов** в `src/engine/plugins/` по категориям:
-- **generators/** (17) — Sine, Cosine, RefSine, RefCosine, AudioFile, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator, QAMModulator, SquareWave, TriangleWave, Impulse, Chirp, Step, OFDMModulator, FSKModulator
+**109 плагинов** в `src/engine/plugins/` по категориям:
+- **generators/** (19) — Sine, Cosine, RefSine, RefCosine, AudioFile, MicrophoneInput, Constant, NoiseGenerator, AMFMPMModulator, PSKModulator, QAMModulator, SquareWave, TriangleWave, SawtoothWave, Impulse, Chirp, Step, OFDMModulator, FSKModulator
 - **channels/** (3) — AWGNChannel, FadingChannel, MultipathChannel
 - **filters/** (22) — NotchFIR, BandpassFIR, HighpassFIR, LowpassFIR, HilbertTransformer, Goertzel, Remez, DelayLine, ComplexDelayLine, DecimatorInterpolator, CICFilter, FIRFilter, IIRFilter, PulseShaper, LMSFilter, RLSFilter, MatchedFilter, ZFEqualizer, PIDController, PolyphaseFilter, FractionalDelay, AllpassFilter
 - **analysis/** (2 файла, входят в другие группы) — SpectrumAnalyzer (группа visualization), Correlator (группа real-math)

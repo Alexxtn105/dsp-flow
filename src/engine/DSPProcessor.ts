@@ -218,10 +218,12 @@ class DSPProcessor {
         WavFileService.init(this.audioContext);
         this.nextAudioStartTime = this.audioContext.currentTime;
 
-        // Запускаем MicrophoneService, если в графе есть microphone-input
-        const hasMicrophone = this.compiledGraph!.some(b => b.blockType === 'microphone-input');
-        if (hasMicrophone) {
-            await MicrophoneService.start(this.audioContext);
+        // Запускаем MicrophoneService, если в графе есть microphone-input (только в real-time режиме)
+        if (!this._fileMode) {
+            const hasMicrophone = this.compiledGraph!.some(b => b.blockType === 'microphone-input');
+            if (hasMicrophone) {
+                await MicrophoneService.start(this.audioContext);
+            }
         }
 
         if (this.state !== ProcessorState.RUNNING_MANUAL) {
@@ -257,6 +259,9 @@ class DSPProcessor {
             clearInterval(this.processingInterval);
             this.processingInterval = null;
         }
+
+        // Останавливаем микрофон при остановке симуляции (приватность)
+        MicrophoneService.stop();
 
         if (this.audioContext) {
             this.audioContext.suspend();

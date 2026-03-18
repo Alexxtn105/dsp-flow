@@ -211,6 +211,7 @@ export const LEGACY_TYPE_TO_ID = {
     'Генератор меандра': 'square-wave',
     'Генератор треугольного сигнала': 'triangle-wave',
     'Генератор пилообразных колебаний': 'sawtooth-wave',
+    'Микрофонный вход': 'microphone-input',
     'Импульс': 'impulse',
     'ЛЧМ-сигнал': 'chirp',
     'Ступенчатая функция': 'step',

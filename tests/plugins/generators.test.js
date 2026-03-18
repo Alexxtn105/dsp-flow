@@ -4,6 +4,8 @@ import CosineGeneratorPlugin from '../../src/engine/plugins/generators/CosineGen
 import RefSineGeneratorPlugin from '../../src/engine/plugins/generators/RefSineGeneratorPlugin.js';
 import RefCosineGeneratorPlugin from '../../src/engine/plugins/generators/RefCosineGeneratorPlugin.js';
 import ConstantPlugin from '../../src/engine/plugins/generators/ConstantPlugin.js';
+import MicrophoneInputPlugin from '../../src/engine/plugins/generators/MicrophoneInputPlugin.js';
+import MicrophoneService from '../../src/engine/MicrophoneService.js';
 
 /**
  * Вспомогательная функция: находит частоту пика в спектре действительного сигнала
@@ -349,5 +351,46 @@ describe('ConstantPlugin', () => {
         const { peakFreq, peakMag } = findPeakFrequency(iSignal, sampleRate);
         expect(peakFreq).toBeCloseTo(1500, -1);
         expect(peakMag).toBeGreaterThan(0.3);
+    });
+});
+
+describe('MicrophoneInputPlugin', () => {
+    it('process() возвращает тишину (placeholder)', () => {
+        const output = MicrophoneInputPlugin.processor.process([], { gain: 1.0, sampleRate: 48000 }, 1024);
+        expect(output).toBeInstanceOf(Float32Array);
+        expect(output.length).toBe(1024);
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('имеет корректные метаданные', () => {
+        expect(MicrophoneInputPlugin.id).toBe('microphone-input');
+        expect(MicrophoneInputPlugin.group).toBe('generators');
+        expect(MicrophoneInputPlugin.signals.input).toBeNull();
+        expect(MicrophoneInputPlugin.signals.output).toBe('real');
+        expect(MicrophoneInputPlugin.icon).toBe('dsp-microphone');
+    });
+});
+
+describe('MicrophoneService', () => {
+    it('readChunk() возвращает тишину когда не активен', () => {
+        const output = MicrophoneService.readChunk(1024);
+        expect(output).toBeInstanceOf(Float32Array);
+        expect(output.length).toBe(1024);
+        for (let i = 0; i < output.length; i++) {
+            expect(output[i]).toBe(0);
+        }
+    });
+
+    it('isActive = false по умолчанию', () => {
+        expect(MicrophoneService.isActive).toBe(false);
+    });
+
+    it('stop() безопасен при повторном вызове', () => {
+        expect(() => {
+            MicrophoneService.stop();
+            MicrophoneService.stop();
+        }).not.toThrow();
     });
 });
