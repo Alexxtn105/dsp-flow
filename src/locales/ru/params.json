@@ -78,6 +78,7 @@
     "channels": "Каналы",
     "dutyCycle": "Скважность",
     "symmetry": "Симметрия",
+    "direction": "Направление",
     "period": "Период",
     "startFrequency": "Начальная частота",
     "endFrequency": "Конечная частота",
@@ -272,5 +273,9 @@
     "dB": "дБ (20·log₁₀|x|)",
     "exp": "exp (eˣ)",
     "pow10": "10ˣ"
+  },
+  "direction": {
+    "rising": "Нарастающая",
+    "falling": "Спадающая"
   }
 }

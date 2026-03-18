@@ -16,6 +16,7 @@ import ChirpPlugin from './generators/ChirpPlugin';
 import StepPlugin from './generators/StepPlugin';
 import OFDMModulatorPlugin from './generators/OFDMModulatorPlugin';
 import FSKModulatorPlugin from './generators/FSKModulatorPlugin';
+import SawtoothWavePlugin from './generators/SawtoothWavePlugin';
 
 // Каналы
 import AWGNChannelPlugin from './channels/AWGNChannelPlugin';
@@ -166,6 +167,7 @@ const allPlugins: PluginDefinition[] = [
     StepPlugin,
     OFDMModulatorPlugin,
     FSKModulatorPlugin,
+    SawtoothWavePlugin,
 
     // Каналы
     AWGNChannelPlugin,

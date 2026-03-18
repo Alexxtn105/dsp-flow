@@ -16,6 +16,7 @@
   "step": "Step",
   "ofdm-modulator": "OFDM Modulator",
   "fsk-modulator": "FSK Modulator",
+  "sawtooth-wave": "Sawtooth Wave",
 
   "awgn-channel": "AWGN Channel",
   "fading-channel": "Fading Channel",
@@ -127,6 +128,7 @@
     "qam-modulator": "16/64/256-QAM modulator with Gray coding",
     "square-wave": "Square wave generator with adjustable duty cycle",
     "triangle-wave": "Triangle/sawtooth wave generator",
+    "sawtooth-wave": "Sawtooth wave generator (rising/falling)",
     "impulse": "Unit impulse or periodic impulse train",
     "chirp": "Linear/exponential frequency sweep (chirp signal)",
     "step": "Unit step function (Heaviside)",

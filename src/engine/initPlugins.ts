@@ -210,6 +210,11 @@ export default function initPlugins(): void {
         { value: 'haar', label: 'Haar' }
     ]);
 
+    registry.registerParamOptions('direction', [
+        { value: 'rising', labelKey: 'direction.rising' },
+        { value: 'falling', labelKey: 'direction.falling' }
+    ]);
+
     // Регистрация всех плагинов
     registry.registerAll(allPlugins);
 

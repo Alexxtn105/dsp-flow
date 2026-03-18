@@ -78,6 +78,7 @@
     "channels": "Channels",
     "dutyCycle": "Duty cycle",
     "symmetry": "Symmetry",
+    "direction": "Direction",
     "period": "Period",
     "startFrequency": "Start frequency",
     "endFrequency": "End frequency",
@@ -272,5 +273,9 @@
     "dB": "dB (20·log₁₀|x|)",
     "exp": "exp (eˣ)",
     "pow10": "10ˣ"
+  },
+  "direction": {
+    "rising": "Rising",
+    "falling": "Falling"
   }
 }

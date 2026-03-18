@@ -1560,6 +1560,34 @@
             }
         ]
     },
+    "sawtooth-wave": {
+        "title": "Sawtooth Wave Generator",
+        "purpose": "Generates a sawtooth wave — a signal that rises (or falls) linearly over one period and then resets instantly. Unlike the triangle wave, the sawtooth contains all harmonics (both odd and even) with amplitudes decreasing as 1/n, making it especially useful for subtractive synthesis and filter testing.",
+        "algorithm": "A normalised phase accumulator increments by frequency / sampleRate each sample. For a rising sawtooth the output is 2·phase − 1 (linearly from −amplitude to +amplitude). For a falling sawtooth the sign is inverted.",
+        "inputDescription": "none (standalone source)",
+        "outputDescription": "real (Float32Array of length chunkSize)",
+        "params": {
+            "frequency": {
+                "description": "Fundamental frequency in Hz. Range: 0 to sampleRate/2."
+            },
+            "amplitude": {
+                "description": "Peak amplitude of the wave. The signal ranges from −amplitude to +amplitude. Range: 0.0–1.0."
+            },
+            "direction": {
+                "description": "Sawtooth direction. 'rising' = slow rise, instant fall. 'falling' = instant rise, slow fall."
+            }
+        },
+        "examples": [
+            {
+                "title": "Rich harmonic content",
+                "description": "SawtoothWave(1000 Hz) → SpectrumAnalyzer Both odd and even harmonics visible with amplitudes falling as 1/n — compare with SquareWave (odd only, 1/n) and TriangleWave (odd only, 1/n²)."
+            },
+            {
+                "title": "Subtractive synthesis",
+                "description": "SawtoothWave(440 Hz) → LowpassFIR(cutoff=2000) → Oscilloscope A sawtooth filtered by a low-pass filter produces a warm, rounded tone typical of analog synthesizers."
+            }
+        ]
+    },
     "impulse": {
         "title": "Impulse Generator",
         "purpose": "Generates a unit impulse (Dirac delta approximation δ[n]) or a periodic impulse train. Applying an impulse to the input of any LTI filter yields the filter's impulse response h[n] at the output, making this block the standard tool for measuring filter characteristics.",

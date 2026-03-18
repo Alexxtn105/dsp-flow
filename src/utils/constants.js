@@ -52,6 +52,7 @@ export const DSP_BLOCK_TYPES = {
     STEP: 'step',
     OFDM_MODULATOR: 'ofdm-modulator',
     FSK_MODULATOR: 'fsk-modulator',
+    SAWTOOTH_WAVE: 'sawtooth-wave',
 
     // Каналы
     AWGN_CHANNEL: 'awgn-channel',
@@ -208,6 +209,7 @@ export const LEGACY_TYPE_TO_ID = {
     'Speaker': 'speaker',
     'Генератор меандра': 'square-wave',
     'Генератор треугольного сигнала': 'triangle-wave',
+    'Генератор пилообразных колебаний': 'sawtooth-wave',
     'Импульс': 'impulse',
     'ЛЧМ-сигнал': 'chirp',
     'Ступенчатая функция': 'step',

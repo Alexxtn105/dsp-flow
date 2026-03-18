@@ -76,6 +76,12 @@ const DSP_ICONS = {
               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     ),
 
+    // Пилообразный сигнал — наклонная линия + вертикальный спад
+    'dsp-sawtooth-wave': (
+        <path d="M2 18 L10 4 L10 18 L18 4 L18 18 L22 10"
+              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    ),
+
     // Импульс (дельта-функция) — вертикальная стрелка
     'dsp-impulse': (
         <>
